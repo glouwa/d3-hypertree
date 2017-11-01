@@ -1,0 +1,46 @@
+{
+  "name": "d3-hypertree",
+  "main": "dist/js/index.js",
+  "types": "dist/d/index.js.map",
+  "typescript": { "definition": "definitions/index" },
+
+  "version": "1.0.0",
+  "description": "Hyperbolictree",  
+  "author": "Michael Glatzhofer",
+  "license": "???",
+  "homepage": "https://github.com/glouwa/d3-hypertree#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/glouwa/d3-hypertree.git"
+  },
+  "keywords": [
+    "hyperbolic tree",
+    "hyper tree"
+  ],
+  "scripts": {
+    "run": "gulp watch",
+    "deplotytree": "cd res && gulp deploy && cd ..",
+    "trqnslate": "cd res && gulp translate --lang en && cd ..",
+    "globalinstall": "npm i -g gulp"
+
+  },
+  "dependencies": {
+  },
+  "devDependencies": {    
+    "@types/d3": "^4.10.0",    
+    "@types/node": "^7.0.27",
+    "browser-sync": "^2.18.13",
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.1",
+    "gulp-debug": "^3.1.0",    
+    "gulp-sass": "^3.1.0",
+    "gulp-typescript": "^3.2.1",
+    "gulp-util": "^3.0.8",    
+    "yargs": "^8.0.2",
+    "merge2": "^1.1.0",
+    "del": "^3.0.0",    
+    "webpack": "^3.7.1",
+    "webpack-stream": "^4.0.0"
+  }
+}
+
