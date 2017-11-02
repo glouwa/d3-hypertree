@@ -1,0 +1,244 @@
+.render-info {
+    position: absolute;
+    left:1.5em;
+    bottom:1.5em;
+    width:20em;
+    padding-left:.3em;
+    padding-bottom:.1em;
+    color:lightgray;
+
+    .bar {
+        height:.2em;
+        float:left;
+    }
+}
+
+.unitdisk-nav {
+    width: 100%;
+    height: 100%;
+    position: relative;
+
+    svg {
+        //filter:drop-shadow(0px 1px 1.5px rgba(0,0,0,0.22));
+
+        .cell {                        
+            pointer-events:none;
+            fill: transparent;
+            stroke-width: 0.001;
+            stroke:none;            
+        }
+        .arc {
+            stroke: #b77d68; //#8d6e63;
+            fill: none;
+            pointer-events: none;
+        }
+        .node {
+            fill: #a5d6a7;
+            stroke: #5eb561;
+            stroke-width: .002;
+            pointer-events:none;
+        }
+        .caption {
+            //text-transform: uppercase;
+            font-size: 0.025pt;
+            dominant-baseline: middle;
+            text-anchor: middle;
+            user-select: none;
+            cursor: default;
+            letter-spacing: 0.11em;
+            pointer-events: none;
+
+            text-rendering: optimizeSpeed;
+/*
+            paint-order:stroke;
+            stroke: #fff;
+            stroke-width: .3;
+            stroke-linecap: butt;
+            stroke-linejoin: miter;*/
+        }
+
+        .caption-background {
+            fill: #fff;
+            opacity: .8;
+            pointer-events: none;
+        }
+
+        /* dynamic */
+
+        $leafcolor: #a5d6a7; //"#e3f2fd" "#ffe082
+        $hovercolor: #42a5f5;
+        $selectedcolor: orange;
+        $rootcolor: #ffeb3b; //#e53935; //#e53935; //"#e3f2fd" "#ffe082
+        $exitcolor: #ce93d8; //"#e3f2fd" "#ffe082
+        $lazycolor: #e53935; //"#e3f2fd" "#ffe082
+
+        $w: #fff;
+        $nodeStroke: #90caf9;
+
+        .cell.leaf {
+            stroke: rgba(darken($leafcolor, 0%), .5);
+            fill: rgba(lighten($leafcolor, 0%), .09);
+
+        }
+
+        .hovered {
+            stroke:         $hovercolor;
+            fill:   lighten($hovercolor, 25%);
+        }
+        .hovered.cell {
+            stroke:      lighten($hovercolor, 27%);
+            fill:   rgba(lighten($hovercolor, 0%), .15);
+        }
+        .hovered.node {
+            stroke:      darken($hovercolor, 10%);
+        }
+
+
+        .selected{
+            stroke:       $selectedcolor;
+            fill: lighten($selectedcolor, 25%);
+        }
+        .selected.cell {
+            stroke:    lighten($selectedcolor, 30%);
+            fill: rgba(lighten($selectedcolor, 0%), .15);
+        }
+        .selected.node {
+            stroke:      darken($selectedcolor, 5%);
+        }
+
+        .root {
+            stroke: darken($rootcolor, 15%);
+            fill:  lighten($rootcolor, 5%);
+        }
+        .root.cell {
+            stroke: rgba(darken($rootcolor, 0%), .9);
+            fill:  rgba(lighten($rootcolor, 0%), .05);
+        }
+        .root.node {
+            stroke: orange; //rgba(darken($rootcolor, 20%), .5);
+        }        
+
+        .lazy {
+            stroke: darken($lazycolor, 15%);
+            fill:  lighten($lazycolor, 5%);
+        }
+        .lazy.cell {
+            stroke: rgba(darken($lazycolor, 95%), .9);
+            fill:  rgba(lighten($lazycolor, 0%), .05);
+        }
+        .lazy.node {
+            stroke: rgba(darken($lazycolor, 20%), .5);
+        }
+
+        .exit {
+            stroke: darken($exitcolor, 15%);
+            fill:  lighten($exitcolor, 5%);
+        }
+        .exit.cell {
+            stroke: rgba(darken($exitcolor, 95%), .9);
+            fill:  rgba(lighten($exitcolor, 0%), .05);
+        }
+        .exit.node {
+            stroke: rgba(darken($exitcolor, 50%), .5);
+        }
+/*
+        .exit.node {
+            stroke: darken($exitcolor, 45%);
+            fill:  lighten($exitcolor, 5%);
+            stroke-width: .001;
+        }
+*/
+        /* extra pfff */
+
+        .background-circle {        
+            fill-opacity: .5;
+            stroke: darken($nodeStroke, 4%); //#f8fcfe;
+            stroke-width: .0001;
+            pointer-events:visibleFill;
+        }
+        .mouse-circle {
+            fill: none;
+           // stroke: lighten($nodeStroke, 7%); //#f0f8fe;
+           // stroke-width: .0004;
+            pointer-events:visibleFill;
+            cursor: crosshair;
+        }
+        .focus-circle {
+            fill: none;
+            stroke: $nodeStroke; //#f8fcfe;
+            stroke-width: .0004;
+            pointer-events:none;
+        }
+
+        .nav-parameter-disc {
+
+            .node {
+                fill: rgba(255, 255, 255, 1); //fill: #BBDEFB;
+                stroke-width: .015;
+                stroke: darken($leafcolor, 5%);
+            }
+            .node:first-child {
+                fill:rgba(255, 255, 255, .55);
+                stroke: darken($nodeStroke, 25%);
+                stroke-width: .003;
+            }            
+            .cell {
+                stroke: black;
+                fill: none;
+            }
+
+            .caption {
+                fill: darken($leafcolor, 5%);
+                //stroke: opacify($w, .5);
+
+                text-transform: none;
+                text-anchor: middle;
+                font-size: .25pt;
+                //stroke-width: .4;
+                //stroke-opacity:.6;
+            }
+            .caption.P {
+                fill: darken($nodeStroke, 25%);;
+            }
+            .caption-background {
+                visibility: hidden;
+            }
+
+            .background-circle {
+                pointer-events:none;
+                fill: none;
+                stroke: none;
+            }
+            .mouse-circle {
+                fill: none;
+                stroke: none; //$nodeStroke;
+                stroke-width: .001;
+                pointer-events:visibleFill;
+                cursor: crosshair;
+            }
+        }
+
+        .nav-background-disc {
+            .background-circle {
+                pointer-events:none;
+                stroke: none;
+            }
+        }
+    }
+
+    > .preloader {
+        width: 100%;
+        height: 100%;
+        > .preloader-wrapper {
+            position: absolute;
+            left: calc(50% - 2.45em);
+            top: calc(50% - 2.1em);
+        }
+    }
+}
+
+#plexxDbg {
+    position: absolute;
+    bottom:0;
+    right: 0;
+}

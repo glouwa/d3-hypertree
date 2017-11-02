@@ -16,13 +16,12 @@ var paths = {
 
 gulp.task('clean', () =>
     del([
-        'dist/report.csv',
-        'dist/**/*',               // here we use a globbing pattern to match everything inside the `mobile` folder
-        '!dist/mobile/deploy.json' // we don't want to clean this file though so we negate the pattern
+        'dist/js/**/*',
+        'dist/d/**/*'
     ])
 )
 
-gulp.task('tsc', () => {
+gulp.task('tsc', ['clean'], () => {
     var tsResult = gulp.src(paths.src + '**/*.ts')
         .pipe(ts.createProject(require('./tsconfig').compilerOptions)())
 
