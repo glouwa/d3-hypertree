@@ -138,6 +138,9 @@ export class UnitDisk
                     endAnimation()
             }
 
+            this.args.ui.transformation.state.P.re = 0
+            this.args.ui.transformation.state.P.im = 0
+
             var step = 0, steps = 33
             this.animationTimer = d3.timer(()=> {
                 if (!this.animationTimer)
