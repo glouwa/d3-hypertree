@@ -1,5 +1,5 @@
-import * as d3                     from 'd3'
-import { HTML }                from 'duct'
+import * as d3  from 'd3'
+import { HTML } from 'duct'
 
 var htmlinfo = `<div class="render-info">
         <div class="bar"></div>
@@ -62,8 +62,8 @@ export function InfoArea(args)
         (<HTMLElement>ui.children[6]).style.width = (100 - ct) + '%';
         (<HTMLElement>ui.children[6]).style.backgroundColor = '#f8f8f8';
 
-        ui.msg(1, `Transforming: ${Δ.toPrecision(3)}ms, ${na} nodes | <sub>r<.995</sub>`)
-        ui.msg(5, `Drawing: ${n} circles, ${l} links, ${c} cells | <sub>w>${mw.toPrecision(2)}</sub>`)
+        ui.msg(1, `Transform: ${Δ.toPrecision(3)}ms, ${na} nodes | <sub>r<.995</sub>`)
+        ui.msg(5, `Draw: ${n} circles, ${l} links, ${c} cells | <sub>w>${mw.toPrecision(2)}</sub>`)
         ui.updateCacheBar(n, l, max)
     }
 

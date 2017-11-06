@@ -21,7 +21,7 @@ gulp.task('clean', () =>
     ])
 )
 
-gulp.task('tsc', ['clean'], () => {
+gulp.task('tsc', () => {
     var tsResult = gulp.src(paths.src + '**/*.ts')
         .pipe(ts.createProject(require('./tsconfig').compilerOptions)())
 
