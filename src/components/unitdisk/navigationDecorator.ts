@@ -72,6 +72,7 @@ export function DecoratorNav(args : InteractionArgs)
         navBackground.updatePositions()
         view.args.data = ui.args.data
         view.updatePositions()
+        navParameter.updatePositions()
     }
     ui.updatePositions = ()=> { view.updatePositions(); navParameter.updatePositions();  }
     ui.updateSelection = ()=> { view.updateSelection(); navBackground.updateSelection(); }
@@ -93,7 +94,7 @@ export function DecoratorNav(args : InteractionArgs)
 
         caption:            (n:N)=> undefined,
         captionOffset:      undefined,
-        nodeRadius:         .03,
+        nodeRadius:         .012,
         clipRadius:         1,
         mouseRadius:        0,
     })
@@ -124,6 +125,7 @@ export function DecoratorNav(args : InteractionArgs)
                                     n.distScale    = n.dampedDistScale = n.weightScale = 1
                                     n.scaleStrText = ` scale(1)`
                                 }
+                                try { cache.voronoiDiagram = this.voronoiLayout(cache.filteredNodes) } catch(e) {}
                             },
         transformation:     navTransformation,
         transform:          (n:N)=> CmulR(n,-1),

@@ -1,9 +1,8 @@
 //import { hierarchy, HierarchyNode } from 'd3-hierarchy'
 //import { timer }                    from 'd3-timer'
 //import { interpolateHcl, rgb }      from 'd3-color'
-import * as d3                     from 'd3'
 
-import { HTML }                from 'duct'
+import * as d3                     from 'd3'
 import { N }                   from '../../models/n'
 import { LoaderFunction }      from '../../models/n-loaders'
 import { LayoutFunction }      from '../../models/n-layouts'
@@ -15,6 +14,8 @@ import { Layer }               from '../layers'
 import { LayerArgs }           from '../layers'
 import { Interaction }         from './mouseAndCache'
 import { InteractionArgs }     from './mouseAndCache'
+
+import { InfoArea }            from '../perfinfo'
 
 var htmlpreloader = `
     <div class="preloader-wrapper big active">
@@ -118,6 +119,25 @@ export class UnitDisk
             this.ui.querySelector('.preloader').innerHTML = ''
             this.ui.args.data = this.data            
 
+            this.args.ui.transformation.state.P.re = 0
+            this.args.ui.transformation.state.P.im = 0
+/*
+            var π = Math.PI
+            for (var i = 0; i < 30; i++) {
+                var p = i/30
+                var λ = .01+p*.98
+
+                var animλ = CptoCk({ θ:2*π*λ, r:1 })
+                this.args.ui.transformation.state.λ.re = animλ.re
+                this.args.ui.transformation.state.λ.im = animλ.im
+                this.args.layout(this.data, this.args.ui.transformation.state)
+
+                if (this.data.leaves().reduce((max, i)=> Math.max(max, i.cachep.r), 0) > .949)
+                    break;
+            }
+            this.args.layout(this.data, this.args.ui.transformation.state)
+            this.ui.updateData()
+*/
             var endAnimation = ()=> {
                 this.animationTimer.stop()
                 this.animationTimer = null
@@ -134,12 +154,9 @@ export class UnitDisk
                 this.args.layout(this.data, this.args.ui.transformation.state)
                 this.ui.updateData()
 
-                if (this.data.leaves().reduce((max, i)=> Math.max(max, i.cachep.r), 0) > .949)
+                if (this.data.leaves().reduce((max, i)=> Math.max(max, i.cachep.r), 0) > .995)
                     endAnimation()
             }
-
-            this.args.ui.transformation.state.P.re = 0
-            this.args.ui.transformation.state.P.im = 0
 
             var step = 0, steps = 33
             this.animationTimer = d3.timer(()=> {
@@ -151,7 +168,7 @@ export class UnitDisk
                    endAnimation()
                 else
                    animateTo(.01+p*.98)
-            },1)
+            },1)  
         })
     }
 
@@ -191,78 +208,3 @@ export class UnitDisk
     }
 }
 
-var htmlinfo = `<div class="render-info">
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div></div>
-        <div></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div></div>
-        <div></div>
-        <div></div>
-    </div>`
-
-class IndoArea
-{
-}
-
-function InfoArea(args)
-{
-    var ui = HTML.parse<HTMLElement & { msg, colorScale, updateModel, updateCacheBar, updateCachInfo }>(htmlinfo)()
-    args.parent.appendChild(ui)
-
-    ui.colorScale = d3.scaleLinear<d3.ColorCommonInstance>()
-        .domain([1, 10])
-        .range([d3.rgb('#a5d6a7'), d3.rgb('#e53935')])
-        .interpolate(d3.interpolateHcl)
-        .clamp(true)
-
-    ui.updateModel = (model)=> {
-        var n = model.descendants().length
-        var l = model.leaves().length
-        var lp = l / n
-        var i = n - l
-        var h = model.height
-        var ø = 0
-        model.each(cn=> ø += (cn.children||[]).length/i)
-        ui.msg(0, `${lp.toPrecision(2)} leaves, ø${ø.toPrecision(3)}, ↓${h}`)
-    }
-
-    ui.updateCacheBar = (n, l, max)=> {
-        var a = n / max * 50
-        var b = l / max * 50;
-
-        (<HTMLElement>ui.children[0]).style.width = b + '%';
-        (<HTMLElement>ui.children[0]).style.backgroundColor = '#a5d6a7';
-
-        (<HTMLElement>ui.children[1]).style.width = a + '%';
-        (<HTMLElement>ui.children[1]).style.backgroundColor = '#8d6e63';
-
-        (<HTMLElement>ui.children[2]).style.width = (100 - a - b) + '%';
-        (<HTMLElement>ui.children[2]).style.backgroundColor = '#f8f8f8';
-    }
-
-    ui.updateCachInfo = (na, cache, max, mw, Δ)=> {
-        var n = cache.filteredNodes.length
-        var l = cache.leafNodes.length
-
-        var ct = Δ / 20 * 100;
-        (<HTMLElement>ui.children[5]).style.width = ct + '%';
-        (<HTMLElement>ui.children[5]).style.backgroundColor = ui.colorScale(Δ);
-
-        (<HTMLElement>ui.children[6]).style.width = (100 - ct) + '%';
-        (<HTMLElement>ui.children[6]).style.backgroundColor = '#f8f8f8';
-
-        ui.msg(1, `${na} nodes, ${Δ.toPrecision(3)}ms`)
-        ui.msg(5, `${mw.toPrecision(3)} max weight → ${l} nodes, ${n} links`)
-        ui.updateCacheBar(n, l, max)
-    }
-
-    ui.msg = (line, msg)=> {
-        ui.children[ui.children.length - 1 - line].innerHTML = msg
-    }
-
-    return ui
-}

@@ -6,10 +6,26 @@ export function dfs(n, fpre, idx=0) {
             dfs(n.children[i], fpre, i)
 }
 
+/*
+
+es git zwei arten von filter:
+ - nur element reausnehmen (kinder trotzdem besuchen)
+ - element und kinder rausnehmen (gar nicht erst besuchen)
+
+
+*/
 export function dfsFlat(n, f?) {
     if (!n) return []
     var r = []
     dfs(n, n=> { if(!f || f(n)) r.push(n) })
+    return r
+}
+
+export function dfsFlat2(n, f?) {
+    if (!n) return []
+    var r = []
+    if(!f || f(n))
+        dfs(n, n=> r.push(n))
     return r
 }
 
