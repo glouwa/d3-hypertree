@@ -1,0 +1,20 @@
+.render-info {
+    position: absolute;
+    left:1.5em;
+    bottom:1.5em;
+    width:20em;
+    padding-left:.3em;
+    padding-bottom:.1em;
+    color:lightgray;
+
+    .bar-bg {
+        height:.2em;
+        background-color:#f8f8f8;
+    }
+
+    .bar {
+        height:.2em;
+        float:left;
+    }
+}
+

@@ -105,70 +105,25 @@ export class UnitDisk
     }
 
     public updateData() : void {
+        var t0 = performance.now()
         this.ui.querySelector('.preloader').innerHTML = htmlpreloader
         this.ui.args.data = undefined
         this.ui.updateData()
         this.args.dataloader(d3h=>
         {
+            var t1 = performance.now()
             var model = <N & d3.HierarchyNode<N>>d3.hierarchy(d3h)
                             .sum(this.args.weight) // this.updateWeights()
 
-            this.infoUi.updateModel(model)
-            this.data = this.args.layout(model, this.args.ui.transformation.state)
-
             this.ui.querySelector('.preloader').innerHTML = ''
-            this.ui.args.data = this.data            
+            this.infoUi.updateModel(model, [t1-t0, performance.now()-t1])
 
-            this.args.ui.transformation.state.P.re = 0
-            this.args.ui.transformation.state.P.im = 0
-/*
-            var π = Math.PI
-            for (var i = 0; i < 30; i++) {
-                var p = i/30
-                var λ = .01+p*.98
+            var t2 = performance.now()
+            this.data = this.args.layout(model, this.args.ui.transformation.state)
+            this.ui.args.data = this.data
+            this.infoUi.updateLayout(model, performance.now()-t2)
 
-                var animλ = CptoCk({ θ:2*π*λ, r:1 })
-                this.args.ui.transformation.state.λ.re = animλ.re
-                this.args.ui.transformation.state.λ.im = animλ.im
-                this.args.layout(this.data, this.args.ui.transformation.state)
-
-                if (this.data.leaves().reduce((max, i)=> Math.max(max, i.cachep.r), 0) > .949)
-                    break;
-            }
-            this.args.layout(this.data, this.args.ui.transformation.state)
-            this.ui.updateData()
-*/
-            var endAnimation = ()=> {
-                this.animationTimer.stop()
-                this.animationTimer = null
-                //this.onZoomFitEnd(null, null, null)
-            }
-
-            var animateTo = λ=> {
-                var π = Math.PI
-                var animλ = CptoCk({ θ:2*π*λ, r:1 })
-                this.args.ui.transformation.state.λ.re = animλ.re
-                this.args.ui.transformation.state.λ.im = animλ.im
-
-                app.toast('Layout')
-                this.args.layout(this.data, this.args.ui.transformation.state)
-                this.ui.updateData()
-
-                if (this.data.leaves().reduce((max, i)=> Math.max(max, i.cachep.r), 0) > .995)
-                    endAnimation()
-            }
-
-            var step = 0, steps = 33
-            this.animationTimer = d3.timer(()=> {
-                if (!this.animationTimer)
-                    return
-
-                var p = step++/steps
-                if (step > steps)
-                   endAnimation()
-                else
-                   animateTo(.01+p*.98)
-            },1)  
+            this.animateUp()
         })
     }
 
@@ -187,8 +142,11 @@ export class UnitDisk
 
     private updateLayout() : void {        
         app.toast('Layout')
-        this.args.layout(this.data, this.args.ui.transformation.state)
+        var t0 = performance.now()
+        this.args.layout(this.data, this.args.ui.transformation.state)        
+        this.infoUi.updateLayout(this.data, performance.now()-t0)
         this.updateTransformation()        
+
     }
 
     private updateTransformation() : void {
@@ -205,6 +163,44 @@ export class UnitDisk
         if (new_ && new_.ancestors) for (var pn of new_.ancestors()) pn[pathId] = n
 
         this.ui.updateSelection()
+    }
+
+    private animateUp()
+    {
+        this.args.ui.transformation.state.P.re = 0
+        this.args.ui.transformation.state.P.im = 0
+
+        var endAnimation = ()=> {
+            this.animationTimer.stop()
+            this.animationTimer = null
+            //this.onZoomFitEnd(null, null, null)
+        }
+
+        var animateTo = λ=> {
+            var π = Math.PI
+            var animλ = CptoCk({ θ:2*π*λ, r:1 })
+            this.args.ui.transformation.state.λ.re = animλ.re
+            this.args.ui.transformation.state.λ.im = animλ.im
+
+            app.toast('Layout')
+            this.args.layout(this.data, this.args.ui.transformation.state)
+            this.ui.updateData()
+
+            if (this.data.leaves().reduce((max, i)=> Math.max(max, i.cachep.r), 0) > .995)
+                endAnimation()
+        }
+
+        var step = 0, steps = 33
+        this.animationTimer = d3.timer(()=> {
+            if (!this.animationTimer)
+                return
+
+            var p = step++/steps
+            if (step > steps)
+               endAnimation()
+            else
+               animateTo(.01+p*.98)
+        },1)
     }
 }
 

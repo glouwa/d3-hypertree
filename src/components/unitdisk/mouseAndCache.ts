@@ -191,6 +191,8 @@ export class Interaction implements UnitDiskUi
 
     private updateCache() {
         this.args.cacheUpdate(this)
+
+        // TODO braucht man eigentluich nicht. muss vorerst aber für nav bg gemacht werden
         try { this.voronoiDiagram = this.voronoiLayout(this.filteredNodes) } catch(e) {}
     }
 

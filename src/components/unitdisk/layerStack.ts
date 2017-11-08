@@ -29,13 +29,13 @@ export class LayerStack
     }
 
     private updateLayers() : void
-    {
+    {        
         for (var layerfactoryfunc of this.args.interaction.args.layers)
         {
             var argscpy = Object.assign({ parent:this.layers }, this.args.interaction)
             var newL = layerfactoryfunc(this.args.interaction, this.layers)
             this[newL.args.name] = newL
-        }
+        }        
     }
 
     public updatePath()
@@ -49,10 +49,13 @@ export class LayerStack
 
     public updateTransformation()
     {
+        var t0 = performance.now()
         if (this.cells)    this.cells.updateData()
         if (this.links)    this.links.updateData()
         if (this.nodes)    this.nodes.updateData()
         if (this.captions) this.captions.updateData()
+        this.args.interaction.args.unitdisk.infoUi.updateD3Info(
+            2, this.args.interaction, 100, 3, performance.now() - t0)
     }
 }
 
