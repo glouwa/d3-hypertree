@@ -197,6 +197,7 @@ export class Interaction implements UnitDiskUi
         this.layerStack.updateTransformation()
     }
 
+    // TODO muss hier weg
     private updateCache() {
         this.args.cacheUpdate(this, this.cache)
     }

@@ -44,6 +44,8 @@ export function InfoArea(args)
     var dataBar      = <HTMLElement>ui.children[9]
     var typeColors   = ['#a5d6a7', '#b77d68', '#a5d6a7', '#666']
 
+    var mag = 1
+
     var colorScale = d3.scaleLinear<d3.ColorCommonInstance>()
         .domain([1, 10])
         .range([d3.rgb('#a5d6a7'), d3.rgb('#e53935')])
@@ -61,31 +63,31 @@ export function InfoArea(args)
     }
 
 
-    ui.updateD3Info = (max, Δ)=> {
+    ui.updateD3Info = (max, Δ, cache)=> {
         var t = Δ.reduce((a,e)=> a+e).toFixed(0)
 
-        D3.innerHTML = `D3: ${t}ms`
-        updateBar(D3Bar, Δ.map(e=> e*10), typeColors)
+        D3.innerHTML = `D<sub>3</sub>: ${t}ms ${cache.filteredNodes.length}nodes`
+        updateBar(D3Bar, Δ.map(e=> e*mag), typeColors)
     }
 
-    ui.updateCachInfo = (na, cache, max, mw, Δ)=> { // updatTransformationInfo
+    ui.updateTransformationInfo = (na, cache, max, mw, Δ)=> { // updatTransformationInfo
         var n = cache.leafNodes.length
         var l = cache.filteredNodes.length
         var c = cache.cells.length
-        var t = cache.labels.length*3
+        var t = cache.labels.length
         var a = n+l+c+t
-        var ct = Δ / 20 * 100
+        var mag_ = .1
 
         rendering.innerHTML = `Draw: ${a}/1000 - ${n}/${l}/${c}/${t} | <sub>w>${mw.toPrecision(2)}</sub>`
-        updateBar(transformBar, [ct], [colorScale(Δ)])
+        updateBar(transformBar, [Δ].map(e=> e*mag), [colorScale(Δ)])
 
         transform.innerHTML = `Transf.: ${Δ.toPrecision(3)}ms, ${na} nodes | <sub>r<.995</sub>`
-        updateBar(renderingBar, [n, l, c, t].map(e=> 100*e/max/3), typeColors)
+        updateBar(renderingBar, [n, l, c, t].map(e=> e*mag_), typeColors)
     }
 
     ui.updateLayout = (x, Δ)=> {
         layout.innerHTML = `Layout: ${Δ.toFixed(1)}ms, ?nodes. max r = .?`
-        updateBar(layoutBar, [Δ], ['#2196f3'])
+        updateBar(layoutBar, [Δ].map(e=> e*mag), ['#2196f3'])
     }
 
     ui.updateModel = (model, Δ)=> {

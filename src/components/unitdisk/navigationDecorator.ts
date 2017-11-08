@@ -52,15 +52,15 @@ export function DecoratorNon(args : InteractionArgs)
     args.parent.appendChild(ui)
 
     ui.args = args
-    ui.updatePositions = ()=>  layerstack.updatePositions()
-    ui.updateSelection = ()=>  layerstack.updateSelection()
-    ui.updateData = ()=> {
-        layerstack.args.data = ui.args.data
-        layerstack.updatePositions()
+    ui.updateTransformation = ()=> interaction.updatePositions()
+    ui.updateSelection      = ()=> interaction.updateSelection()
+    ui.updateData           = ()=> {
+        interaction.args.data = ui.args.data
+        interaction.updatePositions()
     }
 
     args.parent = ui.querySelector('.unitDisc')
-    var layerstack = new Interaction(args)
+    var interaction = new Interaction(args)
     return ui
 }
 
@@ -72,13 +72,14 @@ export function DecoratorNav(args : InteractionArgs)
     ui.args = args
     ui.updateData = ()=> {
         navBackground.args.data = ui.args.data
-        navBackground.updatePositions()
         view.args.data = ui.args.data
+
+        navBackground.updatePositions()        
         view.updatePositions()
         navParameter.updatePositions()
     }
-    ui.updatePositions = ()=> { view.updatePositions(); navParameter.updatePositions();  }
-    ui.updateSelection = ()=> { view.updateSelection(); navBackground.updateSelection(); }
+    ui.updateTransformation = ()=> { view.updatePositions(); navParameter.updatePositions();  }
+    ui.updateSelection      = ()=> { view.updateSelection(); /*navBackground.updateSelection();*/ }
 
     args.parent = ui.querySelector('.unitDisc')
     var view = new Interaction(args)

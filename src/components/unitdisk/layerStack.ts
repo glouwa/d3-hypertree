@@ -57,7 +57,9 @@ export class LayerStack
         if (this.nodes)    this.nodes.updateData()
         var t3 = performance.now()
         if (this.captions) this.captions.updateData()
-        this.args.interaction.args.unitdisk.infoUi.updateD3Info(10, [t1-t0, t2-t1, t3-t2, performance.now() - t3])
+        if (this.args.interaction.cache.filteredNodes.length != 3)
+        this.args.interaction.args.unitdisk.infoUi.updateD3Info(
+            10, [t1-t0, t2-t1, t3-t2, performance.now() - t3], this.args.interaction.cache)
     }
 }
 

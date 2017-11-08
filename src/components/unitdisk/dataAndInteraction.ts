@@ -58,10 +58,10 @@ export interface UnitDiskArgs
 
 export interface UnitDiskUi
 {
-    args:            any,
-    updateData:      ()=> void,
-    updatePositions: ()=> void,
-    updateSelection: ()=> void,
+    args:                 any,
+    updateData:           ()=> void,
+    updateTransformation: ()=> void,
+    updateSelection:      ()=> void,
 }
 
 /**
@@ -144,12 +144,11 @@ export class UnitDisk
         var t0 = performance.now()
         this.args.layout(this.data, this.args.ui.transformation.state)        
         this.infoUi.updateLayout(this.data, performance.now()-t0)
-        this.updateTransformation()        
-
+        this.updateTransformation()
     }
 
     private updateTransformation() : void {
-        this.ui.updatePositions()
+        this.ui.updateTransformation()
     }
 
     public updatePath(pathId:string, n:N)
