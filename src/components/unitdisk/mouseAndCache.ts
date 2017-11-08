@@ -1,6 +1,7 @@
 import * as d3                  from 'd3'
 import { N }                    from '../../models/n'
-import { Transformation }       from '../../hyperbolic-transformation'
+import { Transformation,
+         TransformationCache }  from '../../hyperbolic-transformation'
 import { C, CptoCk, CktoCp,
          CassignC, ArrtoC,
          dfsFlat, CsubC,
@@ -36,20 +37,36 @@ export interface InteractionArgs
 
     onClick:           (n:N, m:C)=> void,
 
-    caption:           (n:N)=> string,   
+    caption:           (n:N)=> string,
     captionOffset:     (n:N)=> C,
     nodeRadius:        number,
     clipRadius?:       number,
     mouseRadius?:      number,
 }
-
-// treeondisk = deco->cahce->interaction->layerstack
 /*
-export class TransformationCache implements UnitDiskUi
+export interface InteractionArgs2
 {
-    args:           InteractionArgs
-    constructor(args : InteractionArgs)
+    parent,
+    unitdisk,? hypertree?
+    data:              N,
+    transformation
     {
+        cacheUpdate:       (i:Interaction, cache:TransformationCache)=> void,
+        transformation:    Transformation<N>,
+        transform:         (n:N)=> C,
+    }
+    interaction:
+    {
+        onClick:           (n:N, m:C)=> void,
+    }
+    geometrie
+    {
+        caption:           (n:N)=> string,
+        captionOffset:     (n:N)=> C,
+        nodeRadius:        number,
+        clipRadius?:       number,
+        mouseRadius?:      number,
+        layers:            ((ls:Interaction, parent:d3Sel)=> Layer)[],
     }
 }
 */
@@ -58,6 +75,8 @@ export class Interaction implements UnitDiskUi
 {
     args:           InteractionArgs   
     focusCircle:    any
+
+    cache = new TransformationCache()
 
     // layerstack
     layerStack:     LayerStack
@@ -190,10 +209,10 @@ export class Interaction implements UnitDiskUi
     }
 
     private updateCache() {
-        this.args.cacheUpdate(this)
+        this.args.cacheUpdate(this, this)
 
         // TODO braucht man eigentluich nicht. muss vorerst aber für nav bg gemacht werden
-        try { this.voronoiDiagram = this.voronoiLayout(this.filteredNodes) } catch(e) {}
+        //try { this.voronoiDiagram = this.voronoiLayout(this.filteredNodes) } catch(e) {}
     }
 
     //-----------------------------------------------------------------------------------------

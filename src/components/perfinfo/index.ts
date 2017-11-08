@@ -24,6 +24,10 @@ data      5335ms: 12345 nodes, 53434kb, .7 leafes, mu_°   4.3, med_°   3.6, mi
                                                    mu_h   8.4, med_h     8, min_h,   max_h,
 */
 
+//IA = HTMLElement & { updateModel, updateLayout, updateCachInfo }
+//export function InfoArea(args) : IA
+
+
 export function InfoArea(args)
 {
     var ui = HTML.parse<HTMLElement & { updateModel, updateLayout, updateCachInfo }>(htmlinfo)()

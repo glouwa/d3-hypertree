@@ -9,8 +9,9 @@ from './hyperbolic-math'
 import { N } from './models/n'
 
 export interface Transformation<OT>
-{
+{    
     state:          T, // state: T,
+    cache: TransformationCache,
 
     transformPoint: (n:C)=> C,
     transformDist:  (p:C)=> number,
@@ -25,6 +26,7 @@ export interface Transformation<OT>
 
 export class HyperbolicTransformation implements Transformation<N>
 {
+    cache: TransformationCache = new TransformationCache()
     state:  T
     dST: T    
     maxMouseR = .98
@@ -43,6 +45,7 @@ export class HyperbolicTransformation implements Transformation<N>
 
 export class PanTransformation implements Transformation<N>
 {
+    cache: TransformationCache = new TransformationCache()
     state:  T
     dST: T
     maxMouseR = 1000
@@ -67,6 +70,7 @@ export class PanTransformation implements Transformation<N>
 
 export class NegTransformation implements Transformation<N>
 {
+    cache: TransformationCache = null
     state:  T
     decorated: Transformation<N>
     maxMouseR = 0
@@ -74,6 +78,7 @@ export class NegTransformation implements Transformation<N>
         this.decorated = d
         this.state = d.state
         this.maxMouseR = d.maxMouseR
+        this.cache = d.cache
     }
 
     transformPoint = (p:C)=> this.decorated.transformPoint(CmulR(p,-1))
@@ -84,3 +89,14 @@ export class NegTransformation implements Transformation<N>
     onDragθ =        (s:C, e:C)=> this.decorated.onDragθ(CmulR(s,-1), CmulR(e,-1))
     onDragλ =        (s:C, e:C)=> this.decorated.onDragλ(CmulR(s,-1), CmulR(e,-1))
 }
+
+export class TransformationCache
+{
+    filteredLinks:  N[]
+    filteredNodes:  N[]
+    leafNodes:      N[]
+
+    voronoiDiagram: d3.VoronoiDiagram<N>
+    cells
+}
+

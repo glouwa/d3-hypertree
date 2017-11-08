@@ -76,7 +76,7 @@ export class UnitDisk
 {
     args           : UnitDiskArgs
     ui             : UnitDiskUi & HTMLElement
-    infoUi         : HTMLElement & { msg:(idx, msg)=>void, updateModel }
+    infoUi         : HTMLElement & { msg, updateModel, updateLayout }
     data           : N
     langMap        : {}
     paths          : { isSelected?:N, isHovered?:N } = {}

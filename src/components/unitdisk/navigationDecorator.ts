@@ -109,13 +109,13 @@ export function DecoratorNav(args : InteractionArgs)
         data:               obj2data(args.transformation.state),
         layers:             args.layers.filter((l, idx)=> idx!==0 && idx!==1),
 
-        cacheUpdate:        cache=> {
-                                var allNodes = dfsFlat(cache.args.data, n=>true)
+        cacheUpdate:        (interaction:Interaction, cache:TransformationCache)=> {
+                                var allNodes = dfsFlat(interaction.args.data, n=>true)
                                 cache.filteredNodes = cache.leafNodes = allNodes
                                 for (var n of allNodes) {
 
                                     n.cache = n.cache || { re:0, im:0 }
-                                    CassignC(n.cache, cache.args.transform(n))
+                                    CassignC(n.cache, interaction.args.transform(n))
 
                                     n.cachep            = CktoCp(n.cache)
                                     n.strCache          = n.cache.re + ' ' + n.cache.im
@@ -125,7 +125,10 @@ export function DecoratorNav(args : InteractionArgs)
                                     n.distScale    = n.dampedDistScale = n.weightScale = 1
                                     n.scaleStrText = ` scale(1)`
                                 }
-                                try { cache.voronoiDiagram = this.voronoiLayout(cache.filteredNodes) } catch(e) {}
+                                try {
+                                    cache.voronoiDiagram = interaction.voronoiLayout(cache.filteredNodes)
+                                    cache.cells = cache.voronoiDiagram.polygons()
+                                } catch(e) {}
                             },
         transformation:     navTransformation,
         transform:          (n:N)=> CmulR(n,-1),
