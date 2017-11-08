@@ -95,6 +95,7 @@ export class TransformationCache
     filteredLinks:  N[]
     filteredNodes:  N[]
     leafNodes:      N[]
+    labels:         N[]
 
     voronoiDiagram: d3.VoronoiDiagram<N>
     cells

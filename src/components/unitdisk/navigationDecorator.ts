@@ -5,13 +5,16 @@ import { obj2data }                      from '../../models/n-loaders'
 import { C, CktoCp, CmulR, CsubC }       from '../../hyperbolic-math'
 import { dfsFlat, πify, CassignC }       from '../../hyperbolic-math'
 import { ArrAddR }                       from '../../hyperbolic-math'
+import { lengthDilledation }             from '../../hyperbolic-math'
 
 import { Transformation }                from '../../hyperbolic-transformation'
 import { PanTransformation }             from '../../hyperbolic-transformation'
 import { NegTransformation }             from '../../hyperbolic-transformation'
+import { TransformationCache }           from '../../hyperbolic-transformation'
 import { Layer }                         from '../layers'
 import { UnitDiskUi }                    from './dataAndInteraction'
 import { Interaction, InteractionArgs }  from './mouseAndCache'
+import { Layers }                        from './layerStack'
 
 var bubblehtml =
     `<defs>
@@ -84,7 +87,7 @@ export function DecoratorNav(args : InteractionArgs)
         parent:             ui.querySelector('.nav-background-disc'),
         unitdisk:           args.unitdisk,
         data:               args.data,
-        layers:             args.layers.filter((l, idx)=> idx!==3),
+        layers:             args.layers.filter((l, idx)=> idx!==3), // no labels here
 
         cacheUpdate:        args.cacheUpdate,
         transformation:     args.transformation,
@@ -93,7 +96,6 @@ export function DecoratorNav(args : InteractionArgs)
         onClick:            (n:N, m:C)=> {},
 
         caption:            (n:N)=> undefined,
-        captionOffset:      undefined,
         nodeRadius:         .012,
         clipRadius:         1,
         mouseRadius:        0,
@@ -103,40 +105,51 @@ export function DecoratorNav(args : InteractionArgs)
         new NegTransformation(
             new PanTransformation(args.transformation.state))
 
+    var rotate = d=>
+        (d.name === 'λ' ? ' rotate(-30)' : ' rotate(0)')
+    var Pscale =  ls=> d=>
+        lengthDilledation(d)
+        * (1 - πify(CktoCp(ls.args.transformation.state.λ).θ) / 2 / Math.PI)
+        / ls.args.nodeRadius
     var navParameter = new Interaction({
         parent:             ui.querySelector('.nav-parameter-disc'),
         unitdisk:           args.unitdisk,
-        data:               obj2data(args.transformation.state),
-        layers:             args.layers.filter((l, idx)=> idx!==0 && idx!==1),
-
+        data:               obj2data(args.transformation.state),        
+        layers:             [
+                                (ls:Interaction, par)=> new Layers.NodeLayer({
+                                    parent:      par,
+                                    data:        l=> ls.cache.filteredNodes,
+                                    r:           l=> d=> ls.args.nodeRadius
+                                                       * (d.name==='P' ? Pscale(ls)(d) : 1),
+                                    transform:   l=> d=> d.transformStrCache,
+                                }),
+                                (ls:Interaction, par)=> new Layers.LabelLayer({
+                                    parent:      par,
+                                    data:        l=> ls.cache.filteredNodes,
+                                    text:        l=> d=> ({P:'+', θ:'🗘', λ:'⚲' })[d.name],
+                                    delta:       l=> d=> ({ re:.0025, im:.025 }),
+                                    transform:   l=> d=> d.transformStrCache + rotate(d)
+                                })
+                            ],
         cacheUpdate:        (interaction:Interaction, cache:TransformationCache)=> {
-                                var allNodes = dfsFlat(interaction.args.data, n=>true)
-                                cache.filteredNodes = cache.leafNodes = allNodes
-                                for (var n of allNodes) {
-
+                                cache.filteredNodes = dfsFlat(interaction.args.data)
+                                for (var n of cache.filteredNodes) {
                                     n.cache = n.cache || { re:0, im:0 }
                                     CassignC(n.cache, interaction.args.transform(n))
 
                                     n.cachep            = CktoCp(n.cache)
                                     n.strCache          = n.cache.re + ' ' + n.cache.im
+                                    n.scaleStrText      = ` scale(1)`
                                     n.transformStrCache = ` translate(${n.strCache})`
-
-                                    n.isOutλ       = n.isOut99         = false
-                                    n.distScale    = n.dampedDistScale = n.weightScale = 1
-                                    n.scaleStrText = ` scale(1)`
                                 }
-                                try {
-                                    cache.voronoiDiagram = interaction.voronoiLayout(cache.filteredNodes)
-                                    cache.cells = cache.voronoiDiagram.polygons()
-                                } catch(e) {}
+                                try { cache.voronoiDiagram = interaction.voronoiLayout(cache.filteredNodes) } catch(e) {}
                             },
         transformation:     navTransformation,
         transform:          (n:N)=> CmulR(n,-1),
 
         onClick:            (n:N, m:C)=> {}, //args.onAnimateTo(navTransformation, n, CsubC(m, navTransformation.state.P)),
 
-        caption:            (n:N)=> ({P:'+', θ:'🗘', λ:'⚲' })[n.name],
-        captionOffset:      (n:N)=> ({ re:.0025, im:.025 }),
+        caption:            (n:N)=> undefined,
         nodeRadius:         .21,
         clipRadius:         1.4,
         mouseRadius:        1.4,

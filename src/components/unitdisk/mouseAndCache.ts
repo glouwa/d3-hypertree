@@ -31,14 +31,13 @@ export interface InteractionArgs
     data:              N,
     layers:            ((ls:Interaction, parent:d3Sel)=> Layer)[],
 
-    cacheUpdate:       (cache:Interaction)=> void,
+    cacheUpdate:       (interaction:Interaction, cache:TransformationCache)=> void,
     transformation:    Transformation<N>,
     transform:         (n:N)=> C,
 
     onClick:           (n:N, m:C)=> void,
 
     caption:           (n:N)=> string,
-    captionOffset:     (n:N)=> C,
     nodeRadius:        number,
     clipRadius?:       number,
     mouseRadius?:      number,
@@ -62,7 +61,6 @@ export interface InteractionArgs2
     geometrie
     {
         caption:           (n:N)=> string,
-        captionOffset:     (n:N)=> C,
         nodeRadius:        number,
         clipRadius?:       number,
         mouseRadius?:      number,
@@ -71,37 +69,28 @@ export interface InteractionArgs2
 }
 */
 
+
+// InteractiveLayerStack
 export class Interaction implements UnitDiskUi
 {
     args:           InteractionArgs   
     focusCircle:    any
 
-    cache = new TransformationCache()
+    cache:          TransformationCache
 
-    // layerstack
-    layerStack:     LayerStack
-
-    // cache
+    layerStack:     LayerStack    
     voronoiLayout:  d3.VoronoiLayout<N>
-
-    //innerNodes:     N[]
-    //allLinks:       N[]
-
-    filteredLinks:  N[]
-    filteredNodes:  N[]
-    leafNodes:      N[]
-
-    voronoiDiagram: d3.VoronoiDiagram<N>
 
     constructor(args : InteractionArgs)
     {
         this.args = args
+        this.cache = args.transformation.cache
 
         var currMousePosAsArr = ()=> d3.mouse(this.args.parent)
         var currMousePosAsC = ()=> ArrtoC(currMousePosAsArr())
         var findNodeByCell = ()=> {
             var m = currMousePosAsArr()
-            var find = this.voronoiDiagram.find(m[0], m[1])
+            var find = this.cache.voronoiDiagram.find(m[0], m[1])
             return find ? find.data : undefined
         }
 
@@ -209,10 +198,7 @@ export class Interaction implements UnitDiskUi
     }
 
     private updateCache() {
-        this.args.cacheUpdate(this, this)
-
-        // TODO braucht man eigentluich nicht. muss vorerst aber für nav bg gemacht werden
-        //try { this.voronoiDiagram = this.voronoiLayout(this.filteredNodes) } catch(e) {}
+        this.args.cacheUpdate(this, this.cache)
     }
 
     //-----------------------------------------------------------------------------------------

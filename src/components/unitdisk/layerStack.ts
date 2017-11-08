@@ -51,11 +51,13 @@ export class LayerStack
     {
         var t0 = performance.now()
         if (this.cells)    this.cells.updateData()
+        var t1 = performance.now()
         if (this.links)    this.links.updateData()
+        var t2 = performance.now()
         if (this.nodes)    this.nodes.updateData()
+        var t3 = performance.now()
         if (this.captions) this.captions.updateData()
-        this.args.interaction.args.unitdisk.infoUi.updateD3Info(
-            2, this.args.interaction, 100, 3, performance.now() - t0)
+        this.args.interaction.args.unitdisk.infoUi.updateD3Info(10, [t1-t0, t2-t1, t3-t2, performance.now() - t3])
     }
 }
 

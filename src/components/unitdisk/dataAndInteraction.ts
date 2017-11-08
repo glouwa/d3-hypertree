@@ -98,7 +98,6 @@ export class UnitDisk
             cacheUpdate:    this.args.ui.cacheUpdate,
             onClick:        (n:N, m:C)=> this.args.ui.onClick(this, n, m),
             caption:        (n:N)=> this.args.ui.caption(this, n),
-            captionOffset:  undefined,
         })        
         this.updateData()
         this.updateLang()
