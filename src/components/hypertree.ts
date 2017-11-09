@@ -50,8 +50,8 @@ export interface HypertreeArgs
         nodeRadius:     number,
         transformation: Transformation<N>,
         cacheUpdate:    (cache:Interaction)=> void,
-        caption:        (unitdisk:Hypertree, n:N)=> string,
-        onClick:        (unitdisk:Hypertree, n:N, m:C)=> void,
+        caption:        (hypertree:Hypertree, n:N)=> string,
+        onClick:        (hypertree:Hypertree, n:N, m:C)=> void,
         layers:         ((ls:Interaction, parent:d3Sel)=> Layer)[],
     }
 }
@@ -87,7 +87,7 @@ export class Hypertree
         this.infoUi = InfoArea(args)
         this.ui = new args.decorator({
             parent:         args.parent,
-            unitdisk:       this,
+            hypertree:      this,
             mouseRadius:    args.ui.transformation.maxMouseR,
             data:           undefined,            
             transformation: this.args.ui.transformation,
@@ -160,7 +160,8 @@ export class Hypertree
         if (old_ && old_.ancestors) for (var pn of old_.ancestors()) pn[pathId] = undefined
         if (new_ && new_.ancestors) for (var pn of new_.ancestors()) pn[pathId] = n
 
-        this.ui.updateSelection()
+        //this.ui.updateSelection()
+        this.ui.updateTransformation()
     }
 
     private animateUp()

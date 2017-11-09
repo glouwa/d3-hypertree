@@ -45,7 +45,7 @@ var htmlnav =
         <div class="preloader"></div>
     </div>`
 
-export function DecoratorNon(args : InteractionArgs)
+export function Unitdisk(args : InteractionArgs)
 {
     var ui = HTML.parse<HTMLElement & HypertreeUi>(html)()
     args.parent.appendChild(ui)
@@ -65,13 +65,13 @@ export function DecoratorNon(args : InteractionArgs)
     return ui
 }
 
-export function DecoratorNav(args : InteractionArgs)
+export function UnitDiskNav(args : InteractionArgs)
 {
     var ui = HTML.parse<HTMLElement & HypertreeUi>(htmlnav)()
     args.parent.appendChild(ui)
 
     ui.args = args
-    ui.updateData = ()=> {
+    ui.updateData           = ()=> {
         navBackground.args.data = ui.args.data
         view.args.data = ui.args.data
 
@@ -90,7 +90,7 @@ export function DecoratorNav(args : InteractionArgs)
 
     var navBackground = new Interaction({
         parent:             ui.querySelector('.nav-background-disc'),
-        unitdisk:           args.unitdisk,
+        hypertree:          args.hypertree,
         data:               args.data,
         layers:             args.layers.filter((l, idx)=> idx!==3), // no labels here
 
@@ -118,7 +118,7 @@ export function DecoratorNav(args : InteractionArgs)
         / ls.args.nodeRadius
     var navParameter = new Interaction({
         parent:             ui.querySelector('.nav-parameter-disc'),
-        unitdisk:           args.unitdisk,
+        hypertree:          args.hypertree,
         data:               obj2data(args.transformation.state),
         layers:             [
                                 (ls:Interaction, par)=> new Layers.NodeLayer({

@@ -21,12 +21,10 @@ var html = ` unused
     <g class="captions"></g>
 </g>`
 
-// macht mouse und voronoi und z cache
-// :(
 export interface InteractionArgs
 {
     parent:            any,
-    unitdisk,
+    hypertree,
     data:              N,
     layers:            ((ls:Interaction, parent:d3Sel)=> Layer)[],
 
@@ -41,11 +39,12 @@ export interface InteractionArgs
     clipRadius?:       number,
     mouseRadius?:      number,
 }
+
 /*
 export interface InteractionArgs2
 {
     parent,
-    unitdisk,? hypertree?
+    hypertree
     data:              N,
     transformation
     {
@@ -68,17 +67,15 @@ export interface InteractionArgs2
 }
 */
 
-
-// InteractiveLayerStack
+// InteractiveUnitdisk
 export class Interaction
 {
     args:           InteractionArgs   
-    focusCircle:    any
-
-    cache:          TransformationCache
-
+    focusCircle:    any                  // d3?... SvgCircle
     layerStack:     LayerStack    
     voronoiLayout:  d3.VoronoiLayout<N>
+
+    cache:          TransformationCache // zeigt auf transformation.cache
 
     constructor(args : InteractionArgs)
     {
@@ -148,8 +145,8 @@ export class Interaction
             .attr("fill", 'url(#exampleGradient)')
             .on("dblclick",  d=> this.onDblClick(findNodeByCell()))
             .on("click",     d=> this.onClick(findNodeByCell()))
-            .on("mousemove", d=> this.args.unitdisk.updatePath('isHovered', findNodeByCell()))
-            .on("mouseout",  d=> this.args.unitdisk.updatePath('isHovered', undefined))
+            .on("mousemove", d=> this.args.hypertree.updatePath('isHovered', findNodeByCell()))
+            .on("mouseout",  d=> this.args.hypertree.updatePath('isHovered', undefined))
             //.call(zoom)
 
         mainGroup.append('circle')
@@ -157,8 +154,8 @@ export class Interaction
             .attr("r", this.args.mouseRadius)
             .on("dblclick",  d=> this.onDblClick(findNodeByCell()))
             .on("click",     d=> this.onClick(findNodeByCell()))
-            .on("mousemove", d=> this.args.unitdisk.updatePath('isHovered', findNodeByCell()))
-            .on("mouseout",  d=> this.args.unitdisk.updatePath('isHovered', undefined))
+            .on("mousemove", d=> this.args.hypertree.updatePath('isHovered', findNodeByCell()))
+            .on("mouseout",  d=> this.args.hypertree.updatePath('isHovered', undefined))
             .call(drag)
             .call(zoom)
 
@@ -210,20 +207,20 @@ export class Interaction
 
     private onDragλ = (s:C, e:C)=> {
         this.args.transformation.onDragλ(s, e)
-        this.args.unitdisk.updateLayout()
+        this.args.hypertree.updateLayout()
     }
 
     private onDragByNode = (n:N, s:C, e:C)=> {
         if (n && n.name == 'θ') {
             this.args.transformation.onDragθ(s, e)
-            this.args.unitdisk.updateTransformation()
+            this.args.hypertree.updateTransformation()
         }
         else if (n && n.name == 'λ') {
             this.onDragλ(s, e)
         }
         else {
             this.args.transformation.onDragP(s, e)
-            this.args.unitdisk.updateTransformation()
+            this.args.hypertree.updateTransformation()
         }
     }
 

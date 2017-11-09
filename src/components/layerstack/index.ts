@@ -1,6 +1,6 @@
 import * as d3 from 'd3'
-import { N }   from '../../models/n'
-import { Interaction }          from '../unitdisk/interactive-unitdisk'
+import { N } from '../../models/n'
+import { Interaction } from '../unitdisk/interactive-unitdisk'
 
 //export * from './layerStack'
 
@@ -95,6 +95,17 @@ export class Layer implements ILayer
     updateColor     = ()=> this.update.call(this.args.updateColor(this))
 }
 
+export var bboxOffset = d=> v=> {
+    var w = v.getComputedTextLength() * 1.2 //var bb = v.getBBox() war schlechter
+    var h = 0.025
+    var paddingLeftRight = .05
+    var paddingTopBottom = .02
+    return {
+        re:(paddingLeftRight/2 + w/2) * Math.cos(d.cachep.θ),
+        im:(paddingTopBottom/2 + h/2) * Math.sin(d.cachep.θ)
+    }
+}
+
 
 export interface LayerStackArgs
 {
@@ -150,7 +161,7 @@ export class LayerStack
         var t3 = performance.now()
         if (this.captions) this.captions.updateData()
         if (this.args.interaction.cache.filteredNodes.length != 3)
-        this.args.interaction.args.unitdisk.infoUi.updateD3Info(
+        this.args.interaction.args.hypertree.infoUi.updateD3Info(
             10, [t1-t0, t2-t1, t3-t2, performance.now() - t3], this.args.interaction.cache)
     }
 }
