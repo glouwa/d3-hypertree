@@ -8,9 +8,8 @@ import { C, CptoCk, CktoCp,
          arcCenter, πify,
          sigmoid }              from '../../hyperbolic-math'
 
-import { UnitDiskUi }           from './dataAndInteraction'
-import { Layer }                from './../layers'
-import { LayerStack }           from './layerStack'
+import { Layer }                from './../layerstack'
+import { LayerStack }           from '../layerstack'
 
 var html = ` unused
 <clipPath id="circle-clip"><circle r="1"></circle></clipPath>
@@ -71,7 +70,7 @@ export interface InteractionArgs2
 
 
 // InteractiveLayerStack
-export class Interaction implements UnitDiskUi
+export class Interaction
 {
     args:           InteractionArgs   
     focusCircle:    any

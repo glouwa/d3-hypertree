@@ -3,19 +3,19 @@
 //import { interpolateHcl, rgb }      from 'd3-color'
 
 import * as d3                     from 'd3'
-import { N }                   from '../../models/n'
-import { LoaderFunction }      from '../../models/n-loaders'
-import { LayoutFunction }      from '../../models/n-layouts'
-import { C, CktoCp, CptoCk }   from '../../hyperbolic-math'
-import { sigmoid }             from '../../hyperbolic-math'
-import { Transformation }      from '../../hyperbolic-transformation'
+import { N }                   from '../models/n'
+import { LoaderFunction }      from '../models/n-loaders'
+import { LayoutFunction }      from '../models/n-layouts'
+import { C, CktoCp, CptoCk }   from '../hyperbolic-math'
+import { sigmoid }             from '../hyperbolic-math'
+import { Transformation }      from '../hyperbolic-transformation'
 
-import { Layer }               from '../layers'
-import { LayerArgs }           from '../layers'
-import { Interaction }         from './mouseAndCache'
-import { InteractionArgs }     from './mouseAndCache'
+import { Layer }               from './layerstack'
+import { LayerArgs }           from './layerstack'
+import { Interaction }         from './unitdisk/interactive-unitdisk'
+import { InteractionArgs }     from './unitdisk/interactive-unitdisk'
 
-import { InfoArea }            from '../perfinfo'
+import { InfoArea }            from './perfinfo'
 
 var htmlpreloader = `
     <div class="preloader-wrapper big active">
@@ -32,7 +32,7 @@ var htmlpreloader = `
         </div>
     </div>`
 
-export interface UnitDiskArgs
+export interface HypertreeArgs
 {
     parent:         any
 
@@ -43,20 +43,20 @@ export interface UnitDiskArgs
     layout:         LayoutFunction,
     onNodeSelect:   (n:N) => void,
 
-    decorator:      { new(a: InteractionArgs) : UnitDiskUi & HTMLElement },
+    decorator:      { new(a: InteractionArgs) : HypertreeUi & HTMLElement },
 
     ui : {
         clipRadius:     number,
         nodeRadius:     number,
         transformation: Transformation<N>,
         cacheUpdate:    (cache:Interaction)=> void,
-        caption:        (unitdisk:UnitDisk, n:N)=> string,
-        onClick:        (unitdisk:UnitDisk, n:N, m:C)=> void,
+        caption:        (unitdisk:Hypertree, n:N)=> string,
+        onClick:        (unitdisk:Hypertree, n:N, m:C)=> void,
         layers:         ((ls:Interaction, parent:d3Sel)=> Layer)[],
     }
 }
 
-export interface UnitDiskUi
+export interface HypertreeUi
 {
     args:                 any,
     updateData:           ()=> void,
@@ -67,22 +67,22 @@ export interface UnitDiskUi
 /**
 * Something like a controller.
 *
-* all operations must be started here, UnitDisk modifyes
+* all operations must be started here, Hypertree modifyes
 * data, langmap, pathes and then updates the ui.
 *
 * data->weights->layout
 */
-export class UnitDisk
+export class Hypertree
 {
-    args           : UnitDiskArgs
-    ui             : UnitDiskUi & HTMLElement
+    args           : HypertreeArgs
+    ui             : HypertreeUi & HTMLElement
     infoUi         : HTMLElement & { msg, updateModel, updateLayout }
     data           : N
     langMap        : {}
     paths          : { isSelected?:N, isHovered?:N } = {}
     animationTimer : any = true
 
-    constructor(args : UnitDiskArgs) {
+    constructor(args : HypertreeArgs) {
         this.args  = args                
         this.infoUi = InfoArea(args)
         this.ui = new args.decorator({

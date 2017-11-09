@@ -11,6 +11,8 @@ declare global {
     var app : App
 }
 
+export { Hypertree } from "./components/hypertree"
+
 export * from './hyperbolic-math'
 export * from './hyperbolic-transformation'
 
@@ -18,22 +20,14 @@ export * from './models/n'
 export * from './models/n-loaders'
 export * from './models/n-layouts'
 
-import * as loaders_ from './models/n-loaders'
-export var loaders = loaders_
 
-import * as layouts_ from './models/n-layouts'
-export var layouts = layouts_
-
-//import * as layers_ from './components/layers'
-//export var layers = layers_
-
-//import * as decorators_ from './components/unitdisk/navigationDecorator'
-//export var decorators = decorators_
-
-export * from './components/layers'
+export * from './components/layerstack'
+export * from './components/layerstack/layers'
 export * from './components/unitdisk'
-export * from './components/unitdisk/layerStack'
-export * from './components/unitdisk/navigationDecorator'
-export * from './components/unitdisk/mouseAndCache'
+export * from './components/unitdisk/interactive-unitdisk'
 
 
+import * as loaders_ from './models/n-loaders'
+import * as layouts_ from './models/n-layouts'
+export var loaders = loaders_
+export var layouts = layouts_

@@ -1,5 +1,8 @@
 import * as d3 from 'd3'
 import { N }   from '../../models/n'
+import { Interaction }          from '../unitdisk/interactive-unitdisk'
+
+//export * from './layerStack'
 
 export interface LayerArgs
 {
@@ -90,4 +93,64 @@ export class Layer implements ILayer
     updateAll       = ()=> this.update.call(this.all)
     updateTransform = ()=> this.update.call(this.args.updateTransform(this))
     updateColor     = ()=> this.update.call(this.args.updateColor(this))
+}
+
+
+export interface LayerStackArgs
+{
+    parent,
+    interaction: Interaction
+}
+
+export class LayerStack
+{
+    args: LayerStackArgs
+
+    layers:         any
+
+    cells:          Layer // set on create
+    links:          Layer
+    nodes:          Layer
+    captions:       Layer
+
+    constructor(args: LayerStackArgs)
+    {
+        this.args = args
+        this.layers = this.args.parent.append('g')
+        this.updateLayers()
+    }
+
+    private updateLayers() : void
+    {
+        for (var layerfactoryfunc of this.args.interaction.args.layers)
+        {
+            var argscpy = Object.assign({ parent:this.layers }, this.args.interaction)
+            var newL = layerfactoryfunc(this.args.interaction, this.layers)
+            this[newL.args.name] = newL
+        }
+    }
+
+    public updatePath()
+    {
+        if (this.cells)    this.cells.updateData()
+        if (this.links)    this.links.updateColor()
+        if (this.nodes)    this.nodes.updateColor()
+        if (this.captions) this.captions.updateData()
+        //Materialize.toast("updatePath", 2500)
+    }
+
+    public updateTransformation()
+    {
+        var t0 = performance.now()
+        if (this.cells)    this.cells.updateData()
+        var t1 = performance.now()
+        if (this.links)    this.links.updateData()
+        var t2 = performance.now()
+        if (this.nodes)    this.nodes.updateData()
+        var t3 = performance.now()
+        if (this.captions) this.captions.updateData()
+        if (this.args.interaction.cache.filteredNodes.length != 3)
+        this.args.interaction.args.unitdisk.infoUi.updateD3Info(
+            10, [t1-t0, t2-t1, t3-t2, performance.now() - t3], this.args.interaction.cache)
+    }
 }

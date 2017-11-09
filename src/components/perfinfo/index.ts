@@ -78,7 +78,7 @@ export function InfoArea(args)
         var a = n+l+c+t
         var mag_ = .1
 
-        rendering.innerHTML = `Draw: ${a}/1000 - ${n}/${l}/${c}/${t} | <sub>w>${mw.toPrecision(2)}</sub>`
+        rendering.innerHTML = `SVG: ${a}/1000 - ${n}/${l}/${c}/${t} | <sub>w>${mw.toPrecision(2)}</sub>`
         updateBar(transformBar, [Δ].map(e=> e*mag), [colorScale(Δ)])
 
         transform.innerHTML = `Transf.: ${Δ.toPrecision(3)}ms, ${na} nodes | <sub>r<.995</sub>`
