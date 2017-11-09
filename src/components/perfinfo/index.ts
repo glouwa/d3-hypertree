@@ -2,6 +2,14 @@ import * as d3  from 'd3'
 import { HTML } from 'duct'
 import { t }    from 'duct'
 
+/*                                                 tooltip
+draw      2ms:    543 nodes
+transform 7ms:    543 nodes,                       ..links, ..cells, ..caps |w>16.5
+layout    11ms:   12345 nodes                      kh
+weights   32ms:   12345 nodes                      mu_w   234, med_w   555, min_w,   max_w,
+data      5335ms: 12345 nodes, 53434kb, .7 leafes, mu_°   4.3, med_°   3.6, min_°,   max_°,
+                                                   mu_h   8.4, med_h     8, min_h,   max_h,
+*/
 var htmlinfo = `<div class="render-info">
         <div></div>
         <div class="bar-bg"></div>
@@ -15,18 +23,8 @@ var htmlinfo = `<div class="render-info">
         <div class="bar-bg"></div>
     </div>`
 
-/*
-draw      2ms:    543 nodes
-transform 7ms:    543 nodes,   ..links, ..cells, ..caps |w>16.5
-layout    11ms:   12345 nodes  kh
-weights   32ms:   12345 nodes                      mu_w   234, med_w   555, min_w,   max_w,
-data      5335ms: 12345 nodes, 53434kb, .7 leafes, mu_°   4.3, med_°   3.6, min_°,   max_°,
-                                                   mu_h   8.4, med_h     8, min_h,   max_h,
-*/
-
 //IA = HTMLElement & { updateModel, updateLayout, updateCachInfo }
 //export function InfoArea(args) : IA
-
 
 export function InfoArea(args)
 {
@@ -66,7 +64,10 @@ export function InfoArea(args)
     ui.updateD3Info = (max, Δ, cache)=> {
         var t = Δ.reduce((a,e)=> a+e).toFixed(0)
 
-        D3.innerHTML = `D<sub>3</sub>: ${t}ms ${cache.filteredNodes.length}nodes`
+        D3.innerHTML = `D<sub>3</sub>:
+                                ${cache.filteredNodes.length}nodes
+                                ${t} \\ 10ms
+                                `
         updateBar(D3Bar, Δ.map(e=> e*mag), typeColors)
     }
 
@@ -78,16 +79,22 @@ export function InfoArea(args)
         var a = n+l+c+t
         var mag_ = .1
 
-        rendering.innerHTML = `SVG: ${a}/1000 - ${n}/${l}/${c}/${t} | <sub>w>${mw.toPrecision(2)}</sub>`
         updateBar(transformBar, [Δ].map(e=> e*mag), [colorScale(Δ)])
+        rendering.innerHTML = `SVG: | <sub>w>${mw.toPrecision(2)}</sub>
+                                ${n}/${l}/${c}/${t}
+                                ${a} \\ 1000`
 
-        transform.innerHTML = `Transf.: ${Δ.toPrecision(3)}ms, ${na} nodes | <sub>r<.995</sub>`
         updateBar(renderingBar, [n, l, c, t].map(e=> e*mag_), typeColors)
+        transform.innerHTML = `Transf.: | <sub>r<.995</sub>
+                                ${na} nodes
+                                ${Δ.toPrecision(3)} \\ 10ms
+                                `
     }
 
     ui.updateLayout = (x, Δ)=> {
-        layout.innerHTML = `Layout: ${Δ.toFixed(1)}ms, ?nodes. max r = .?`
         updateBar(layoutBar, [Δ].map(e=> e*mag), ['#2196f3'])
+        layout.innerHTML = `Layout: ?nodes. max r = .?
+                                ${Δ.toFixed(1)} \\ 10ms`
     }
 
     ui.updateModel = (model, Δ)=> {
@@ -99,8 +106,13 @@ export function InfoArea(args)
         var h = model.height
         var ø = 0; model.each(cn=> ø += (cn.children||[]).length/i)
 
-        data.innerHTML = `Load: ${t}ms, ${n}n, ${lp}l, ↕<sub>max</sub>=${h}, ○<sub>μ</sub>=${ø.toPrecision(2)}, ○<sub>ø</sub>=?`
         updateBar(dataBar, Δ.map(e=>e/20), ['#ff9800', '#2196f3'])
+        data.innerHTML = `Load: ${n}n,
+                                ${lp}l,
+                                ↕<sub>max</sub>=${h},
+                                ○<sub>μ</sub>=${ø.toPrecision(2)},
+                                ${t} \\ 1000ms
+                                `
     }
 
     ui.update = ()=> {}

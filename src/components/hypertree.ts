@@ -80,7 +80,7 @@ export class Hypertree
     data           : N
     langMap        : {}
     paths          : { isSelected?:N, isHovered?:N } = {}
-    animationTimer : any = true
+    animationTimer : any = null
 
     constructor(args : HypertreeArgs) {
         this.args  = args                
@@ -168,6 +168,9 @@ export class Hypertree
     {
         this.args.ui.transformation.state.P.re = 0
         this.args.ui.transformation.state.P.im = 0
+
+        if (this.animationTimer)
+            endAnimation()
 
         var endAnimation = ()=> {
             this.animationTimer.stop()

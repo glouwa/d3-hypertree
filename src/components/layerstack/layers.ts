@@ -17,16 +17,16 @@ export namespace Layers
         constructor(args: CellLayerArgs)
         {
             super({
-                parent: args.parent,
-                clip: args.clip,
-                data: args.data,
+                parent:            args.parent,
+                clip:              args.clip,
+                data:              args.data,
                 name:              'cells',
                 className:         'cell',
                 elementType:       'polygon',
                 create:            l=> e=> e.classed("root",      d=> !d.data.parent)
                                             .classed("leaf",      d=> !d.data.children),
-                updateColor:       l=> s=> s.classed("hovered",   d=> d.data.isHovered)
-                                            .classed("selected",  d=> d.data.isSelected),
+                updateColor:       l=> s=> s.classed("hovered",   d=> d.data.isHovered && d.data.parent)
+                                            .classed("selected",  d=> d.data.isSelected && d.data.parent),
                 updateTransform:   l=> s=> s.attr("points",       d=> d.join(" ")),
             })
         }
@@ -61,15 +61,15 @@ export namespace Layers
                                             .classed("selected",  d=> d.isSelected),
                 updateTransform:   l=> s=> {
                     if (args.curvature(null) == 'l')
-                        s.attr('x1',           d=> d.cache.re)
-                         .attr('y1',           d=> d.cache.im)
-                         .attr('x2',           d=> d.parent.cache.re)
-                         .attr('y2',           d=> d.parent.cache.im)
-                         .attr("stroke-width", d=> args.width(null)(d))
+                        s.attr('x1',             d=> d.cache.re)
+                         .attr('y1',             d=> d.cache.im)
+                         .attr('x2',             d=> d.parent.cache.re)
+                         .attr('y2',             d=> d.parent.cache.im)
+                         .attr("stroke-width",   d=> args.width(null)(d))
                          .attr("stroke-linecap", d=> "round")
                     else
-                        s.attr("d",            d=> this.arcOptions[args.curvature(null)](d))
-                         .attr("stroke-width", d=> args.width(null)(d))
+                        s.attr("d",              d=> this.arcOptions[args.curvature(null)](d))
+                         .attr("stroke-width",   d=> args.width(null)(d))
                          .attr("stroke-linecap", d=> "round")
                 },
             })

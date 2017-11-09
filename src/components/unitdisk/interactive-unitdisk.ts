@@ -264,7 +264,7 @@ export class Interaction
                 this.dblClickTimer = null
                 this.args.onClick(d, m)
             },
-            200)
+            300)
     }
 
     private onDblClick = (n:N) =>

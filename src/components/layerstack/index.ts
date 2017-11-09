@@ -2,8 +2,6 @@ import * as d3 from 'd3'
 import { N } from '../../models/n'
 import { Interaction } from '../unitdisk/interactive-unitdisk'
 
-//export * from './layerStack'
-
 export interface LayerArgs
 {
     parent:          any,
