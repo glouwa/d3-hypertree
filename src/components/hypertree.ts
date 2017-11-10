@@ -120,7 +120,8 @@ export class Hypertree
             var t2 = performance.now()
             this.data = this.args.layout(model, this.args.ui.transformation.state)
             this.ui.args.data = this.data
-            this.infoUi.updateLayout(model, performance.now()-t2)
+            this.args.ui.transformation.cache.N = this.data.descendants().length
+            this.infoUi.updateLayout(this.args.ui.transformation.cache, performance.now()-t2)
 
             this.animateUp()
         })
@@ -143,7 +144,7 @@ export class Hypertree
         app.toast('Layout')
         var t0 = performance.now()
         this.args.layout(this.data, this.args.ui.transformation.state)        
-        this.infoUi.updateLayout(this.data, performance.now()-t0)
+        this.infoUi.updateLayout(this.args.ui.transformation.cache, performance.now()-t0)
         this.updateTransformation()
     }
 

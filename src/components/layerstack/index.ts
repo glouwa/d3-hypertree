@@ -65,6 +65,12 @@ export class Layer implements ILayer
         this.update.call(this.all)
 
 // extrashit
+        if (this.args.name === 'captions')
+            this.addTextBackgroundRects()
+    }
+
+    private addTextBackgroundRects()
+    {
         this.rootSVG.selectAll('rect').remove()
 
         var svgRootHere = this.rootSVG
@@ -79,7 +85,7 @@ export class Layer implements ILayer
                 .attr("x",         x=> view.attributes.dx.value - paddingLeftRight/2 - w/2)
                 .attr("y",         x=> view.attributes.dy.value - paddingTopBottom/2 - .02)
                 .attr("rx",        x=> .012)
-                .attr("ry",        x=> .012)                
+                .attr("ry",        x=> .012)
                 .attr("width",     x=> w + paddingLeftRight)
                 .attr("height",    x=> h + paddingTopBottom + .007)
                 .attr("transform", x=> d.transformStrCache + d.scaleStrText)

@@ -38,9 +38,9 @@ var htmlnav =
     `<div class="unitdisk-nav">
         <svg width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">
             ${bubblehtml}
-            <g class="unitDisc"            transform="translate(520,500) scale(470)"></g>
-            <g class="nav-background-disc" transform="translate(105,105) scale(70)"></g>
-            <g class="nav-parameter-disc"  transform="translate(105,105) scale(70)"></g>
+            <g class="unitDisc"            transform="translate(500,500) scale(470)"></g>
+            <g class="nav-background-disc" transform="translate(100,100) scale(70)"></g>
+            <g class="nav-parameter-disc"  transform="translate(100,100) scale(70)"></g>
         </svg>
         <div class="preloader"></div>
     </div>`

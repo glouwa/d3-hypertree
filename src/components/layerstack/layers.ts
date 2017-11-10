@@ -143,8 +143,8 @@ export namespace Layers
                                             .classed("leaf",      d=> d.parent)
                                             .classed("exit",      d=> (!d.children || !d.children.length)
                                                                       && d.data && d.data.numLeafs),
-                updateColor:       l=> s=> s.classed("hovered",   d=> d.isHovered)
-                                            .classed("selected",  d=> d.isSelected),
+                updateColor:       l=> s=> s.classed("hovered",   d=> d.isHovered && d.data.parent)
+                                            .classed("selected",  d=> d.isSelected && d.data.parent),
                 updateTransform:   l=> s=> s.attr("transform",    d=> args.transform(null)(d))
                                             .attr("r",            d=> args.r(null)(d)),
             })
