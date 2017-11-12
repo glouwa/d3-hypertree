@@ -49,6 +49,10 @@ export function Unitdisk(args : InteractionArgs)
 {
     var ui = HTML.parse<HTMLElement & HypertreeUi>(html)()
     args.parent.appendChild(ui)
+    args.parent = ui.querySelector('.unitDisc')
+
+
+    var interaction = new Interaction(args)
 
     ui.args = args
     ui.updateData           = ()=> {
@@ -60,8 +64,6 @@ export function Unitdisk(args : InteractionArgs)
     }
     ui.updateSelection      = ()=> interaction.updateSelection()
 
-    args.parent = ui.querySelector('.unitDisc')
-    var interaction = new Interaction(args)
     return ui
 }
 
@@ -69,23 +71,9 @@ export function UnitDiskNav(args : InteractionArgs)
 {
     var ui = HTML.parse<HTMLElement & HypertreeUi>(htmlnav)()
     args.parent.appendChild(ui)
-
-    ui.args = args
-    ui.updateData           = ()=> {
-        navBackground.args.data = ui.args.data
-        view.args.data = ui.args.data
-
-        navBackground.updatePositions()
-        view.updatePositions()
-        navParameter.updatePositions()
-    }
-    ui.updateTransformation = ()=> {
-        view.updatePositions();
-        navParameter.updatePositions();
-    }
-    ui.updateSelection      = ()=> { view.updateSelection(); /*navBackground.updateSelection();*/ }
-
     args.parent = ui.querySelector('.unitDisc')
+
+
     var view = new Interaction(args)
 
     var navBackground = new Interaction({
@@ -109,7 +97,6 @@ export function UnitDiskNav(args : InteractionArgs)
     var navTransformation =
         new NegTransformation(
             new PanTransformation(args.transformation.state))
-
     var rotate = d=>
         (d.name === 'λ' ? ' rotate(-30)' : ' rotate(0)')
     var Pscale =  ls=> d=>
@@ -124,8 +111,7 @@ export function UnitDiskNav(args : InteractionArgs)
                                 (ls:Interaction, par)=> new Layers.NodeLayer({
                                     parent:      par,
                                     data:        l=> ls.cache.filteredNodes,
-                                    r:           l=> d=> ls.args.nodeRadius
-                                                       * (d.name==='P' ? Pscale(ls)(d) : 1),
+                                    r:           l=> d=> ls.args.nodeRadius * (d.name==='P' ? Pscale(ls)(d) : 1),
                                     transform:   l=> d=> d.transformStrCache,
                                 }),
                                 (ls:Interaction, par)=> new Layers.LabelLayer({
@@ -159,6 +145,22 @@ export function UnitDiskNav(args : InteractionArgs)
         clipRadius:         1.4,
         mouseRadius:        1.4,
     })
+
+    ui.args = args
+    ui.updateData           = ()=> {
+        navBackground.args.data = ui.args.data
+        view.args.data = ui.args.data
+
+        navBackground.updatePositions()
+        view.updatePositions()
+        navParameter.updatePositions()
+    }
+    ui.updateTransformation = ()=> {
+        view.updatePositions();
+        navParameter.updatePositions();
+    }
+    ui.updateSelection      = ()=> { view.updateSelection(); /*navBackground.updateSelection();*/ }
+
 
     return ui
 }

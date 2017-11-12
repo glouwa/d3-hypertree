@@ -189,7 +189,7 @@ export class Hypertree
             this.args.layout(this.data, this.args.ui.transformation.state)
             this.ui.updateData()
 
-            if (this.data.leaves().reduce((max, i)=> Math.max(max, i.cachep.r), 0) > .995)
+            if (this.data.leaves().reduce((max, i)=> Math.max(max, i.cachep.r), 0) > .95)
                 endAnimation()
         }
 

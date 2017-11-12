@@ -29,6 +29,11 @@ export class Layer implements ILayer
     update : any
     data : any
 
+    all             = ()=> this.update.call(this.args.updateTransform(this)).call(this.args.updateColor(this))
+    updateAll       = ()=> this.update.call(this.all)
+    updateTransform = ()=> this.update.call(this.args.updateTransform(this))
+    updateColor     = ()=> this.update.call(this.args.updateColor(this))
+
     constructor(args : LayerArgs) {
         this.args = args
         this.rootSVG = args.parent.append('g')
@@ -77,38 +82,35 @@ export class Layer implements ILayer
         this.rootSVG.selectAll("text").each(function(d:N, i, v:SVGTextElement[])
         {
             var view:any = v[i]
-            var w = view.getComputedTextLength() * 1.2
-            var h = 0.025
-            var paddingLeftRight = .05
+            var w = view.getComputedTextLength()
+            var h = 0.045
+            var paddingLeftRight = .08
             var paddingTopBottom = .02
             svgRootHere.insert('rect', d=> this)
                 .attr("x",         x=> view.attributes.dx.value - paddingLeftRight/2 - w/2)
-                .attr("y",         x=> view.attributes.dy.value - paddingTopBottom/2 - .02)
+                .attr("y",         x=> view.attributes.dy.value - paddingTopBottom/2 - h/2)
                 .attr("rx",        x=> .012)
                 .attr("ry",        x=> .012)
                 .attr("width",     x=> w + paddingLeftRight)
-                .attr("height",    x=> h + paddingTopBottom + .007)
+                .attr("height",    x=> h + paddingTopBottom)
                 .attr("transform", x=> d.transformStrCache + d.scaleStrText)
                 .classed('caption-background', true)
         })
-    }
-
-    all             = ()=> this.update.call(this.args.updateTransform(this)).call(this.args.updateColor(this))
-    updateAll       = ()=> this.update.call(this.all)
-    updateTransform = ()=> this.update.call(this.args.updateTransform(this))
-    updateColor     = ()=> this.update.call(this.args.updateColor(this))
+    }    
 }
 
 export var bboxOffset = d=> v=> {
-    var w = v.getComputedTextLength() * 1.2 //var bb = v.getBBox() war schlechter
-    var h = 0.025
-    var paddingLeftRight = .05
+    var w = v.getComputedTextLength()  //var bb = v.getBBox() war schlechter
+    var h = 0.045
+    var paddingLeftRight = .08
     var paddingTopBottom = .02
     return {
         re:(paddingLeftRight/2 + w/2) * Math.cos(d.cachep.θ),
         im:(paddingTopBottom/2 + h/2) * Math.sin(d.cachep.θ)
     }
 }
+
+//-------------------------------------------------------------------------------------------------
 
 
 export interface LayerStackArgs

@@ -77,6 +77,35 @@ export class Interaction
 
     cache:          TransformationCache // zeigt auf transformation.cache
 
+    //-----------------------------------------------------------------------------------------
+
+    private updateLayers() : void {
+        this.updateCache()
+        this.layerStack = new LayerStack({
+            parent: d3.select(this.args.parent),
+            interaction: this
+        })
+    }
+
+    updateSelection() {
+        this.layerStack.updatePath()
+    }
+
+    updateData() : void { console.assert(false) }
+
+    updatePositions() : void {
+        this.focusCircle
+            .attr("r", πify(CktoCp(this.args.transformation.state.λ).θ) / 2 / Math.PI)
+
+        this.updateCache()
+        this.layerStack.updateTransformation()
+    }
+
+    // TODO muss hier weg
+    private updateCache() {
+        this.args.cacheUpdate(this, this.cache)
+    }
+
     constructor(args : InteractionArgs)
     {
         this.args = args
@@ -167,35 +196,6 @@ export class Interaction
             this.focusCircle = mainGroup.select('empty-selection')
 
         this.updateLayers()
-    }
-
-    //-----------------------------------------------------------------------------------------
-
-    private updateLayers() : void {
-        this.updateCache()
-        this.layerStack = new LayerStack({
-            parent: d3.select(this.args.parent),
-            interaction: this
-        })
-    }
-
-    updateSelection() {
-        this.layerStack.updatePath()
-    }
-
-    updateData() : void { console.assert(false) }
-
-    updatePositions() : void {
-        this.focusCircle
-            .attr("r", πify(CktoCp(this.args.transformation.state.λ).θ) / 2 / Math.PI)
-
-        this.updateCache()
-        this.layerStack.updateTransformation()
-    }
-
-    // TODO muss hier weg
-    private updateCache() {
-        this.args.cacheUpdate(this, this.cache)
     }
 
     //-----------------------------------------------------------------------------------------

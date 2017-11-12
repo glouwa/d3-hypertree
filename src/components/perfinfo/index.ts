@@ -106,7 +106,7 @@ export function InfoArea(args)
         var a = n+l+c+t
 
         updateBar(renderingBar, [n, l, c, t].map(e=> e*mag_svg), typeColors)
-        renderingLabel.innerHTML = `SVG<sub>w>${mw.toPrecision(2)}</sub>`
+        renderingLabel.innerHTML = `SVG`
         renderingInfo.innerHTML  = `${n} / ${l} / ${c} / ${t}`
         renderingInfo.title      = `${n} circles \n${l} links \n${c} cells \n${t} labels`
         renderingQ.innerHTML     = `${a}`
@@ -114,7 +114,7 @@ export function InfoArea(args)
 
         updateBar(transformBar, [Δ].map(e=> e*mag), [colorScale(Δ)])
         transformLabel.innerHTML = `Transf.`
-        transformInfo.innerHTML  = `${na} nodes`
+        transformInfo.innerHTML  = `${na} nodes<sub>w>${mw.toFixed(1)}</sub>`
         transformQ.innerHTML     = `${Δ.toFixed()}`
         transformQmax.innerHTML  = `<sub>${ms}ms</sub>`
     }
