@@ -39,8 +39,6 @@ export class HyperbolicTransformation implements Transformation<N>
     onDragP =        (s:C, e:C)=> CassignC(this.state.P, compose(this.dST, shift(this.dST, s, maxR(e, this.maxMouseR))).P)
     onDragθ:         (s:C, e:C)=> {}
     onDragλ =        (s:C, e:C)=> CassignC(this.state.λ, setR(e, 1))
-
-
 }
 
 export class PanTransformation implements Transformation<N>
@@ -64,8 +62,6 @@ export class PanTransformation implements Transformation<N>
     onDragP =        (s:C, e:C)=> CassignC(this.state.P, maxR(CaddC(this.dST.P, CsubC(e, s)), .999))
     onDragθ =        (s:C, e:C)=> CassignC(this.state.θ, setR(e, 1))
     onDragλ =        (s:C, e:C)=> CassignC(this.state.λ, setR(e, 1))
-
-
 }
 
 export class NegTransformation implements Transformation<N>
@@ -92,6 +88,7 @@ export class NegTransformation implements Transformation<N>
 
 export class TransformationCache
 {
+    N:              number
     filteredLinks:  N[]
     filteredNodes:  N[]
     leafNodes:      N[]

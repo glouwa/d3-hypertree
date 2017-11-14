@@ -13,7 +13,7 @@ import { Transformation }      from '../hyperbolic-transformation'
 import { Layer }               from './layerstack'
 import { LayerArgs }           from './layerstack'
 import { Interaction }         from './unitdisk/interactive-unitdisk'
-import { InteractionArgs }     from './unitdisk/interactive-unitdisk'
+import { UnitDiskArgs }        from './unitdisk'
 
 import { InfoArea }            from './perfinfo'
 
@@ -43,7 +43,7 @@ export interface HypertreeArgs
     layout:         LayoutFunction,
     onNodeSelect:   (n:N) => void,
 
-    decorator:      { new(a: InteractionArgs) : HypertreeUi & HTMLElement },
+    decorator:      { new(a: UnitDiskArgs) : HypertreeUi & HTMLElement },
 
     ui : {
         clipRadius:     number,
@@ -56,7 +56,7 @@ export interface HypertreeArgs
     }
 }
 
-export interface HypertreeUi
+export interface HypertreeUi // = unitdisk :/
 {
     args:                 any,
     updateData:           ()=> void,

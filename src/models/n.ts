@@ -5,8 +5,7 @@ import { HierarchyNode } from 'd3'
 export interface NavObject {
 }
 
-export interface File {
-    path,
+export interface File {    
     io {
         read,
         write,
@@ -26,25 +25,22 @@ export interface Species {
 //HierarchyNode<Datum>
 */
 
-
-
-
-
 export interface N {
     id:                 string,        //
     name?:              string,
+
     data:               any,           //
     parent:             N,             //?
     children:           Array<N>,      //?
-
     depth:              number,        //
     height:             number,
     value?:             number,        //
-    sum,
 
     ancestors,
     descendants,
     leaves,
+
+    sum,
 
 //layout
     z?:                 C,

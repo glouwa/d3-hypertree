@@ -7,13 +7,11 @@ export function dfs(n, fpre, idx=0) {
 }
 
 /*
-
 es git zwei arten von filter:
  - nur element reausnehmen (kinder trotzdem besuchen)
  - element und kinder rausnehmen (gar nicht erst besuchen)
-
-
 */
+
 export function dfsFlat(n, f?) {
     if (!n) return []
     var r = []
@@ -39,6 +37,27 @@ export function sigmoid(x)
     return .5 + .5 * Math.tanh(x*6-3)
 }
 
+export function maxR(c:C, v:number)
+{
+    var mp = CktoCp(c);
+    mp.r = mp.r>v?v:mp.r;
+    return CptoCk(mp)
+}
+
+export function setR(c:C, r)
+{
+    var mp = CktoCp(c)
+    mp.r = r
+    return CptoCk(mp)
+}
+
+export function πify(α:number) : number
+{
+    if (α < 0)           return α + 2 * Math.PI
+    if (α > 2 * Math.PI) return α - 2 * Math.PI
+    return α
+}
+
 //----------------------------------------------------------------------------------------
 
 export interface T { P:C, θ:C, λ:C }
@@ -58,12 +77,12 @@ export function h2e(t:T, z:C) : C
     return CdivC(oben, unten)
 }
 
-        function e2h(t:T, z:C) : C
-        {
-            var θ = Cneg(CmulC(Ccon(t.θ), t.P))
-            var P = Ccon(t.θ)
-            return h2e(makeT(P, θ), z)
-        }
+function e2h(t:T, z:C) : C
+{
+    var θ = Cneg(CmulC(Ccon(t.θ), t.P))
+    var P = Ccon(t.θ)
+    return h2e(makeT(P, θ), z)
+}
 
 export function compose(t1:T, t2:T) : T
 {
@@ -190,26 +209,3 @@ export function ArrAddR(p:[number, number], s:number) : [number,number] { return
             else
                 return { r:0, θ:0 }
         }
-
-export function maxR(c:C, v:number)
-{
-    var mp = CktoCp(c);
-    mp.r = mp.r>v?v:mp.r;
-    return CptoCk(mp)
-}
-
-export function setR(c:C, r)
-{
-    var mp = CktoCp(c)
-    mp.r = r
-    return CptoCk(mp)
-}
-
-export function πify(α:number) : number
-{
-    if (α < 0)           return α + 2 * Math.PI
-    if (α > 2 * Math.PI) return α - 2 * Math.PI
-    return α
-}
-
-

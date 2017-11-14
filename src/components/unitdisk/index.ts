@@ -13,7 +13,7 @@ import { TransformationCache }           from '../../hyperbolic-transformation'
 import { HypertreeUi }                   from '../hypertree'
 import { Layer }                         from '../layerstack'
 import { Layers }                        from '../layerstack/layers'
-import { Interaction, InteractionArgs }  from './interactive-unitdisk'
+import { Interaction }                   from './interactive-unitdisk'
 
 var bubblehtml =
     `<defs>
@@ -45,7 +45,51 @@ var htmlnav =
         <div class="preloader"></div>
     </div>`
 
-export function Unitdisk(args : InteractionArgs)
+export interface UnitDiskArgs
+{
+    parent:            any,
+    hypertree,
+    data:              N,
+    layers:            ((ls:Interaction, parent:d3Sel)=> Layer)[],
+
+    cacheUpdate:       (interaction:Interaction, cache:TransformationCache)=> void,
+    transformation:    Transformation<N>,
+    transform:         (n:N)=> C,
+
+    onClick:           (n:N, m:C)=> void,
+
+    caption:           (n:N)=> string,
+    nodeRadius:        number,
+    clipRadius?:       number,
+    mouseRadius?:      number,
+}
+
+/*export interface UnitDiskArgs2
+{
+    parent,
+    hypertree
+    data:              N,
+    transformation
+    {
+        cacheUpdate:       (i:Interaction, cache:TransformationCache)=> void,
+        transformation:    Transformation<N>,
+        transform:         (n:N)=> C,
+    }
+    interaction:
+    {
+        onClick:           (n:N, m:C)=> void,
+    }
+    geometrie
+    {
+        caption:           (n:N)=> string,
+        nodeRadius:        number,
+        clipRadius?:       number,
+        mouseRadius?:      number,
+        layers:            ((ls:Interaction, parent:d3Sel)=> Layer)[],
+    }
+}*/
+
+export function Unitdisk(args : UnitDiskArgs)
 {
     var ui = HTML.parse<HTMLElement & HypertreeUi>(html)()
     args.parent.appendChild(ui)
@@ -67,7 +111,7 @@ export function Unitdisk(args : InteractionArgs)
     return ui
 }
 
-export function UnitDiskNav(args : InteractionArgs)
+export function UnitDiskNav(args : UnitDiskArgs)
 {
     var ui = HTML.parse<HTMLElement & HypertreeUi>(htmlnav)()
     args.parent.appendChild(ui)

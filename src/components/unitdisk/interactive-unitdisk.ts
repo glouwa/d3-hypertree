@@ -10,6 +10,7 @@ import { C, CptoCk, CktoCp,
 
 import { Layer }                from './../layerstack'
 import { LayerStack }           from '../layerstack'
+import { UnitDiskArgs }         from './'
 
 var html = ` unused
 <clipPath id="circle-clip"><circle r="1"></circle></clipPath>
@@ -21,71 +22,18 @@ var html = ` unused
     <g class="captions"></g>
 </g>`
 
-export interface InteractionArgs
-{
-    parent:            any,
-    hypertree,
-    data:              N,
-    layers:            ((ls:Interaction, parent:d3Sel)=> Layer)[],
-
-    cacheUpdate:       (interaction:Interaction, cache:TransformationCache)=> void,
-    transformation:    Transformation<N>,
-    transform:         (n:N)=> C,
-
-    onClick:           (n:N, m:C)=> void,
-
-    caption:           (n:N)=> string,
-    nodeRadius:        number,
-    clipRadius?:       number,
-    mouseRadius?:      number,
-}
-
-/*
-export interface InteractionArgs2
-{
-    parent,
-    hypertree
-    data:              N,
-    transformation
-    {
-        cacheUpdate:       (i:Interaction, cache:TransformationCache)=> void,
-        transformation:    Transformation<N>,
-        transform:         (n:N)=> C,
-    }
-    interaction:
-    {
-        onClick:           (n:N, m:C)=> void,
-    }
-    geometrie
-    {
-        caption:           (n:N)=> string,
-        nodeRadius:        number,
-        clipRadius?:       number,
-        mouseRadius?:      number,
-        layers:            ((ls:Interaction, parent:d3Sel)=> Layer)[],
-    }
-}
-*/
 
 // InteractiveUnitdisk
 export class Interaction
 {
-    args:           InteractionArgs   
+    args:           UnitDiskArgs
     focusCircle:    any                  // d3?... SvgCircle
-    layerStack:     LayerStack    
+    layerStack:     LayerStack
     voronoiLayout:  d3.VoronoiLayout<N>
 
     cache:          TransformationCache // zeigt auf transformation.cache
 
     //-----------------------------------------------------------------------------------------
-
-    private updateLayers() : void {
-        this.updateCache()
-        this.layerStack = new LayerStack({
-            parent: d3.select(this.args.parent),
-            interaction: this
-        })
-    }
 
     updateSelection() {
         this.layerStack.updatePath()
@@ -106,7 +54,7 @@ export class Interaction
         this.args.cacheUpdate(this, this.cache)
     }
 
-    constructor(args : InteractionArgs)
+    constructor(args : UnitDiskArgs)
     {
         this.args = args
         this.cache = args.transformation.cache
@@ -195,7 +143,11 @@ export class Interaction
         else
             this.focusCircle = mainGroup.select('empty-selection')
 
-        this.updateLayers()
+        this.updateCache()
+        this.layerStack = new LayerStack({
+            parent: d3.select(this.args.parent),
+            interaction: this
+        })
     }
 
     //-----------------------------------------------------------------------------------------
