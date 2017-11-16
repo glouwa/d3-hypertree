@@ -112,7 +112,8 @@ export class Hypertree
         this.args.dataloader((d3h, t1)=>
         {
             var t2 = performance.now()
-            var model = <N & d3.HierarchyNode<N>>d3.hierarchy(d3h)
+            var model = <N & d3.HierarchyNode<N>>d3
+                            .hierarchy(d3h)
                             .sum(this.args.weight) // this.updateWeights()
 
             this.ui.querySelector('.preloader').innerHTML = ''
@@ -122,8 +123,7 @@ export class Hypertree
             this.data = this.args.layout(model, this.args.ui.transformation.state)
             this.ui.args.data = this.data
             this.args.ui.transformation.cache.N = this.data.descendants().length
-            for (var n of dfsFlat(this.data, n=>true))
-                n.label = this.args.ui.caption(this, n)
+            this.updateLang_()
             this.infoUi.updateLayout(this.args.ui.transformation.cache, performance.now()-t3)
 
             this.animateUp()
@@ -134,12 +134,14 @@ export class Hypertree
         this.args.langloader(langMap=>
         {            
             this.langMap = langMap
-
-            for (var n of dfsFlat(this.data, n=>true))
-                n.label = this.args.ui.caption(this, n)
-
+            this.updateLang_()
             this.updateTransformation()
         })
+    }
+
+    private updateLang_() {
+        for (var n of dfsFlat(this.data, n=>true))
+            n.label = this.args.ui.caption(this, n)
     }
 
     private updateWeights() : void {
@@ -186,24 +188,24 @@ export class Hypertree
         if (this.animationTimer)
             endAnimation()
 
-        var animateTo = λ=> {
-            var π = Math.PI
-            var animλ = CptoCk({ θ:2*π*λ, r:1 })
-            this.args.ui.transformation.state.λ.re = animλ.re
-            this.args.ui.transformation.state.λ.im = animλ.im
-
-            app.toast('Layout')
-            this.args.layout(this.data, this.args.ui.transformation.state)
-            this.ui.updateData()
-
-            if (this.data.leaves().reduce((max, i)=> Math.max(max, i.cachep.r), 0) > .95)
-                endAnimation()
-        }
-
         var step = 0, steps = 33
         this.animationTimer = d3.timer(()=> {
             if (!this.animationTimer)
                 return
+
+            var animateTo = λ=> {
+                var π = Math.PI
+                var animλ = CptoCk({ θ:2*π*λ, r:1 })
+                this.args.ui.transformation.state.λ.re = animλ.re
+                this.args.ui.transformation.state.λ.im = animλ.im
+
+                app.toast('Layout')
+                this.args.layout(this.data, this.args.ui.transformation.state)
+                this.ui.updateData()
+
+                if (this.data.leaves().reduce((max, i)=> Math.max(max, i.cachep.r), 0) > .95)
+                    endAnimation()
+            }
 
             var p = step++/steps
             if (step > steps)
