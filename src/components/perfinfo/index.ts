@@ -1,6 +1,6 @@
 import * as d3  from 'd3'
-import { HTML } from 'duct'
-import { t }    from 'duct'
+import { HTML } from 'ducd'
+import { t }    from 'ducd'
 
 /*                                                 tooltip
 draw      2ms:    543 nodes
@@ -152,10 +152,13 @@ export function InfoArea(args)
         var h = model.height
         var ø = 0; model.each(cn=> ø += (cn.children||[]).length/i)
 
-        updateBar(dataBar, Δ.map(e=>e/mag_load), ['#ff9800', '#2196f3'])
+        updateBar(dataBar, Δ.map(e=>e/mag_load), ['#ff9800', '#2196f3', 'green'])
         dataLabel.innerHTML = `Load`
         dataInfo.innerHTML  = `${n} nodes`
-        dataInfo.title   = `${lp} leaves\n`
+        dataInfo.title   = `download: ${Δ[0].toFixed(0)}ms\n`
+        dataInfo.title  += `parse: ${Δ[1].toFixed(0)}ms\n`
+        dataInfo.title  += `hierarchy and weights: ${Δ[2].toFixed(0)}ms\n`
+        dataInfo.title  += `${lp} leaves\n`
         dataInfo.title  += `↕ max: ${h}\n`
         dataInfo.title  += `↕ μ: ?\n`
         dataInfo.title  += `↕ ⌀: ?\n`

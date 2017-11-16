@@ -23,7 +23,8 @@
   },
   "dependencies": {
     "d3": "^4.10.0",
-    "xml2js": "^0.4.17"
+    "xml2js": "^0.4.17",
+    "ducd": "^1.0.0"
   },
   "devDependencies": {
     "@types/d3": "^4.10.0",

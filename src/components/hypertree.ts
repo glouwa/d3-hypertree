@@ -2,10 +2,11 @@
 //import { timer }                    from 'd3-timer'
 //import { interpolateHcl, rgb }      from 'd3-color'
 
-import * as d3                     from 'd3'
+import * as d3                 from 'd3'
 import { N }                   from '../models/n'
 import { LoaderFunction }      from '../models/n-loaders'
 import { LayoutFunction }      from '../models/n-layouts'
+import { dfsFlat }             from '../hyperbolic-math'
 import { C, CktoCp, CptoCk }   from '../hyperbolic-math'
 import { sigmoid }             from '../hyperbolic-math'
 import { Transformation }      from '../hyperbolic-transformation'
@@ -88,16 +89,16 @@ export class Hypertree
         this.ui = new args.decorator({
             parent:         args.parent,
             hypertree:      this,
-            mouseRadius:    args.ui.transformation.maxMouseR,
             data:           undefined,            
             transformation: this.args.ui.transformation,
             transform:      (n:N)=> this.ui.args.transformation.transformPoint(n.z),
             layers:         this.args.ui.layers,
-            clipRadius:     this.args.ui.clipRadius,
-            nodeRadius:     this.args.ui.nodeRadius,
             cacheUpdate:    this.args.ui.cacheUpdate,
             onClick:        (n:N, m:C)=> this.args.ui.onClick(this, n, m),
             caption:        (n:N)=> this.args.ui.caption(this, n),
+            clipRadius:     this.args.ui.clipRadius,
+            nodeRadius:     this.args.ui.nodeRadius,
+            mouseRadius:    args.ui.transformation.maxMouseR,
         })        
         this.updateData()
         this.updateLang()
@@ -108,20 +109,22 @@ export class Hypertree
         this.ui.querySelector('.preloader').innerHTML = htmlpreloader
         this.ui.args.data = undefined
         this.ui.updateData()
-        this.args.dataloader(d3h=>
+        this.args.dataloader((d3h, t1)=>
         {
-            var t1 = performance.now()
+            var t2 = performance.now()
             var model = <N & d3.HierarchyNode<N>>d3.hierarchy(d3h)
                             .sum(this.args.weight) // this.updateWeights()
 
             this.ui.querySelector('.preloader').innerHTML = ''
-            this.infoUi.updateModel(model, [t1-t0, performance.now()-t1])
+            this.infoUi.updateModel(model, [t1-t0, t2-t1, performance.now()-t2])
 
-            var t2 = performance.now()
+            var t3 = performance.now()
             this.data = this.args.layout(model, this.args.ui.transformation.state)
             this.ui.args.data = this.data
             this.args.ui.transformation.cache.N = this.data.descendants().length
-            this.infoUi.updateLayout(this.args.ui.transformation.cache, performance.now()-t2)
+            for (var n of dfsFlat(this.data, n=>true))
+                n.label = this.args.ui.caption(this, n)
+            this.infoUi.updateLayout(this.args.ui.transformation.cache, performance.now()-t3)
 
             this.animateUp()
         })
@@ -129,8 +132,12 @@ export class Hypertree
 
     public updateLang() : void {
         this.args.langloader(langMap=>
-        {
+        {            
             this.langMap = langMap
+
+            for (var n of dfsFlat(this.data, n=>true))
+                n.label = this.args.ui.caption(this, n)
+
             this.updateTransformation()
         })
     }
@@ -149,7 +156,7 @@ export class Hypertree
     }
 
     private updateTransformation() : void {
-        this.ui.updateTransformation()
+        requestAnimationFrame(this.ui.updateTransformation)
     }
 
     public updatePath(pathId:string, n:N)
@@ -162,7 +169,7 @@ export class Hypertree
         if (new_ && new_.ancestors) for (var pn of new_.ancestors()) pn[pathId] = n
 
         //this.ui.updateSelection()
-        this.ui.updateTransformation()
+        requestAnimationFrame(this.ui.updateTransformation)
     }
 
     private animateUp()
@@ -170,14 +177,14 @@ export class Hypertree
         this.args.ui.transformation.state.P.re = 0
         this.args.ui.transformation.state.P.im = 0
 
-        if (this.animationTimer)
-            endAnimation()
-
         var endAnimation = ()=> {
             this.animationTimer.stop()
             this.animationTimer = null
             //this.onZoomFitEnd(null, null, null)
         }
+
+        if (this.animationTimer)
+            endAnimation()
 
         var animateTo = λ=> {
             var π = Math.PI

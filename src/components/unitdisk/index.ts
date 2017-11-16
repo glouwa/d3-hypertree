@@ -1,5 +1,5 @@
 import * as d3                           from 'd3'
-import { HTML }                          from 'duct'
+import { HTML }                          from 'ducd'
 import { N }                             from '../../models/n'
 import { obj2data }                      from '../../models/n-loaders'
 import { C, CktoCp, CmulR, CsubC }       from '../../hyperbolic-math'

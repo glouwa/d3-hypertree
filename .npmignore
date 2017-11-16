@@ -1,0 +1,13 @@
+doc/
+res/
+node_modules/
+src/
+
+# qt cerator
+*.directory
+*.config
+*.creator
+*.creator.user
+*.files
+*.includes
+.idea/
