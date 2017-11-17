@@ -11,7 +11,7 @@ import { PanTransformation }             from '../../hyperbolic-transformation'
 import { NegTransformation }             from '../../hyperbolic-transformation'
 import { TransformationCache }           from '../../hyperbolic-transformation'
 import { HypertreeUi }                   from '../hypertree'
-import { Layer }                         from '../layerstack'
+import { ILayer }                        from '../layerstack'
 import { Layers }                        from '../layerstack/layers'
 import { Interaction }                   from './interactive-unitdisk'
 
@@ -50,7 +50,7 @@ export interface UnitDiskArgs
     parent:            any,
     hypertree,
     data:              N,
-    layers:            ((ls:Interaction, parent:d3Sel)=> Layer)[],
+    layers:            ((ls:Interaction, parent:d3Sel)=> ILayer)[],
 
     cacheUpdate:       (interaction:Interaction, cache:TransformationCache)=> void,
     transformation:    Transformation<N>,
@@ -152,14 +152,12 @@ export function UnitDiskNav(args : UnitDiskArgs)
         hypertree:          args.hypertree,
         data:               obj2data(args.transformation.state),
         layers:             [
-                                (ls:Interaction, par)=> new Layers.NodeLayer({
-                                    parent:      par,
+                                (ls:Interaction, par)=> new Layers.NodeLayer({                                    
                                     data:        l=> ls.cache.filteredNodes,
                                     r:           l=> d=> ls.args.nodeRadius * (d.name==='P' ? Pscale(ls)(d) : 1),
                                     transform:   l=> d=> d.transformStrCache,
                                 }),
-                                (ls:Interaction, par)=> new Layers.LabelLayer({
-                                    parent:      par,
+                                (ls:Interaction, par)=> new Layers.LabelLayer({                                    
                                     data:        l=> ls.cache.filteredNodes,
                                     text:        l=> d=> ({P:'+', θ:'🗘', λ:'⚲' })[d.name],
                                     delta:       l=> d=> ({ re:.0025, im:.025 }),
@@ -180,7 +178,7 @@ export function UnitDiskNav(args : UnitDiskArgs)
                                 try { cache.voronoiDiagram = interaction.voronoiLayout(cache.filteredNodes) } catch(e) {}
                             },
         transformation:     navTransformation,
-        transform:          (n:N)=> CmulR(n,-1),
+        transform:          (n:any)=> CmulR(n, -1),
 
         onClick:            (n:N, m:C)=> {}, //args.onAnimateTo(navTransformation, n, CsubC(m, navTransformation.state.P)),
 

@@ -7,8 +7,6 @@ import { C, CptoCk, CktoCp,
          dfsFlat, CsubC,
          arcCenter, πify,
          sigmoid }              from '../../hyperbolic-math'
-
-import { Layer }                from './../layerstack'
 import { LayerStack }           from '../layerstack'
 import { UnitDiskArgs }         from './'
 
@@ -187,7 +185,7 @@ export class Interaction
 
         this.onDragStart(n, m)
 
-        var md = CktoCp(m), initR = md.r, step = 0, steps = 33
+        var md = CktoCp(m), initR = md.r, step = 0, steps = 20
         this.animationTimer = d3.timer(()=> //setInterval(() => // todo: use d3 timer (requestAnimationFrame)
         {
             md.r = initR * (1 - sigmoid(step++/steps))

@@ -4,7 +4,7 @@ import { stratify } from 'd3-hierarchy'
 import { request, json, csv } from 'd3-request'
 
 // todo loader MUSS ein generic sein
-export type LoaderFunction = (ok: (root:N)=>void)=> void
+export type LoaderFunction = (ok: (root:N, t0:number)=>void)=> void
 
 function oneNode(ok) {
     ok({

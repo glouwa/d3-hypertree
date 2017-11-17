@@ -17,14 +17,78 @@ export interface LayerArgs
 
 export interface ILayer
 {
-    updateAll:       ()=> void,
+    name:            string,
+    attach:          (parent)=> void,
+    updateData:      ()=> void,
     updateTransform: ()=> void,
     updateColor:     ()=> void,
 }
 
-export class Layer implements ILayer
+export interface LayerStackArgs
 {
-    args : LayerArgs    
+    parent,
+    interaction: Interaction
+}
+
+export class LayerStack
+{
+    args: LayerStackArgs
+
+    layers:         any
+
+    cells:          ILayer // set on create
+    links:          ILayer
+    nodes:          ILayer
+    captions:       ILayer
+
+    constructor(args: LayerStackArgs)
+    {
+        this.args = args
+        this.layers = this.args.parent.append('g')
+        this.updateLayers()
+    }
+
+    private updateLayers() : void
+    {
+        for (var layerfactoryfunc of this.args.interaction.args.layers)
+        {
+            var argscpy = Object.assign({ parent:this.layers }, this.args.interaction)
+            var newL = layerfactoryfunc(this.args.interaction, this.layers)            
+            if (newL.attach) newL.attach(this.layers)
+            this[newL.name] = newL // todo newL.args is a workaround
+        }
+    }
+
+    public updateTransformation()
+    {
+        var t0 = performance.now()
+        if (this.cells)    this.cells.updateData()
+        var t1 = performance.now()
+        if (this.links)    this.links.updateData()
+        var t2 = performance.now()
+        if (this.nodes)    this.nodes.updateData()
+        var t3 = performance.now()
+        if (this.captions) this.captions.updateData()
+        if (this.args.interaction.cache.filteredNodes.length != 3)
+        this.args.interaction.args.hypertree.infoUi.updateD3Info(
+            10, [t1-t0, t2-t1, t3-t2, performance.now() - t3], this.args.interaction.cache)
+    }
+
+    public updatePath()
+    {
+        if (this.cells)    this.cells.updateData()
+        if (this.links)    this.links.updateColor()
+        if (this.nodes)    this.nodes.updateColor()
+        if (this.captions) this.captions.updateData()
+        //Materialize.toast("updatePath", 2500)
+    }
+}
+
+//-------------------------------------------------------------------------------------------------
+
+export class D3UpdateLayer
+{
+    args : LayerArgs
     rootSVG : d3.Selection<SVGElement, N, SVGElement, undefined>
     update : any
     data : any
@@ -57,7 +121,7 @@ export class Layer implements ILayer
 
         this.data = this.args.data(this)
         this.update =
-            this.update            
+            this.update
                 .data(this.data, d=> d)
 
         this.update.exit().remove()
@@ -96,7 +160,7 @@ export class Layer implements ILayer
                 .attr("transform", x=> d.transformStrCache + d.scaleStrText)
                 .classed('caption-background', true)
         })
-    }    
+    }
 }
 
 export var bboxOffset = d=> v=> {
@@ -110,64 +174,3 @@ export var bboxOffset = d=> v=> {
     }
 }
 
-//-------------------------------------------------------------------------------------------------
-
-
-export interface LayerStackArgs
-{
-    parent,
-    interaction: Interaction
-}
-
-export class LayerStack
-{
-    args: LayerStackArgs
-
-    layers:         any
-
-    cells:          Layer // set on create
-    links:          Layer
-    nodes:          Layer
-    captions:       Layer
-
-    constructor(args: LayerStackArgs)
-    {
-        this.args = args
-        this.layers = this.args.parent.append('g')
-        this.updateLayers()
-    }
-
-    private updateLayers() : void
-    {
-        for (var layerfactoryfunc of this.args.interaction.args.layers)
-        {
-            var argscpy = Object.assign({ parent:this.layers }, this.args.interaction)
-            var newL = layerfactoryfunc(this.args.interaction, this.layers)
-            this[newL.args.name] = newL
-        }
-    }
-
-    public updatePath()
-    {
-        if (this.cells)    this.cells.updateData()
-        if (this.links)    this.links.updateColor()
-        if (this.nodes)    this.nodes.updateColor()
-        if (this.captions) this.captions.updateData()
-        //Materialize.toast("updatePath", 2500)
-    }
-
-    public updateTransformation()
-    {
-        var t0 = performance.now()
-        if (this.cells)    this.cells.updateData()
-        var t1 = performance.now()
-        if (this.links)    this.links.updateData()
-        var t2 = performance.now()
-        if (this.nodes)    this.nodes.updateData()
-        var t3 = performance.now()
-        if (this.captions) this.captions.updateData()
-        if (this.args.interaction.cache.filteredNodes.length != 3)
-        this.args.interaction.args.hypertree.infoUi.updateD3Info(
-            10, [t1-t0, t2-t1, t3-t2, performance.now() - t3], this.args.interaction.cache)
-    }
-}

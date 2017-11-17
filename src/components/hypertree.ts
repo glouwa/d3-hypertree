@@ -11,7 +11,7 @@ import { C, CktoCp, CptoCk }   from '../hyperbolic-math'
 import { sigmoid }             from '../hyperbolic-math'
 import { Transformation }      from '../hyperbolic-transformation'
 
-import { Layer }               from './layerstack'
+import { ILayer }              from './layerstack'
 import { LayerArgs }           from './layerstack'
 import { Interaction }         from './unitdisk/interactive-unitdisk'
 import { UnitDiskArgs }        from './unitdisk'
@@ -53,16 +53,26 @@ export interface HypertreeArgs
         cacheUpdate:    (cache:Interaction)=> void,
         caption:        (hypertree:Hypertree, n:N)=> string,
         onClick:        (hypertree:Hypertree, n:N, m:C)=> void,
-        layers:         ((ls:Interaction, parent:d3Sel)=> Layer)[],
+        layers:         ((ls:Interaction, parent:d3Sel)=> ILayer)[],
     }
+}
+
+export interface IHypertree
+{
+    args:                 any,
+    updateData:           (data)=> void,
+    updateLang:           (langmap)=> void,
+    updateSelection:      (selection)=> void,
+    updateTransformation: (T)=> void
 }
 
 export interface HypertreeUi // = unitdisk :/
 {
     args:                 any,
     updateData:           ()=> void,
-    updateTransformation: ()=> void,
+    updateLang:           ()=> void,
     updateSelection:      ()=> void,
+    updateTransformation: ()=> void
 }
 
 /**
@@ -144,6 +154,19 @@ export class Hypertree
             n.label = this.args.ui.caption(this, n)
     }
 
+    public updatePath(pathId:string, n:N)
+    {
+        var old_ =  this.paths[pathId]
+        this.paths[pathId] = n
+        var new_ =  this.paths[pathId]
+
+        if (old_ && old_.ancestors) for (var pn of old_.ancestors()) pn[pathId] = undefined
+        if (new_ && new_.ancestors) for (var pn of new_.ancestors()) pn[pathId] = n
+
+        //this.ui.updateSelection()
+        requestAnimationFrame(this.ui.updateTransformation)
+    }
+
     private updateWeights() : void {
         //this.data.sum(this.args.weight) // todo: testen ob man das braucht
         this.updateLayout()
@@ -158,19 +181,6 @@ export class Hypertree
     }
 
     private updateTransformation() : void {
-        requestAnimationFrame(this.ui.updateTransformation)
-    }
-
-    public updatePath(pathId:string, n:N)
-    {
-        var old_ =  this.paths[pathId]
-        this.paths[pathId] = n
-        var new_ =  this.paths[pathId]
-
-        if (old_ && old_.ancestors) for (var pn of old_.ancestors()) pn[pathId] = undefined
-        if (new_ && new_.ancestors) for (var pn of new_.ancestors()) pn[pathId] = n
-
-        //this.ui.updateSelection()
         requestAnimationFrame(this.ui.updateTransformation)
     }
 

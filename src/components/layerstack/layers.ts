@@ -1,25 +1,35 @@
-import { N }                    from '../../models/n'
-import { CsubC, CktoCp }        from '../../hyperbolic-math'
-import { arcCenter }            from '../../hyperbolic-math'
-import { Layer, LayerArgs }     from './index'
+import { N }                        from '../../models/n'
+import { CsubC, CktoCp }            from '../../hyperbolic-math'
+import { arcCenter }                from '../../hyperbolic-math'
+import { ILayer }                   from './index'
+import { D3UpdateLayer, LayerArgs } from './index'
 
 export namespace Layers
 {
     export interface CellLayerArgs
     {
-        parent,
         data,
         clip?:  (l)=> string,
     }
 
-    export class CellLayer extends Layer
+    export class CellLayer implements ILayer
     {
-        constructor(args: CellLayerArgs)
-        {
-            super({
-                parent:            args.parent,
-                clip:              args.clip,
-                data:              args.data,
+        args: CellLayerArgs
+        layer: D3UpdateLayer
+        updateData =      ()=> this.layer.updateData()
+        updateTransform = ()=> this.layer.updateTransform()
+        updateColor =     ()=> this.layer.updateColor()
+        name = 'cells'
+
+        constructor(args: CellLayerArgs) {
+            this.args = args
+        }
+
+        public attach(parent) {
+            this.layer = new D3UpdateLayer({
+                parent:            parent,
+                clip:              this.args.clip,
+                data:              this.args.data,
                 name:              'cells',
                 className:         'cell',
                 elementType:       'polygon',
@@ -37,58 +47,62 @@ export namespace Layers
     export type ArcCurvature = '+' | '0' | '-' | 'l'
     export interface ArcLayerArgs
     {
-        parent,
         data:      (l)=> any,
         curvature: (l)=> ArcCurvature,
         width,
         clip?:     (l)=> string,
     }
 
-    export class ArcLayer extends Layer
+    export class ArcLayer implements ILayer
     {
         args: ArcLayerArgs
-        constructor(args: ArcLayerArgs)
-        {
-            super({
-                parent: args.parent,
-                clip: args.clip,
-                data: args.data,
+        layer: D3UpdateLayer
+        updateData =      ()=> this.layer.updateData()
+        updateTransform = ()=> this.layer.updateTransform()
+        updateColor =     ()=> this.layer.updateColor()
+        name = 'links'
+
+        constructor(args: ArcLayerArgs) {
+            this.args = args
+        }
+
+        public attach(parent) {
+            this.layer = new D3UpdateLayer({
+                parent:            parent,
+                clip:              this.args.clip,
+                data:              this.args.data,
                 name:              'links',
                 className:         'arc',
-                elementType:       args.curvature(null) == 'l' ? 'line' : 'path',
+                elementType:       this.args.curvature(null) == 'l' ? 'line' : 'path',
                 create:            l=> s=> {},
                 updateColor:       l=> s=> s.classed("hovered",   d=> d.isHovered)
                                             .classed("selected",  d=> d.isSelected),
                 updateTransform:   l=> s=> {
-                    if (args.curvature(null) == 'l')
+                    if (this.args.curvature(null) == 'l')
                         s.attr('x1',             d=> d.cache.re)
                          .attr('y1',             d=> d.cache.im)
                          .attr('x2',             d=> d.parent.cache.re)
                          .attr('y2',             d=> d.parent.cache.im)
-                         .attr("stroke-width",   d=> args.width(null)(d))
+                         .attr("stroke-width",   d=> this.args.width(null)(d))
                          .attr("stroke-linecap", d=> "round")
                     else
-                        s.attr("d",              d=> this.arcOptions[args.curvature(null)](d))
-                         .attr("stroke-width",   d=> args.width(null)(d))
+                        s.attr("d",              d=> this.arcOptions[this.args.curvature(null)](d))
+                         .attr("stroke-width",   d=> this.args.width(null)(d))
                          .attr("stroke-linecap", d=> "round")
                 },
             })
         }
 
-        private curvature()
-        {
+        private curvature() {
             return this.args.curvature(this)
         }
 
-        private width(d)
-        {
+        private width(d) {
             return this.arcOptions[this.args.curvature(this)](d)
         }
 
-        private svgArc(a:string, b:string) : (d:N)=> string
-        {
-            return function(d) : string
-            {
+        private svgArc(a:string, b:string) : (d:N)=> string {
+            return function(d) : string {
                 var arcP1 = d.cache
                 var arcP2 = d.parent.cache
                 var arcC = arcCenter(arcP1, arcP2)
@@ -101,8 +115,7 @@ export namespace Layers
             }
         }
 
-        private svgArcLine(d)
-        {
+        private svgArcLine(d) {
             var s = d.strCache                                  //this.t(d)
             var e = d.parent.strCache                           //this.t(d.parent)
             return `M ${s} L ${e}`
@@ -119,25 +132,34 @@ export namespace Layers
 
     export interface NodeLayerArgs
     {
-        parent,
         data,
         r:         (l)=> any,
         transform,
         clip?:     (l)=> string,
     }
 
-    export class NodeLayer extends Layer
+    export class NodeLayer implements ILayer
     {
-        constructor(args: NodeLayerArgs)
-        {
-            super({
-                parent: args.parent,
-                clip: args.clip,
-                data: args.data,
+        args: NodeLayerArgs
+        layer: D3UpdateLayer
+        updateData =      ()=> this.layer.updateData()
+        updateTransform = ()=> this.layer.updateTransform()
+        updateColor =     ()=> this.layer.updateColor()
+        name = 'nodes'
+
+        constructor(args: NodeLayerArgs) {
+            this.args = args
+        }
+
+        public attach(parent) {
+            this.layer = new D3UpdateLayer({
+                parent:            parent,
+                clip:              this.args.clip,
+                data:              this.args.data,
                 name:              'nodes',
                 className:         'node',
                 elementType:       'circle',
-                create:            l=> s=> s.attr("r",            d=> args.r(null)(d))
+                create:            l=> s=> s.attr("r",            d=> this.args.r(null)(d))
                                             .classed("root",      d=> !d.parent)
                                             .classed("lazy",      d=> d.hasOutChildren)
                                             .classed("leaf",      d=> d.parent)
@@ -145,8 +167,8 @@ export namespace Layers
                                                                       && d.data && d.data.numLeafs),
                 updateColor:       l=> s=> s.classed("hovered",   d=> d.isHovered && d.data.parent)
                                             .classed("selected",  d=> d.isSelected && d.data.parent),
-                updateTransform:   l=> s=> s.attr("transform",    d=> args.transform(null)(d))
-                                            .attr("r",            d=> args.r(null)(d)),
+                updateTransform:   l=> s=> s.attr("transform",    d=> this.args.transform(null)(d))
+                                            .attr("r",            d=> this.args.r(null)(d)),
             })
         }
     }
@@ -154,8 +176,7 @@ export namespace Layers
     //-----------------------------------------------------------------------------------------
 
     export interface LabelLayerArgs
-    {
-        parent,
+    {        
         data:     (l)=> any,
         delta,
         transform,
@@ -163,24 +184,34 @@ export namespace Layers
         clip?:    (l)=> string,
     }
 
-    export class LabelLayer extends Layer
+    export class LabelLayer implements ILayer
     {
-        constructor(args: LabelLayerArgs)
-        {
-            super({
-                parent: args.parent,
-                clip: args.clip,
-                data: args.data,
+        args: LabelLayerArgs
+        layer: D3UpdateLayer
+        updateData =      ()=> this.layer.updateData()
+        updateTransform = ()=> this.layer.updateTransform()
+        updateColor =     ()=> this.layer.updateColor()
+        name = 'captions'
+
+        constructor(args: LabelLayerArgs) {
+            this.args = args
+        }
+
+        public attach(parent) {
+            this.layer = new D3UpdateLayer({
+                parent:            parent,
+                clip:              this.args.clip,
+                data:              this.args.data,
                 name:              'captions',
                 className:         'caption',
                 elementType:       'text',
                 create:            l=> s=> s.classed("P",         d=> d.name == 'P')
-                                            .classed("caption-icon",      d=> d.icon && navigator.platform.includes('inux') ),
+                                            .classed("caption-icon", d=> d.icon && navigator.platform.includes('inux') ),
                 updateColor:       l=> s=> {},
-                updateTransform:   l=> s=> s.attr("transform",    d=> args.transform(null)(d))
-                                            .text(                args.text(null))
-                                            .attr("dx",           (d, i, v)=> args.delta(null)(d, i, v).re)
-                                            .attr("dy",           (d, i, v)=> args.delta(null)(d, i, v).im)
+                updateTransform:   l=> s=> s.attr("transform",    d=> this.args.transform(null)(d))
+                                            .text(                this.args.text(null))
+                                            .attr("dx",           (d, i, v)=> this.args.delta(null)(d, i, v).re)
+                                            .attr("dy",           (d, i, v)=> this.args.delta(null)(d, i, v).im)
             })
         }
     }
