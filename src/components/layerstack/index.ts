@@ -53,7 +53,7 @@ export class LayerStack
         for (var layerfactoryfunc of this.args.interaction.args.layers)
         {
             var argscpy = Object.assign({ parent:this.layers }, this.args.interaction)
-            var newL = layerfactoryfunc(this.args.interaction, this.layers)            
+            var newL = layerfactoryfunc(this.args.interaction)
             if (newL.attach) newL.attach(this.layers)
             this[newL.name] = newL // todo newL.args is a workaround
         }
@@ -146,7 +146,7 @@ export class D3UpdateLayer
         this.rootSVG.selectAll("text").each(function(d:N, i, v:SVGTextElement[])
         {
             var view:any = v[i]
-            var w = view.getComputedTextLength()
+            var w = d.labellen = d.labellen || view.getComputedTextLength()
             var h = 0.045
             var paddingLeftRight = .08
             var paddingTopBottom = .02
@@ -164,7 +164,7 @@ export class D3UpdateLayer
 }
 
 export var bboxOffset = d=> v=> {
-    var w = v.getComputedTextLength()  //var bb = v.getBBox() war schlechter
+    var w = d.labellen = d.labellen || v.getComputedTextLength()  //var bb = v.getBBox() war schlechter
     var h = 0.045
     var paddingLeftRight = .08
     var paddingTopBottom = .02

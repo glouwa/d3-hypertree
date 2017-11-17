@@ -53,7 +53,7 @@ export interface HypertreeArgs
         cacheUpdate:    (cache:Interaction)=> void,
         caption:        (hypertree:Hypertree, n:N)=> string,
         onClick:        (hypertree:Hypertree, n:N, m:C)=> void,
-        layers:         ((ls:Interaction, parent:d3Sel)=> ILayer)[],
+        layers:         ((ls:Interaction)=> ILayer)[],
     }
 }
 
@@ -150,8 +150,10 @@ export class Hypertree
     }
 
     private updateLang_() {
-        for (var n of dfsFlat(this.data, n=>true))
+        for (var n of dfsFlat(this.data, n=>true)) {
             n.label = this.args.ui.caption(this, n)
+            n.labellen = undefined
+        }
     }
 
     public updatePath(pathId:string, n:N)

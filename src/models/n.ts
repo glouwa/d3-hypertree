@@ -42,6 +42,10 @@ export interface N {
 
     sum,
 
+//  labels
+    label:              number,
+    labellen:           number
+
 //layout
     z?:                 C,
 
@@ -61,6 +65,8 @@ export interface N {
 // selection
     isSelected?:        N,
     isHovered?:         N,
+
+
 }
 
 

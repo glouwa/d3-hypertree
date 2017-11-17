@@ -50,7 +50,7 @@ export interface UnitDiskArgs
     parent:            any,
     hypertree,
     data:              N,
-    layers:            ((ls:Interaction, parent:d3Sel)=> ILayer)[],
+    layers:            ((ls:Interaction)=> ILayer)[],
 
     cacheUpdate:       (interaction:Interaction, cache:TransformationCache)=> void,
     transformation:    Transformation<N>,
@@ -152,12 +152,12 @@ export function UnitDiskNav(args : UnitDiskArgs)
         hypertree:          args.hypertree,
         data:               obj2data(args.transformation.state),
         layers:             [
-                                (ls:Interaction, par)=> new Layers.NodeLayer({                                    
+                                (ls:Interaction)=> new Layers.NodeLayer({
                                     data:        l=> ls.cache.filteredNodes,
                                     r:           l=> d=> ls.args.nodeRadius * (d.name==='P' ? Pscale(ls)(d) : 1),
                                     transform:   l=> d=> d.transformStrCache,
                                 }),
-                                (ls:Interaction, par)=> new Layers.LabelLayer({                                    
+                                (ls:Interaction)=> new Layers.LabelLayer({
                                     data:        l=> ls.cache.filteredNodes,
                                     text:        l=> d=> ({P:'+', θ:'🗘', λ:'⚲' })[d.name],
                                     delta:       l=> d=> ({ re:.0025, im:.025 }),
