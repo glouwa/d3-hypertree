@@ -19,40 +19,43 @@ export function dfsFlat(n, f?) {
     return r
 }
 
+export function dfs2(n, f, fpre, idx=0) {
+    if (!n) return []
+    if (fpre) fpre(n, idx)
+    if (n.children)
+        if (f(n))
+            for (var i=0; i < n.children.length; i++)
+                dfs2(n.children[i], f, fpre, i)
+}
+
 export function dfsFlat2(n, f?) {
     if (!n) return []
     var r = []
-    if(!f || f(n))
-        dfs(n, n=> r.push(n))
+    dfs2(n, f, n=> r.push(n))
     return r
 }
 
-export function clone(o)
-{
+export function clone(o) {
     return JSON.parse(JSON.stringify(o))
 }
 
-export function sigmoid(x)
-{
+export function sigmoid(x) {
     return .5 + .5 * Math.tanh(x*6-3)
 }
 
-export function maxR(c:C, v:number)
-{
+export function maxR(c:C, v:number) {
     var mp = CktoCp(c);
     mp.r = mp.r>v?v:mp.r;
     return CptoCk(mp)
 }
 
-export function setR(c:C, r)
-{
+export function setR(c:C, r) {
     var mp = CktoCp(c)
     mp.r = r
     return CptoCk(mp)
 }
 
-export function πify(α:number) : number
-{
+export function πify(α:number) : number {
     if (α < 0)           return α + 2 * Math.PI
     if (α > 2 * Math.PI) return α - 2 * Math.PI
     return α

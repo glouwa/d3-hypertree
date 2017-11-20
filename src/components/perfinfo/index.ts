@@ -115,6 +115,7 @@ export function InfoArea(args)
         updateBar(transformBar, [Δ].map(e=> e*mag), [colorScale(Δ)])
         transformLabel.innerHTML = `Transf.`
         transformInfo.innerHTML  = `${na} nodes<sub>w>${mw.toFixed(1)}</sub>`
+        transformInfo.title      = `${na}`
         transformQ.innerHTML     = `${Δ.toFixed()}`
         transformQmax.innerHTML  = `<sub>${ms}ms</sub>`
     }

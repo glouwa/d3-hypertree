@@ -3,7 +3,7 @@
   "main": "dist/js/index.js",
   "types": "dist/d/index.js.map",
 
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Hyperbolictree",
   "author": "Michael Glatzhofer",
   "license": "???",
