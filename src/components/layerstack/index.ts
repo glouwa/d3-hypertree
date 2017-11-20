@@ -2,19 +2,6 @@ import * as d3 from 'd3'
 import { N } from '../../models/n'
 import { Interaction } from '../unitdisk/interactive-unitdisk'
 
-export interface LayerArgs
-{
-    parent:          any,
-    name:            string,
-    className:       string,
-    elementType:     string,    
-    data:            (l)=> any,
-    create:          (l)=> (s)=> any,
-    updateTransform: (l)=> (s)=> any,
-    updateColor:     (l)=> (s)=> any,
-    clip?:           (l)=> string,
-}
-
 export interface ILayer
 {
     name:            string,
@@ -86,6 +73,19 @@ export class LayerStack
 
 //-------------------------------------------------------------------------------------------------
 
+export interface LayerArgs
+{
+    parent:          any,
+    name:            string,
+    className:       string,
+    elementType:     string,
+    data:            any,
+    create:          (s)=> any,
+    updateTransform: (s)=> any,
+    updateColor:     (s)=> any,
+    clip?:           string,
+}
+
 export class D3UpdateLayer
 {
     args : LayerArgs
@@ -93,17 +93,18 @@ export class D3UpdateLayer
     update : any
     data : any
 
-    all             = ()=> this.update.call(this.args.updateTransform(this)).call(this.args.updateColor(this))
+    all             = ()=> this.update.call(this.args.updateTransform)
+                                      .call(this.args.updateColor)
     updateAll       = ()=> this.update.call(this.all)
-    updateTransform = ()=> this.update.call(this.args.updateTransform(this))
-    updateColor     = ()=> this.update.call(this.args.updateColor(this))
+    updateTransform = ()=> this.update.call(this.args.updateTransform)
+    updateColor     = ()=> this.update.call(this.args.updateColor)
 
     constructor(args : LayerArgs) {
         this.args = args
         this.rootSVG = args.parent.append('g')
-            .attr("clip-path", this.args.clip ? `url(${this.args.clip(this)})` : undefined)
+            .attr("clip-path", this.args.clip ? `url(${this.args.clip})` : undefined)
 
-        this.data = this.args.data(this)
+        this.data = this.args.data
         this.update =
             this.rootSVG
                 .selectAll(this.args.elementType)
@@ -112,14 +113,14 @@ export class D3UpdateLayer
 
         this.update
             .attr("class", this.args.className)
-            .call(this.args.create(this))
+            .call(this.args.create)
             .call(this.all)
     }
 
     updateData() {
         var oldElements = this.update
 
-        this.data = this.args.data(this)
+        this.data = this.args.data
         this.update =
             this.update
                 .data(this.data, d=> d)
@@ -128,7 +129,7 @@ export class D3UpdateLayer
         var n = this.update
             .enter().append(this.args.elementType)
                 .attr("class", this.args.className)
-                .call(this.args.create(this))
+                .call(this.args.create)
 
         this.update = this.update.merge(n)
         this.update.call(this.all)

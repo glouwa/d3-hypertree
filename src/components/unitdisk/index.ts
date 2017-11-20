@@ -12,7 +12,8 @@ import { NegTransformation }             from '../../hyperbolic-transformation'
 import { TransformationCache }           from '../../hyperbolic-transformation'
 import { HypertreeUi }                   from '../hypertree'
 import { ILayer }                        from '../layerstack'
-import { Layers }                        from '../layerstack/layers'
+import { NodeLayer }                     from '../layerstack/layers/node-layer'
+import { LabelLayer }                    from '../layerstack/layers/text-rect-layer'
 import { Interaction }                   from './interactive-unitdisk'
 
 var bubblehtml =
@@ -152,16 +153,16 @@ export function UnitDiskNav(args : UnitDiskArgs)
         hypertree:          args.hypertree,
         data:               obj2data(args.transformation.state),
         layers:             [
-                                (ls:Interaction)=> new Layers.NodeLayer({
-                                    data:        l=> ls.cache.filteredNodes,
-                                    r:           l=> d=> ls.args.nodeRadius * (d.name==='P' ? Pscale(ls)(d) : 1),
-                                    transform:   l=> d=> d.transformStrCache,
+                                (ls:Interaction)=> new NodeLayer({
+                                    data:        ()=> ls.cache.filteredNodes,
+                                    r:           d=> ls.args.nodeRadius * (d.name==='P' ? Pscale(ls)(d) : 1),
+                                    transform:   d=> d.transformStrCache,
                                 }),
-                                (ls:Interaction)=> new Layers.LabelLayer({
-                                    data:        l=> ls.cache.filteredNodes,
-                                    text:        l=> d=> ({P:'+', θ:'🗘', λ:'⚲' })[d.name],
-                                    delta:       l=> d=> ({ re:.0025, im:.025 }),
-                                    transform:   l=> d=> d.transformStrCache + rotate(d)
+                                (ls:Interaction)=> new LabelLayer({
+                                    data:        ()=> ls.cache.filteredNodes,
+                                    text:        d=> ({P:'+', θ:'🗘', λ:'⚲' })[d.name],
+                                    delta:       d=> ({ re:.0025, im:.025 }),
+                                    transform:   d=> d.transformStrCache + rotate(d)
                                 })
                             ],
         cacheUpdate:        (interaction:Interaction, cache:TransformationCache)=> {
