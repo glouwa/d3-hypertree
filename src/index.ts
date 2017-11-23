@@ -1,16 +1,3 @@
-declare global {
-    type d3Sel = {}
-    interface App {
-        controllerTree,
-        toast,
-        init
-    }
-    interface Window {
-        app:App
-    }
-    var app : App
-}
-
 export { Hypertree } from "./components/hypertree"
 
 export * from './hyperbolic-math'

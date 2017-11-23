@@ -175,7 +175,7 @@ export class Hypertree
     }
 
     private updateLayout() : void {        
-        app.toast('Layout')
+        //app.toast('Layout')
         var t0 = performance.now()
         this.args.layout(this.data, this.args.ui.transformation.state)        
         this.infoUi.updateLayout(this.args.ui.transformation.cache, performance.now()-t0)
@@ -211,7 +211,7 @@ export class Hypertree
                 this.args.ui.transformation.state.λ.re = animλ.re
                 this.args.ui.transformation.state.λ.im = animλ.im
 
-                app.toast('Layout')
+                //app.toast('Layout')
                 this.args.layout(this.data, this.args.ui.transformation.state)
                 this.ui.updateData()
 
