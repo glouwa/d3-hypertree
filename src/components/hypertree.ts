@@ -124,7 +124,7 @@ export class Hypertree
             var t2 = performance.now()
             var model = <N & d3.HierarchyNode<N>>d3
                             .hierarchy(d3h)
-                            .sum(this.args.weight) // this.updateWeights()
+                            //.sum(this.args.weight) // this.updateWeights()
 
             this.ui.querySelector('.preloader').innerHTML = ''
             this.infoUi.updateModel(model, [t1-t0, t2-t1, performance.now()-t2])
@@ -133,6 +133,7 @@ export class Hypertree
             this.data = this.args.layout(model, this.args.ui.transformation.state)
             this.ui.args.data = this.data
             this.args.ui.transformation.cache.N = this.data.descendants().length
+            this.updateWeights()
             this.updateLang_()
             this.infoUi.updateLayout(this.args.ui.transformation.cache, performance.now()-t3)
 
@@ -170,7 +171,11 @@ export class Hypertree
     }
 
     private updateWeights() : void {
-        //this.data.sum(this.args.weight) // todo: testen ob man das braucht
+        this.data.sum(this.args.weight) 
+        for (var n of dfsFlat(this.data, n=>true)) {
+            n.weightScale = (Math.log2(n.value) || 1)
+                / (Math.log2(this.data.value || this.data.children.length) || 1)
+        }
         this.updateLayout()
     }
 

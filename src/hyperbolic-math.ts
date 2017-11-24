@@ -19,17 +19,30 @@ export function dfsFlat(n, f?) {
     return r
 }
 
-export function dfs2(n, f, fpre, idx=0) {
-    if (!n) return []
-    if (fpre) fpre(n, idx)
-    if (n.children)
-        if (f(n))
-            for (var i=0; i < n.children.length; i++)
-                dfs2(n.children[i], f, fpre, i)
+type VisitOrder = 'dfs' | 'bfs' | 'dfsReverse' | 'bfsReverse'
+interface VisitArgs {
+    tree: {}, // N eigentlich
+    order: VisitOrder,
+    abortFilter: (n)=> boolean,
+    visitFilter: (n)=> boolean,
+    preAction:  (n)=> void,
+    postAction: (n)=> void
+}
+function visit(args:VisitArgs)
+{
 }
 
-export function dfsFlat2(n, f?) {
-    if (!n) return []
+export function dfs2(n, f, fpre, idx=0) {
+    if (!n) return 
+    if (!f(n)) return 
+    if (fpre) 
+        fpre(n, idx)
+    if (n.children)        
+        for (var i=0; i < n.children.length; i++)
+            dfs2(n.children[i], f, fpre, i)
+}
+
+export function dfsFlat2(n, f?) {    
     var r = []
     dfs2(n, f, n=> r.push(n))
     return r
