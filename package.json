@@ -2,7 +2,6 @@
   "name": "d3-hypertree",
   "main": "dist/js/index.js",
   "types": "dist/d/index.js.map",
-
   "version": "1.0.1",
   "description": "Hyperbolictree",
   "author": "Michael Glatzhofer",
@@ -19,7 +18,6 @@
   "scripts": {
     "run": "gulp watch",
     "globalinstall": "npm i -g gulp"
-
   },
   "dependencies": {
     "d3": "^4.10.0",
@@ -30,16 +28,17 @@
     "@types/d3": "^4.10.0",
     "@types/node": "^7.0.27",
     "browser-sync": "^2.18.13",
+    "del": "^3.0.0",
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.1",
     "gulp-debug": "^3.1.0",
+    "gulp-plumber": "^1.1.0",
     "gulp-sass": "^3.1.0",
     "gulp-typescript": "^3.2.1",
     "gulp-util": "^3.0.8",
-    "yargs": "^8.0.2",
     "merge2": "^1.1.0",
-    "del": "^3.0.0",
     "webpack": "^3.7.1",
-    "webpack-stream": "^4.0.0"
+    "webpack-stream": "^4.0.0",
+    "yargs": "^8.0.2"
   }
 }

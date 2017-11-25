@@ -3,8 +3,9 @@ var ts          = require('gulp-typescript')
 var sass        = require('gulp-sass')
 var concat      = require('gulp-concat')
 var gutil       = require('gulp-util')
+var plumber     = require('gulp-plumber')
 var merge       = require('merge2')
-var del         = require('del');
+var del         = require('del')
 var webpack     = require('webpack-stream')
 
 var paths = {
@@ -23,6 +24,7 @@ gulp.task('clean', () =>
 
 gulp.task('tsc', () => {
     var tsResult = gulp.src(paths.src + '**/*.ts')
+        .pipe(plumber())
         .pipe(ts.createProject(require('./tsconfig').compilerOptions)())
 
     return merge([
@@ -33,6 +35,7 @@ gulp.task('tsc', () => {
 
 gulp.task('webpack', ['tsc'], () =>
     gulp.src(paths.dist + 'js/index.js')
+        .pipe(plumber())
         .pipe(webpack({
             output: { filename:'index.js' },
             devtool: 'source-map'
@@ -42,6 +45,7 @@ gulp.task('webpack', ['tsc'], () =>
 
 gulp.task('sass', () =>
     gulp.src(paths.src + '**/*.scss')
+        .pipe(plumber())
         .pipe(sass())
         .pipe(concat('index-browser.css'))
         .pipe(gulp.dest(paths.dist))

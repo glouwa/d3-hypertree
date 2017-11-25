@@ -33,27 +33,36 @@ function visit(args:VisitArgs)
 {
 }
 
-export function dfs2({ node, abortFilter, preAction, idx=0 }) {
-    if (!node) return 
-    if (!abortFilter(node)) return 
+export function dfs2({ node, abortFilter, preAction, highway, idx=0 }) {
+    if (!node) 
+        return 
+    if (!abortFilter(node, idx, highway)) 
+        return 
     if (preAction) 
-        preAction(node, idx)
+        preAction(node, idx, highway) 
     if (node.children)        
-        for (var i=0; i < node.children.length; i++)
+        for (var i=0; i < node.children.length; i++) {
+            var h = highway
+            if (highway.length > 1)
+                if (node.children[i] == highway[1])
+                    h = highway.slice(1) 
             dfs2({
                 node:node.children[i], 
-                abortFilter:abortFilter, 
+                abortFilter:abortFilter,  
                 preAction:preAction, 
+                highway:h,
                 idx:i
             })
+        }
 }
 
 export function dfsFlat2(n, f?) {    
     var r = []
     dfs2({
-        node:n, 
-        abortFilter:f,
-        preAction: n=> r.push(n)
+        node: n, 
+        abortFilter: f,
+        preAction: n=> r.push(n),
+        highway: []
     })
     return r
 }
