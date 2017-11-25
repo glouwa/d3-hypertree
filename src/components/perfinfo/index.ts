@@ -98,7 +98,8 @@ export function InfoArea(args)
         diff.exit().remove()
     }
 
-    ui.updateTransformationInfo = (na, cache, max, mw, Δ)=> { // updatTransformationInfo
+    ui.updateTransformationInfo = (cache, startNode, minWeigth, Δ)=> { // updatTransformationInfo
+        var na = cache.allNodes.length
         var n = cache.leafNodes.length
         var l = cache.filteredNodes.length
         var c = cache.cells.length
@@ -114,8 +115,10 @@ export function InfoArea(args)
 
         updateBar(transformBar, [Δ].map(e=> e*mag), [colorScale(Δ)])
         transformLabel.innerHTML = `Transf.`
-        transformInfo.innerHTML  = `${na} nodes<sub>w>${mw.toFixed(1)}</sub>`
-        transformInfo.title      = `${na}`
+        transformInfo.innerHTML  = `${na} nodes<sub>w>${minWeigth.toFixed(1)}</sub>`
+        transformInfo.title      = `Visible node count: ${na}\n`
+        transformInfo.title     += `Start node weigth: ${startNode?startNode.value:'-'}\n`
+        transformInfo.title     += `Min weigth: ${minWeigth.toFixed(1)}\n`
         transformQ.innerHTML     = `${Δ.toFixed()}`
         transformQmax.innerHTML  = `<sub>${ms}ms</sub>`
     }

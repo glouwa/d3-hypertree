@@ -171,7 +171,7 @@ export class Hypertree
     }
 
     private updateWeights() : void {
-        this.data.sum(this.args.weight) 
+        this.data.sum(this.args.weight)
         for (var n of dfsFlat(this.data, n=>true)) {
             n.weightScale = (Math.log2(n.value) || 1)
                 / (Math.log2(this.data.value || this.data.children.length) || 1)
@@ -183,7 +183,7 @@ export class Hypertree
         //app.toast('Layout')
         var t0 = performance.now()
         this.args.layout(this.data, this.args.ui.transformation.state)        
-        this.infoUi.updateLayout(this.args.ui.transformation.cache, performance.now()-t0)
+        this.infoUi.updateLayout(this.args.ui.transformation.cache, performance.now() - t0)
         this.updateTransformation()
     }
 
@@ -220,7 +220,7 @@ export class Hypertree
                 this.args.layout(this.data, this.args.ui.transformation.state)
                 this.ui.updateData()
 
-                if (this.data.leaves().reduce((max, i)=> Math.max(max, i.cachep.r), 0) > .95)
+                if (this.data.leaves().reduce((max, n)=> Math.max(max, CktoCp(n.z).r), 0) > .95)
                     endAnimation()
             }
 
