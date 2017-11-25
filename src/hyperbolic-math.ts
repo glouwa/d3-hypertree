@@ -28,23 +28,33 @@ interface VisitArgs {
     preAction:  (n)=> void,
     postAction: (n)=> void
 }
+
 function visit(args:VisitArgs)
 {
 }
 
-export function dfs2(n, f, fpre, idx=0) {
-    if (!n) return 
-    if (!f(n)) return 
-    if (fpre) 
-        fpre(n, idx)
-    if (n.children)        
-        for (var i=0; i < n.children.length; i++)
-            dfs2(n.children[i], f, fpre, i)
+export function dfs2({ node, abortFilter, preAction, idx=0 }) {
+    if (!node) return 
+    if (!abortFilter(node)) return 
+    if (preAction) 
+        preAction(node, idx)
+    if (node.children)        
+        for (var i=0; i < node.children.length; i++)
+            dfs2({
+                node:node.children[i], 
+                abortFilter:abortFilter, 
+                preAction:preAction, 
+                idx:i
+            })
 }
 
 export function dfsFlat2(n, f?) {    
     var r = []
-    dfs2(n, f, n=> r.push(n))
+    dfs2({
+        node:n, 
+        abortFilter:f,
+        preAction: n=> r.push(n)
+    })
     return r
 }
 

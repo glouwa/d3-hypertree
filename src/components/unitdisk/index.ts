@@ -154,6 +154,7 @@ export function UnitDiskNav(args : UnitDiskArgs)
         data:               obj2data(args.transformation.state),
         layers:             [
                                 (ls:Interaction)=> new NodeLayer({
+                                    name:        'nodes',
                                     data:        ()=> ls.cache.filteredNodes,
                                     r:           d=> ls.args.nodeRadius * (d.name==='P' ? Pscale(ls)(d) : 1),
                                     transform:   d=> d.transformStrCache,

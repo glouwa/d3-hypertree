@@ -11,15 +11,15 @@ data      5335ms: 12345 nodes, 53434kb, .7 leafes, mu_°   4.3, med_°   3.6, mi
                                                    mu_h   8.4, med_h     8, min_h,   max_h,
 */
 var htmlinfo = `<div class="render-info">
-    <div class="label"> </div> <div class="nodes"></div> <div class="q"></div> <div class="qmax"></div> <div class="info i1">🌩</div>
+    <div class="label"> </div> <div class="nodes"></div> <div class="q"></div> <div class="qmax"></div> <div class="info i1"></div>
     <div class="bar-bg"></div>
-    <div class="label"> </div> <div class="nodes"></div> <div class="q"></div> <div class="qmax"></div> <div class="info i2">🌧</div>
+    <div class="label"> </div> <div class="nodes"></div> <div class="q"></div> <div class="qmax"></div> <div class="info i2"></div>
     <div class="bar-bg"></div>
     <div class="label"> </div> <div class="nodes"></div> <div class="q"></div> <div class="qmax"></div> <div class="info i3"></div>
     <div class="bar-bg"></div>
-    <div class="label"> </div> <div class="nodes"></div> <div class="q"></div> <div class="qmax"></div> <div class="info i4">🌥</div>
+    <div class="label"> </div> <div class="nodes"></div> <div class="q"></div> <div class="qmax"></div> <div class="info i4"></div>
     <div class="bar-bg"></div>
-    <div class="label"> </div> <div class="nodes"></div> <div class="q"></div> <div class="qmax"></div> <div class="info i5">🌤</div>
+    <div class="label"> </div> <div class="nodes"></div> <div class="q"></div> <div class="qmax"></div> <div class="info i5"></div>
     <div class="bar-bg"></div>
 </div>`
 

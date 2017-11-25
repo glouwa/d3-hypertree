@@ -120,7 +120,7 @@ export class Interaction
             .attr("fill", 'url(#exampleGradient)')
             .on("dblclick",  d=> this.onDblClick(findNodeByCell()))
             .on("click",     d=> this.onClick(findNodeByCell()))
-            .on("mousemove", d=> this.args.hypertree.updatePath('isHovered', findNodeByCell()))
+            //.on("mousemove", d=> this.args.hypertree.updatePath('isHovered', findNodeByCell()))
             .on("mouseout",  d=> this.args.hypertree.updatePath('isHovered', undefined))
             //.call(zoom)
 

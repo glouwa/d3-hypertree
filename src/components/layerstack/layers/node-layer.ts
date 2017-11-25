@@ -3,6 +3,7 @@ import { D3UpdateLayer } from '../index'
 
 export interface NodeLayerArgs
 {
+    name:      string,
     data:      ()=> any,
     r:         (d)=> any,
     transform,
@@ -11,7 +12,7 @@ export interface NodeLayerArgs
 
 export class NodeLayer implements ILayer
 {
-    name = 'nodes'
+    name: string
     args: NodeLayerArgs
     layer: D3UpdateLayer
     updateData =      ()=> this.layer.updateData()
@@ -20,6 +21,7 @@ export class NodeLayer implements ILayer
 
     constructor(args: NodeLayerArgs) {
         this.args = args
+        this.name = args.name
     }
 
     public attach(parent) {
@@ -27,7 +29,7 @@ export class NodeLayer implements ILayer
             parent:            parent,
             clip:              this.args.clip,
             data:              this.args.data,
-            name:              'nodes',
+            name:              this.args.name,
             className:         'node',
             elementType:       'circle',
             create:            s=> s.attr("r",            d=> this.args.r(d))
