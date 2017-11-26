@@ -139,8 +139,8 @@ export class D3UpdateLayer
         this.update.call(this.all)
 
 // extrashit
-        if (this.args.name === 'captions')
-            this.addTextBackgroundRects()
+        //if (this.args.name === 'captions')
+        //    this.addTextBackgroundRects()
     }
 
     private addTextBackgroundRects()

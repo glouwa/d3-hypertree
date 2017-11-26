@@ -125,8 +125,7 @@ export function UnitDiskNav(args : UnitDiskArgs)
         parent:             ui.querySelector('.nav-background-disc'),
         hypertree:          args.hypertree,
         data:               args.data,
-        layers:             args.layers.filter((l, idx)=> idx!==3), // no labels here
-
+        layers:             args.layers.filter((l, idx)=> idx !== 2 && idx !== 3), // no labels, specials here
         cacheUpdate:        args.cacheUpdate,
         transformation:     args.transformation,
         transform:          (n:N)=> n.z,
