@@ -60,7 +60,7 @@ export class LayerStack
         var t4 = performance.now()
         if (this.specials) this.specials.updateData()
 
-        if (this.args.interaction.cache.filteredNodes.length != 3)
+        if (this.args.interaction.cache.unculledNodes.length != 3)
             this.args.interaction.args.hypertree.infoUi.updateD3Info(
                 10, [t1-t0, t2-t1, t3-t2, performance.now() - t3], this.args.interaction.cache)
     }

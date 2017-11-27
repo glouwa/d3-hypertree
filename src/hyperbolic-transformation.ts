@@ -89,9 +89,9 @@ export class NegTransformation implements Transformation<N>
 export class TransformationCache
 {
     N:              number
-    filteredLinks:  N[]
-    filteredNodes:  N[]
-    leafNodes:      N[]
+    links:  N[]
+    unculledNodes:  N[]
+    leafOrLazy:      N[]
     labels:         N[]
 
     voronoiDiagram: d3.VoronoiDiagram<N>

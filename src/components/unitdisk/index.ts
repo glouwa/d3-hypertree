@@ -154,20 +154,20 @@ export function UnitDiskNav(args : UnitDiskArgs)
         layers:             [
                                 (ls:Interaction)=> new NodeLayer({
                                     name:        'nodes',
-                                    data:        ()=> ls.cache.filteredNodes,
+                                    data:        ()=> ls.cache.unculledNodes,
                                     r:           d=> ls.args.nodeRadius * (d.name==='P' ? Pscale(ls)(d) : 1),
                                     transform:   d=> d.transformStrCache,
                                 }),
                                 (ls:Interaction)=> new LabelLayer({
-                                    data:        ()=> ls.cache.filteredNodes,
+                                    data:        ()=> ls.cache.unculledNodes,
                                     text:        d=> ({P:'+', θ:'🗘', λ:'⚲' })[d.name],
                                     delta:       d=> ({ re:.0025, im:.025 }),
                                     transform:   d=> d.transformStrCache + rotate(d)
                                 })
                             ],
         cacheUpdate:        (interaction:Interaction, cache:TransformationCache)=> {
-                                cache.filteredNodes = dfsFlat(interaction.args.data)
-                                for (var n of cache.filteredNodes) {
+                                cache.unculledNodes = dfsFlat(interaction.args.data)
+                                for (var n of cache.unculledNodes) {
                                     n.cache = n.cache || { re:0, im:0 }
                                     CassignC(n.cache, interaction.args.transform(n))
 
@@ -176,7 +176,7 @@ export function UnitDiskNav(args : UnitDiskArgs)
                                     n.scaleStrText      = ` scale(1)`
                                     n.transformStrCache = ` translate(${n.strCache})`
                                 }
-                                try { cache.voronoiDiagram = interaction.voronoiLayout(cache.filteredNodes) } catch(e) {}
+                                try { cache.voronoiDiagram = interaction.voronoiLayout(cache.unculledNodes) } catch(e) {}
                             },
         transformation:     navTransformation,
         transform:          (n:any)=> CmulR(n, -1),

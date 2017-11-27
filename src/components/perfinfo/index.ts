@@ -88,8 +88,8 @@ export function InfoArea(args)
     }
 
     ui.updateSvgInfo = (cache, Δ)=> {        
-        var n = cache.leafNodes.length
-        var l = cache.filteredNodes.length        
+        var n = cache.leafOrLazy.length
+        var l = cache.unculledNodes.length        
         var t = cache.labels.length
         var a = n+l+t // n * 2 if cells
         Δ = [0, l, n, t]
@@ -102,15 +102,14 @@ export function InfoArea(args)
         renderingQmax.innerHTML  = `<sub>1000#</sub>`
     }
 
-    ui.updateTransformationInfo = (cache, startNode, minWeigth, Δ)=> {
-        var na = cache.allNodes.length
+    ui.updateTransformationInfo = (cache, minWeigth, Δ)=> {
+        var na = cache.unculledNodes.length
         var hwexits = minWeigth.map(n=>n.toFixed(1)).join(' ⟶ ')
         
         updateBar(transformBar, [Δ].map(e=> e*mag), [colorScale(Δ)])
         transformLabel.innerHTML = `Transf.`
         transformInfo.innerHTML  = `${na} nodes<sub>w > ${'...'}</sub>`
-        transformInfo.title      = `Visible node count: ${na}\n`
-        transformInfo.title     += `Start node weigth: ${startNode?startNode.value:'-'}\n`
+        transformInfo.title      = `Visible node count: ${na}\n`        
         transformInfo.title     += `Min weigth: ${hwexits}\n`
         transformQ.innerHTML     = `${Δ.toFixed()}`
         transformQmax.innerHTML  = `<sub>${ms}ms</sub>`
@@ -121,7 +120,7 @@ export function InfoArea(args)
         var t = Δ.reduce((a,e)=> a+e).toFixed(0)
 
         D3Label.innerHTML = `D<sub>3</sub>`
-        D3Info.innerHTML  = `${cache.filteredNodes.length} nodes`
+        D3Info.innerHTML  = `${cache.unculledNodes.length} nodes`
         D3Info.title      = Δ.map((e, i)=> `${layerlist[i]}: ${e.toFixed()}ms`).join('\n')
         D3Q.innerHTML     = `${t}`
         D3Qmax.innerHTML  = `<sub>${ms}ms</sub>`
