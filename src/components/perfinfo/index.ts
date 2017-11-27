@@ -2,14 +2,6 @@ import * as d3  from 'd3'
 import { HTML } from 'ducd'
 import { t }    from 'ducd'
 
-/*                                                 tooltip
-draw      2ms:    543 nodes
-transform 7ms:    543 nodes,                       ..links, ..cells, ..caps |w>16.5
-layout    11ms:   12345 nodes                      kh
-weights   32ms:   12345 nodes                      mu_w   234, med_w   555, min_w,   max_w,
-data      5335ms: 12345 nodes, 53434kb, .7 leafes, mu_°   4.3, med_°   3.6, min_°,   max_°,
-                                                   mu_h   8.4, med_h     8, min_h,   max_h,
-*/
 var htmlinfo = `<div class="render-info">
     <div class="label"> </div> <div class="nodes"></div> <div class="q"></div> <div class="qmax"></div> <div class="info i1"></div>
     <div class="bar-bg"></div>
@@ -22,9 +14,6 @@ var htmlinfo = `<div class="render-info">
     <div class="label"> </div> <div class="nodes"></div> <div class="q"></div> <div class="qmax"></div> <div class="info i5"></div>
     <div class="bar-bg"></div>
 </div>`
-
-//IA = HTMLElement & { updateModel, updateLayout, updateCachInfo }
-//export function InfoArea(args) : IA
 
 export function InfoArea(args)
 {
@@ -98,27 +87,31 @@ export function InfoArea(args)
         diff.exit().remove()
     }
 
-    ui.updateTransformationInfo = (cache, startNode, minWeigth, Δ)=> { // updatTransformationInfo
-        var na = cache.allNodes.length
+    ui.updateSvgInfo = (cache, Δ)=> {        
         var n = cache.leafNodes.length
-        var l = cache.filteredNodes.length
-        var c = cache.cells.length
+        var l = cache.filteredNodes.length        
         var t = cache.labels.length
-        var a = n+l+c+t
-
-        updateBar(renderingBar, [n, l, c, t].map(e=> e*mag_svg), typeColors)
+        var a = n+l+t // n * 2 if cells
+        Δ = [0, l, n, t]
+        
+        updateBar(renderingBar, Δ.map(e=> e*mag_svg), typeColors)
         renderingLabel.innerHTML = `SVG`
-        renderingInfo.innerHTML  = `${n} / ${l} / ${c} / ${t}`
-        renderingInfo.title      = `${n} circles \n${l} links \n${c} cells \n${t} labels`
+        renderingInfo.innerHTML  = Δ.join(' / ')
+        renderingInfo.title      = `${n} nodes \n${l} links \n${t} labels`
         renderingQ.innerHTML     = `${a}`
-        renderingQmax.innerHTML  = `<sub>1000#</sub>` //∊
+        renderingQmax.innerHTML  = `<sub>1000#</sub>`
+    }
 
+    ui.updateTransformationInfo = (cache, startNode, minWeigth, Δ)=> {
+        var na = cache.allNodes.length
+        var hwexits = minWeigth.map(n=>n.toFixed(1)).join(' ⟶ ')
+        
         updateBar(transformBar, [Δ].map(e=> e*mag), [colorScale(Δ)])
         transformLabel.innerHTML = `Transf.`
-        transformInfo.innerHTML  = `${na} nodes<sub>w>${minWeigth.toFixed(1)}</sub>`
+        transformInfo.innerHTML  = `${na} nodes<sub>w > ${'...'}</sub>`
         transformInfo.title      = `Visible node count: ${na}\n`
         transformInfo.title     += `Start node weigth: ${startNode?startNode.value:'-'}\n`
-        transformInfo.title     += `Min weigth: ${minWeigth.toFixed(1)}\n`
+        transformInfo.title     += `Min weigth: ${hwexits}\n`
         transformQ.innerHTML     = `${Δ.toFixed()}`
         transformQmax.innerHTML  = `<sub>${ms}ms</sub>`
     }

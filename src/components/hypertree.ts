@@ -76,12 +76,10 @@ export interface HypertreeUi // = unitdisk :/
 }
 
 /**
-* Something like a controller.
+* pipeline implementation:
+* ajax -> weights -> layout -> transformation -> unitdisk / langmaps
 *
-* all operations must be started here, Hypertree modifyes
-* data, langmap, pathes and then updates the ui.
-*
-* data->weights->layout
+* states: pipeline, interaction*
 */
 export class Hypertree
 {
@@ -205,7 +203,7 @@ export class Hypertree
         if (this.animationTimer)
             endAnimation()
 
-        var step = 0, steps = 33
+        var step = 0, steps = 16
         this.animationTimer = d3.timer(()=> {
             if (!this.animationTimer)
                 return
@@ -220,7 +218,9 @@ export class Hypertree
                 this.args.layout(this.data, this.args.ui.transformation.state)
                 this.ui.updateData()
 
-                if (this.data.leaves().reduce((max, n)=> Math.max(max, CktoCp(n.z).r), 0) > .95)
+                if (this.data
+                    .leaves()
+                    .reduce((max, n)=> Math.max(max, CktoCp(n.z).r), 0) > .995)
                     endAnimation()
             }
 
@@ -228,8 +228,8 @@ export class Hypertree
             if (step > steps)
                endAnimation()
             else
-               animateTo(.01+p*.98)
-        },1)
+               animateTo(.01 + p * .98)
+        })
     }
 }
 

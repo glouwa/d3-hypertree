@@ -185,7 +185,7 @@ export class Interaction
 
         this.onDragStart(n, m)
 
-        var md = CktoCp(m), initR = md.r, step = 0, steps = 32
+        var md = CktoCp(m), initR = md.r, step = 0, steps = 24
         this.animationTimer = d3.timer(()=> //setInterval(() => // todo: use d3 timer (requestAnimationFrame)
         {
             md.r = initR * (1 - sigmoid(step++/steps))
