@@ -124,7 +124,7 @@ export class Interaction
             .attr("class", "mouse-circle")
             .attr("r", this.args.mouseRadius)
             .on("dblclick",  d=> this.onDblClick(findNodeByCell()))
-            .on("click",     d=> this.onClick(findNodeByCell()))
+            //.on("click",     d=> this.onClick(findNodeByCell()))
             .on("mousemove", d=> this.args.hypertree.updatePath('isHovered', findNodeByCell()))
             .on("mouseout",  d=> this.args.hypertree.updatePath('isHovered', undefined))
             .call(drag)
@@ -171,9 +171,17 @@ export class Interaction
     }
 
     private onDragEnd = (n:N, s:C, e:C)=> {
+        var dc = CsubC(s, e)        
+        var dist = Math.sqrt(dc.re*dc.re + dc.im*dc.im)
+        
+        if (dist < .006) {
+            console.log('drag to small -> its a click', dist)
+            this.onClick(n, e) // sollte on click sein und auch timer berücksichtigen oder?
+        }
     }
 
     private animationTimer = null
+    private cancelAnimationTimer = ()=> { this.animationTimer.stop(); this.animationTimer = null }
     private animateTo(n:N, m:C) : void
     {
         if (this.animationTimer)
@@ -182,47 +190,40 @@ export class Interaction
         this.onDragStart(n, m)
 
         var md = CktoCp(m), initR = md.r, step = 0, steps = 20
-        this.animationTimer = d3.timer(()=> //setInterval(() => // todo: use d3 timer (requestAnimationFrame)
-        {
+        this.animationTimer = d3.timer(()=> {            
             md.r = initR * (1 - sigmoid(step++/steps))
-
-            if (step > steps) {
-               //clearInterval(this.animationTimer)
-               this.animationTimer.stop()
-               this.animationTimer = null
-               this.onDragEnd(null, null, null)
-            }
-            else {
-               this.onDragByNode(null, m, CptoCk(md))
-            }
+            if (step > steps) 
+                this.cancelAnimationTimer()            
+            else  
+               this.onDragByNode(null, m, CptoCk(md))            
         },1)
     }
 
     //-----------------------------------------------------------------------------------------
 
     private dblClickTimer = null
-    private onClick = (n:N) =>
-    {
-        d3.event.preventDefault()
-        var m = ArrtoC(d3.mouse(this.args.parent))
+    private cancelClickTimer = ()=> { clearTimeout(this.dblClickTimer); this.dblClickTimer = null }
+    private onClick = (n:N, m) => {
+        if (d3.event && d3.event.preventDefault) d3.event.preventDefault()
+        m = m || ArrtoC(d3.mouse(this.args.parent))
 
-        if (!this.dblClickTimer)
+        if (!this.dblClickTimer) 
             this.dblClickTimer = setTimeout(() => {
                 this.dblClickTimer = null
-                                
+                
                 //this.args.onClick(d, m)
                 this.animateTo(n, m)
             },
             300)
+        else 
+            this.cancelClickTimer()
     }
 
-    private onDblClick = (n:N) =>
-    {
+    private onDblClick = (n:N) => {
         d3.event.preventDefault()
         var m = ArrtoC(d3.mouse(this.args.parent))
 
-        clearTimeout(this.dblClickTimer)
-        this.dblClickTimer = null
+        this.cancelClickTimer()        
 
         //this.animateTo(n, ArrtoC(d3.mouse(this.args.parent)))
         this.args.onClick(n, m)        
