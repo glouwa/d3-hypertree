@@ -156,8 +156,8 @@ export class D3UpdateLayer
             var paddingLeftRight = .08
             var paddingTopBottom = .02
             svgRootHere.insert('rect', d=> this)
-                .attr("x",         x=> view.attributes.dx.value - paddingLeftRight/2 - w/2)
-                .attr("y",         x=> view.attributes.dy.value - paddingTopBottom/2 - h/2)
+                .attr("x",         x=> view.attributes.dx.value - paddingLeftRight*.5 - w*.5)
+                .attr("y",         x=> view.attributes.dy.value - paddingTopBottom*.5 - h*.75)
                 .attr("rx",        x=> .012)
                 .attr("ry",        x=> .012)
                 .attr("width",     x=> w + paddingLeftRight)

@@ -31,17 +31,18 @@ var html =
         <svg width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">
             ${bubblehtml}
             <g class="unitDisc" transform="translate(520,500) scale(470)"></g>
-        </svg>
+        </svg> 
         <div class="preloader"></div>
     </div>`
 
 var htmlnav =
     `<div class="unitdisk-nav">
-        <svg width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">
+        <svg width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">            
             ${bubblehtml}
-            <g class="unitDisc"            transform="translate(500,500) scale(470)"></g>
-            <g class="nav-background-disc" transform="translate(100,100) scale(70)"></g>
+            <g class="unitDisc"            transform="translate(500,500) scale(470)"></g>            
             <g class="nav-parameter-disc"  transform="translate(100,100) scale(70)"></g>
+            <!--circle r="1" fill="#111" opacity=".75"    transform="translate(100,100) scale(70)"/>-->
+            <g class="nav-background-disc" transform="translate(100,100) scale(70)"></g>                         
         </svg>
         <div class="preloader"></div>
     </div>`
@@ -108,7 +109,6 @@ export function Unitdisk(args : UnitDiskArgs)
         interaction.updatePositions()
     }
     ui.updateSelection      = ()=> interaction.updateSelection()
-
     return ui
 }
 
@@ -169,7 +169,10 @@ export function UnitDiskNav(args : UnitDiskArgs)
                                 cache.unculledNodes = dfsFlat(interaction.args.data)
                                 for (var n of cache.unculledNodes) {
                                     n.cache = n.cache || { re:0, im:0 }
-                                    CassignC(n.cache, interaction.args.transform(n))
+                                    var np = interaction.args.transform(n)
+                                    if (n.name == 'θ' || n.name == 'λ')
+                                        np = CmulR(np, 1.08)
+                                    CassignC(n.cache, np)
 
                                     n.cachep            = CktoCp(n.cache)
                                     n.strCache          = n.cache.re + ' ' + n.cache.im
@@ -203,8 +206,6 @@ export function UnitDiskNav(args : UnitDiskArgs)
         navParameter.updatePositions();
     }
     ui.updateSelection      = ()=> { view.updateSelection(); /*navBackground.updateSelection();*/ }
-
-
     return ui
 }
 
