@@ -26,27 +26,6 @@ var bubblehtml =
         </radialGradient>
     </defs>`
 
-var html =
-    `<div class="unitdisk-nav">
-        <svg width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">
-            ${bubblehtml}
-            <g class="unitDisc" transform="translate(520,500) scale(470)"></g>
-        </svg> 
-        <div class="preloader"></div>
-    </div>`
-
-var htmlnav =
-    `<div class="unitdisk-nav">
-        <svg width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">            
-            ${bubblehtml}
-            <g class="unitDisc"            transform="translate(500,500) scale(470)"></g>            
-            <g class="nav-parameter-disc"  transform="translate(100,100) scale(70)"></g>
-            <!--circle r="1" fill="#111" opacity=".75"    transform="translate(100,100) scale(70)"/>-->
-            <g class="nav-background-disc" transform="translate(100,100) scale(70)"></g>                         
-        </svg>
-        <div class="preloader"></div>
-    </div>`
-
 export interface UnitDiskArgs
 {
     parent:            any,
@@ -71,6 +50,11 @@ export interface UnitDiskArgs
     parent,
     hypertree
     data:              N,
+    selection: {
+        onChange
+        nodes:
+        paths:
+    }
     transformation
     {
         cacheUpdate:       (i:Interaction, cache:TransformationCache)=> void,
@@ -90,6 +74,15 @@ export interface UnitDiskArgs
         layers:            ((ls:Interaction, parent:d3Sel)=> Layer)[],
     }
 }*/
+
+var html =
+`<div class="unitdisk-nav">
+    <svg width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">
+        ${bubblehtml}
+        <g class="unitDisc" transform="translate(520,500) scale(470)"></g>
+    </svg> 
+    <div class="preloader"></div>
+</div>`
 
 export function Unitdisk(args : UnitDiskArgs)
 {
@@ -112,6 +105,18 @@ export function Unitdisk(args : UnitDiskArgs)
     return ui
 }
 
+var htmlnav =
+`<div class="unitdisk-nav">
+    <svg width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">            
+        ${bubblehtml}
+        <g class="unitDisc"            transform="translate(500,500) scale(470)"></g>            
+        <g class="nav-parameter-disc"  transform="translate(100,100) scale(70)"></g>
+        <!--circle r="1" fill="#111" opacity=".75"    transform="translate(100,100) scale(70)"/>-->
+        <g class="nav-background-disc" transform="translate(100,100) scale(70)"></g>                         
+    </svg>
+    <div class="preloader"></div>
+</div>`
+
 export function UnitDiskNav(args : UnitDiskArgs)
 {
     var ui = HTML.parse<HTMLElement & HypertreeUi>(htmlnav)()
@@ -125,7 +130,9 @@ export function UnitDiskNav(args : UnitDiskArgs)
         parent:             ui.querySelector('.nav-background-disc'),
         hypertree:          args.hypertree,
         data:               args.data,
-        layers:             args.layers.filter((l, idx)=> idx !== 2 && idx !== 3), // no labels, specials here
+        layers:             args.layers.filter((l, idx)=> idx !== 0 
+                                                       && idx !== 2 
+                                                       && idx !== 3), // no labels, specials here
         cacheUpdate:        args.cacheUpdate,
         transformation:     args.transformation,
         transform:          (n:N)=> n.z,
