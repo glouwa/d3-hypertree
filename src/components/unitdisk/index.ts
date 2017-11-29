@@ -20,9 +20,9 @@ var bubblehtml =
     `<defs>
         <radialGradient id="exampleGradient">
             <stop offset="50%"   stop-color="white"/>
-            <stop offset="92%"   stop-color="#f5fbfe"/>
-            <stop offset="99.8%" stop-color="#ddeffd"/>
-            <stop offset="100%"  stop-color="#90caf9"/>
+            <stop offset="92%"   stop-color="#6e6e6e"/>
+            <stop offset="99.8%" stop-color="#3e3e3e"/>
+            <stop offset="100%"  stop-color="#2e2e2e"/>
         </radialGradient>
     </defs>`
 
