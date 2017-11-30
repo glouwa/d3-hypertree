@@ -85,7 +85,7 @@ export interface HypertreeUi // = unitdisk :/
 export class Hypertree
 {
     args           : HypertreeArgs
-    ui             : HypertreeUi & HTMLElement
+    ui             : HTMLElement & HypertreeUi
     infoUi         : HTMLElement & { msg, updateModel, updateLayout }
     layerInfo      : HTMLElement & { updateModel }
     data           : N
