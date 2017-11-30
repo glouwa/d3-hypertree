@@ -17,6 +17,7 @@ import { Interaction }         from './unitdisk/interactive-unitdisk'
 import { UnitDiskArgs }        from './unitdisk'
 
 import { InfoArea }            from './perfinfo'
+import { LayerInfo }           from './layerinfo'
 
 var htmlpreloader = `
     <div class="preloader-wrapper big active">
@@ -86,6 +87,7 @@ export class Hypertree
     args           : HypertreeArgs
     ui             : HypertreeUi & HTMLElement
     infoUi         : HTMLElement & { msg, updateModel, updateLayout }
+    layerInfo      : HTMLElement & { updateModel }
     data           : N
     langMap        : {}
     paths          : { isSelected?:N, isHovered?:N } = {}
@@ -94,6 +96,7 @@ export class Hypertree
     constructor(args : HypertreeArgs) {
         this.args  = args                
         this.infoUi = InfoArea(args)
+        this.layerInfo = LayerInfo(args)
         this.ui = new args.decorator({
             parent:         args.parent,
             hypertree:      this,
