@@ -95,8 +95,9 @@ export class Hypertree
 
     constructor(args : HypertreeArgs) {
         this.args  = args                
-        this.infoUi = InfoArea(args)
-        this.layerInfo = LayerInfo(args)
+        this.infoUi = InfoArea(args, 'data')
+        this.layerInfo = LayerInfo(args, 'data')
+        this.layerInfo = LayerInfo(args, 'nav')
         this.ui = new args.decorator({
             parent:         args.parent,
             hypertree:      this,

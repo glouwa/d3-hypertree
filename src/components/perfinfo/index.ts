@@ -103,15 +103,18 @@ export function InfoArea(args)
     }
 
     ui.updateTransformationInfo = (cache, minWeigth, Δ)=> {
+        var t = Δ.reduce((a,e)=> a+e).toFixed(0)
         var na = cache.unculledNodes.length
         var hwexits = minWeigth.map(n=>n.toFixed(1)).join(' ⟶ ')
+        var Δms = Δ.map(n=>n.toFixed(1))
         
-        updateBar(transformBar, [Δ].map(e=> e*mag), [colorScale(Δ)])
+        updateBar(transformBar, Δ.map(e=> e*mag), ['#2196f3', '#ffc107', '#673ab7', '#4caf50'])
         transformLabel.innerHTML = `Transf.`
         transformInfo.innerHTML  = `${na} nodes<sub>w > ${'...'}</sub>`
         transformInfo.title      = `Visible node count: ${na}\n`        
         transformInfo.title     += `Min weigth: ${hwexits}\n`
-        transformQ.innerHTML     = `${Δ.toFixed()}`
+        transformInfo.title     += `${Δms[0]} culling\n${Δms[1]} lazysearch\n${Δms[2]} voronoi\n${Δms[3]} labels`
+        transformQ.innerHTML     = `${t}`
         transformQmax.innerHTML  = `<sub>${ms}ms</sub>`
     }
 

@@ -16,7 +16,7 @@ import { NodeLayer }                     from '../layerstack/layers/node-layer'
 import { LabelLayer }                    from '../layerstack/layers/text-rect-layer'
 import { Interaction }                   from './interactive-unitdisk'
 
-var bubblehtml =
+var bubbleSvgDef =
     `<defs>
         <radialGradient id="exampleGradient">
             <stop offset="50%"   stop-color="white"/>
@@ -78,7 +78,7 @@ export interface UnitDiskArgs
 var html =
 `<div class="unitdisk-nav">
     <svg width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">
-        ${bubblehtml}
+        ${bubbleSvgDef}
         <g class="unitDisc" transform="translate(520,500) scale(470)"></g>
     </svg> 
     <div class="preloader"></div>
@@ -108,11 +108,10 @@ export function Unitdisk(args : UnitDiskArgs)
 var htmlnav =
 `<div class="unitdisk-nav">
     <svg width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">            
-        ${bubblehtml}
-        <g class="unitDisc"            transform="translate(500,500) scale(470)"></g>            
-        <g class="nav-parameter-disc"  transform="translate(100,100) scale(70)"></g>
-        <!--circle r="1" fill="#111" opacity=".75"    transform="translate(100,100) scale(70)"/>-->
-        <g class="nav-background-disc" transform="translate(100,100) scale(70)"></g>                         
+        ${bubbleSvgDef}
+        <g class="unitDisc"            transform="translate(500,500) scale(440)"></g>            
+        <g class="nav-parameter-disc"  transform="translate(120,120) scale(60)"></g>        
+        <g class="nav-background-disc" transform="translate(120,120) scale(60)"></g>                         
     </svg>
     <div class="preloader"></div>
 </div>`
@@ -123,7 +122,7 @@ export function UnitDiskNav(args : UnitDiskArgs)
     args.parent.appendChild(ui)
     args.parent = ui.querySelector('.unitDisc')
 
-
+ 
     var view = new Interaction(args)
 
     var navBackground = new Interaction({
