@@ -82,14 +82,14 @@ export interface HypertreeUi // = unitdisk :/
 *
 * states: pipeline, interaction*
 */
-export class Hypertree
+export class Hypertree 
 {
     args           : HypertreeArgs
     ui             : HTMLElement & HypertreeUi
     infoUi         : HTMLElement & { msg, updateModel, updateLayout }
     layerInfo      : HTMLElement & { updateModel }
     data           : N
-    langMap        : {}
+    langMap        : {} 
     paths          : { isSelected?:N, isHovered?:N } = {}
     animationTimer : any = null
 

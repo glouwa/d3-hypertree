@@ -4,6 +4,7 @@ var sass        = require('gulp-sass')
 var concat      = require('gulp-concat')
 var gutil       = require('gulp-util')
 var plumber     = require('gulp-plumber')
+var debug       = require('gulp-debug')
 var merge       = require('merge2')
 var del         = require('del')
 var webpack     = require('webpack-stream')
@@ -12,6 +13,19 @@ var paths = {
     src: './src/',
     dist: './dist/'
 }
+
+var files = {
+    darkcss:  'index-browser.dark.css',
+    lightcss: 'index-browser.light.css',
+    mainjs:   'index.js'
+}
+
+var scss = (t)=> gulp.src(paths.src + '**/*.'+t+'.scss')
+    .pipe(plumber())
+    .pipe(debug())
+    .pipe(sass())
+    .pipe(concat(files[t+'css']))
+    .pipe(gulp.dest(paths.dist))
 
 // ---------------------------------------------------------------------------------------------
 
@@ -34,22 +48,16 @@ gulp.task('tsc', () => {
 })
 
 gulp.task('webpack', ['tsc'], () =>
-    gulp.src(paths.dist + 'js/index.js')
+    gulp.src(paths.dist + 'js/' + files.mainjs)
         .pipe(plumber())
         .pipe(webpack({
-            output: { filename:'index.js' },
+            output: { filename:files.mainjs },
             devtool: 'source-map'
         }))
         .pipe(gulp.dest(paths.dist)) 
 )
 
-gulp.task('sass', () =>
-    gulp.src(paths.src + '**/*.scss')
-        .pipe(plumber())
-        .pipe(sass())
-        .pipe(concat('index-browser.css'))
-        .pipe(gulp.dest(paths.dist))
-)
+gulp.task('sass',    ()=> merge([scss('light'), scss('dark')]))   
 
 // ---------------------------------------------------------------------------------------------
 
@@ -65,5 +73,5 @@ gulp.task('default',  ['watch'])
 gulp.task('watch',    ['build'], () => {    
     gulp.watch('../ducd/dist/index.js',   ['build'])
     gulp.watch(paths.src + '**/*.ts',   ['build'])
-    gulp.watch(paths.src + '**/*.scss', ['sass+bs'])
+    gulp.watch(paths.src + '**/*.scss', ['sass'])
 })
