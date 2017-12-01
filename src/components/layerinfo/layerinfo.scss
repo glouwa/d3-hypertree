@@ -11,8 +11,7 @@
     
     width:14em;
     padding-right:.3em;
-    padding-bottom:.1em;
-    color: #777;
+    padding-bottom:.1em;    
     font-size: .8em;
 
     display: grid;
@@ -21,12 +20,11 @@
     //grid-template-rows: repeat(10, 1fr);
     grid-gap: .0em;
 
-    div   { align-self: end;   margin-bottom: -.1em; margin-left: 0em; }
+    div   { align-self:   end; margin-bottom: -.1em; margin-left: 0em; }
     .q    { justify-self: end; margin-right: .35em; }
    
     .bar-bg {
-        height:.25em;
-        background-color:#2b2929;
+        height:.25em;        
         margin-bottom: .15em;
         grid-column: 1 / 5;        
         .bar {
