@@ -1,0 +1,38 @@
+.layer-info.data {
+    bottom:1em;
+}
+.layer-info.nav {
+    top:1em;
+}
+.layer-info {
+    z-index: 1000;
+    position: absolute;
+    right:-2.5em;
+    
+    width:14em;
+    padding-right:.3em;
+    padding-bottom:.1em;
+    color: #777;
+    font-size: .8em;
+
+    display: grid;
+    grid-template-rows: repeat(20, auto);
+    grid-template-columns: auto auto 1.95em 1.7em;//repeat(4, auto);
+    //grid-template-rows: repeat(10, 1fr);
+    grid-gap: .0em;
+
+    div   { align-self: end;   margin-bottom: -.1em; margin-left: 0em; }
+    .q    { justify-self: end; margin-right: .35em; }
+   
+    .bar-bg {
+        height:.25em;
+        background-color:#2b2929;
+        margin-bottom: .15em;
+        grid-column: 1 / 5;        
+        .bar {
+            height:.25em;
+            position: absolute;
+        }
+    }
+}
+ 
