@@ -15,12 +15,12 @@ var paths = {
 }
 
 var files = {
-    darkcss:  'index-browser.dark.css',
-    lightcss: 'index-browser.light.css',
+    darkcss:  'index-browser-dark.css',
+    lightcss: 'index-browser-light.css',
     mainjs:   'index.js'
 }
 
-var scss = (t)=> gulp.src(paths.src + '**/*.'+t+'.scss')
+var scss = (t)=> gulp.src(paths.src + `**/*${t}.scss`)
     .pipe(plumber())
     .pipe(debug())
     .pipe(sass())
