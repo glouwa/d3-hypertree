@@ -1,0 +1,8 @@
+@import 'perfinfo'; 
+
+.render-info {
+    color: rgba(darken(#a5d6a7, 30%), .6);
+    .bar-bg {
+        background-color:#f8f8f8;        
+    }
+}

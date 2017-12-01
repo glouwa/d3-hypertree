@@ -1,3 +1,4 @@
+@import "unitdisk";
 
 $leafcolor:     #a5d6a7; //"#e3f2fd" "#ffe082
 $hovercolor:    #fff;  //#42a5f5;
@@ -9,75 +10,37 @@ $w:             #fff;
 $nodeStroke:    #90caf9;
 
 .unitdisk-nav {
-    width: 92%;
-    height: 100%;
-    position: relative;    
- 
-    > .preloader {
-        width: 100%;
-        height: 100%;
-        > .preloader-wrapper {
-            position: absolute;
-            left: calc(50% - 2.1em);
-            top: calc(50% - 2.1em);
-        }
-    }
-
+   
     svg {
         //filter:drop-shadow(0px 1px 1.5px rgba(0,0,0,0.22));
 
-        .cell {
-            pointer-events:none;
+        .cell {            
             fill: rgba(255, 204, 188, 0.03); //#ffccbc38; //transparent;
             stroke:    rgba(255, 204, 188, 0.1);
-
             stroke-width: 0.001;
         }
         .arc {
             stroke: #bbb; //#8d6e63;
             fill: none;
-            pointer-events: none;
         }
         .node {
             fill: #f4f8f4;
             stroke: #555;
             stroke-width: .001;
-            pointer-events:none;
-        }
-        .caption-icon {
-            font-family: 'NotoColorEmoji', Roboto;
-            font-size: .8;
-        }
-        .caption {
-            //font-family: 'NotoColorEmoji';
-            //text-transform: uppercase;
-            //font-size: .025pt;
-            font-size: .0025em;
-            font-weight:300;
-            //dominant-baseline: middle;
-            text-anchor: middle;
-            user-select: none;
-            cursor: default;
-            letter-spacing: 0.05em;
-            pointer-events: none;
-
-            text-rendering: optimizeSpeed;
-
+        }        
+        .caption {            
             fill: #fff;
-
             paint-order:stroke;
             stroke: rgba(#000, 1);
             stroke-width: .003;
             //stroke-linecap: butt;
             //stroke-linejoin: miter;
         }
-
         .caption-background {
             fill: rgba(#333, .1);              
             fill: rgba(#111111, .5);              
-            fill: none;
-            pointer-events: none;
-        }        
+            fill: none;            
+        }
 
         .cell.leaf      { stroke: rgba($leafcolor, .05);               fill: rgba(lighten($leafcolor, 0%), .00);    }
         .root           { stroke: darken($rootcolor, 15%);             fill: lighten($rootcolor, 5%);               }
@@ -103,15 +66,12 @@ $nodeStroke:    #90caf9;
         .background-circle {
             fill-opacity: .08;
             //stroke: darken($nodeStroke, 4%); //#f8fcfe;
-            //stroke-width: .0001;
-            pointer-events:visibleFill;
+            //stroke-width: .0001;            
         }
         .mouse-circle {
             fill: none;
            // stroke: lighten($nodeStroke, 7%); //#f0f8fe;
-           // stroke-width: .0004;
-            pointer-events:visibleFill;
-            cursor: crosshair;
+           // stroke-width: .0004;            
         }
         .focus-circle {        
             fill:rgba(255, 255, 255, .0);
@@ -120,13 +80,10 @@ $nodeStroke:    #90caf9;
             /*// einfacher kreis
             fill: none;
             stroke: $nodeStroke; //#f8fcfe;
-            stroke-width: .0004;*/
-            pointer-events:none;
+            stroke-width: .0004;*/            
         }
-
         .nav-background-disc {
-            .background-circle {
-                pointer-events:none;
+            .background-circle {                
                 stroke: none;                
             }
         }
@@ -149,22 +106,14 @@ $nodeStroke:    #90caf9;
             .caption {
                 fill: #444; //darken($leafcolor, 5%);
                 //stroke: opacify($w, .5);
-                dominant-baseline: middle;
-                text-transform: none;
-                text-anchor: middle;
-                font-size: .25pt;
                 //stroke-width: .4;
                 //stroke-opacity:.6;
             }
             .caption.P {
                 //fill: darken($nodeStroke, 25%);
                 fill: #fff;
-            }
-            .caption-background {
-                visibility: hidden;
-            }
-            .background-circle {
-                pointer-events:none;
+            }            
+            .background-circle {                
                 fill: none;
                 stroke: none;
             }
@@ -172,8 +121,6 @@ $nodeStroke:    #90caf9;
                 fill: none;
                 stroke: none; //$nodeStroke;
                 stroke-width: .001;
-                pointer-events:visibleFill;
-                cursor: crosshair;
             }
         }
     }

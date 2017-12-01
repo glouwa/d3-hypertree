@@ -1,0 +1,84 @@
+.unitdisk-nav {
+    width: 92%;
+    height: 100%;
+    position: relative;    
+ 
+    > .preloader {
+        width: 100%;
+        height: 100%;
+        > .preloader-wrapper {
+            position: absolute;
+            left: calc(50% - 2.1em);
+            top: calc(50% - 2.1em);
+        }
+    }
+
+    svg {
+
+        .cell {
+            pointer-events:none;
+        }
+        .arc {            
+            pointer-events: none;
+        }
+        .node {            
+            pointer-events:none;
+        }
+        .caption-icon {
+            font-family: 'NotoColorEmoji', Roboto;
+            font-size: .8;
+        }
+        .caption {
+            //font-family: 'NotoColorEmoji';
+            //text-transform: uppercase;
+            //font-size: .025pt;
+            font-size: .0025em;
+            font-weight:300;
+            //dominant-baseline: middle;
+            text-anchor: middle;
+            user-select: none;
+            cursor: default;
+            letter-spacing: 0.05em;
+            pointer-events: none;
+
+            text-rendering: optimizeSpeed;
+        }
+
+        .caption-background {            
+            pointer-events: none;
+        }        
+
+        .background-circle {
+            pointer-events:visibleFill;
+        }
+        .mouse-circle {
+            pointer-events:visibleFill;
+            cursor: crosshair;
+        }
+        .focus-circle {        
+            pointer-events:none;
+        }
+
+        .nav-background-disc {
+            .background-circle {
+                pointer-events:none;
+            }
+        }
+
+        .nav-parameter-disc {            
+            .caption {
+                dominant-baseline: middle;
+                text-transform: none;
+                text-anchor: middle;
+                font-size: .25pt;                
+            }            
+            .background-circle {
+                pointer-events:none;            
+            }
+            .mouse-circle {            
+                pointer-events:visibleFill;
+                cursor: crosshair;
+            }
+        }
+    }
+}
