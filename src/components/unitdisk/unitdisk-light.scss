@@ -52,17 +52,17 @@ $nodeStroke:    #90caf9;
         .exit           { stroke: darken($exitcolor, 15%);           fill: lighten($exitcolor, 5%);               }
         .exit.cell      { stroke: rgba(darken($exitcolor, 95%), .9); fill: rgba(lighten($exitcolor, 0%), .05);    }
         .exit.node      { stroke: rgba(darken($exitcolor, 50%), .5);                                              }
-
+ 
         .hovered        { stroke: $hovercolor;                       fill: lighten($hovercolor, 25%);             }
         .hovered.cell   { stroke: lighten($hovercolor, 27%);         fill: rgba(lighten($hovercolor, 0%), .15);   }
         .hovered.node   { stroke: darken($hovercolor, 10%);                                                       }
-
+ 
         .selected       { stroke: $selectedcolor;                    fill: lighten($selectedcolor, 25%);          }
         .selected.cell  { stroke: rgba($selectedcolor, .2);          fill: rgba(lighten($selectedcolor, 0%), .1); }
         .selected.node  { stroke: darken($selectedcolor, 5%);                                                     }
 
         .background-circle {
-            fill-opacity: .1;
+            fill-opacity: .05;
             stroke: darken($nodeStroke, 4%); //#f8fcfe;
             stroke-width: .0001;
         }
