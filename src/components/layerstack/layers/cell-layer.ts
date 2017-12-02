@@ -34,7 +34,7 @@ export class CellLayer implements ILayer
             updateColor:       s=> s.classed("lazy",      d=> d.data.hasOutChildren)                                 
                                     .classed("hovered",   d=> d.data.isHovered && d.data.parent)
                                     .classed("selected",  d=> d.data.isSelected && d.data.parent),
-            updateTransform:   s=> s.classed("lazy",      d=> d.data.hasOutChildren)                                 
+            updateTransform:   s=> s//.classed("lazy",      d=> d.data.hasOutChildren)                                 
                                     .attr("points",       d=> d.join(" ")),
         })
     }
