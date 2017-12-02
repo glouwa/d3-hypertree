@@ -49,7 +49,6 @@ $nodeStroke:    #90caf9;
         .root.node      { stroke: orange;                                                                         }
 
         .lazy           { stroke: darken($lazycolor, 15%);             fill: lighten($lazycolor, 5%);               }
-
         .lazy.cell      { stroke: rgba(255, 204, 188, 0.1);          fill: rgba(255, 204, 188, 0.03);           }
         .lazy.node      { stroke: #c5c5c5;      stroke-width:.0023                                                }
 

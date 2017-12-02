@@ -15,8 +15,8 @@ $nodeStroke:    #90caf9;
         //filter:drop-shadow(0px 1px 1.5px rgba(0,0,0,0.22));
 
         .cell {            
-            fill: rgba(255, 204, 188, 0.2); //#ffccbc38; //transparent;
-            stroke:    rgba(255, 204, 188, 0.3);
+            stroke: rgba($leafcolor, .25);             
+            fill: rgba(lighten($leafcolor, 0%), .03);
             stroke-width: 0.001;
         }
         .arc {
@@ -40,14 +40,14 @@ $nodeStroke:    #90caf9;
             opacity: .8;         
         }
 
-        .cell.leaf      { stroke: rgba($leafcolor, .25);             fill: rgba(lighten($leafcolor, 0%), .03);    }
+        //.cell.leaf      { stroke: rgba($leafcolor, .25);             fill: rgba(lighten($leafcolor, 0%), .03);    }
 
         .root           { stroke: darken($rootcolor, 15%);           fill: lighten($rootcolor, 5%);               }
         .root.cell      { stroke: rgba(darken($rootcolor, 0%), .9);  fill: rgba(lighten($rootcolor, 0%), .05);    }
         .root.node      { stroke: orange;                                                                       }
 
         .lazy           { stroke: darken($lazycolor, 15%);           fill: lighten($lazycolor, 5%);               }
-        .lazy.cell      { stroke: rgba(darken($lazycolor, 95%), .9); fill: rgba(lighten($lazycolor, 0%), .05);    }
+        .lazy.cell      { stroke: rgba(255, 204, 188, .5);         fill: rgba(255, 204, 188, 0.2);            }
         .lazy.node      { stroke: rgba(darken($lazycolor, 20%), .5);                                              }
 
         .exit           { stroke: darken($exitcolor, 15%);           fill: lighten($exitcolor, 5%);               }
@@ -56,7 +56,7 @@ $nodeStroke:    #90caf9;
  
         //.hovered        { stroke: $hovercolor;                       fill: lighten($hovercolor, 25%);             }
         .hovered.arc    { stroke: $hovercolor;                                                                    }
-        .hovered.cell   { stroke: lighten($hovercolor, 27%);         fill: rgba(lighten($hovercolor, 0%), .15);   }
+        //.hovered.cell   { stroke: lighten($hovercolor, 27%);         fill: rgba(lighten($hovercolor, 0%), .15);   }
         .hovered.node   { stroke: darken($hovercolor, 10%);                                                       }
  
         //.selected       { stroke: $selectedcolor;                    fill: lighten($selectedcolor, 25%);          }

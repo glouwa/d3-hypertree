@@ -76,8 +76,8 @@ export class ArcLayer implements ILayer
     }
 
     private svgArcLine(d) {
-        var s = d.strCache                                  //this.t(d)
-        var e = d.parent.strCache                           //this.t(d.parent)
+        var s = d.strCache
+        var e = d.parent.strCache
         return `M ${s} L ${e}`
     }
 
