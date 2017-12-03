@@ -28,11 +28,12 @@ $nodeStroke:    #90caf9;
             stroke: #555;
             stroke-width: .001;
         }        
-        .caption {            
+        .caption {     
+            font-weight:400;       
             fill: #fff;
             paint-order:stroke;
             stroke: rgba(#000, 1);
-            stroke-width: .003;
+            stroke-width: .006;
             //stroke-linecap: butt;
             //stroke-linejoin: miter;
         }
