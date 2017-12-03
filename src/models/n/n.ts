@@ -1,4 +1,4 @@
-import { C, Cp }         from '../hyperbolic-math'
+import { C, Cp }         from '../../hyperbolic-math'
 import { HierarchyNode } from 'd3'
 
 /*

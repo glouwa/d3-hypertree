@@ -5,7 +5,7 @@ import {
     C, CktoCp, CptoCk,
     Cneg, CmulR, Clog, Cpow,
     h2e,
-    πify, dfs, dfsFlat }       from '../hyperbolic-math'
+    πify, dfs, dfsFlat }       from '../../hyperbolic-math'
 
 export type LayoutFunction = (root:N, t?:T) => N
 

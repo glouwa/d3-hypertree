@@ -3,9 +3,9 @@
 //import { interpolateHcl, rgb }      from 'd3-color'
 
 import * as d3                 from 'd3'
-import { N }                   from '../models/n'
-import { LoaderFunction }      from '../models/n-loaders'
-import { LayoutFunction }      from '../models/n-layouts'
+import { N }                   from '../models/n/n'
+import { LoaderFunction }      from '../models/n/n-loaders'
+import { LayoutFunction }      from '../models/n/n-layouts'
 import { dfsFlat }             from '../hyperbolic-math'
 import { C, CktoCp, CptoCk }   from '../hyperbolic-math'
 import { sigmoid }             from '../hyperbolic-math'

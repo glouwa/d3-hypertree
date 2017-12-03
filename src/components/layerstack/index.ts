@@ -1,5 +1,5 @@
 import * as d3 from 'd3'
-import { N } from '../../models/n'
+import { N } from '../../models/n/n'
 import { Interaction } from '../unitdisk/interactive-unitdisk'
 
 export interface ILayer

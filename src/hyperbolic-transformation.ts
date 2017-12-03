@@ -6,7 +6,7 @@ import {
     dfs, clone, πify, setR, maxR
 }
 from './hyperbolic-math'
-import { N } from './models/n'
+import { N } from './models/n/n'
 
 export interface Transformation<OT>
 {    

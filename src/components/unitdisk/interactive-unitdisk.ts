@@ -1,5 +1,5 @@
 import * as d3                  from 'd3'
-import { N }                    from '../../models/n'
+import { N }                    from '../../models/n/n'
 import { Transformation,
          TransformationCache }  from '../../hyperbolic-transformation'
 import { C, CptoCk, CktoCp,
