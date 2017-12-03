@@ -16,8 +16,8 @@ import { LayerArgs }           from './layerstack'
 import { Interaction }         from './unitdisk/interactive-unitdisk'
 import { UnitDiskArgs }        from './unitdisk'
 
-import { InfoArea }            from './perfinfo'
-import { LayerInfo }           from './layerinfo'
+import { InfoArea }            from './unitdisk-meta'
+import { LayerInfo }           from './layerstack-meta'
 
 var htmlpreloader = `
     <div class="preloader-wrapper big active">
