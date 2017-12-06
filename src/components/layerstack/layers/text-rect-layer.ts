@@ -31,13 +31,11 @@ export class LabelLayer implements ILayer
             name:              'captions',
             className:         'caption',
             elementType:       'text',
-            create:            s=> s.classed("P",         d=> d.name == 'P')
-                                    .classed("caption-icon", d=> d.icon && navigator.platform.includes('inux') ),
+            create:            s=> s.classed("P",            d=> d.name == 'P')
+                                    .classed("caption-icon", d=> d.icon && navigator.platform.includes('inux'))
+                                    .text(                   this.args.text),
             updateColor:       s=> {},
-            updateTransform:   s=> s.attr("transform",    d=> this.args.transform(d))
-                                    .text(                this.args.text)
-                                    .attr("dx",           (d, i, v)=> this.args.delta(d, i, v).re)
-                                    .attr("dy",           (d, i, v)=> this.args.delta(d, i, v).im)
+            updateTransform:   s=> s.attr("transform",       this.args.transform)
         })
     }
 }

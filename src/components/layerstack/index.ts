@@ -170,7 +170,7 @@ export class D3UpdateLayer
 
 export var bboxOffset = d=> v=> {
     var w = d.labellen = d.labellen || v.getComputedTextLength()  //var bb = v.getBBox() war schlechter
-    var h = 0.045
+    var h = .045
     var paddingLeftRight = .08
     var paddingTopBottom = .02
     return {
