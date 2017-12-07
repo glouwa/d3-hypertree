@@ -121,7 +121,7 @@ export class D3UpdateLayer
             .call(this.all)
     }
 
-    updateData() {
+    updateData() {        
         var oldElements = this.update
 
         this.data = this.args.data
@@ -137,7 +137,7 @@ export class D3UpdateLayer
 
         this.update = this.update.merge(n)
         this.update.call(this.all)
-
+        
 // extrashit
         //if (this.args.name === 'captions')
         //    this.addTextBackgroundRects()
