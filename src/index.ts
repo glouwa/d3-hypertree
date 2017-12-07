@@ -12,8 +12,9 @@ export * from './components/layerstack'
 import * as cell from './components/layerstack/layers/cell-layer'
 import * as arc  from './components/layerstack/layers/link-layer'
 import * as node from './components/layerstack/layers/node-layer'
-import * as sym from './components/layerstack/layers/symbol-layer'
+import * as sym  from './components/layerstack/layers/symbol-layer'
 import * as text from './components/layerstack/layers/text-rect-layer'
+
 export namespace layers
 {
     export var  CellLayer       = cell.CellLayer
@@ -28,10 +29,8 @@ export namespace layers
     export type LabelLayerArgs  = text.LabelLayerArgs
 }
 
-
 export * from './components/unitdisk'
 export * from './components/unitdisk/interactive-unitdisk'
-
 
 import * as loaders_ from './models/n/n-loaders'
 import * as layouts_ from './models/n/n-layouts'

@@ -85,7 +85,7 @@ export interface HypertreeUi // = unitdisk :/
 export class Hypertree 
 {
     args           : HypertreeArgs
-    ui             : HTMLElement & HypertreeUi
+    unitdisk       : HTMLElement & HypertreeUi
     infoUi         : HTMLElement & { msg, updateModel, updateLayout }
     layerInfo      : HTMLElement & { updateModel }
     data           : N
@@ -98,12 +98,12 @@ export class Hypertree
         this.infoUi = InfoArea(args, 'data')
         this.layerInfo = LayerInfo(args, 'data')
         this.layerInfo = LayerInfo(args, 'nav')
-        this.ui = new args.decorator({
+        this.unitdisk = new args.decorator({
             parent:         args.parent,
             hypertree:      this,
             data:           undefined,            
             transformation: this.args.ui.transformation,
-            transform:      (n:N)=> this.ui.args.transformation.transformPoint(n.z),
+            transform:      (n:N)=> this.unitdisk.args.transformation.transformPoint(n.z),
             layers:         this.args.ui.layers,
             cacheUpdate:    this.args.ui.cacheUpdate,
             onClick:        (n:N, m:C)=> this.args.ui.onClick(this, n, m),
@@ -111,16 +111,16 @@ export class Hypertree
             clipRadius:     this.args.ui.clipRadius,
             nodeRadius:     this.args.ui.nodeRadius,
             mouseRadius:    args.ui.transformation.maxMouseR,
-        })        
+        })
         this.updateData()
         this.updateLang()
     }
 
     public updateData() : void {
         var t0 = performance.now()
-        this.ui.querySelector('.preloader').innerHTML = htmlpreloader
-        this.ui.args.data = undefined
-        this.ui.updateData()
+        this.unitdisk.ui.querySelector('.preloader').innerHTML = htmlpreloader
+        this.unitdisk.args.data = undefined
+        this.unitdisk.updateData()
         this.args.dataloader((d3h, t1)=>
         {
             var t2 = performance.now()
@@ -128,12 +128,12 @@ export class Hypertree
                             .hierarchy(d3h)
                             //.sum(this.args.weight) // this.updateWeights()
 
-            this.ui.querySelector('.preloader').innerHTML = ''
+            this.unitdisk.ui.querySelector('.preloader').innerHTML = ''
             this.infoUi.updateModel(model, [t1-t0, t2-t1, performance.now()-t2])
 
             var t3 = performance.now()
             this.data = this.args.layout(model, this.args.ui.transformation.state)
-            this.ui.args.data = this.data
+            this.unitdisk.args.data = this.data
             this.args.ui.transformation.cache.N = this.data.descendants().length
             this.updateWeights()
             this.updateLang_()
@@ -169,7 +169,7 @@ export class Hypertree
         if (new_ && new_.ancestors) for (var pn of new_.ancestors()) pn[pathId] = n
 
         //this.ui.updateSelection()
-        requestAnimationFrame(this.ui.updateTransformation)
+        requestAnimationFrame(()=> this.unitdisk.updateTransformation())
     }
 
     private updateWeights() : void {
@@ -190,8 +190,8 @@ export class Hypertree
     }
 
     private updateTransformation() : void {
-        requestAnimationFrame(this.ui.updateTransformation)
-    }
+        requestAnimationFrame(()=> this.unitdisk.updateTransformation())
+    } 
 
     private animateUp()
     {
@@ -220,7 +220,7 @@ export class Hypertree
 
                 //app.toast('Layout')
                 this.args.layout(this.data, this.args.ui.transformation.state)
-                this.ui.updateData()
+                this.unitdisk.updateData()
 
                 if (this.data
                     .leaves()

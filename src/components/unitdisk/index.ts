@@ -76,143 +76,167 @@ export interface UnitDiskArgs
 }*/
 
 var html =
-`<div class="unitdisk-nav">
-    <svg width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">
-        ${bubbleSvgDef}
-        <g class="unitDisc" transform="translate(520,500) scale(470)"></g>
-    </svg> 
-    <div class="preloader"></div>
-</div>`
+    `<div class="unitdisk-nav">
+        <svg width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">
+            ${bubbleSvgDef}
+            <g class="unitDisc" transform="translate(520,500) scale(470)"></g>
+        </svg> 
+        <div class="preloader"></div>
+    </div>`
 
-export function Unitdisk(args : UnitDiskArgs)
+export class UnitDisk
 {
-    var ui = HTML.parse<HTMLElement & HypertreeUi>(html)()
-    args.parent.appendChild(ui)
-    args.parent = ui.querySelector('.unitDisc')
+    args : UnitDiskArgs
+    ui :  HTMLElement & HypertreeUi
+    interaction : Interaction
 
+    constructor(args : UnitDiskArgs) {
+        this.args = args
+        this.ui = HTML.parse<HTMLElement & HypertreeUi>(html)()
+        this.ui.args = args
 
-    var interaction = new Interaction(args)
+        args.parent.appendChild(this.ui) 
+        args.parent = this.ui.querySelector('.unitDisc')
 
-    ui.args = args
-    ui.updateData           = ()=> {
-        interaction.args.data = ui.args.data
-        interaction.updatePositions()
+        this.interaction = new Interaction(args)
     }
-    ui.updateTransformation = ()=> {
-        interaction.updatePositions()
+
+    public updateData() {
+        this.interaction.args.data = this.ui.args.data
+        this.interaction.updatePositions()
     }
-    ui.updateSelection      = ()=> interaction.updateSelection()
-    return ui
+
+    public updateTransformation() {
+        this.interaction.updatePositions()
+    }
+
+    public updateSelection() {
+        this.interaction.updateSelection()   
+    }
 }
 
 var htmlnav =
-`<div class="unitdisk-nav">
-    <svg width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">            
-        ${bubbleSvgDef}
-        <g class="unitDisc"            transform="translate(500,500) scale(440)"></g>            
-        <g class="nav-parameter-disc"  transform="translate(120,120) scale(60)"></g>        
-        <g class="nav-background-disc" transform="translate(120,120) scale(60)"></g>                         
-    </svg>
-    <div class="preloader"></div>
-</div>`
+    `<div class="unitdisk-nav">
+        <svg width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">            
+            ${bubbleSvgDef}
+            <g class="unitDisc"            transform="translate(500,500) scale(440)"></g>            
+            <g class="nav-parameter-disc"  transform="translate(120,120) scale(60)"></g>        
+            <g class="nav-background-disc" transform="translate(120,120) scale(60)"></g>                         
+        </svg>
+        <div class="preloader"></div>
+    </div>`
 
-export function UnitDiskNav(args : UnitDiskArgs)
+export class UnitDiskNav
 {
-    var ui = HTML.parse<HTMLElement & HypertreeUi>(htmlnav)()
-    args.parent.appendChild(ui)
-    args.parent = ui.querySelector('.unitDisc')
+    args : UnitDiskArgs
+    ui :  HTMLElement & HypertreeUi 
+    interaction : Interaction
 
- 
-    var view = new Interaction(args)
+    view
+    navBackground
+    navParameter
 
-    var navBackground = new Interaction({
-        parent:             ui.querySelector('.nav-background-disc'),
-        hypertree:          args.hypertree,
-        data:               args.data,
-        layers:             args.layers.filter((l, idx)=> idx !== 0 
-                                                       && idx !== 2 
-                                                       && idx !== 3), // no labels, specials here
-        cacheUpdate:        args.cacheUpdate,
-        transformation:     args.transformation,
-        transform:          (n:N)=> n.z,
+    constructor(args : UnitDiskArgs) {
+        this.args = args
+        this.ui = HTML.parse<HTMLElement & HypertreeUi>(htmlnav)()
+        this.ui.args = args
 
-        onClick:            (n:N, m:C)=> {},
+        args.parent.appendChild(this.ui)
+        args.parent = this.ui.querySelector('.unitDisc')
 
-        caption:            (n:N)=> undefined,
-        nodeRadius:         .012,
-        clipRadius:         1,
-        mouseRadius:        0,
-    })
+    
+        this.view = new Interaction(args)
 
-    var navTransformation =
-        new NegTransformation(
-            new PanTransformation(args.transformation.state))
-    var rotate = d=>
-        (d.name === 'λ' ? ' rotate(-30)' : ' rotate(0)')
-    var Pscale =  ls=> d=>
-        lengthDilledation(d)
-        * (1 - πify(CktoCp(ls.args.transformation.state.λ).θ) / 2 / Math.PI)
-        / ls.args.nodeRadius
-    var navParameter = new Interaction({
-        parent:             ui.querySelector('.nav-parameter-disc'),
-        hypertree:          args.hypertree,
-        data:               obj2data(args.transformation.state),
-        layers:             [
-                                (ls:Interaction)=> new NodeLayer({
-                                    name:        'nodes',
-                                    data:        ()=> ls.cache.unculledNodes,
-                                    r:           d=> ls.args.nodeRadius * (d.name==='P' ? Pscale(ls)(d) : 1),
-                                    transform:   d=> d.transformStrCache,
-                                }),
-                                (ls:Interaction)=> new LabelLayer({
-                                    data:        ()=> ls.cache.unculledNodes,
-                                    text:        d=> ({P:'+', θ:'🗘', λ:'⚲' })[d.name],
-                                    delta:       d=> ({ re:.0025, im:.025 }),
-                                    transform:   d=> d.transformStrCache + rotate(d)
-                                })
-                            ],
-        cacheUpdate:        (interaction:Interaction, cache:TransformationCache)=> {
-                                cache.unculledNodes = dfsFlat(interaction.args.data)
-                                for (var n of cache.unculledNodes) {
-                                    n.cache = n.cache || { re:0, im:0 }
-                                    var np = interaction.args.transform(n)
-                                    if (n.name == 'θ' || n.name == 'λ')
-                                        np = CmulR(np, 1.08)
-                                    CassignC(n.cache, np)
+        this.navBackground = new Interaction({
+            parent:             this.ui.querySelector('.nav-background-disc'),
+            hypertree:          args.hypertree,
+            data:               args.data,
+            layers:             args.layers.filter((l, idx)=> idx !== 0 
+                                                        && idx !== 2 
+                                                        && idx !== 3), // no labels, specials here
+            cacheUpdate:        args.cacheUpdate,
+            transformation:     args.transformation,
+            transform:          (n:N)=> n.z,
 
-                                    n.cachep            = CktoCp(n.cache)
-                                    n.strCache          = n.cache.re + ' ' + n.cache.im
-                                    n.scaleStrText      = ` scale(1)`
-                                    n.transformStrCache = ` translate(${n.strCache})`
-                                }
-                                try { cache.voronoiDiagram = interaction.voronoiLayout(cache.unculledNodes) } catch(e) {}
-                            },
-        transformation:     navTransformation,
-        transform:          (n:any)=> CmulR(n, -1),
+            onClick:            (n:N, m:C)=> {},
 
-        onClick:            (n:N, m:C)=> {}, //args.onAnimateTo(navTransformation, n, CsubC(m, navTransformation.state.P)),
+            caption:            (n:N)=> undefined,
+            nodeRadius:         .012,
+            clipRadius:         1,
+            mouseRadius:        0,
+        })
 
-        caption:            (n:N)=> undefined,
-        nodeRadius:         .21,
-        clipRadius:         1.4,
-        mouseRadius:        1.4,
-    })
+        var navTransformation =
+            new NegTransformation(
+                new PanTransformation(args.transformation.state))
+        var rotate = d=>
+            (d.name === 'λ' ? ' rotate(-30)' : ' rotate(0)')
+        var Pscale =  ls=> d=>
+            lengthDilledation(d)
+            * (1 - πify(CktoCp(ls.args.transformation.state.λ).θ) / 2 / Math.PI)
+            / ls.args.nodeRadius
+        this.navParameter = new Interaction({
+            parent:             this.ui.querySelector('.nav-parameter-disc'),
+            hypertree:          args.hypertree,
+            data:               obj2data(args.transformation.state),
+            layers:             [
+                                    (ls:Interaction)=> new NodeLayer({
+                                        name:        'nodes',
+                                        data:        ()=> ls.cache.unculledNodes,
+                                        r:           d=> ls.args.nodeRadius * (d.name==='P' ? Pscale(ls)(d) : 1),
+                                        transform:   d=> d.transformStrCache,
+                                    }),
+                                    (ls:Interaction)=> new LabelLayer({
+                                        data:        ()=> ls.cache.unculledNodes,
+                                        text:        d=> ({P:'+', θ:'🗘', λ:'⚲' })[d.name],
+                                        delta:       d=> ({ re:.0025, im:.025 }),
+                                        transform:   d=> d.transformStrCache + rotate(d)
+                                    })
+                                ],
+            cacheUpdate:        (interaction:Interaction, cache:TransformationCache)=> {
+                                    cache.unculledNodes = dfsFlat(interaction.args.data)
+                                    for (var n of cache.unculledNodes) {
+                                        n.cache = n.cache || { re:0, im:0 }
+                                        var np = interaction.args.transform(n)
+                                        if (n.name == 'θ' || n.name == 'λ')
+                                            np = CmulR(np, 1.08)
+                                        CassignC(n.cache, np)
 
-    ui.args = args
-    ui.updateData           = ()=> {
-        navBackground.args.data = ui.args.data
-        view.args.data = ui.args.data
+                                        n.cachep            = CktoCp(n.cache)
+                                        n.strCache          = n.cache.re + ' ' + n.cache.im
+                                        n.scaleStrText      = ` scale(1)`
+                                        n.transformStrCache = ` translate(${n.strCache})`
+                                    }
+                                    try { cache.voronoiDiagram = interaction.voronoiLayout(cache.unculledNodes) } catch(e) {}
+                                },
+            transformation:     navTransformation,
+            transform:          (n:any)=> CmulR(n, -1),
 
-        navBackground.updatePositions()
-        view.updatePositions()
-        navParameter.updatePositions()
+            onClick:            (n:N, m:C)=> {}, //args.onAnimateTo(navTransformation, n, CsubC(m, navTransformation.state.P)),
+
+            caption:            (n:N)=> undefined,
+            nodeRadius:         .21,
+            clipRadius:         1.4,
+            mouseRadius:        1.4,
+        })
     }
-    ui.updateTransformation = ()=> {
-        view.updatePositions();
-        navParameter.updatePositions();
+
+    public updateData() {
+        this.navBackground.args.data = this.ui.args.data
+        this.view.args.data = this.ui.args.data
+
+        this.navBackground.updatePositions()
+        this.view.updatePositions()
+        this.navParameter.updatePositions()
     }
-    ui.updateSelection      = ()=> { view.updateSelection(); /*navBackground.updateSelection();*/ }
-    return ui
+
+    public updateTransformation() {
+        this.view.updatePositions();
+        this.navParameter.updatePositions();
+    }
+    public updateSelection() {
+        this.view.updateSelection(); /*navBackground.updateSelection();*/
+    }        
 }
 
 
