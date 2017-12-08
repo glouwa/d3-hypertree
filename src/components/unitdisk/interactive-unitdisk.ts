@@ -11,24 +11,21 @@ import { LayerStack }           from '../layerstack'
 import { UnitDiskArgs }         from './'
 
 var html = ` unused
-<clipPath id="circle-clip"><circle r="1"></circle></clipPath>
-<circle class="background-circle" r="1"></circle>
-<g class="layers"><g clip-path="url(#circle-clip)">
-    <g class="cells"></g>
-    <g class="links"></g>
-    <g class="nodes"></g>
-    <g class="captions"></g>
-</g>`
+    <clipPath id="circle-clip"><circle r="1"></circle></clipPath>
+    <circle class="background-circle" r="1"></circle>
+    <g class="layers"><g clip-path="url(#circle-clip)">
+        <g class="cells"></g>
+        <g class="links"></g>
+        <g class="nodes"></g>
+        <g class="captions"></g>
+    </g>`
 
-// InteractiveUnitdisk
 class Interaction
 {
-    args:           UnitDiskArgs
+    args:        UnitDiskArgs
     mainGroup
-    focusCircle:    any                  // d3?... SvgCircle
-    layerStack:     LayerStack
-   
-    cache:          TransformationCache // zeigt auf transformation.cache
+    layerStack:  LayerStack
+    cache:       TransformationCache // zeigt auf transformation.cache
 
     updateSelection() {
         this.layerStack.updatePath()
@@ -39,16 +36,8 @@ class Interaction
     }
 
     updatePositions() : void {
-        this.focusCircle
-            .attr("r", πify(CktoCp(this.args.transformation.state.λ).θ) / 2 / Math.PI)
-
-        this.updateCache()
-        this.layerStack.updateTransformation()
-    }
-
-    // TODO muss hier weg
-    private updateCache() {
         this.args.cacheUpdate(this, this.cache)
+        this.layerStack.updateTransformation()
     }
 
     constructor(args : UnitDiskArgs) {
@@ -59,24 +48,11 @@ class Interaction
         this.mainGroup.append("clipPath")
             .attr("id", "circle-clip"+this.args.clipRadius)
             .append("circle")
-                .attr("r", this.args.clipRadius)
-
-        this.mainGroup.append('circle')
-            .attr("class", "background-circle")
-            .attr("r", this.args.clipRadius)
-            .attr("fill", 'url(#exampleGradient)')            
-            //.on("mouseout",  d=> this.args.hypertree.updatePath('isHovered', undefined))
-     
-        if (this.args.parent.getAttribute("class") == 'unitDisc')
-            this.focusCircle = this.mainGroup.append('circle')
-                .attr("class", "focus-circle")
-                .attr("r", πify(CktoCp(this.args.transformation.state.λ).θ) / 2 / Math.PI)
-        else
-            this.focusCircle = this.mainGroup.select('empty-selection')
+                .attr("r", this.args.clipRadius)       
     }
 
     protected initLayerStack() {
-        this.updateCache()
+        this.args.cacheUpdate(this, this.cache)
         this.layerStack = new LayerStack({
             parent: d3.select(this.args.parent),
             interaction: this
@@ -209,7 +185,7 @@ export class Interaction2 extends Interaction
             if (step > steps) 
                 this.cancelAnimationTimer()            
             else  
-                this.onDragByNode(null, m, CptoCk(md))            
+                this.onDragByNode(null, m, CptoCk(md))
         },1)
     }
 

@@ -147,9 +147,10 @@ export class UnitDiskNav
             parent:             this.ui.querySelector('.nav-background-disc'),
             hypertree:          args.hypertree,
             data:               args.data,
-            layers:             args.layers.filter((l, idx)=> idx !== 0 
-                                                        && idx !== 2 
-                                                        && idx !== 3), // no labels, specials here
+            layers:             args.layers.filter((l, idx)=> idx !== 1
+                                                           && idx !== 2
+                                                           && idx !== 4
+                                                           && idx !== 5),
             cacheUpdate:        args.cacheUpdate,
             transformation:     args.transformation,
             transform:          (n:N)=> n.z,
@@ -227,8 +228,8 @@ export class UnitDiskNav
     }
 
     public updateTransformation() {
-        this.view.updatePositions();
-        this.navParameter.updatePositions();
+        this.view.updatePositions()
+        this.navParameter.updatePositions()
     }
     public updateSelection() {
         this.view.updateSelection(); /*navBackground.updateSelection();*/

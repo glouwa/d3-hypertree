@@ -1,6 +1,6 @@
 import * as d3 from 'd3'
 import { N } from '../../models/n/n'
-import { Interaction } from '../unitdisk/interactive-unitdisk'
+import { Interaction2 } from '../unitdisk/interactive-unitdisk'
 
 export interface ILayer
 {
@@ -14,15 +14,16 @@ export interface ILayer
 export interface LayerStackArgs
 {
     parent,
-    interaction: Interaction
+    interaction: Interaction2
 }
 
 export class LayerStack
 {
     args: LayerStackArgs
 
-    layers:         any
+    layersGroup:    any
 
+    focus:          ILayer
     cells:          ILayer // set on create
     links:          ILayer
     nodes:          ILayer
@@ -32,7 +33,7 @@ export class LayerStack
     constructor(args: LayerStackArgs)
     {
         this.args = args
-        this.layers = this.args.parent.append('g')
+        this.layersGroup = this.args.parent.append('g')
         this.updateLayers()
     }
 
@@ -40,23 +41,31 @@ export class LayerStack
     {
         for (var layerfactoryfunc of this.args.interaction.args.layers)
         {
-            var argscpy = Object.assign({ parent:this.layers }, this.args.interaction)
+            var argscpy = Object.assign({ parent:this.layersGroup }, this.args.interaction)
             var newL = layerfactoryfunc(this.args.interaction)
-            if (newL.attach) newL.attach(this.layers)
             this[newL.name] = newL // todo newL.args is a workaround
+
+            if (newL.attach) 
+                newL.attach(this.layersGroup)
         }
     }
 
     public updateTransformation()
     {
+        if (this.focus) this.focus.updateData()
+
         var t0 = performance.now()
-        if (this.cells)    this.cells.updateData()
+        if (this.cells) this.cells.updateData()
+
         var t1 = performance.now()
-        if (this.links)    this.links.updateData()
+        if (this.links) this.links.updateData()
+
         var t2 = performance.now()
-        if (this.nodes)    this.nodes.updateData()
+        if (this.nodes) this.nodes.updateData()
+
         var t3 = performance.now()
         if (this.captions) this.captions.updateData()
+
         var t4 = performance.now()
         if (this.specials) this.specials.updateData()
 
