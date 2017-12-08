@@ -92,9 +92,7 @@ export class UnitDisk
 
     constructor(args : UnitDiskArgs) {
         this.args = args
-        this.ui = HTML.parse<HTMLElement & HypertreeUi>(html)()
-        this.ui.args = args
-
+        this.ui = HTML.parse<HTMLElement & HypertreeUi>(html)()        
         args.parent.appendChild(this.ui) 
         args.parent = this.ui.querySelector('.unitDisc')
 
@@ -138,9 +136,7 @@ export class UnitDiskNav
 
     constructor(args : UnitDiskArgs) {
         this.args = args
-        this.ui = HTML.parse<HTMLElement & HypertreeUi>(htmlnav)()
-        this.ui.args = args
-
+        this.ui = HTML.parse<HTMLElement & HypertreeUi>(htmlnav)()        
         args.parent.appendChild(this.ui)
         args.parent = this.ui.querySelector('.unitDisc')
 
@@ -222,8 +218,8 @@ export class UnitDiskNav
     }
 
     public updateData() {
-        this.navBackground.args.data = this.ui.args.data
-        this.view.args.data = this.ui.args.data
+        this.navBackground.args.data = this.args.data
+        this.view.args.data = this.args.data
 
         this.navBackground.updatePositions()
         this.view.updatePositions()

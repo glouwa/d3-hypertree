@@ -38,7 +38,13 @@ export class HyperbolicTransformation implements Transformation<N>
     onDragStart =    (m:C)=> this.dST = clone(this.state)
     onDragP =        (s:C, e:C)=> CassignC(this.state.P, compose(this.dST, shift(this.dST, s, maxR(e, this.maxMouseR))).P)
     onDragθ:         (s:C, e:C)=> {}
-    onDragλ =        (s:C, e:C)=> CassignC(this.state.λ, setR(e, 1))
+    onDragλ =        (s:C, e:C)=> {
+        CassignC(this.state.λ, setR(e, 1))
+        /*if (this.cache.centerNode) {
+            this.state.P.re = this.cache.centerNode.cache.re
+            this.state.P.im = this.cache.centerNode.cache.im
+        }*/
+    }
 }
 
 export class PanTransformation implements Transformation<N>
@@ -95,6 +101,7 @@ export class TransformationCache
     labels:         N[]
 
     voronoiDiagram: d3.VoronoiDiagram<N>
+    centerNode:     N
     cells
 }
 

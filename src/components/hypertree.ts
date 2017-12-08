@@ -121,8 +121,7 @@ export class Hypertree
         this.unitdisk.ui.querySelector('.preloader').innerHTML = htmlpreloader
         this.unitdisk.args.data = undefined
         this.unitdisk.updateData()
-        this.args.dataloader((d3h, t1)=>
-        {
+        this.args.dataloader((d3h, t1)=> {
             var t2 = performance.now()
             var model = <N & d3.HierarchyNode<N>>d3
                             .hierarchy(d3h)
@@ -144,8 +143,7 @@ export class Hypertree
     }
 
     public updateLang() : void {
-        this.args.langloader(langMap=>
-        {            
+        this.args.langloader(langMap=> {            
             this.langMap = langMap
             this.updateLang_()
             this.updateTransformation()
@@ -165,8 +163,13 @@ export class Hypertree
         this.paths[pathId] = n
         var new_ =  this.paths[pathId]
 
-        if (old_ && old_.ancestors) for (var pn of old_.ancestors()) pn[pathId] = undefined
-        if (new_ && new_.ancestors) for (var pn of new_.ancestors()) pn[pathId] = n
+        if (old_ && old_.ancestors) 
+            for (var pn of old_.ancestors())
+                pn[pathId] = undefined
+
+        if (new_ && new_.ancestors) 
+            for (var pn of new_.ancestors()) 
+                pn[pathId] = n
 
         //this.ui.updateSelection()
         requestAnimationFrame(()=> this.unitdisk.updateTransformation())
@@ -184,8 +187,10 @@ export class Hypertree
     private updateLayout() : void {        
         //app.toast('Layout')
         var t0 = performance.now()
+
         this.args.layout(this.data, this.args.ui.transformation.state)        
         this.infoUi.updateLayout(this.args.ui.transformation.cache, performance.now() - t0)
+        
         this.updateTransformation()
     }
 
