@@ -14,7 +14,8 @@ import { HypertreeUi }                   from '../hypertree'
 import { ILayer }                        from '../layerstack'
 import { NodeLayer }                     from '../layerstack/layers/node-layer'
 import { LabelLayer }                    from '../layerstack/layers/text-rect-layer'
-import { Interaction2 }                   from './interactive-unitdisk'
+import { InteractionLayer }              from '../layerstack/layers/interaction-layer'
+import { Interaction2 }                  from './interactive-unitdisk'
 
 var bubbleSvgDef =
     `<defs>
@@ -186,6 +187,9 @@ export class UnitDiskNav
                                         text:        d=> ({P:'+', θ:'🗘', λ:'⚲' })[d.name],
                                         delta:       d=> ({ re:.0025, im:.025 }),
                                         transform:   d=> d.transformStrCache + rotate(d)
+                                    }),
+                                    (ls:Interaction)=> new InteractionLayer({  
+                                        unitdisk:    ls                          
                                     })
                                 ],
             cacheUpdate:        (interaction:Interaction2, cache:TransformationCache)=> {

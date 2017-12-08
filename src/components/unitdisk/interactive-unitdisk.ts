@@ -10,7 +10,7 @@ import { C, CptoCk, CktoCp,
 import { LayerStack }           from '../layerstack'
 import { UnitDiskArgs }         from './'
 
-class Interaction
+export class Interaction2
 {
     args:        UnitDiskArgs
     mainGroup
@@ -57,9 +57,14 @@ class Interaction
         })
     }
 }
-
+/*
 export class Interaction2 extends Interaction
 {
+    cache
+    hypertree
+    transformtion
+    mouseRadius
+
     constructor(args : UnitDiskArgs) {
         super(args)
         this.initMouseStuff()        
@@ -96,15 +101,15 @@ export class Interaction2 extends Interaction
         var zoom = d3.zoom()
             .scaleExtent([.51, 1.49])
             .filter(()=> d3.event.type=='wheel')
-         /*   .filter(()=> {
-                return d3.event.type=='wheel'
-                //console.log(d3.event.touches && d3.event.touches.length == 2)
-                return d3.event.type=='wheel'// || ( d3.event.touches && d3.event.touches.length == 2)
-
-                //return d3.event.type==='wheel' //|| d3.event.type!=='touchstart'
-                //return d3.event.type!=='dblclick' && d3.event.type!=='mousedown'
-                //return d3.event.type!=='dblclick' || d3.event.type=='touchstart'//&& d3.event.type!=='mousedown' && d3.event.type!=='touchstart'
-            })*/
+          //  .filter(()=> {
+          //      return d3.event.type=='wheel'
+          //      //console.log(d3.event.touches && d3.event.touches.length == 2)
+          //      return d3.event.type=='wheel'// || ( d3.event.touches && d3.event.touches.length == 2)
+          //
+          //      //return d3.event.type==='wheel' //|| d3.event.type!=='touchstart'
+          //      //return d3.event.type!=='dblclick' && d3.event.type!=='mousedown'
+          //      //return d3.event.type!=='dblclick' || d3.event.type=='touchstart'//&& d3.event.type!=='mousedown' && d3.event.type!=='touchstart'
+          //  })
             .on("zoom", ()=> this.onDragλ(
                 null,
                 CptoCk({ θ:d3.event.transform.k * Math.PI*2-Math.PI, r:1 }),
@@ -208,4 +213,4 @@ export class Interaction2 extends Interaction
         //this.animateTo(n, ArrtoC(d3.mouse(this.args.parent)))
         this.args.onClick(n, m)
     }
-}
+}*/
