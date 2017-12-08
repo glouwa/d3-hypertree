@@ -10,42 +10,38 @@ import { C, CptoCk, CktoCp,
 
 export interface InteractionLayerArgs
 {
-    unitdisk    
+    unitdisk, 
+    mouseRadius,
+    onClick
 }
 
 export class InteractionLayer implements ILayer
 {
     name: string
+    parent
     args: InteractionLayerArgs    
     updateData =      ()=> {}
     updateTransform = ()=> {}
     updateColor =     ()=> {}
 
-    cache
-
     constructor(args : InteractionLayerArgs) {        
         this.args = args
         this.name = 'interaction'
-
-        this.cache = args.unitdisk.cache
-        this.args.hypertree = args.unitdisk.args.hypertree
-        this.args.transformation = args.unitdisk.args.transformation
-        this.args.mouseRadius = args.unitdisk.args.mouseRadius
-        this.args.onClick = args.unitdisk.args.onClick
     }
 
     public attach(parent) {
-        this.args.parent = parent        
-        this.mainGroup = this.args.parent
+        this.parent = parent        
         this.initMouseStuff()
     }
 
-    private initMouseStuff(parent) {
-        this.currMousePosAsArr = ()=> d3.mouse(this.args.parent._groups[0][0])
-        this.currMousePosAsC = ()=> ArrtoC(this.currMousePosAsArr())
+    currMousePosAsArr = ()=> d3.mouse(this.parent._groups[0][0])
+    currMousePosAsC = ()=> ArrtoC(this.currMousePosAsArr())
+
+    private initMouseStuff() {
+        
         var findNodeByCell = ()=> {
             var m = this.currMousePosAsArr()
-            var find = this.cache.voronoiDiagram.find(m[0], m[1])
+            var find = this.args.unitdisk.cache.voronoiDiagram.find(m[0], m[1])
             return find ? find.data : undefined
         }
 
@@ -87,13 +83,13 @@ export class InteractionLayer implements ILayer
 
         // svg elements -------------------------------------------------------------------
           
-        this.mainGroup.append('circle')
+        this.parent.append('circle')
             .attr("class", "mouse-circle")
             .attr("r", this.args.mouseRadius)
             .on("dblclick",  d=> this.onDblClick(findNodeByCell()))
             //.on("click",     d=> this.onClick(findNodeByCell()))
-            .on("mousemove", d=> this.args.hypertree.updatePath('isHovered', findNodeByCell()))
-            .on("mouseout",  d=> this.args.hypertree.updatePath('isHovered', undefined))
+            .on("mousemove", d=> this.args.unitdisk.args.hypertree.updatePath('isHovered', findNodeByCell()))
+            .on("mouseout",  d=> this.args.unitdisk.args.hypertree.updatePath('isHovered', undefined))
             .call(drag)
             .call(zoom)
     }
@@ -102,25 +98,25 @@ export class InteractionLayer implements ILayer
 
     private onDragStart = (n:N, m:C)=> {
         if (!this.animationTimer)
-            this.args.transformation.onDragStart(m)
+            this.args.unitdisk.args.transformation.onDragStart(m)
     }
 
     private onDragλ = (s:C, e:C)=> {
-        this.args.transformation.onDragλ(s, e)
-        this.args.hypertree.updateLayout()
+        this.args.unitdisk.args.transformation.onDragλ(s, e)
+        this.args.unitdisk.args.hypertree.updateLayout()
     }
 
     private onDragByNode = (n:N, s:C, e:C)=> {
         if (n && n.name == 'θ') {
-            this.args.transformation.onDragθ(s, e)
-            this.args.hypertree.updateTransformation()
+            this.args.unitdisk.args.transformation.onDragθ(s, e)
+            this.args.unitdisk.args.hypertree.updateTransformation()
         }
         else if (n && n.name == 'λ') {
             this.onDragλ(s, e)
         }
         else {
-            this.args.transformation.onDragP(s, e)
-            this.args.hypertree.updateTransformation()
+            this.args.unitdisk.args.transformation.onDragP(s, e)
+            this.args.unitdisk.args.hypertree.updateTransformation()
         }
     }
 
@@ -160,7 +156,9 @@ export class InteractionLayer implements ILayer
         clearTimeout(this.dblClickTimer); this.dblClickTimer = null 
     }
     private onClick = (n:N, m) => {
-        if (d3.event && d3.event.preventDefault) d3.event.preventDefault()
+        if (d3.event && d3.event.preventDefault) 
+            d3.event.preventDefault()
+            
         m = m || this.currMousePosAsC()
 
         if (!this.dblClickTimer) 

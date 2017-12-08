@@ -87,8 +87,8 @@ var html =
 
 export class UnitDisk
 {
-    args : UnitDiskArgs
-    ui :  HTMLElement & HypertreeUi
+    args        : UnitDiskArgs
+    ui          : HTMLElement & HypertreeUi
     interaction : Interaction2
 
     constructor(args : UnitDiskArgs) {
@@ -128,10 +128,10 @@ var htmlnav =
 export class UnitDiskNav
 {
     args : UnitDiskArgs
-    ui :  HTMLElement & HypertreeUi 
+    ui 
     interaction : Interaction2
 
-    vie : Interaction2
+    view : Interaction2
     navBackground : Interaction2
     navParameter : Interaction2
 
@@ -188,8 +188,10 @@ export class UnitDiskNav
                                         delta:       d=> ({ re:.0025, im:.025 }),
                                         transform:   d=> d.transformStrCache + rotate(d)
                                     }),
-                                    (ls:Interaction)=> new InteractionLayer({  
-                                        unitdisk:    ls                          
+                                    (ls:Interaction2)=> new InteractionLayer({                                        
+                                        unitdisk:    ls,
+                                        mouseRadius: ls.args.mouseRadius,
+                                        onClick:     ls.args.onClick
                                     })
                                 ],
             cacheUpdate:        (interaction:Interaction2, cache:TransformationCache)=> {

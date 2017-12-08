@@ -70,6 +70,7 @@ export interface IHypertree
 export interface HypertreeUi // = unitdisk :/
 {
     args:                 any,
+    ui,
     updateData:           ()=> void,
     updateLang:           ()=> void,
     updateSelection:      ()=> void,
