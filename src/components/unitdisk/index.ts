@@ -14,7 +14,7 @@ import { HypertreeUi }                   from '../hypertree'
 import { ILayer }                        from '../layerstack'
 import { NodeLayer }                     from '../layerstack/layers/node-layer'
 import { LabelLayer }                    from '../layerstack/layers/text-rect-layer'
-import { Interaction }                   from './interactive-unitdisk'
+import { Interaction2 }                   from './interactive-unitdisk'
 
 var bubbleSvgDef =
     `<defs>
@@ -31,9 +31,9 @@ export interface UnitDiskArgs
     parent:            any,
     hypertree,
     data:              N,
-    layers:            ((ls:Interaction)=> ILayer)[],
+    layers:            ((ls:Interaction2)=> ILayer)[],
 
-    cacheUpdate:       (interaction:Interaction, cache:TransformationCache)=> void,
+    cacheUpdate:       (interaction:Interaction2, cache:TransformationCache)=> void,
     transformation:    Transformation<N>,
     transform:         (n:N)=> C,
 
@@ -88,7 +88,7 @@ export class UnitDisk
 {
     args : UnitDiskArgs
     ui :  HTMLElement & HypertreeUi
-    interaction : Interaction
+    interaction : Interaction2
 
     constructor(args : UnitDiskArgs) {
         this.args = args
@@ -96,7 +96,7 @@ export class UnitDisk
         args.parent.appendChild(this.ui) 
         args.parent = this.ui.querySelector('.unitDisc')
 
-        this.interaction = new Interaction(args)
+        this.interaction = new Interaction2(args)
     }
 
     public updateData() {
@@ -128,7 +128,7 @@ export class UnitDiskNav
 {
     args : UnitDiskArgs
     ui :  HTMLElement & HypertreeUi 
-    interaction : Interaction
+    interaction : Interaction2
 
     view
     navBackground
@@ -141,9 +141,9 @@ export class UnitDiskNav
         args.parent = this.ui.querySelector('.unitDisc')
 
     
-        this.view = new Interaction(args)
+        this.view = new Interaction2(args)
 
-        this.navBackground = new Interaction({
+        this.navBackground = new Interaction2({
             parent:             this.ui.querySelector('.nav-background-disc'),
             hypertree:          args.hypertree,
             data:               args.data,
@@ -171,25 +171,25 @@ export class UnitDiskNav
             lengthDilledation(d)
             * (1 - πify(CktoCp(ls.args.transformation.state.λ).θ) / 2 / Math.PI)
             / ls.args.nodeRadius
-        this.navParameter = new Interaction({
+        this.navParameter = new Interaction2({
             parent:             this.ui.querySelector('.nav-parameter-disc'),
             hypertree:          args.hypertree,
             data:               obj2data(args.transformation.state),
             layers:             [
-                                    (ls:Interaction)=> new NodeLayer({
+                                    (ls:Interaction2)=> new NodeLayer({
                                         name:        'nodes',
                                         data:        ()=> ls.cache.unculledNodes,
                                         r:           d=> ls.args.nodeRadius * (d.name==='P' ? Pscale(ls)(d) : 1),
                                         transform:   d=> d.transformStrCache,
                                     }),
-                                    (ls:Interaction)=> new LabelLayer({
+                                    (ls:Interaction2)=> new LabelLayer({
                                         data:        ()=> ls.cache.unculledNodes,
                                         text:        d=> ({P:'+', θ:'🗘', λ:'⚲' })[d.name],
                                         delta:       d=> ({ re:.0025, im:.025 }),
                                         transform:   d=> d.transformStrCache + rotate(d)
                                     })
                                 ],
-            cacheUpdate:        (interaction:Interaction, cache:TransformationCache)=> {
+            cacheUpdate:        (interaction:Interaction2, cache:TransformationCache)=> {
                                     cache.unculledNodes = dfsFlat(interaction.args.data)
                                     for (var n of cache.unculledNodes) {
                                         n.cache = n.cache || { re:0, im:0 }

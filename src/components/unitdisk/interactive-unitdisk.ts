@@ -20,24 +20,23 @@ var html = ` unused
     <g class="captions"></g>
 </g>`
 
-
 // InteractiveUnitdisk
-export class Interaction
+class Interaction
 {
     args:           UnitDiskArgs
+    mainGroup
     focusCircle:    any                  // d3?... SvgCircle
     layerStack:     LayerStack
-    voronoiLayout:  d3.VoronoiLayout<N>
-
+   
     cache:          TransformationCache // zeigt auf transformation.cache
-
-    //-----------------------------------------------------------------------------------------
 
     updateSelection() {
         this.layerStack.updatePath()
     }
 
-    updateData() : void { console.assert(false) }
+    updateData() : void { 
+        console.assert(false) 
+    }
 
     updatePositions() : void {
         this.focusCircle
@@ -52,11 +51,51 @@ export class Interaction
         this.args.cacheUpdate(this, this.cache)
     }
 
-    constructor(args : UnitDiskArgs)
-    {
+    constructor(args : UnitDiskArgs) {
         this.args = args
         this.cache = args.transformation.cache
 
+        this.mainGroup = d3.select(args.parent)
+        this.mainGroup.append("clipPath")
+            .attr("id", "circle-clip"+this.args.clipRadius)
+            .append("circle")
+                .attr("r", this.args.clipRadius)
+
+        this.mainGroup.append('circle')
+            .attr("class", "background-circle")
+            .attr("r", this.args.clipRadius)
+            .attr("fill", 'url(#exampleGradient)')            
+            //.on("mouseout",  d=> this.args.hypertree.updatePath('isHovered', undefined))
+     
+        if (this.args.parent.getAttribute("class") == 'unitDisc')
+            this.focusCircle = this.mainGroup.append('circle')
+                .attr("class", "focus-circle")
+                .attr("r", πify(CktoCp(this.args.transformation.state.λ).θ) / 2 / Math.PI)
+        else
+            this.focusCircle = this.mainGroup.select('empty-selection')
+    }
+
+    protected initLayerStack() {
+        this.updateCache()
+        this.layerStack = new LayerStack({
+            parent: d3.select(this.args.parent),
+            interaction: this
+        })
+    }
+}
+
+export class Interaction2 extends Interaction
+{
+    args:           UnitDiskArgs    
+    voronoiLayout:  d3.VoronoiLayout<N>
+
+    constructor(args : UnitDiskArgs) {
+        super(args)
+        this.initMouseStuff()
+        this.initLayerStack()
+    }
+
+    private initMouseStuff() {
         var currMousePosAsArr = ()=> d3.mouse(this.args.parent)
         var currMousePosAsC = ()=> ArrtoC(currMousePosAsArr())
         var findNodeByCell = ()=> {
@@ -107,20 +146,8 @@ export class Interaction
             .extent([[-2,-2], [2,2]])
 
         // svg elements -------------------------------------------------------------------
-
-        var mainGroup = d3.select(args.parent)
-        mainGroup.append("clipPath")
-            .attr("id", "circle-clip"+this.args.clipRadius)
-            .append("circle")
-                .attr("r", this.args.clipRadius)
-
-        mainGroup.append('circle')
-            .attr("class", "background-circle")
-            .attr("r", this.args.clipRadius)
-            .attr("fill", 'url(#exampleGradient)')            
-            //.on("mouseout",  d=> this.args.hypertree.updatePath('isHovered', undefined))
-            
-        mainGroup.append('circle')
+          
+        this.mainGroup.append('circle')
             .attr("class", "mouse-circle")
             .attr("r", this.args.mouseRadius)
             .on("dblclick",  d=> this.onDblClick(findNodeByCell()))
@@ -129,19 +156,6 @@ export class Interaction
             .on("mouseout",  d=> this.args.hypertree.updatePath('isHovered', undefined))
             .call(drag)
             .call(zoom)
-
-        if (this.args.parent.getAttribute("class") == 'unitDisc')
-            this.focusCircle = mainGroup.append('circle')
-                .attr("class", "focus-circle")
-                .attr("r", πify(CktoCp(this.args.transformation.state.λ).θ) / 2 / Math.PI)
-        else
-            this.focusCircle = mainGroup.select('empty-selection')
-
-        this.updateCache()
-        this.layerStack = new LayerStack({
-            parent: d3.select(this.args.parent),
-            interaction: this
-        })
     }
 
     //-----------------------------------------------------------------------------------------
@@ -174,14 +188,14 @@ export class Interaction
         var dc = CsubC(s, e)        
         var dist = Math.sqrt(dc.re*dc.re + dc.im*dc.im)
         
-        if (dist < .006) {
-            console.log('drag to small -> its a click', dist)
-            this.onClick(n, e) // sollte on click sein und auch timer berücksichtigen oder?
-        }
+        if (dist < .006)
+            this.onClick(n, e) // sollte on click sein und auch timer berücksichtigen oder?        
     }
 
     private animationTimer = null
-    private cancelAnimationTimer = ()=> { this.animationTimer.stop(); this.animationTimer = null }
+    private cancelAnimationTimer = ()=> { 
+        this.animationTimer.stop(); this.animationTimer = null 
+    }
     private animateTo(n:N, m:C) : void
     {
         if (this.animationTimer)
@@ -195,14 +209,16 @@ export class Interaction
             if (step > steps) 
                 this.cancelAnimationTimer()            
             else  
-               this.onDragByNode(null, m, CptoCk(md))            
+                this.onDragByNode(null, m, CptoCk(md))            
         },1)
     }
 
     //-----------------------------------------------------------------------------------------
 
     private dblClickTimer = null
-    private cancelClickTimer = ()=> { clearTimeout(this.dblClickTimer); this.dblClickTimer = null }
+    private cancelClickTimer = ()=> {
+        clearTimeout(this.dblClickTimer); this.dblClickTimer = null 
+    }
     private onClick = (n:N, m) => {
         if (d3.event && d3.event.preventDefault) d3.event.preventDefault()
         m = m || ArrtoC(d3.mouse(this.args.parent))
@@ -223,9 +239,8 @@ export class Interaction
         d3.event.preventDefault()
         var m = ArrtoC(d3.mouse(this.args.parent))
 
-        this.cancelClickTimer()        
-
+        this.cancelClickTimer()
         //this.animateTo(n, ArrtoC(d3.mouse(this.args.parent)))
-        this.args.onClick(n, m)        
+        this.args.onClick(n, m)
     }
 }

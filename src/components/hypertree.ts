@@ -13,7 +13,7 @@ import { Transformation }      from '../hyperbolic-transformation'
 
 import { ILayer }              from './layerstack'
 import { LayerArgs }           from './layerstack'
-import { Interaction }         from './unitdisk/interactive-unitdisk'
+import { Interaction2 }        from './unitdisk/interactive-unitdisk'
 import { UnitDiskArgs }        from './unitdisk'
 
 import { InfoArea }            from './unitdisk-meta'
@@ -51,10 +51,10 @@ export interface HypertreeArgs
         clipRadius:     number,
         nodeRadius:     number,
         transformation: Transformation<N>,
-        cacheUpdate:    (cache:Interaction)=> void,
+        cacheUpdate:    (cache:Interaction2)=> void,
         caption:        (hypertree:Hypertree, n:N)=> string,
         onClick:        (hypertree:Hypertree, n:N, m:C)=> void,
-        layers:         ((ls:Interaction)=> ILayer)[],
+        layers:         ((ls:Interaction2)=> ILayer)[],
     }
 }
 
