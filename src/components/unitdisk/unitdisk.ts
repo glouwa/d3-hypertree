@@ -63,8 +63,7 @@ export interface UnitDiskArgs
 
     caption:           (n:N)=> string,
     nodeRadius:        number,
-    clipRadius?:       number,
-    mouseRadius?:      number,
+    clipRadius?:       number
 }
 
 var html =
@@ -147,8 +146,7 @@ export class UnitDiskNav
 
             caption:            (n:N)=> undefined,
             nodeRadius:         .012,
-            clipRadius:         1,
-            mouseRadius:        0,
+            clipRadius:         1
         })
 
         var navTransformation =
@@ -179,7 +177,7 @@ export class UnitDiskNav
                                     }),
                                     (ls:Interaction2)=> new InteractionLayer({                                        
                                         unitdisk:    ls,
-                                        mouseRadius: ls.args.mouseRadius,
+                                        mouseRadius: 1.5,
                                         onClick:     (n:N, m:C)=> {}
                                     })
                                 ],
@@ -204,8 +202,7 @@ export class UnitDiskNav
 
             caption:            (n:N)=> undefined,
             nodeRadius:         .21,
-            clipRadius:         1.4,
-            mouseRadius:        1.4,
+            clipRadius:         1.5
         })
     }
 

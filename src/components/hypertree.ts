@@ -94,7 +94,7 @@ export class Hypertree
     animationTimer : any = null
 
     constructor(args : HypertreeArgs) {
-        this.args  = args                
+        this.args  = args
         this.infoUi = InfoArea(args, 'data')
         this.layerInfo = LayerInfo(args, 'data')
         this.layerInfo = LayerInfo(args, 'nav')
@@ -108,8 +108,7 @@ export class Hypertree
             cacheUpdate:    this.args.ui.cacheUpdate,            
             caption:        (n:N)=> this.args.ui.caption(this, n),
             clipRadius:     this.args.ui.clipRadius,
-            nodeRadius:     this.args.ui.nodeRadius,
-            mouseRadius:    args.ui.transformation.maxMouseR,
+            nodeRadius:     this.args.ui.nodeRadius
         })
         this.updateData()
         this.updateLang()
