@@ -93,7 +93,7 @@ export class UnitDisk
     constructor(args : UnitDiskArgs) {
         this.args = args
         this.ui = HTML.parse<HTMLElement & HypertreeUi>(html)()        
-        args.parent.appendChild(this.ui) 
+        args.parent.appendChild(this.ui)
         args.parent = this.ui.querySelector('.unitDisc')
 
         this.interaction = new Interaction2(args)
@@ -130,9 +130,9 @@ export class UnitDiskNav
     ui :  HTMLElement & HypertreeUi 
     interaction : Interaction2
 
-    view
-    navBackground
-    navParameter
+    vie : Interaction2
+    navBackground : Interaction2
+    navParameter : Interaction2
 
     constructor(args : UnitDiskArgs) {
         this.args = args
@@ -147,10 +147,8 @@ export class UnitDiskNav
             parent:             this.ui.querySelector('.nav-background-disc'),
             hypertree:          args.hypertree,
             data:               args.data,
-            layers:             args.layers.filter((l, idx)=> idx !== 1
-                                                           && idx !== 2
-                                                           && idx !== 4
-                                                           && idx !== 5),
+            layers:             args.layers.filter((l, idx)=> 
+                                    idx !== 1 && idx !== 2 && idx !== 4 && idx !== 5),
             cacheUpdate:        args.cacheUpdate,
             transformation:     args.transformation,
             transform:          (n:N)=> n.z,

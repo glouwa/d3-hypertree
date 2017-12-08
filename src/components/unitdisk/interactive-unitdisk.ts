@@ -10,20 +10,11 @@ import { C, CptoCk, CktoCp,
 import { LayerStack }           from '../layerstack'
 import { UnitDiskArgs }         from './'
 
-var html = ` unused
-    <clipPath id="circle-clip"><circle r="1"></circle></clipPath>
-    <circle class="background-circle" r="1"></circle>
-    <g class="layers"><g clip-path="url(#circle-clip)">
-        <g class="cells"></g>
-        <g class="links"></g>
-        <g class="nodes"></g>
-        <g class="captions"></g>
-    </g>`
-
 class Interaction
 {
     args:        UnitDiskArgs
     mainGroup
+    voronoiLayout: d3.VoronoiLayout<N>
     layerStack:  LayerStack
     cache:       TransformationCache // zeigt auf transformation.cache
 
@@ -32,7 +23,7 @@ class Interaction
     }
 
     updateData() : void { 
-        console.assert(false) 
+        console.assert(false)
     }
 
     updatePositions() : void {
@@ -44,17 +35,24 @@ class Interaction
         this.args = args
         this.cache = args.transformation.cache
 
+        this.voronoiLayout = d3.voronoi<N>()
+            .x(d=> { console.assert(typeof d.cache.re === 'number'); return d.cache.re })
+            .y(d=> { console.assert(typeof d.cache.re === 'number'); return d.cache.im })
+            .extent([[-2,-2], [2,2]])
+
         this.mainGroup = d3.select(args.parent)
         this.mainGroup.append("clipPath")
             .attr("id", "circle-clip"+this.args.clipRadius)
             .append("circle")
                 .attr("r", this.args.clipRadius)       
+
+        this.initLayerStack()
     }
 
     protected initLayerStack() {
         this.args.cacheUpdate(this, this.cache)
         this.layerStack = new LayerStack({
-            parent: d3.select(this.args.parent),
+            parent: this.mainGroup,
             interaction: this
         })
     }
@@ -62,13 +60,13 @@ class Interaction
 
 export class Interaction2 extends Interaction
 {
-    args:           UnitDiskArgs    
-    voronoiLayout:  d3.VoronoiLayout<N>
+    args:          UnitDiskArgs    
+    hypertree
+    transformation
 
     constructor(args : UnitDiskArgs) {
         super(args)
-        this.initMouseStuff()
-        this.initLayerStack()
+        this.initMouseStuff()        
     }
 
     private initMouseStuff() {
@@ -115,11 +113,6 @@ export class Interaction2 extends Interaction
                 null,
                 CptoCk({ θ:d3.event.transform.k * Math.PI*2-Math.PI, r:1 }),
             ))
-
-        this.voronoiLayout = d3.voronoi<N>()
-            .x(d=> { console.assert(typeof d.cache.re === 'number'); return d.cache.re })
-            .y(d=> { console.assert(typeof d.cache.re === 'number'); return d.cache.im })
-            .extent([[-2,-2], [2,2]])
 
         // svg elements -------------------------------------------------------------------
           
