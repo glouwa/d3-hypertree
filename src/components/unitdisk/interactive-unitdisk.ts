@@ -8,7 +8,7 @@ import { C, CptoCk, CktoCp,
          arcCenter, πify,
          sigmoid }              from '../../hyperbolic-math'
 import { LayerStack }           from '../layerstack'
-import { UnitDiskArgs }         from './'
+import { UnitDiskArgs }         from './unitdisk'
 
 export class Interaction2
 {

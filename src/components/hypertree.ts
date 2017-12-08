@@ -14,7 +14,7 @@ import { Transformation }      from '../hyperbolic-transformation'
 import { ILayer }              from './layerstack'
 import { LayerArgs }           from './layerstack'
 import { Interaction2 }        from './unitdisk/interactive-unitdisk'
-import { UnitDiskArgs }        from './unitdisk'
+import { UnitDiskArgs }        from './unitdisk/unitdisk'
 
 import { InfoArea }            from './unitdisk-meta'
 import { LayerInfo }           from './layerstack-meta'
@@ -52,8 +52,7 @@ export interface HypertreeArgs
         nodeRadius:     number,
         transformation: Transformation<N>,
         cacheUpdate:    (cache:Interaction2)=> void,
-        caption:        (hypertree:Hypertree, n:N)=> string,
-        onClick:        (hypertree:Hypertree, n:N, m:C)=> void,
+        caption:        (hypertree:Hypertree, n:N)=> string,       
         layers:         ((ls:Interaction2)=> ILayer)[],
     }
 }
@@ -106,8 +105,7 @@ export class Hypertree
             transformation: this.args.ui.transformation,
             transform:      (n:N)=> this.unitdisk.args.transformation.transformPoint(n.z),
             layers:         this.args.ui.layers,
-            cacheUpdate:    this.args.ui.cacheUpdate,
-            onClick:        (n:N, m:C)=> this.args.ui.onClick(this, n, m),
+            cacheUpdate:    this.args.ui.cacheUpdate,            
             caption:        (n:N)=> this.args.ui.caption(this, n),
             clipRadius:     this.args.ui.clipRadius,
             nodeRadius:     this.args.ui.nodeRadius,

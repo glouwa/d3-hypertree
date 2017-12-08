@@ -27,6 +27,29 @@ var bubbleSvgDef =
         </radialGradient>
     </defs>`
 
+/*export interface UnitDiskArgs2
+{
+    parent,
+    hypertree
+    data:              N,
+    
+    transformation
+    {
+        cacheUpdate:       (i:Interaction, cache:TransformationCache)=> void,
+        transformation:    Transformation<N>,
+        transform:         (n:N)=> C,
+    }
+    
+    geometrie
+    {
+        caption:           (n:N)=> string,
+        nodeRadius:        number,
+        clipRadius?:       number,
+        mouseRadius?:      number,
+        layers:            ((ls:Interaction, parent:d3Sel)=> Layer)[],
+    }
+}*/
+
 export interface UnitDiskArgs
 {
     parent:            any,
@@ -38,50 +61,18 @@ export interface UnitDiskArgs
     transformation:    Transformation<N>,
     transform:         (n:N)=> C,
 
-    onClick:           (n:N, m:C)=> void,
-
     caption:           (n:N)=> string,
     nodeRadius:        number,
     clipRadius?:       number,
     mouseRadius?:      number,
 }
 
-/*export interface UnitDiskArgs2
-{
-    parent,
-    hypertree
-    data:              N,
-    selection: {
-        onChange
-        nodes:
-        paths:
-    }
-    transformation
-    {
-        cacheUpdate:       (i:Interaction, cache:TransformationCache)=> void,
-        transformation:    Transformation<N>,
-        transform:         (n:N)=> C,
-    }
-    interaction:
-    {
-        onClick:           (n:N, m:C)=> void,
-    }
-    geometrie
-    {
-        caption:           (n:N)=> string,
-        nodeRadius:        number,
-        clipRadius?:       number,
-        mouseRadius?:      number,
-        layers:            ((ls:Interaction, parent:d3Sel)=> Layer)[],
-    }
-}*/
-
 var html =
     `<div class="unitdisk-nav">
         <svg width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">
             ${bubbleSvgDef}
             <g class="unitDisc" transform="translate(520,500) scale(470)"></g>
-        </svg> 
+        </svg>
         <div class="preloader"></div>
     </div>`
 
@@ -127,13 +118,13 @@ var htmlnav =
 
 export class UnitDiskNav
 {
-    args : UnitDiskArgs
+    args          : UnitDiskArgs
     ui 
-    interaction : Interaction2
+    interaction   : Interaction2
 
-    view : Interaction2
+    view          : Interaction2
     navBackground : Interaction2
-    navParameter : Interaction2
+    navParameter  : Interaction2
 
     constructor(args : UnitDiskArgs) {
         this.args = args
@@ -153,8 +144,6 @@ export class UnitDiskNav
             cacheUpdate:        args.cacheUpdate,
             transformation:     args.transformation,
             transform:          (n:N)=> n.z,
-
-            onClick:            (n:N, m:C)=> {},
 
             caption:            (n:N)=> undefined,
             nodeRadius:         .012,
@@ -191,7 +180,7 @@ export class UnitDiskNav
                                     (ls:Interaction2)=> new InteractionLayer({                                        
                                         unitdisk:    ls,
                                         mouseRadius: ls.args.mouseRadius,
-                                        onClick:     ls.args.onClick
+                                        onClick:     (n:N, m:C)=> {}
                                     })
                                 ],
             cacheUpdate:        (interaction:Interaction2, cache:TransformationCache)=> {
@@ -212,8 +201,6 @@ export class UnitDiskNav
                                 },
             transformation:     navTransformation,
             transform:          (n:any)=> CmulR(n, -1),
-
-            onClick:            (n:N, m:C)=> {}, //args.onAnimateTo(navTransformation, n, CsubC(m, navTransformation.state.P)),
 
             caption:            (n:N)=> undefined,
             nodeRadius:         .21,

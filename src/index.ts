@@ -37,7 +37,7 @@ export namespace layers
     export type InteractionLayerArgs = int.InteractionLayerArgs
 }
 
-export * from './components/unitdisk'
+export * from './components/unitdisk/unitdisk'
 export * from './components/unitdisk/interactive-unitdisk'
 
 import * as loaders_ from './models/n/n-loaders'

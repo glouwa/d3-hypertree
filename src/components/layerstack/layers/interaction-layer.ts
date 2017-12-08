@@ -17,9 +17,9 @@ export interface InteractionLayerArgs
 
 export class InteractionLayer implements ILayer
 {
-    name: string
+    name:             string
     parent
-    args: InteractionLayerArgs    
+    args:             InteractionLayerArgs    
     updateData =      ()=> {}
     updateTransform = ()=> {}
     updateColor =     ()=> {}
