@@ -60,10 +60,6 @@ class Interaction
 
 export class Interaction2 extends Interaction
 {
-    args:          UnitDiskArgs    
-    hypertree
-    transformation
-
     constructor(args : UnitDiskArgs) {
         super(args)
         this.initMouseStuff()        
