@@ -139,7 +139,7 @@ export class UnitDiskNav
             hypertree:          args.hypertree,
             data:               args.data,
             layers:             args.layers.filter((l, idx)=> 
-                                    idx !== 1 && idx !== 2 && idx !== 4 && idx !== 5),
+                                    idx !== 1 && idx !== 2 && idx !== 4 && idx !== 5 && idx !== 7),
             cacheUpdate:        args.cacheUpdate,
             transformation:     args.transformation,
             transform:          (n:N)=> n.z,
