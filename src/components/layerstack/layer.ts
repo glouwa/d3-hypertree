@@ -15,10 +15,10 @@ export interface LayerArgs
 
 export class D3UpdateLayer
 {
-    args : LayerArgs
+    args    : LayerArgs
     rootSVG : d3.Selection<SVGElement, N, SVGElement, undefined>
-    update : any
-    data : any
+    update  : any
+    data    : any
 
     all             = ()=> this.update.call(this.args.updateTransform)
                                       .call(this.args.updateColor)

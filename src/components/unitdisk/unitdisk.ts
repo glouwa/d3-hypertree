@@ -66,6 +66,8 @@ export interface UnitDiskArgs
     clipRadius?:       number
 }
 
+//----------------------------------------------------------------------------------------
+
 var html =
     `<div class="unitdisk-nav">
         <svg width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">
