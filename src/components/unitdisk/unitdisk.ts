@@ -93,7 +93,7 @@ export class UnitDisk
     }
 
     public updateData() {
-        this.interaction.args.data = this.ui.args.data
+        this.interaction.args.data = this.args.data
         this.interaction.updatePositions()
     }
 
@@ -129,7 +129,7 @@ export class UnitDiskNav
 
     constructor(args : UnitDiskArgs) {
         this.args = args
-        this.ui = HTML.parse<HTMLElement & HypertreeUi>(htmlnav)()        
+        this.ui = HTML.parse<HTMLElement & HypertreeUi>(htmlnav)()
         args.parent.appendChild(this.ui)
         args.parent = this.ui.querySelector('.unitDisc')
 
