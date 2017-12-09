@@ -11,8 +11,8 @@ import { C, CktoCp, CptoCk }   from '../hyperbolic-math'
 import { sigmoid }             from '../hyperbolic-math'
 import { Transformation }      from '../hyperbolic-transformation'
 
-import { ILayer }              from './layerstack'
-import { LayerArgs }           from './layerstack'
+import { ILayer }              from './layerstack/layerstack'
+import { LayerArgs }           from './layerstack/layer'
 import { Interaction2 }        from './unitdisk/interactive-unitdisk'
 import { UnitDiskArgs }        from './unitdisk/unitdisk'
 
@@ -94,10 +94,10 @@ export class Hypertree
     animationTimer : any = null
 
     constructor(args : HypertreeArgs) {
-        this.args  = args
+        this.args  = args        
         this.infoUi = InfoArea(args, 'data')
         this.layerInfo = LayerInfo(args, 'data')
-        this.layerInfo = LayerInfo(args, 'nav')
+        this.layerInfo = LayerInfo(args, 'nav') // soltle nachher sein, erst dann ist klar ob 2 oder 4
         this.unitdisk = new args.decorator({
             parent:         args.parent,
             hypertree:      this,
@@ -109,7 +109,7 @@ export class Hypertree
             caption:        (n:N)=> this.args.ui.caption(this, n),
             clipRadius:     this.args.ui.clipRadius,
             nodeRadius:     this.args.ui.nodeRadius
-        })
+        })        
         this.updateData()
         this.updateLang()
     }

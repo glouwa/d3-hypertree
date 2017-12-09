@@ -11,7 +11,7 @@ import { PanTransformation }             from '../../hyperbolic-transformation'
 import { NegTransformation }             from '../../hyperbolic-transformation'
 import { TransformationCache }           from '../../hyperbolic-transformation'
 import { HypertreeUi }                   from '../hypertree'
-import { ILayer }                        from '../layerstack'
+import { ILayer }                        from '../layerstack/layerstack'
 import { NodeLayer }                     from '../layerstack/layers/node-layer'
 import { LabelLayer }                    from '../layerstack/layers/text-rect-layer'
 import { InteractionLayer }              from '../layerstack/layers/interaction-layer'
@@ -171,7 +171,7 @@ export class UnitDiskNav
                                     }),
                                     (ls:Interaction2)=> new LabelLayer({
                                         data:        ()=> ls.cache.unculledNodes,
-                                        text:        d=> ({P:'+', θ:'🗘', λ:'⚲' })[d.name],
+                                        text:        d=> ({ P:'+', θ:'🗘', λ:'⚲' })[d.name],
                                         delta:       d=> ({ re:.0025, im:.025 }),
                                         transform:   d=> d.transformStrCache + rotate(d)
                                     }),

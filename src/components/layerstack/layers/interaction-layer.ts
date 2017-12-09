@@ -1,12 +1,11 @@
 import * as d3              from 'd3'
-import { ILayer }           from '../index'
+import { ILayer }           from '../layerstack'
 import { N }                from '../../../models/n/n'
 import { C, CptoCk, CktoCp,
     CassignC, ArrtoC,
     dfsFlat, CsubC,
     arcCenter, πify,
     sigmoid }               from '../../../hyperbolic-math'
-
 
 export interface InteractionLayerArgs
 {
@@ -36,21 +35,19 @@ export class InteractionLayer implements ILayer
 
     currMousePosAsArr = ()=> d3.mouse(this.parent._groups[0][0])
     currMousePosAsC = ()=> ArrtoC(this.currMousePosAsArr())
+    findNodeByCell = ()=> {
+        var m = this.currMousePosAsArr()
+        var find = this.args.unitdisk.cache.voronoiDiagram.find(m[0], m[1])
+        return find ? find.data : undefined
+    }
 
     private initMouseStuff() {
-        
-        var findNodeByCell = ()=> {
-            var m = this.currMousePosAsArr()
-            var find = this.args.unitdisk.cache.voronoiDiagram.find(m[0], m[1])
-            return find ? find.data : undefined
-        }
-
         var dragStartPoint = null
         var dragStartElement = null
         var drag = d3.drag()
             //.filter(()=> console.log(d3.event.type); return true; )
             .on("start", ()=> this.onDragStart(
-                dragStartElement = findNodeByCell(),
+                dragStartElement = this.findNodeByCell(),
                 dragStartPoint = this.currMousePosAsC()
             ))
             .on("end",   ()=> this.onDragEnd(
@@ -81,14 +78,12 @@ export class InteractionLayer implements ILayer
                 CptoCk({ θ:d3.event.transform.k * Math.PI*2-Math.PI, r:1 }),
             ))
 
-        // svg elements -------------------------------------------------------------------
-          
         this.parent.append('circle')
             .attr("class", "mouse-circle")
             .attr("r", this.args.mouseRadius)
-            .on("dblclick",  d=> this.onDblClick(findNodeByCell()))
+            .on("dblclick",  d=> this.onDblClick(this.findNodeByCell()))
             //.on("click",     d=> this.onClick(findNodeByCell()))
-            .on("mousemove", d=> this.args.unitdisk.args.hypertree.updatePath('isHovered', findNodeByCell()))
+            .on("mousemove", d=> this.args.unitdisk.args.hypertree.updatePath('isHovered', this.findNodeByCell()))
             .on("mouseout",  d=> this.args.unitdisk.args.hypertree.updatePath('isHovered', undefined))
             .call(drag)
             .call(zoom)

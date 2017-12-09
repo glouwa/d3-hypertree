@@ -1,5 +1,5 @@
-import { ILayer }        from '../index'
-import { D3UpdateLayer } from '../index'
+import { ILayer }        from '../layerstack'
+import { D3UpdateLayer } from '../layer'
 
 export interface NodeLayerArgs
 {
