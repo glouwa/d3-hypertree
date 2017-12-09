@@ -131,9 +131,8 @@ export class UnitDiskNav
         this.args = args
         this.ui = HTML.parse<HTMLElement & HypertreeUi>(htmlnav)()
         args.parent.appendChild(this.ui)
-        args.parent = this.ui.querySelector('.unitDisc')
 
-    
+        args.parent = this.ui.querySelector('.unitDisc')    
         this.view = new Interaction2(args)
 
         this.navBackground = new Interaction2({
@@ -160,6 +159,7 @@ export class UnitDiskNav
             lengthDilledation(d)
             * (1 - πify(CktoCp(ls.args.transformation.state.λ).θ) / 2 / Math.PI)
             / ls.args.nodeRadius
+            
         this.navParameter = new Interaction2({
             parent:             this.ui.querySelector('.nav-parameter-disc'),
             hypertree:          args.hypertree,

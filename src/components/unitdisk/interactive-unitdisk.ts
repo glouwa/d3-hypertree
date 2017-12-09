@@ -6,8 +6,7 @@ import { UnitDiskArgs }         from './unitdisk'
 
 export class Interaction2
 {
-    args          : UnitDiskArgs
-    mainGroup
+    args          : UnitDiskArgs    
     voronoiLayout : d3.VoronoiLayout<N>
     layerStack    : LayerStack
     cache         : TransformationCache // zeigt auf transformation.cache
@@ -15,21 +14,21 @@ export class Interaction2
     constructor(args : UnitDiskArgs) {
         this.args = args
         this.cache = args.transformation.cache
+        var mainGroup = d3.select(args.parent)
 
         this.voronoiLayout = d3.voronoi<N>()
             .x(d=> d.cache.re)
             .y(d=> d.cache.im)
             .extent([[-2,-2], [2,2]])
-
-        this.mainGroup = d3.select(args.parent)
-        this.mainGroup.append('clipPath')
+        
+        mainGroup.append('clipPath')
             .attr('id', 'circle-clip' + this.args.clipRadius)
             .append('circle')
                 .attr('r', this.args.clipRadius)       
 
         this.args.cacheUpdate(this, this.cache)
         this.layerStack = new LayerStack({
-            parent: this.mainGroup,
+            parent: mainGroup,
             interaction: this
         })
     }
