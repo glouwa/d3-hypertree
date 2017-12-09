@@ -38,12 +38,7 @@ export class HyperbolicTransformation implements Transformation<N>
     onDragStart =    (m:C)=> this.dST = clone(this.state)
     onDragP =        (s:C, e:C)=> CassignC(this.state.P, compose(this.dST, shift(this.dST, s, maxR(e, this.maxMouseR))).P)
     onDragθ:         (s:C, e:C)=> {}
-    onDragλ =        (s:C, e:C)=> {
-        CassignC(this.state.λ, setR(e, 1))
-        /*if (this.cache.centerNode) {
-            this.state.P.re = this.cache.centerNode.cache.re
-            this.state.P.im = this.cache.centerNode.cache.im
-        }*/
+    onDragλ =        (s:C, e:C)=> CassignC(this.state.λ, setR(e, 1)) 
     }
 }
 
@@ -67,7 +62,8 @@ export class PanTransformation implements Transformation<N>
     onDragStart =    (m:C)=> this.dST = clone(this.state)
     onDragP =        (s:C, e:C)=> CassignC(this.state.P, maxR(CaddC(this.dST.P, CsubC(e, s)), .999))
     onDragθ =        (s:C, e:C)=> CassignC(this.state.θ, setR(e, 1))
-    onDragλ =        (s:C, e:C)=> CassignC(this.state.λ, setR(e, 1))
+    onDragλ =        (s:C, e:C)=> CassignC(this.state.λ, setR(e, 1)) 
+    }
 }
 
 export class NegTransformation implements Transformation<N>

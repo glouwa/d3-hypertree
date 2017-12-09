@@ -41,10 +41,10 @@ export class Interaction2
             .extent([[-2,-2], [2,2]])
 
         this.mainGroup = d3.select(args.parent)
-        this.mainGroup.append("clipPath")
-            .attr("id", "circle-clip"+this.args.clipRadius)
-            .append("circle")
-                .attr("r", this.args.clipRadius)       
+        this.mainGroup.append('clipPath')
+            .attr('id', 'circle-clip' + this.args.clipRadius)
+            .append('circle')
+                .attr('r', this.args.clipRadius)       
 
         this.initLayerStack()
     }

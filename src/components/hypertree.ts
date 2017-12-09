@@ -189,6 +189,11 @@ export class Hypertree
         this.args.layout(this.data, this.args.ui.transformation.state)        
         this.infoUi.updateLayout(this.args.ui.transformation.cache, performance.now() - t0)
         
+        if (this.args.ui.transformation.cache.centerNode) {
+            this.args.ui.transformation.state.P.re = -this.args.ui.transformation.cache.centerNode.z.re
+            this.args.ui.transformation.state.P.im = -this.args.ui.transformation.cache.centerNode.z.im
+        }
+
         this.updateTransformation()
     }
 
