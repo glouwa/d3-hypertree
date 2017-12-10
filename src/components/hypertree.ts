@@ -21,7 +21,6 @@ import { IUnitDisk }           from './unitdisk/unitdisk'
 import { InfoArea }            from './unitdisk-meta'
 import { LayerInfo }           from './layerstack-meta'
 
-
 var htmlpreloader = `
     <div class="preloader-wrapper big active">
         <div class="spinner-layer spinner-red-only">
@@ -102,7 +101,7 @@ export class Hypertree
     data           : N
     langMap        : {}
     view           : HTMLElement
-    animationTimer : any = null
+    animation      : boolean = false
     paths          : { 
         isSelected?:N, 
         isHovered?:N 
@@ -228,21 +227,16 @@ export class Hypertree
         this.args.ui.transformation.state.P.re = 0
         this.args.ui.transformation.state.P.im = 0
 
-        var endAnimation = ()=> {
-            this.animationTimer.stop()
-            this.animationTimer = null
-            //this.onZoomFitEnd(null, null, null)
-        }
-
-        if (this.animationTimer)
-            endAnimation()
-
+        this.animation = true
         var step = 0, steps = 16
-        this.animationTimer = d3.timer(()=> {
-            if (!this.animationTimer)
-                return
-
-            var animateTo = λ=> {
+        var frame = ()=>
+        {
+            var p = step++/steps
+            if (step > steps) {
+                this.animation = false
+            }
+            else {
+                var λ = .01 + p * .98
                 var π = Math.PI
                 var animλ = CptoCk({ θ:2*π*λ, r:1 })
                 this.args.ui.transformation.state.λ.re = animλ.re
@@ -255,15 +249,13 @@ export class Hypertree
                 if (this.data
                     .leaves()
                     .reduce((max, n)=> Math.max(max, CktoCp(n.z).r), 0) > .995)
-                    endAnimation()
+                    this.animation = false
+                else
+                    requestAnimationFrame(()=> frame())
             }
+        }
 
-            var p = step++/steps
-            if (step > steps)
-               endAnimation()
-            else
-               animateTo(.01 + p * .98)
-        })
+        requestAnimationFrame(()=> frame())
     }
 }
 

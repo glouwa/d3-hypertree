@@ -34,7 +34,7 @@ export interface UnitDiskArgs
     data:              N,
     layers:            ((ls:IUnitDisk)=> ILayer)[],
 
-    cacheUpdate:       (interaction:IUnitDisk, cache:TransformationCache)=> void,
+    cacheUpdate:       (ud:IUnitDisk, cache:TransformationCache)=> void,
     transformation:    Transformation<N>,
     transform:         (n:N)=> C,
 
@@ -99,9 +99,10 @@ export class UnitDisk implements IUnitDisk
 
 //----------------------------------------------------------------------------------------
 
-export class UnitDiskNav
+export class UnitDiskNav implements IUnitDisk
 {
     args          : UnitDiskArgs
+    cache         // redircteds NOT xD to view.cache
       
     view          : UnitDisk
     navBackground : UnitDisk
@@ -134,10 +135,10 @@ export class UnitDiskNav
                 new PanTransformation(args.transformation.state))
         var rotate = d=>
             (d.name === 'λ' ? ' rotate(-30)' : ' rotate(0)')
-        var Pscale =  ls=> d=>
+        var Pscale =  ud=> d=>
             lengthDilledation(d)
-            * (1 - πify(CktoCp(ls.args.transformation.state.λ).θ) / 2 / Math.PI)
-            / ls.args.nodeRadius
+            * (1 - πify(CktoCp(ud.args.transformation.state.λ).θ) / 2 / Math.PI)
+            / ud.args.nodeRadius
 
         this.navParameter = new UnitDisk({
             parent:             args.parent,
@@ -146,20 +147,20 @@ export class UnitDiskNav
             hypertree:          args.hypertree,
             data:               obj2data(args.transformation.state),
             layers:             [
-                                    (ls:UnitDisk)=> new NodeLayer({
+                                    (ud:UnitDisk)=> new NodeLayer({
                                         name:        'nodes',
-                                        data:        ()=> ls.cache.unculledNodes,
-                                        r:           d=> ls.args.nodeRadius * (d.name==='P' ? Pscale(ls)(d) : 1),
+                                        data:        ()=> ud.cache.unculledNodes,
+                                        r:           d=> ud.args.nodeRadius * (d.name==='P' ? Pscale(ud)(d) : 1),
                                         transform:   d=> d.transformStrCache,
                                     }),
-                                    (ls:UnitDisk)=> new LabelLayer({
-                                        data:        ()=> ls.cache.unculledNodes,
+                                    (ud:UnitDisk)=> new LabelLayer({
+                                        data:        ()=> ud.cache.unculledNodes,
                                         text:        d=> ({ P:'+', θ:'🗘', λ:'⚲' })[d.name],
                                         delta:       d=> ({ re:.0025, im:.025 }),
                                         transform:   d=> d.transformStrCache + rotate(d)
                                     }),
-                                    (ls:UnitDisk)=> new InteractionLayer({                                        
-                                        unitdisk:    ls,
+                                    (ud:UnitDisk)=> new InteractionLayer({                                        
+                                        unitdisk:    ud,
                                         mouseRadius: 1.5,
                                         onClick:     (n:N, m:C)=> {}
                                     })
@@ -178,7 +179,8 @@ export class UnitDiskNav
                                         n.scaleStrText      = ` scale(1)`
                                         n.transformStrCache = ` translate(${n.strCache})`
                                     }
-                                    try { cache.voronoiDiagram = ud.voronoiLayout(cache.unculledNodes) } catch(e) {}
+                                    cache.voronoiDiagram = ud.voronoiLayout(cache.unculledNodes)
+                                    //try { cache.voronoiDiagram = ud.voronoiLayout(cache.unculledNodes) } catch(e) {}
                                 },
             transformation:     navTransformation,
             transform:          (n:any)=> CmulR(n, -1),
