@@ -108,11 +108,9 @@ export class Hypertree
     }              = {}    
 
     constructor(args : HypertreeArgs) {
-        this.args = args        
+        this.args = args
         this.infoUi = InfoArea(args, 'data')
-        this.layerInfo = LayerInfo(args, 'data')
-        this.layerInfo = LayerInfo(args, 'nav') // soltle nachher sein, erst dann ist klar ob 2 oder 4
-
+        
         this.view = HTML.parse<HTMLElement>(hypertreehtml)()
         args.parent.appendChild(this.view)
 
@@ -130,6 +128,15 @@ export class Hypertree
             clipRadius:     this.args.ui.clipRadius,
             nodeRadius:     this.args.ui.nodeRadius            
         })        
+
+        this.layerInfo = LayerInfo(this.args.parent, this.unitdisk, 'data')
+        if (this.unitdisk.navParameter)
+            this.layerInfo = LayerInfo(
+                this.args.parent, 
+                this.unitdisk.navParameter, 
+                'nav'
+            ) // soltle nachher sein, erst dann ist klar ob 2 oder 4
+        
         this.updateData()
         this.updateLang()
     }

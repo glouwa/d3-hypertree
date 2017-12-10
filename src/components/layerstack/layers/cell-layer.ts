@@ -3,15 +3,15 @@ import { D3UpdateLayer } from '../layer'
 
 export interface CellLayerArgs
 {
-    data:   ()=> any,
-    clip?:  string,
+    data:  ()=> any,
+    clip?: string,
 }
 
 export class CellLayer implements ILayer
-{
-    name = 'cells'
+{    
     args: CellLayerArgs
     layer: D3UpdateLayer
+    name =            'cells'
     updateData =      ()=> this.layer.updateData()
     updateTransform = ()=> this.layer.updateTransform()
     updateColor =     ()=> this.layer.updateColor()
@@ -25,7 +25,7 @@ export class CellLayer implements ILayer
             parent:            parent,
             clip:              this.args.clip,
             data:              this.args.data,
-            name:              'cells',
+            name:              this.name,
             className:         'cell',
             elementType:       'polygon',
             create:            s=> s.classed("root",      d=> !d.data.parent)   

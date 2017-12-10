@@ -25,10 +25,11 @@ export class LayerStack
     private updateLayers() : void
     {
         this.layers = {}
-        for (var layerfactoryfunc of this.args.unitdisk.args.layers) {
-            var newL = layerfactoryfunc(this.args.unitdisk)            
-            this.layers[newL.name] = newL
-            newL.attach(this.layersGroup)            
+        for (var layerfactoryfunc of this.args.unitdisk.args.layers)
+        {
+            var layer = layerfactoryfunc(this.args.unitdisk)            
+            this.layers[layer.name] = layer
+            layer.attach(this.layersGroup)            
         }
     }
 

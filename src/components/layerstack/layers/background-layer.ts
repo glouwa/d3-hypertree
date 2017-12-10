@@ -6,17 +6,16 @@ export interface BackgroundLayerArgs
 }
 
 export class BackgroundLayer implements ILayer
-{
-    name: string
+{    
     args: BackgroundLayerArgs
     layer: D3UpdateLayer
+    name =            'background'  
     updateData =      ()=> this.layer.updateData()
     updateTransform = ()=> this.layer.updateTransform()
     updateColor =     ()=> this.layer.updateColor()
 
     constructor(args : BackgroundLayerArgs) {        
         this.args = args
-        this.name = 'background'
     }
 
     public attach(parent) {

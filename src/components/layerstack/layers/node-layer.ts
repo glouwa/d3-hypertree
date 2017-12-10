@@ -11,10 +11,10 @@ export interface NodeLayerArgs
 }
 
 export class NodeLayer implements ILayer
-{
-    name: string
+{    
     args: NodeLayerArgs
     layer: D3UpdateLayer
+    name: string
     updateData =      ()=> this.layer.updateData()
     updateTransform = ()=> this.layer.updateTransform()
     updateColor =     ()=> this.layer.updateColor()

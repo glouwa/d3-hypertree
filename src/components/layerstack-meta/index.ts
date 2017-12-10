@@ -10,11 +10,11 @@ var cbox4 = (id, c)=>  `<div class="bar-bg"></div>`
 
 var html = `<div class="layer-info"> </div>`
 
-export function LayerInfo(args, cls)
+export function LayerInfo(parent, unitdisk, cls)
 {
     var ui = HTML.parse<HTMLElement & { updateInfo }>(html)()
     ui.classList.add(cls)
-    args.parent.appendChild(ui)
+    parent.appendChild(ui)
     
     var rows = ['name', 'type', 'count', 'time', 'enabled']
     var cols = 'layers'
@@ -34,20 +34,12 @@ export function LayerInfo(args, cls)
         pos += 5
     }
 
-    add('Bg',      'circles',   6, true, true)
-    add('IFλ',     'circles',   6, true)
-    add('Cells',   'polygons',  6, true)
-    add('Weight',  'circles',   0)
-    add('Pathes',  'lines',     0)
-    add('Pathes2', 'arcs',      0)
-    add('Arcs',    'paths',     0, true, false)
-    add('Lines',   'lines',    36, false, true)
-    add('Leafs',   'circles',   6, true, true)
-    add('Lazys',   'circles',  26, true)
-    add('Nodes',   'circles',   0)
-    add('LabelBg', 'rects',     0)
-    add('Label',   'texts',    16, true)
-    add('Symbols', 'paths',     6, true, true)
-
+    for (var l in unitdisk.layerStack.layers)
+    {
+        var layer = unitdisk.layerStack.layers[l]        
+        add(layer.name, 'circle', layer.args.data?layer.args.data.length:1, true, true)
+        console.log(layer)
+    }
+    
     return ui
 }

@@ -7,17 +7,16 @@ export interface FocusLayerArgs
 }
 
 export class FocusLayer implements ILayer
-{
-    name: string
+{    
     args: FocusLayerArgs
     layer: D3UpdateLayer
+    name =            'focus'
     updateData =      ()=> this.layer.updateData()
     updateTransform = ()=> this.layer.updateTransform()
     updateColor =     ()=> this.layer.updateColor()
 
     constructor(args : FocusLayerArgs) {        
-        this.args = args
-        this.name = 'focus'
+        this.args = args        
     }
 
     public attach(parent) {

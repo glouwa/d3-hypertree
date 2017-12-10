@@ -16,16 +16,15 @@ export interface InteractionLayerArgs
 
 export class InteractionLayer implements ILayer
 {
-    name:             string
     parent
     args:             InteractionLayerArgs    
+    name =            'interaction'
     updateData =      ()=> {}
     updateTransform = ()=> {}
     updateColor =     ()=> {}
 
     constructor(args : InteractionLayerArgs) {        
-        this.args = args
-        this.name = 'interaction'
+        this.args = args 
     }
 
     public attach(parent) {

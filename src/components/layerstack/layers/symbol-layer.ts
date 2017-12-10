@@ -15,10 +15,10 @@ var symbol = d3.symbol().size(.001)
 var d_star = symbol.type(d3['symbolStar'])()
 
 export class SymbolLayer implements ILayer
-{
-    name: string
+{    
     args: SymbolLayerArgs
     layer: D3UpdateLayer
+    name: string
     updateData =      ()=> this.layer.updateData()
     updateTransform = ()=> this.layer.updateTransform()
     updateColor =     ()=> this.layer.updateColor()

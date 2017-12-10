@@ -18,8 +18,9 @@ import { LayerStack }                    from '../layerstack/layerstack'
 
 export interface IUnitDisk
 {
-    args: UnitDiskArgs
+    args:                 UnitDiskArgs
     cache
+    layerStack:           LayerStack
 
     updateData:           ()=> void
     updateTransformation: ()=> void 
@@ -103,6 +104,7 @@ export class UnitDiskNav implements IUnitDisk
 {
     args          : UnitDiskArgs
     cache         // redircteds NOT xD to view.cache
+    layerStack
       
     view          : UnitDisk
     navBackground : UnitDisk
@@ -112,6 +114,8 @@ export class UnitDiskNav implements IUnitDisk
         this.args = args
 
         this.view = new UnitDisk(args)
+        this.cache = this.view.cache
+        this.layerStack = this.view.layerStack
 
         this.navBackground = new UnitDisk({
             parent:             args.parent,

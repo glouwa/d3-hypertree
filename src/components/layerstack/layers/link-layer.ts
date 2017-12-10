@@ -14,10 +14,10 @@ export interface ArcLayerArgs
 }
 
 export class ArcLayer implements ILayer
-{
-    name = 'links'
+{    
     args: ArcLayerArgs
     layer: D3UpdateLayer
+    name =            'links'
     updateData =      ()=> this.layer.updateData()
     updateTransform = ()=> this.layer.updateTransform()
     updateColor =     ()=> this.layer.updateColor()
@@ -31,7 +31,7 @@ export class ArcLayer implements ILayer
             parent:            parent,
             clip:              this.args.clip,
             data:              this.args.data,
-            name:              'links',
+            name:              this.name,
             className:         'arc',
             elementType:       this.args.curvature == 'l' ? 'line' : 'path',
             create:            s=> {},

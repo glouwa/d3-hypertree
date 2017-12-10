@@ -11,10 +11,10 @@ export interface LabelLayerArgs
 }
 
 export class LabelLayer implements ILayer
-{
-    name = 'captions'
+{    
     args: LabelLayerArgs
     layer: D3UpdateLayer
+    name =            'captions'
     updateData =      ()=> this.layer.updateData()
     updateTransform = ()=> this.layer.updateTransform()
     updateColor =     ()=> this.layer.updateColor()
@@ -28,7 +28,7 @@ export class LabelLayer implements ILayer
             parent:            parent,
             clip:              this.args.clip,
             data:              this.args.data,
-            name:              'captions',
+            name:              this.name,
             className:         'caption',
             elementType:       'text',
             create:            s=> s.classed("P",            d=> d.name == 'P')
