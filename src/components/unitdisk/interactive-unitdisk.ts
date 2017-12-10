@@ -7,10 +7,11 @@ import { UnitDiskArgs }         from './unitdisk'
 export class Interaction2
 {
     args          : UnitDiskArgs    
+    
     voronoiLayout : d3.VoronoiLayout<N>
     layerStack    : LayerStack
     cache         : TransformationCache // zeigt auf transformation.cache
-
+    
     constructor(args : UnitDiskArgs) {
         this.args = args
         this.cache = args.transformation.cache
@@ -20,7 +21,7 @@ export class Interaction2
             .x(d=> d.cache.re)
             .y(d=> d.cache.im)
             .extent([[-2,-2], [2,2]])
-        
+
         mainGroup.append('clipPath')
             .attr('id', 'circle-clip' + this.args.clipRadius)
             .append('circle')

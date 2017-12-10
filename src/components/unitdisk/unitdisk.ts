@@ -16,6 +16,7 @@ import { NodeLayer }                     from '../layerstack/layers/node-layer'
 import { LabelLayer }                    from '../layerstack/layers/text-rect-layer'
 import { InteractionLayer }              from '../layerstack/layers/interaction-layer'
 import { Interaction2 }                  from './interactive-unitdisk'
+import { LayerStack }                    from '../layerstack/layerstack'
 
 var bubbleSvgDef =
     `<defs>
@@ -26,29 +27,6 @@ var bubbleSvgDef =
             <stop offset="100%"  stop-color="#232323"/>
         </radialGradient>
     </defs>`
-
-/*export interface UnitDiskArgs2
-{
-    parent,
-    hypertree
-    data:              N,
-    
-    transformation
-    {
-        cacheUpdate:       (i:Interaction, cache:TransformationCache)=> void,
-        transformation:    Transformation<N>,
-        transform:         (n:N)=> C,
-    }
-    
-    geometrie
-    {
-        caption:           (n:N)=> string,
-        nodeRadius:        number,
-        clipRadius?:       number,
-        mouseRadius?:      number,
-        layers:            ((ls:Interaction, parent:d3Sel)=> Layer)[],
-    }
-}*/
 
 export interface UnitDiskArgs
 {
@@ -79,32 +57,57 @@ var html =
 
 export class UnitDisk
 {
-    args        : UnitDiskArgs
-    ui          : HTMLElement & HypertreeUi
-    interaction : Interaction2
+    args          : UnitDiskArgs
+    ui            : HTMLElement & HypertreeUi
+
+    voronoiLayout : d3.VoronoiLayout<N>
+    layerStack    : LayerStack
+    cache         : TransformationCache // zeigt auf transformation.cache
 
     constructor(args : UnitDiskArgs) {
         this.args = args
-        this.ui = HTML.parse<HTMLElement & HypertreeUi>(html)()        
+        this.ui = HTML.parse<HTMLElement & HypertreeUi>(html)()
         args.parent.appendChild(this.ui)
         args.parent = this.ui.querySelector('.unitDisc')
 
-        this.interaction = new Interaction2(args)
+        this.cache = args.transformation.cache
+        var mainGroup = d3.select(args.parent)
+
+        this.voronoiLayout = d3.voronoi<N>()
+            .x(d=> d.cache.re)
+            .y(d=> d.cache.im)
+            .extent([[-2,-2], [2,2]])
+        
+        mainGroup.append('clipPath')
+            .attr('id', 'circle-clip' + this.args.clipRadius)
+            .append('circle')
+                .attr('r', this.args.clipRadius)       
+
+        this.args.cacheUpdate(this, this.cache)
+        this.layerStack = new LayerStack({
+            parent: mainGroup,
+            interaction: this
+        })
     }
 
-    public updateData() {
-        this.interaction.args.data = this.args.data
-        this.interaction.updatePositions()
+    public updateData() {        
+        this.args.cacheUpdate(this, this.cache)
+
+        this.layerStack.updateTransformation()
     }
 
     public updateTransformation() {
-        this.interaction.updatePositions()
+        this.args.cacheUpdate(this, this.cache)
+
+        this.layerStack.updateTransformation()
     }
 
     public updateSelection() {
-        this.interaction.updateSelection()   
+        this.layerStack.updatePath()
     }
 }
+
+//----------------------------------------------------------------------------------------
 
 var htmlnav =
     `<div class="unitdisk-nav">
@@ -159,7 +162,7 @@ export class UnitDiskNav
             lengthDilledation(d)
             * (1 - πify(CktoCp(ls.args.transformation.state.λ).θ) / 2 / Math.PI)
             / ls.args.nodeRadius
-            
+
         this.navParameter = new Interaction2({
             parent:             this.ui.querySelector('.nav-parameter-disc'),
             hypertree:          args.hypertree,

@@ -3,6 +3,7 @@
 //import { interpolateHcl, rgb }      from 'd3-color'
 
 import * as d3                 from 'd3'
+import { HTML }                from 'ducd'
 import { N }                   from '../models/n/n'
 import { LoaderFunction }      from '../models/n/n-loaders'
 import { LayoutFunction }      from '../models/n/n-layouts'
@@ -33,6 +34,16 @@ var htmlpreloader = `
             </div>
         </div>
     </div>`
+
+var bubbleSvgDef =
+    `<defs>
+        <radialGradient id="exampleGradient">
+            <stop offset="50%"   stop-color="white"/>
+            <stop offset="92%"   stop-color="#606060"/>
+            <stop offset="99.8%" stop-color="#242424"/>
+            <stop offset="100%"  stop-color="#232323"/>
+        </radialGradient>
+    </defs>`
 
 export interface HypertreeArgs
 {
@@ -76,6 +87,14 @@ export interface HypertreeUi // = unitdisk :/
     updateTransformation: ()=> void
 }
 
+var hypertreehtml =
+    `<div class="unitdisk-nav">
+        <svg class="hypertree" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">            
+            ${bubbleSvgDef}            
+        </svg>
+        <div class="preloader"></div>
+    </div>`
+
 /**
 * pipeline implementation:
 * ajax -> weights -> layout -> transformation -> unitdisk / langmaps
@@ -90,14 +109,24 @@ export class Hypertree
     layerInfo      : HTMLElement & { updateModel }
     data           : N
     langMap        : {}
-    paths          : { isSelected?:N, isHovered?:N } = {}
+    view           : HTMLElement
     animationTimer : any = null
+    paths          : { 
+        isSelected?:N, 
+        isHovered?:N 
+    }              = {}    
 
     constructor(args : HypertreeArgs) {
-        this.args  = args        
+        this.args = args        
         this.infoUi = InfoArea(args, 'data')
         this.layerInfo = LayerInfo(args, 'data')
         this.layerInfo = LayerInfo(args, 'nav') // soltle nachher sein, erst dann ist klar ob 2 oder 4
+
+        //var view = HTML.parse<HTMLElement & HypertreeUi>(hypertreehtml)()
+        //args.parent.append(view)
+
+        //view.getElementsByClassName('hypertree')
+
         this.unitdisk = new args.decorator({
             parent:         args.parent,
             hypertree:      this,
