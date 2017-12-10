@@ -1,6 +1,6 @@
-import * as d3 from 'd3'
-import { N } from '../../models/n/n'
-import { Interaction2 } from '../unitdisk/interactive-unitdisk'
+import * as d3       from 'd3'
+import { N }         from '../../models/n/n'
+import { IUnitDisk } from '../unitdisk/unitdisk'
 
 export interface ILayer
 {
@@ -14,7 +14,7 @@ export interface ILayer
 export interface LayerStackArgs
 {
     parent,
-    interaction: Interaction2
+    interaction: IUnitDisk
 }
 
 export class LayerStack

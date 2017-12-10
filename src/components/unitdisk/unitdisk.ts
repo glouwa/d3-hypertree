@@ -18,24 +18,22 @@ import { InteractionLayer }              from '../layerstack/layers/interaction-
 import { Interaction2 }                  from './interactive-unitdisk'
 import { LayerStack }                    from '../layerstack/layerstack'
 
-var bubbleSvgDef =
-    `<defs>
-        <radialGradient id="exampleGradient">
-            <stop offset="50%"   stop-color="white"/>
-            <stop offset="92%"   stop-color="#606060"/>
-            <stop offset="99.8%" stop-color="#242424"/>
-            <stop offset="100%"  stop-color="#232323"/>
-        </radialGradient>
-    </defs>`
+export interface IUnitDisk
+{
+    args: UnitDiskArgs
+    cache
+}
 
 export interface UnitDiskArgs
 {
     parent:            any,
+    position:          string,
+    className:         string,
     hypertree,
     data:              N,
-    layers:            ((ls:Interaction2)=> ILayer)[],
+    layers:            ((ls:IUnitDisk)=> ILayer)[],
 
-    cacheUpdate:       (interaction:Interaction2, cache:TransformationCache)=> void,
+    cacheUpdate:       (interaction:IUnitDisk, cache:TransformationCache)=> void,
     transformation:    Transformation<N>,
     transform:         (n:N)=> C,
 
@@ -46,46 +44,36 @@ export interface UnitDiskArgs
 
 //----------------------------------------------------------------------------------------
 
-var html =
-    `<div class="unitdisk-nav">
-        <svg width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">
-            ${bubbleSvgDef}
-            <g class="unitDisc" transform="translate(520,500) scale(470)"></g>
-        </svg>
-        <div class="preloader"></div>
-    </div>`
-
-export class UnitDisk
+export class UnitDisk implements IUnitDisk
 {
-    args          : UnitDiskArgs
-    ui            : HTMLElement & HypertreeUi
-
-    voronoiLayout : d3.VoronoiLayout<N>
-    layerStack    : LayerStack
+    args          : UnitDiskArgs    
+    voronoiLayout : d3.VoronoiLayout<N>    
     cache         : TransformationCache // zeigt auf transformation.cache
+
+    view          
+    layerStack    : LayerStack
 
     constructor(args : UnitDiskArgs) {
         this.args = args
-        this.ui = HTML.parse<HTMLElement & HypertreeUi>(html)()
-        args.parent.appendChild(this.ui)
-        args.parent = this.ui.querySelector('.unitDisc')
-
         this.cache = args.transformation.cache
-        var mainGroup = d3.select(args.parent)
+                
+        this.view = d3.select(args.parent).append('g')
+            .attr('class', this.args.className)
+            .attr('transform', this.args.position)
+        this.view.append('clipPath')
+            .attr('id', 'circle-clip' + this.args.clipRadius)
+            .append('circle')
+                .attr('r', this.args.clipRadius)       
 
         this.voronoiLayout = d3.voronoi<N>()
             .x(d=> d.cache.re)
             .y(d=> d.cache.im)
             .extent([[-2,-2], [2,2]])
         
-        mainGroup.append('clipPath')
-            .attr('id', 'circle-clip' + this.args.clipRadius)
-            .append('circle')
-                .attr('r', this.args.clipRadius)       
-
         this.args.cacheUpdate(this, this.cache)
+
         this.layerStack = new LayerStack({
-            parent: mainGroup,
+            parent: this.view,
             interaction: this
         })
     }
@@ -109,37 +97,23 @@ export class UnitDisk
 
 //----------------------------------------------------------------------------------------
 
-var htmlnav =
-    `<div class="unitdisk-nav">
-        <svg width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">            
-            ${bubbleSvgDef}
-            <g class="unitDisc"            transform="translate(500,500) scale(440)"></g>            
-            <g class="nav-parameter-disc"  transform="translate(120,120) scale(60)"></g>        
-            <g class="nav-background-disc" transform="translate(120,120) scale(60)"></g>                         
-        </svg>
-        <div class="preloader"></div>
-    </div>`
-
 export class UnitDiskNav
 {
     args          : UnitDiskArgs
-    ui 
-    interaction   : Interaction2
-
-    view          : Interaction2
-    navBackground : Interaction2
-    navParameter  : Interaction2
+      
+    view          : UnitDisk
+    navBackground : UnitDisk
+    navParameter  : UnitDisk
 
     constructor(args : UnitDiskArgs) {
         this.args = args
-        this.ui = HTML.parse<HTMLElement & HypertreeUi>(htmlnav)()
-        args.parent.appendChild(this.ui)
 
-        args.parent = this.ui.querySelector('.unitDisc')    
-        this.view = new Interaction2(args)
+        this.view = new UnitDisk(args)
 
-        this.navBackground = new Interaction2({
-            parent:             this.ui.querySelector('.nav-background-disc'),
+        this.navBackground = new UnitDisk({
+            parent:             args.parent,
+            className:          'nav-background-disc',
+            position:           'translate(120,120) scale(60)',
             hypertree:          args.hypertree,
             data:               args.data,
             layers:             args.layers.filter((l, idx)=> 
@@ -163,34 +137,36 @@ export class UnitDiskNav
             * (1 - πify(CktoCp(ls.args.transformation.state.λ).θ) / 2 / Math.PI)
             / ls.args.nodeRadius
 
-        this.navParameter = new Interaction2({
-            parent:             this.ui.querySelector('.nav-parameter-disc'),
+        this.navParameter = new UnitDisk({
+            parent:             args.parent,
+            className:          'nav-parameter-disc',
+            position:           'translate(120,120) scale(60)',
             hypertree:          args.hypertree,
             data:               obj2data(args.transformation.state),
             layers:             [
-                                    (ls:Interaction2)=> new NodeLayer({
+                                    (ls:UnitDisk)=> new NodeLayer({
                                         name:        'nodes',
                                         data:        ()=> ls.cache.unculledNodes,
                                         r:           d=> ls.args.nodeRadius * (d.name==='P' ? Pscale(ls)(d) : 1),
                                         transform:   d=> d.transformStrCache,
                                     }),
-                                    (ls:Interaction2)=> new LabelLayer({
+                                    (ls:UnitDisk)=> new LabelLayer({
                                         data:        ()=> ls.cache.unculledNodes,
                                         text:        d=> ({ P:'+', θ:'🗘', λ:'⚲' })[d.name],
                                         delta:       d=> ({ re:.0025, im:.025 }),
                                         transform:   d=> d.transformStrCache + rotate(d)
                                     }),
-                                    (ls:Interaction2)=> new InteractionLayer({                                        
+                                    (ls:UnitDisk)=> new InteractionLayer({                                        
                                         unitdisk:    ls,
                                         mouseRadius: 1.5,
                                         onClick:     (n:N, m:C)=> {}
                                     })
                                 ],
-            cacheUpdate:        (interaction:Interaction2, cache:TransformationCache)=> {
-                                    cache.unculledNodes = dfsFlat(interaction.args.data)
+            cacheUpdate:        (ud:UnitDisk, cache:TransformationCache)=> {
+                                    cache.unculledNodes = dfsFlat(ud.args.data)
                                     for (var n of cache.unculledNodes) {
                                         n.cache = n.cache || { re:0, im:0 }
-                                        var np = interaction.args.transform(n)
+                                        var np = ud.args.transform(n)
                                         if (n.name == 'θ' || n.name == 'λ')
                                             np = CmulR(np, 1.08)
                                         CassignC(n.cache, np)
@@ -200,7 +176,7 @@ export class UnitDiskNav
                                         n.scaleStrText      = ` scale(1)`
                                         n.transformStrCache = ` translate(${n.strCache})`
                                     }
-                                    try { cache.voronoiDiagram = interaction.voronoiLayout(cache.unculledNodes) } catch(e) {}
+                                    try { cache.voronoiDiagram = ud.voronoiLayout(cache.unculledNodes) } catch(e) {}
                                 },
             transformation:     navTransformation,
             transform:          (n:any)=> CmulR(n, -1),
@@ -215,14 +191,14 @@ export class UnitDiskNav
         this.navBackground.args.data = this.args.data
         this.view.args.data = this.args.data
 
-        this.navBackground.updatePositions()
-        this.view.updatePositions()
-        this.navParameter.updatePositions()
+        this.navBackground.updateTransformation()
+        this.view.updateTransformation()
+        this.navParameter.updateTransformation()
     }
 
     public updateTransformation() {
-        this.view.updatePositions()
-        this.navParameter.updatePositions()
+        this.view.updateTransformation()
+        this.navParameter.updateTransformation()
     }
     public updateSelection() {
         this.view.updateSelection(); /*navBackground.updateSelection();*/

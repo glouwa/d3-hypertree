@@ -88,10 +88,10 @@ export interface HypertreeUi // = unitdisk :/
 }
 
 var hypertreehtml =
-    `<div class="unitdisk-nav">
-        <svg class="hypertree" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">            
+    `<div class="unitdisk-nav">        
+        <svg width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">
             ${bubbleSvgDef}            
-        </svg>
+        </svg>        
         <div class="preloader"></div>
     </div>`
 
@@ -122,13 +122,12 @@ export class Hypertree
         this.layerInfo = LayerInfo(args, 'data')
         this.layerInfo = LayerInfo(args, 'nav') // soltle nachher sein, erst dann ist klar ob 2 oder 4
 
-        //var view = HTML.parse<HTMLElement & HypertreeUi>(hypertreehtml)()
-        //args.parent.append(view)
-
-        //view.getElementsByClassName('hypertree')
+        this.view = HTML.parse<HTMLElement & HypertreeUi>(hypertreehtml)()
+        args.parent.appendChild(this.view)
 
         this.unitdisk = new args.decorator({
-            parent:         args.parent,
+            parent:         this.view.querySelector('.unitdisk-nav > svg'),
+            position:       'translate(520,500) scale(470)',
             hypertree:      this,
             data:           undefined,            
             transformation: this.args.ui.transformation,
@@ -137,7 +136,7 @@ export class Hypertree
             cacheUpdate:    this.args.ui.cacheUpdate,            
             caption:        (n:N)=> this.args.ui.caption(this, n),
             clipRadius:     this.args.ui.clipRadius,
-            nodeRadius:     this.args.ui.nodeRadius
+            nodeRadius:     this.args.ui.nodeRadius            
         })        
         this.updateData()
         this.updateLang()
@@ -145,16 +144,17 @@ export class Hypertree
 
     public updateData() : void {
         var t0 = performance.now()
-        this.unitdisk.ui.querySelector('.preloader').innerHTML = htmlpreloader
+        this.view.querySelector('.preloader').innerHTML = htmlpreloader
         this.unitdisk.args.data = undefined
         this.unitdisk.updateData()
+
         this.args.dataloader((d3h, t1)=> {
             var t2 = performance.now()
             var model = <N & d3.HierarchyNode<N>>d3
                             .hierarchy(d3h)
                             //.sum(this.args.weight) // this.updateWeights()
 
-            this.unitdisk.ui.querySelector('.preloader').innerHTML = ''
+            this.view.querySelector('.preloader').innerHTML = ''
             this.infoUi.updateModel(model, [t1-t0, t2-t1, performance.now()-t2])
 
             var t3 = performance.now()
