@@ -1,5 +1,17 @@
 import { N } from '../../models/n/n'
 
+export interface ILayer
+{
+    name:            string,
+
+    updateTime?:     number,
+
+    attach:          (parent)=> void,
+    updateData:      ()=> void,
+    updateTransform: ()=> void,
+    updateColor:     ()=> void,
+}
+
 export interface LayerArgs
 {
     parent:          any,

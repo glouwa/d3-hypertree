@@ -1,5 +1,5 @@
 import * as d3           from 'd3'
-import { ILayer }        from '../layerstack'
+import { ILayer }        from '../layer'
 import { D3UpdateLayer } from '../layer'
 
 export interface SymbolLayerArgs

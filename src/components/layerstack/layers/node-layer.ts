@@ -1,4 +1,4 @@
-import { ILayer }        from '../layerstack'
+import { ILayer }        from '../layer'
 import { D3UpdateLayer } from '../layer'
 
 export interface NodeLayerArgs

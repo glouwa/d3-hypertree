@@ -12,7 +12,7 @@ import { C, CktoCp, CptoCk }   from '../hyperbolic-math'
 import { sigmoid }             from '../hyperbolic-math'
 import { Transformation }      from '../hyperbolic-transformation'
 
-import { ILayer }              from './layerstack/layerstack'
+import { ILayer }              from './layerstack/layer'
 import { LayerArgs }           from './layerstack/layer'
 import { UnitDiskArgs }        from './unitdisk/unitdisk'
 import { UnitDisk }            from './unitdisk/unitdisk'

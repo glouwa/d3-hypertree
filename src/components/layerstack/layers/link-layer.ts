@@ -1,7 +1,7 @@
 import { N }              from '../../../models/n/n'
 import { CsubC, CktoCp }  from '../../../hyperbolic-math'
 import { arcCenter }      from '../../../hyperbolic-math'
-import { ILayer }         from '../layerstack'
+import { ILayer }         from '../layer'
 import { D3UpdateLayer }  from '../layer'
 
 export type ArcCurvature = '+' | '0' | '-' | 'l'

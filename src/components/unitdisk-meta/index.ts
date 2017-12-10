@@ -60,7 +60,7 @@ export function InfoArea(args)
     var dataW          = <HTMLElement>ui.children[28]
     var dataBar        = <HTMLElement>ui.children[29]
 
-    var typeColors     = ['#a5d6a7', '#b77d68', '#a5d6a7', '#666']
+    var typeColors     = ['#a5d6a7', '#b77d68', '#a5d6a7', '#666', '#a5d6a7', '#b77d68', '#a5d6a7', '#666']
     var mag_svg        = .1
     var mag_load       = 10
     var mag            = 2
@@ -117,10 +117,9 @@ export function InfoArea(args)
         transformQ.innerHTML     = `${t}`
         transformQmax.innerHTML  = `<sub>${ms}ms</sub>`
     }
-
-    var layerlist = ['circles','links','cells','labels']
-    ui.updateD3Info = (max, Δ, cache)=> {
-        var t = Δ.reduce((a,e)=> a+e).toFixed(0)
+    
+    ui.updateD3Info = (max, Δ, cache, layerlist)=> {
+        var t = Δ.reduce((a,e)=> a+e).toFixed(1)
 
         D3Label.innerHTML = `D<sub>3</sub>`
         D3Info.innerHTML  = `${cache.unculledNodes.length} nodes`

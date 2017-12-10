@@ -1,5 +1,5 @@
 import * as d3              from 'd3'
-import { ILayer }           from '../layerstack'
+import { ILayer }           from '../layer'
 import { N }                from '../../../models/n/n'
 import { C, CptoCk, CktoCp,
     CassignC, ArrtoC,
