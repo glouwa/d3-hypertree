@@ -10,18 +10,19 @@ import { Transformation }                from '../../hyperbolic-transformation'
 import { PanTransformation }             from '../../hyperbolic-transformation'
 import { NegTransformation }             from '../../hyperbolic-transformation'
 import { TransformationCache }           from '../../hyperbolic-transformation'
-import { HypertreeUi }                   from '../hypertree'
 import { ILayer }                        from '../layerstack/layerstack'
 import { NodeLayer }                     from '../layerstack/layers/node-layer'
 import { LabelLayer }                    from '../layerstack/layers/text-rect-layer'
 import { InteractionLayer }              from '../layerstack/layers/interaction-layer'
-import { Interaction2 }                  from './interactive-unitdisk'
 import { LayerStack }                    from '../layerstack/layerstack'
 
 export interface IUnitDisk
 {
     args: UnitDiskArgs
     cache
+
+    updateData:           ()=> void
+    updateTransformation: ()=> void 
 }
 
 export interface UnitDiskArgs
@@ -60,6 +61,7 @@ export class UnitDisk implements IUnitDisk
         this.view = d3.select(args.parent).append('g')
             .attr('class', this.args.className)
             .attr('transform', this.args.position)
+        
         this.view.append('clipPath')
             .attr('id', 'circle-clip' + this.args.clipRadius)
             .append('circle')
@@ -74,7 +76,7 @@ export class UnitDisk implements IUnitDisk
 
         this.layerStack = new LayerStack({
             parent: this.view,
-            interaction: this
+            unitdisk: this
         })
     }
 

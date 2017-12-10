@@ -14,7 +14,7 @@ export interface ILayer
 export interface LayerStackArgs
 {
     parent,
-    interaction: IUnitDisk
+    unitdisk: IUnitDisk
 }
 
 export class LayerStack
@@ -39,10 +39,10 @@ export class LayerStack
 
     private updateLayers() : void
     {
-        for (var layerfactoryfunc of this.args.interaction.args.layers)
+        for (var layerfactoryfunc of this.args.unitdisk.args.layers)
         {
-            var argscpy = Object.assign({ parent:this.layersGroup }, this.args.interaction)
-            var newL = layerfactoryfunc(this.args.interaction)
+            var argscpy = Object.assign({ parent:this.layersGroup }, this.args.unitdisk)
+            var newL = layerfactoryfunc(this.args.unitdisk)
             this[newL.name] = newL // todo newL.args is a workaround
 
             if (newL.attach) 
@@ -69,9 +69,9 @@ export class LayerStack
         var t4 = performance.now()
         if (this.specials) this.specials.updateData()
 
-        if (this.args.interaction.cache.unculledNodes.length != 3)
-            this.args.interaction.args.hypertree.infoUi.updateD3Info(
-                10, [t1-t0, t2-t1, t3-t2, performance.now() - t3], this.args.interaction.cache)
+        if (this.args.unitdisk.cache.unculledNodes.length != 3)
+            this.args.unitdisk.args.hypertree.infoUi.updateD3Info(
+                10, [t1-t0, t2-t1, t3-t2, performance.now() - t3], this.args.unitdisk.cache)
     }
 
     public updatePath()

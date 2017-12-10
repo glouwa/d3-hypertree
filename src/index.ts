@@ -39,7 +39,6 @@ export namespace layers
 }
 
 export * from './components/unitdisk/unitdisk'
-export * from './components/unitdisk/interactive-unitdisk'
 
 import * as loaders_ from './models/n/n-loaders'
 import * as layouts_ from './models/n/n-layouts'

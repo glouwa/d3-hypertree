@@ -14,11 +14,13 @@ import { Transformation }      from '../hyperbolic-transformation'
 
 import { ILayer }              from './layerstack/layerstack'
 import { LayerArgs }           from './layerstack/layer'
-import { Interaction2 }        from './unitdisk/interactive-unitdisk'
 import { UnitDiskArgs }        from './unitdisk/unitdisk'
+import { UnitDisk }            from './unitdisk/unitdisk'
+import { IUnitDisk }           from './unitdisk/unitdisk'
 
 import { InfoArea }            from './unitdisk-meta'
 import { LayerInfo }           from './layerstack-meta'
+
 
 var htmlpreloader = `
     <div class="preloader-wrapper big active">
@@ -56,15 +58,15 @@ export interface HypertreeArgs
     layout:         LayoutFunction,
     onNodeSelect:   (n:N) => void,
 
-    decorator:      { new(a: UnitDiskArgs) : HypertreeUi & HTMLElement },
+    decorator:      { new(a: UnitDiskArgs) : IUnitDisk },
 
     ui : {
         clipRadius:     number,
         nodeRadius:     number,
         transformation: Transformation<N>,
-        cacheUpdate:    (cache:Interaction2)=> void,
+        cacheUpdate:    (cache:UnitDisk)=> void,
         caption:        (hypertree:Hypertree, n:N)=> string,       
-        layers:         ((ls:Interaction2)=> ILayer)[],
+        layers:         ((ls:UnitDisk)=> ILayer)[],
     }
 }
 
@@ -75,16 +77,6 @@ export interface IHypertree
     updateLang:           (langmap)=> void,
     updateSelection:      (selection)=> void,
     updateTransformation: (T)=> void
-}
-
-export interface HypertreeUi // = unitdisk :/
-{
-    args:                 any,
-    ui,
-    updateData:           ()=> void,
-    updateLang:           ()=> void,
-    updateSelection:      ()=> void,
-    updateTransformation: ()=> void
 }
 
 var hypertreehtml =
@@ -104,7 +96,7 @@ var hypertreehtml =
 export class Hypertree 
 {
     args           : HypertreeArgs
-    unitdisk       : HTMLElement & HypertreeUi
+    unitdisk       : IUnitDisk
     infoUi         : HTMLElement & { msg, updateModel, updateLayout }
     layerInfo      : HTMLElement & { updateModel }
     data           : N
@@ -122,11 +114,12 @@ export class Hypertree
         this.layerInfo = LayerInfo(args, 'data')
         this.layerInfo = LayerInfo(args, 'nav') // soltle nachher sein, erst dann ist klar ob 2 oder 4
 
-        this.view = HTML.parse<HTMLElement & HypertreeUi>(hypertreehtml)()
+        this.view = HTML.parse<HTMLElement>(hypertreehtml)()
         args.parent.appendChild(this.view)
 
         this.unitdisk = new args.decorator({
             parent:         this.view.querySelector('.unitdisk-nav > svg'),
+            className:      'unitDisc',
             position:       'translate(520,500) scale(470)',
             hypertree:      this,
             data:           undefined,            
