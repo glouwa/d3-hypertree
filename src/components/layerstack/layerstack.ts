@@ -12,24 +12,29 @@ export interface LayerStackArgs
 export class LayerStack
 {
     args:        LayerStackArgs
-    layersGroup: any
+    layersSvg: any
     layers:      { [key:string]: ILayer }
     
     constructor(args: LayerStackArgs)
     {
         this.args = args
-        this.layersGroup = this.args.parent.append('g')
+        this.layers = {}
+        this.layersSvg = this.args.parent.append('g')        
+        for (var layerfactoryfunc of this.args.unitdisk.args.layers) {            
+            var layer = layerfactoryfunc(this.args.unitdisk)                        
+            this.layers[layer.name] = layer
+        }
         this.updateLayers()
     }
 
-    private updateLayers() : void
-    {
-        this.layers = {}
-        for (var layerfactoryfunc of this.args.unitdisk.args.layers)
-        {
-            var layer = layerfactoryfunc(this.args.unitdisk)            
-            this.layers[layer.name] = layer
-            layer.attach(this.layersGroup)            
+    public updateLayers() : void
+    {        
+        this.layersSvg.selectAll('*').remove();
+
+        for (var l in this.layers) {
+            var layer = this.layers[l]
+            if (!layer.args.invisible)
+                layer.attach(this.layersSvg)            
         }
     }
 
@@ -40,11 +45,13 @@ export class LayerStack
 
         for (var l in this.layers) {
             var beginTime = performance.now()
+            var layer = this.layers[l]
 
-            this.layers[l].updateData()
+            if (!layer.args.invisible) 
+                layer.updateData()
 
             timings.push(performance.now() - beginTime)
-            names.push(this.layers[l].name)
+            names.push(layer.name)
         }
 
         if (this.args.unitdisk.cache.unculledNodes.length != 3)

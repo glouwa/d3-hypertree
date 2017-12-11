@@ -8,6 +8,7 @@ export type ArcCurvature = '+' | '0' | '-' | 'l'
 export interface ArcLayerArgs
 {
     data:      ()=> any,
+    name:      string,
     curvature: ArcCurvature,
     width,
     clip?:     string,
@@ -24,6 +25,7 @@ export class ArcLayer implements ILayer
 
     constructor(args: ArcLayerArgs) {
         this.args = args
+        this.name = args.name
     }
 
     public attach(parent) {

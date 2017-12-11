@@ -19,7 +19,7 @@ import { UnitDisk }            from './unitdisk/unitdisk'
 import { IUnitDisk }           from './unitdisk/unitdisk'
 
 import { InfoArea }            from './unitdisk-meta'
-import { LayerInfo }           from './layerstack-meta'
+import { LayerInfo }           from './layerstack-meta/layerstack-meta'
 
 var htmlpreloader = `
     <div class="preloader-wrapper big active">

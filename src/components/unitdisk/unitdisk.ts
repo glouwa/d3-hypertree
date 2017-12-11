@@ -124,7 +124,8 @@ export class UnitDiskNav implements IUnitDisk
             hypertree:          args.hypertree,
             data:               args.data,
             layers:             args.layers.filter((l, idx)=> 
-                                    idx !== 1 && idx !== 2 && idx !== 4 && idx !== 5 && idx !== 7),
+                                    idx !== 1 && idx !== 2 && idx !== 3 &&
+                                    idx !== 5 && idx !== 6 && idx !== 8),
             cacheUpdate:        args.cacheUpdate,
             transformation:     args.transformation,
             transform:          (n:N)=> n.z,
