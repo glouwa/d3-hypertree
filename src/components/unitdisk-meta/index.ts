@@ -119,11 +119,11 @@ export function InfoArea(args)
     }
     
     ui.updateD3Info = (max, Δ, cache, layerlist)=> {
-        var t = Δ.reduce((a,e)=> a+e).toFixed(1)
+        var t = Δ.reduce((a,e)=> a+e).toFixed(0)
 
         D3Label.innerHTML = `D<sub>3</sub>`
         D3Info.innerHTML  = `${cache.unculledNodes.length} nodes`
-        D3Info.title      = Δ.map((e, i)=> `${layerlist[i]}: ${e.toFixed()}ms`).join('\n')
+        D3Info.title      = Δ.map((e, i)=> `${layerlist[i]}: ${e.toFixed(1)}ms`).join('\n')
         D3Q.innerHTML     = `${t}`
         D3Qmax.innerHTML  = `<sub>${ms}ms</sub>`
 

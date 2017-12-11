@@ -3,11 +3,11 @@ import { D3UpdateLayer } from '../layer'
 
 export interface LabelLayerArgs
 {
-    data:     ()=> any,
+    data:      ()=> any,    
     delta,
     transform,
     text,
-    clip?:    string,
+    clip?:     string,
 }
 
 export class LabelLayer implements ILayer
@@ -20,7 +20,7 @@ export class LabelLayer implements ILayer
     updateColor =     ()=> this.layer.updateColor()
 
     constructor(args: LabelLayerArgs) {
-        this.args = args
+        this.args = args        
     }
 
     public attach(parent) {
@@ -35,7 +35,7 @@ export class LabelLayer implements ILayer
                                     .classed("caption-icon", d=> d.icon && navigator.platform.includes('inux'))
                                     .text(                   this.args.text),
             updateColor:       s=> {},
-            updateTransform:   s=> s.attr("transform",       this.args.transform)
+            updateTransform:   s=> s.attr("transform", (d, i, v)=> this.args.transform(d, this.args.delta(d, i, v)))
                                     .text(                   this.args.text)
         })
     }

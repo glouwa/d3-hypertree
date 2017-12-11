@@ -18,7 +18,7 @@ export class ArcLayer implements ILayer
 {    
     args: ArcLayerArgs
     layer: D3UpdateLayer
-    name =            'links'
+    name:             string
     updateData =      ()=> this.layer.updateData()
     updateTransform = ()=> this.layer.updateTransform()
     updateColor =     ()=> this.layer.updateColor()

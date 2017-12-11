@@ -124,7 +124,7 @@ export class UnitDiskNav implements IUnitDisk
             hypertree:          args.hypertree,
             data:               args.data,
             layers:             args.layers.filter((l, idx)=> 
-                                    idx !== 1 && idx !== 2 && idx !== 3 &&
+                                    idx !== 1 && idx !== 2 && idx !== 4 &&
                                     idx !== 5 && idx !== 6 && idx !== 8),
             cacheUpdate:        args.cacheUpdate,
             transformation:     args.transformation,
@@ -158,11 +158,13 @@ export class UnitDiskNav implements IUnitDisk
                                         r:           d=> ud.args.nodeRadius * (d.name==='P' ? Pscale(ud)(d) : 1),
                                         transform:   d=> d.transformStrCache,
                                     }),
-                                    (ud:UnitDisk)=> new LabelLayer({
+                                    (ud:UnitDisk)=> new LabelLayer({                                        
                                         data:        ()=> ud.cache.unculledNodes,
                                         text:        d=> ({ P:'+', θ:'🗘', λ:'⚲' })[d.name],
-                                        delta:       d=> ({ re:.0025, im:.025 }),
-                                        transform:   d=> d.transformStrCache + rotate(d)
+                                        delta:       d=> ({ re:.0025, im:.025 }),                                        
+                                        transform:   (d, delta)=> 
+                                                        ` translate(${d.cache.re+delta.re} ${d.cache.im+delta.im})` 
+                                                        + rotate(d)
                                     }),
                                     (ud:UnitDisk)=> new InteractionLayer({                                        
                                         unitdisk:    ud,
