@@ -50,7 +50,7 @@ export function LayerInfo(parent, unitdisk, cls)
     }
 
     function updateCheck(checkBox, layer:ILayer, layerViews) {        
-        layer.args.invisible = ~layer.args.invisible
+        layer.args.invisible = !layer.args.invisible
 
         var checked = !layer.args.invisible
         var type = 'circle'

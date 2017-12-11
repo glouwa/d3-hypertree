@@ -11,9 +11,9 @@ export interface LayerStackArgs
 
 export class LayerStack
 {
-    args:        LayerStackArgs
+    args:      LayerStackArgs
     layersSvg: any
-    layers:      { [key:string]: ILayer }
+    layers:    { [key:string]: ILayer }
     
     constructor(args: LayerStackArgs)
     {
@@ -45,8 +45,8 @@ export class LayerStack
 
         for (var l in this.layers) {
             var beginTime = performance.now()
-            var layer = this.layers[l]
 
+            var layer = this.layers[l]
             if (!layer.args.invisible) 
                 layer.updateData()
 
