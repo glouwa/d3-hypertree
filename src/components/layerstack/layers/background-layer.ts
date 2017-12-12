@@ -2,7 +2,7 @@ import { ILayer }        from '../layer'
 import { D3UpdateLayer } from '../layer'
 
 export interface BackgroundLayerArgs
-{    
+{
 }
 
 export class BackgroundLayer implements ILayer

@@ -22,6 +22,8 @@ export interface IUnitDisk
     cache
     layerStack:           LayerStack
 
+    navParameter?:        UnitDisk,
+
     updateData:           ()=> void
     updateTransformation: ()=> void 
 }

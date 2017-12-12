@@ -3,7 +3,7 @@ import { N } from '../../models/n/n'
 export interface ILayer
 {
     name:            string,
-
+    args,
     updateTime?:     number,
 
     attach:          (parent)=> void,
@@ -15,7 +15,7 @@ export interface ILayer
 export interface LayerArgs
 {
     parent:          any,
-    name:            string,
+    name:            string,    
     className:       string,
     elementType:     string,
     data:            any,

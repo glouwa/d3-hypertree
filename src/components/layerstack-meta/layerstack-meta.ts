@@ -6,10 +6,9 @@ var countHtml  = (id, c)=>  `<div class="nodes"></div> `
 var check1Html = (id, c)=>  `<div class="cbx">           
                                 <input type="checkbox" id="${id}" class="filled-in" ${c?'checked':''}/>
                                 <label for="${id}"></label>
-                            </div> `
+                             </div>`
 var barHtml    = (id, c)=>  `<div class="bar-bg"></div>`
-
-var html = `<div class="layer-info"></div>`
+var html       =            `<div class="layer-info"></div>`
 
 export function LayerInfo(parent, unitdisk, cls)
 {
@@ -56,11 +55,7 @@ export function LayerInfo(parent, unitdisk, cls)
         var type = 'circle'
         var count = layer.args.data?layer.args.data.length:1
 
-        if (checked)
-            layerViews.count.innerHTML = `${count} ${type}`
-        else
-            layerViews.count.innerHTML = ``
-
+        layerViews.count.innerHTML = checked?`${count} ${type}`:``
         unitdisk.layerStack.updateLayers()
     }
 
