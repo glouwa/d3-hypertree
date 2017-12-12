@@ -261,7 +261,6 @@ export class Hypertree
                     requestAnimationFrame(()=> frame())
             }
         }
-
         requestAnimationFrame(()=> frame())
     }
 }

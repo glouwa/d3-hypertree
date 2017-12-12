@@ -3,6 +3,7 @@ import { D3UpdateLayer } from '../layer'
 
 export interface LabelLayerArgs
 {
+    name:      string,
     data:      ()=> any,    
     delta,
     transform,
@@ -12,15 +13,16 @@ export interface LabelLayerArgs
 
 export class LabelLayer implements ILayer
 {    
-    args: LabelLayerArgs
-    layer: D3UpdateLayer
-    name =            'captions'
+    args:             LabelLayerArgs
+    layer:            D3UpdateLayer
+    name:             string
     updateData =      ()=> this.layer.updateData()
     updateTransform = ()=> this.layer.updateTransform()
     updateColor =     ()=> this.layer.updateColor()
 
     constructor(args: LabelLayerArgs) {
-        this.args = args        
+        this.args = args  
+        this.name = args.name      
     }
 
     public attach(parent) {

@@ -10,6 +10,7 @@ export interface ArcLayerArgs
     data:      ()=> any,
     name:      string,
     curvature: ArcCurvature,
+    classed:   (s)=> void,
     width,
     clip?:     string,
 }
@@ -37,8 +38,7 @@ export class ArcLayer implements ILayer
             className:         'arc',
             elementType:       this.args.curvature == 'l' ? 'line' : 'path',
             create:            s=> {},
-            updateColor:       s=> s.classed("hovered",   d=> d.isHovered)
-                                    .classed("selected",  d=> d.isSelected),
+            updateColor:       s=> this.args.classed(s),
             updateTransform:   s=> {
                 if (this.args.curvature == 'l')
                     s.attr('x1',             d=> d.cache.re)

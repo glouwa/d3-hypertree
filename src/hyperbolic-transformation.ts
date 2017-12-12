@@ -92,10 +92,15 @@ export class TransformationCache
     links:          N[]
     unculledNodes:  N[]
     leafOrLazy:     N[]
+    spezialNodes:   N[]
+    paths:          N[]
+    weights:        N[]
     labels:         N[]
-
+    emojis:         N[]
+    imgages:        N[]
+    
     voronoiDiagram: d3.VoronoiDiagram<N>
     centerNode:     N
-    cells
+    cells:          N[]
 }
 

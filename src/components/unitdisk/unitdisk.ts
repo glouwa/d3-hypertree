@@ -119,15 +119,14 @@ export class UnitDiskNav implements IUnitDisk
         this.cache = this.view.cache
         this.layerStack = this.view.layerStack
 
+        var usedLayers = [1,0,0,0,1,0,0,0,0,0,0,0,1,1]
         this.navBackground = new UnitDisk({
             parent:             args.parent,
             className:          'nav-background-disc',
             position:           'translate(120,120) scale(60)',
             hypertree:          args.hypertree,
             data:               args.data,
-            layers:             args.layers.filter((l, idx)=> 
-                                    idx !== 1 && idx !== 2 && idx !== 4 &&
-                                    idx !== 5 && idx !== 6 && idx !== 8),
+            layers:             args.layers.filter((l, idx)=> usedLayers[idx]),
             cacheUpdate:        args.cacheUpdate,
             transformation:     args.transformation,
             transform:          (n:N)=> n.z,
@@ -160,7 +159,8 @@ export class UnitDiskNav implements IUnitDisk
                                         r:           d=> ud.args.nodeRadius * (d.name==='P' ? Pscale(ud)(d) : 1),
                                         transform:   d=> d.transformStrCache,
                                     }),
-                                    (ud:UnitDisk)=> new LabelLayer({                                        
+                                    (ud:UnitDisk)=> new LabelLayer({
+                                        name:        'labels',
                                         data:        ()=> ud.cache.unculledNodes,
                                         text:        d=> ({ P:'+', θ:'🗘', λ:'⚲' })[d.name],
                                         delta:       d=> ({ re:.0025, im:.025 }),                                        
