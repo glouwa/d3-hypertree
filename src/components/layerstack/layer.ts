@@ -56,7 +56,7 @@ export class D3UpdateLayer
             .call(this.all)
     }
 
-    updateData() {        
+    updateData() {
         var oldElements = this.update
 
         this.data = this.args.data
@@ -74,7 +74,7 @@ export class D3UpdateLayer
         this.update.call(this.all)
         
 // extrashit
-        //if (this.args.name === 'captions')
+        //if (this.args.name === 'labels')
         //    this.addTextBackgroundRects()
     }
 
@@ -91,8 +91,8 @@ export class D3UpdateLayer
             var paddingLeftRight = .08
             var paddingTopBottom = .02
             svgRootHere.insert('rect', d=> this)
-                .attr("x",         x=> view.attributes.dx.value - paddingLeftRight*.5 - w*.5)
-                .attr("y",         x=> view.attributes.dy.value - paddingTopBottom*.5 - h*.75)
+                //.attr("x",         x=> view.attributes.dx.value - paddingLeftRight*.5 - w*.5)
+                //.attr("y",         x=> view.attributes.dy.value - paddingTopBottom*.5 - h*.75)
                 .attr("rx",        x=> .012)
                 .attr("ry",        x=> .012)
                 .attr("width",     x=> w + paddingLeftRight)
@@ -109,8 +109,8 @@ export var bboxOffset = d=> v=> {
     var paddingLeftRight = .08
     var paddingTopBottom = .02
     return {
-        re:(paddingLeftRight/2 + w/2) * Math.cos(d.cachep.θ),
-        im:(paddingTopBottom/2 + h/2) * Math.sin(d.cachep.θ)
+        re:(paddingLeftRight/2 + w/2) * Math.cos(d.cachep.θ) - w/2,
+        im:(paddingTopBottom/2 + h/2) * Math.sin(d.cachep.θ) + h/3
     }
 }
 
