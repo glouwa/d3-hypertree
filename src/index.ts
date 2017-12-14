@@ -17,6 +17,7 @@ import * as text from './components/layerstack/layers/text-rect-layer'
 import * as bg   from './components/layerstack/layers/background-layer'
 import * as foc  from './components/layerstack/layers/focus-layer'
 import * as int  from './components/layerstack/layers/interaction-layer'
+import * as img  from './components/layerstack/layers/image-layer'
 
 export namespace layers
 {
@@ -36,6 +37,8 @@ export namespace layers
     export type FocusLayerArgs       = foc.FocusLayerArgs
     export var  InteractionLayer     = int.InteractionLayer
     export type InteractionLayerArgs = int.InteractionLayerArgs
+    export var  ImageLayer           = img.ImageLayer
+    export type ImageLayerArgs       = img.ImageLayerArgs
 }
 
 export * from './components/unitdisk/unitdisk'

@@ -31,9 +31,9 @@ export class CellLayer implements ILayer
             create:            s=> s.classed("root",      d=> !d.data.parent)   
                                     .classed("lazy",      d=> d.data.hasOutChildren)                                 
                                     .classed("leaf",      d=> !d.data.children),
-            updateColor:       s=> s.classed("lazy",      d=> d.data.hasOutChildren)                                 
-                                    .classed("hovered",   d=> d.data.isHovered && d.data.parent)
-                                    .classed("selected",  d=> d.data.isSelected && d.data.parent),
+            updateColor:       s=> s.classed("lazy",      d=> d.data.hasOutChildren),
+                                    //.classed("hovered",   d=> d.data.isHovered && d.data.parent)
+                                    //.classed("selected",  d=> d.data.isSelected && d.data.parent),
             updateTransform:   s=> s//.classed("lazy",      d=> d.data.hasOutChildren)                                 
                                     .attr("points",       d=> d.join(" ")),
         })
