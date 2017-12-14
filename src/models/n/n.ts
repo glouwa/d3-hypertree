@@ -25,7 +25,7 @@ export interface Species {
 //HierarchyNode<Datum>
 */
 
-export interface N {
+export interface N {    
     id:                 string,        //
     name?:              string,
 

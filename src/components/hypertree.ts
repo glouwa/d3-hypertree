@@ -123,7 +123,7 @@ export class Hypertree
             transformation: this.args.ui.transformation,
             transform:      (n:N)=> this.unitdisk.args.transformation.transformPoint(n.z),
             layers:         this.args.ui.layers,
-            cacheUpdate:    this.args.ui.cacheUpdate,            
+            cacheUpdate:    this.args.ui.cacheUpdate,
             caption:        (n:N)=> this.args.ui.caption(this, n),
             clipRadius:     this.args.ui.clipRadius,
             nodeRadius:     this.args.ui.nodeRadius            
@@ -149,8 +149,10 @@ export class Hypertree
 
         this.args.dataloader((d3h, t1)=> {
             var t2 = performance.now()
+            var ncount = 0
             var model = <N & d3.HierarchyNode<N>>d3
                             .hierarchy(d3h)
+                            .each((n:any)=> n.mergeId = ncount++)
                             //.sum(this.args.weight) // this.updateWeights()
 
             this.view.querySelector('.preloader').innerHTML = ''

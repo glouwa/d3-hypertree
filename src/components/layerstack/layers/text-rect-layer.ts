@@ -38,7 +38,7 @@ export class LabelLayer implements ILayer
                                     .text(                   this.args.text),
             updateColor:       s=> {},
             updateTransform:   s=> s.attr("transform", (d, i, v)=> this.args.transform(d, this.args.delta(d, i, v)))
-                                    .text(                   this.args.text)
+                                    //.text(                   this.args.text)
         })
     }
 }
