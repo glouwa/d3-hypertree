@@ -7,7 +7,11 @@ var htmlinfo = `<div class="render-info">
     <div class="bar-bg"></div>
     <div class="label"> </div> <div class="nodes"></div> <div class="q"></div> <div class="qmax"></div> <div class="info i2"></div>
     <div class="bar-bg"></div>
-    <div class="label"> </div> <div class="nodes"></div> <div class="q"></div> <div class="qmax"></div> <div class="info i3"></div>
+    <div class="label"> </div>  <div class="nodes slider">
+                                    <p class="range-field">
+                                        <input type="range" min="1" max="300" value="150" class="slider" id="myRange">
+                                    </p>
+                                </div> <div class="q"></div> <div class="qmax"></div> <div class="info i3"></div>
     <div class="bar-bg"></div>
     <div class="label"> </div> <div class="nodes"></div> <div class="q"></div> <div class="qmax"></div> <div class="info i4"></div>
     <div class="bar-bg"></div>
@@ -110,7 +114,7 @@ export function InfoArea(args)
         
         updateBar(transformBar, Δ.map(e=> e*mag), ['#2196f3', '#ffc107', '#673ab7', '#4caf50'])
         transformLabel.innerHTML = `Transf.`
-        transformInfo.innerHTML  = `${na} nodes<sub>w > ${'...'}</sub>`
+        //transformInfo.innerHTML  = `${na} nodes<sub>w > ${'...'}</sub>`
         transformInfo.title      = `Visible node count: ${na}\n`        
         transformInfo.title     += `Min weigth: ${hwexits}\n`
         transformInfo.title     += `${Δms[0]} culling\n${Δms[1]} lazysearch\n${Δms[2]} voronoi\n${Δms[3]} labels`
@@ -122,7 +126,7 @@ export function InfoArea(args)
         var t = Δ.reduce((a,e)=> a+e).toFixed(0)
 
         D3Label.innerHTML = `D<sub>3</sub>`
-        D3Info.innerHTML  = `${cache.unculledNodes.length} nodes`
+        D3Info.innerHTML  = `${cache.unculledNodes.length} unc. nodes`
         D3Info.title      = Δ.map((e, i)=> `${layerlist[i]}: ${e.toFixed(1)}ms`).join('\n')
         D3Q.innerHTML     = `${t}`
         D3Qmax.innerHTML  = `<sub>${ms}ms</sub>`

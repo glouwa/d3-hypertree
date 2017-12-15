@@ -141,6 +141,11 @@ export class UnitDiskNav implements IUnitDisk
                 new PanTransformation(args.transformation.state))
         var rotate = d=>
             (d.name === 'λ' ? ' rotate(-30)' : ' rotate(0)')
+        var deltaMap = {
+            P:{ re:.0025, im:.05 }, 
+            θ:{ re:.0025, im:.03 }, 
+            λ:{ re:.0025, im:-.0005 }
+        }
         var Pscale =  ud=> d=>
             lengthDilledation(d)
             * (1 - πify(CktoCp(ud.args.transformation.state.λ).θ) / 2 / Math.PI)
@@ -163,7 +168,7 @@ export class UnitDiskNav implements IUnitDisk
                                         name:        'labels',
                                         data:        ()=> ud.cache.unculledNodes,
                                         text:        d=> ({ P:'+', θ:'🗘', λ:'⚲' })[d.name],
-                                        delta:       d=> ({ re:.0025, im:.025 }),                                        
+                                        delta:       d=> deltaMap[d.name],
                                         transform:   (d, delta)=> 
                                                         ` translate(${d.cache.re+delta.re} ${d.cache.im+delta.im})` 
                                                         + rotate(d)

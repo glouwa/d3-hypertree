@@ -47,7 +47,7 @@ export class D3UpdateLayer
         this.update =
             this.rootSVG
                 .selectAll(this.args.elementType)
-                    .data(this.data, d=> d.mergeId)
+                    .data(this.data, (d:any)=> d.mergeId)
                         .enter().append(args.elementType)
 
         this.update

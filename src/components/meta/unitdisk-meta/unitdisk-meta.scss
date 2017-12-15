@@ -1,0 +1,70 @@
+.render-info {
+    z-index: 1000;
+    position: absolute;
+    left:1em;
+    bottom:1em;
+    width:23em;
+    padding-left:.3em;
+    padding-bottom:.1em;    
+    font-size: .8em;
+
+    display: grid; 
+    grid-gap: .0em;
+    grid-template-rows: repeat(10, auto);
+    grid-template-columns: 5em auto auto 4em 1.2em;//repeat(4, auto);
+
+    .slider {
+        position: relative; 
+        z-index: 100;
+        height: 1em;
+    }
+
+    div {
+        .range-field {
+            margin: 0;
+        }
+
+        input {            
+            margin-top: .0em;            
+            margin-bottom: 0px;        
+            border: none;        
+        }
+
+        $sliderMainColor: #666;
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            border: 1px solid $sliderMainColor;
+            height: 16px;
+            width: 16px;
+            border-radius: 8px;
+            background: #222;
+            cursor: pointer;
+            margin-top: -6px; /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */            
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            cursor: pointer;
+            background: none; // $sliderMainColor;            
+        }
+        
+        input[type=range] + .thumb {
+            background-color: $sliderMainColor;
+            z-index: 101;
+        }
+    }
+
+    div   { align-self:   end; margin-bottom: -.1em; margin-left: 0em; }
+    .q    { justify-self: end; margin-right: .35em; }
+    .qmax { justify-self: end; margin-right: .0em; }
+    .info { justify-self: end; margin: auto 0; /*grid-column: 5;*/ font-size: 1em; }
+
+    .bar-bg {
+        height:.25em;        
+        margin-bottom: .15em;
+        grid-column: 1 / 6; 
+        .bar {
+            height:.25em;
+            position: absolute;
+        }
+    } 
+}

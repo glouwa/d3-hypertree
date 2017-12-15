@@ -18,8 +18,8 @@ import { UnitDiskArgs }        from './unitdisk/unitdisk'
 import { UnitDisk }            from './unitdisk/unitdisk'
 import { IUnitDisk }           from './unitdisk/unitdisk'
 
-import { InfoArea }            from './unitdisk-meta'
-import { LayerInfo }           from './layerstack-meta/layerstack-meta'
+import { InfoArea }            from './meta/unitdisk-meta/unitdisk-meta'
+import { LayerInfo }           from './meta/layerstack-meta/layerstack-meta'
 
 var htmlpreloader = `
     <div class="preloader-wrapper big active">
@@ -83,7 +83,7 @@ var hypertreehtml =
         <svg width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">
             ${bubbleSvgDef}            
         </svg>        
-        <div class="preloader"></div>
+        <div class="preloader"></div>        
     </div>`
 
 /**

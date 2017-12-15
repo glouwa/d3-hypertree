@@ -1,5 +1,5 @@
 import { HTML } from 'ducd'
-import { ILayer } from '../layerstack/layer'
+import { ILayer } from '../../layerstack/layer'
 
 var labelHtml  = (id, c)=>  `<div class="label"></div> `
 var countHtml  = (id, c)=>  `<div class="nodes"></div> `

@@ -70,7 +70,11 @@
                 dominant-baseline: middle;                
                 text-anchor: middle;
                 font-size: .25pt;                
-            }            
+            }      
+            .caption.P {
+                font-size: .55pt;  
+                font-weight: 100;
+            }      
             .background-circle {
                 pointer-events:none;            
             }
