@@ -159,8 +159,10 @@ export class InteractionLayer implements ILayer
             this.dblClickTimer = setTimeout(() => {
                 this.dblClickTimer = null
                 
-                //this.args.onClick(d, m)
-                this.animateTo(n, m)
+                if (n != this.args.unitdisk.args.transformation.cache.centerNode)
+                    this.animateTo(n, m)
+                else                
+                    this.args.onClick(n, m)
             },
             300)
         else 
