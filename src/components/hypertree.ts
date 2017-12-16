@@ -227,7 +227,7 @@ export class Hypertree
         this.updateTransformation()
     }
 
-    private updateTransformation() : void {
+    public updateTransformation() : void {
         requestAnimationFrame(()=> this.unitdisk.updateTransformation())
     } 
 

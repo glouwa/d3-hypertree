@@ -9,7 +9,7 @@ var htmlinfo = `<div class="render-info">
     <div class="bar-bg"></div>
     <div class="label"> </div>  <div class="nodes slider">
                                     <p class="range-field">
-                                        <input type="range" min="1" max="300" value="150" class="slider" id="myRange">
+                                        <input type="range" min="2" max="500" value="150" class="slider" id="myRange">
                                     </p>
                                 </div> <div class="q"></div> <div class="qmax"></div> <div class="info i3"></div>
     <div class="bar-bg"></div>
@@ -86,7 +86,7 @@ export function InfoArea(args)
             .attr('class', 'bar')
             .merge(diff)
             .style('left', d=> d[2]+'%')
-            .style('width', d=> d[0]+'%')
+            .style('width', d=> Math.max(d[0], 2)+'%')
             .style('background-color', d=> d[1])
         diff.exit().remove()
     }
@@ -103,7 +103,7 @@ export function InfoArea(args)
         renderingInfo.innerHTML  = Δ.join(' / ')
         renderingInfo.title      = `${n} nodes \n${l} links \n${t} labels`
         renderingQ.innerHTML     = `${a}`
-        renderingQmax.innerHTML  = `<sub>1000#</sub>`
+        renderingQmax.innerHTML  = `<sub>#</sub>`
     }
 
     ui.updateTransformationInfo = (cache, minWeigth, Δ)=> {
@@ -119,7 +119,7 @@ export function InfoArea(args)
         transformInfo.title     += `Min weigth: ${hwexits}\n`
         transformInfo.title     += `${Δms[0]} culling\n${Δms[1]} lazysearch\n${Δms[2]} voronoi\n${Δms[3]} labels`
         transformQ.innerHTML     = `${t}`
-        transformQmax.innerHTML  = `<sub>${ms}ms</sub>`
+        transformQmax.innerHTML  = `<sub>ms</sub>`
     }
     
     ui.updateD3Info = (max, Δ, cache, layerlist)=> {
@@ -129,7 +129,7 @@ export function InfoArea(args)
         D3Info.innerHTML  = `${cache.unculledNodes.length} unc. nodes`
         D3Info.title      = Δ.map((e, i)=> `${layerlist[i]}: ${e.toFixed(1)}ms`).join('\n')
         D3Q.innerHTML     = `${t}`
-        D3Qmax.innerHTML  = `<sub>${ms}ms</sub>`
+        D3Qmax.innerHTML  = `<sub>ms</sub>`
 
         updateBar(D3Bar, Δ.map(e=> e*mag), typeColors)
     }
@@ -139,7 +139,7 @@ export function InfoArea(args)
         layoutLabel.innerHTML = `Layout`
         layoutInfo.innerHTML  = `${cache.N} nodes`
         layoutQ.innerHTML     = `${Δ.toFixed()}`
-        layoutQmax.innerHTML  = `<sub>${ms}ms</sub>`
+        layoutQmax.innerHTML  = `<sub>ms</sub>`
     }
 
     ui.updateModel = (model, Δ)=> {
@@ -167,8 +167,8 @@ export function InfoArea(args)
         dataInfo.title  += `○ max: ?\n`
         dataInfo.title  += `○ μ: ${ø.toPrecision(2)}\n`
         dataInfo.title  += `○ ⌀: ?\n`
-        dataQ.innerHTML     = `${t}`
-        dataQmax.innerHTML  = `<sub>1000ms</sub>`
+        dataQ.innerHTML     = `${t/1000}`
+        dataQmax.innerHTML  = `<sub>s</sub>`
     }
 
     ui.update = ()=> {}

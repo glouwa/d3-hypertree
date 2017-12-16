@@ -3,7 +3,7 @@
     position: absolute;
     left:1em;
     bottom:1em;
-    width:23em;
+    width:18em;
     padding-left:.3em;
     padding-bottom:.1em;    
     font-size: .8em;
@@ -11,7 +11,7 @@
     display: grid; 
     grid-gap: .0em;
     grid-template-rows: repeat(10, auto);
-    grid-template-columns: 5em auto auto 4em 1.2em;//repeat(4, auto);
+    grid-template-columns: 5em auto auto auto .0em;;
 
     .slider {
         position: relative; 
@@ -53,10 +53,10 @@
         }
     }
 
-    div   { align-self:   end; margin-bottom: -.1em; margin-left: 0em; }
-    .q    { justify-self: end; margin-right: .35em; }
-    .qmax { justify-self: end; margin-right: .0em; }
-    .info { justify-self: end; margin: auto 0; /*grid-column: 5;*/ font-size: 1em; }
+    div   { align-self:   end;    margin-bottom: -.1em; margin-left: 0em; }
+    .q    { justify-self: end;    margin-right: .09em; }
+    .qmax { justify-self: normal; margin-right: .0em; }
+    .info { justify-self: end;    margin: auto 0; /*grid-column: 5;*/ font-size: 1em; }
 
     .bar-bg {
         height:.25em;        
