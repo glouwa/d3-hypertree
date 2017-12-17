@@ -20,14 +20,27 @@
     //grid-template-rows: repeat(10, 1fr);
     grid-gap: .0em;
 
+    .switch {        
+        height: 1.4em;
+        width: 1.4em;
+        border-radius: .7em;
+        border-color: #555;
+        border-width: 1px;
+        border-style: solid;
+        background-color: #222;        
+        cursor: pointer;
+        z-index: 100;
+        margin: 0 .4em -.05em auto
+    }
+
     .label {
         text-transform: capitalize;
     }
 
     div   { 
-        align-self:   
-        end; margin-bottom: 
-        -.1em; margin-left: 0em; 
+        align-self: end; 
+        margin-bottom: -.1em; 
+        margin-left: 0em; 
     }
     
     .q {

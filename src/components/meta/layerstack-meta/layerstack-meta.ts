@@ -3,6 +3,7 @@ import { ILayer } from '../../layerstack/layer'
 
 var labelHtml  = (id, c)=>  `<div class="label"></div> `
 var countHtml  = (id, c)=>  `<div class="nodes"></div> `
+var switchHtml = (id, c)=>  `<div class="switch"></div> `
 var check1Html = (id, c)=>  `<div class="cbx">           
                                 <input type="checkbox" id="${id}" class="filled-in" ${c?'checked':''}/>
                                 <label for="${id}"></label>
@@ -42,22 +43,43 @@ export function LayerInfo(parent, unitdisk, cls)
         
         ui.children[pos].innerHTML = name
         layerViews.checkNormal.querySelector('input').onchange = function() {            
+            function updateCheck(checkBox, layer:ILayer, layerViews) {        
+                layer.args.invisible = !layer.args.invisible
+
+                var checked = !layer.args.invisible
+                var type = 'circle'
+                var count = layer.args.data?layer.args.data.length:1
+
+                layerViews.count.innerHTML = checked?`${count} ${type}`:``
+                unitdisk.layerStack.updateLayers()
+            }
             updateCheck(this, layer, layerViews)
         }
 
         pos += 5
     }
 
-    function updateCheck(checkBox, layer:ILayer, layerViews) {        
-        layer.args.invisible = !layer.args.invisible
+    function addSwitch()
+    {
+        const stateViews = {
+            view: HTML.parse<HTMLElement>(switchHtml(pos, true))(),
+            drag: HTML.parse<HTMLElement>(switchHtml(pos, true))(),
+            bar:  HTML.parse<HTMLElement>(barHtml(pos, false))(),
+        }
 
-        var checked = !layer.args.invisible
-        var type = 'circle'
-        var count = layer.args.data?layer.args.data.length:1
+        ui.appendChild(document.createElement('div'))
+        ui.appendChild(document.createElement('div'))
+        ui.appendChild(stateViews.view)
+        ui.appendChild(stateViews.drag)        
+        ui.appendChild(stateViews.bar)
 
-        layerViews.count.innerHTML = checked?`${count} ${type}`:``
-        unitdisk.layerStack.updateLayers()
+        stateViews.drag.style.visibility = 'hidden'
+
+        pos += 5
     }
+
+    if (cls !== 'nav')
+        addSwitch()
 
     for (var l in unitdisk.layerStack.layers)            
         add(unitdisk.layerStack.layers[l])

@@ -145,6 +145,8 @@ export class Hypertree
         var t0 = performance.now()
         this.view.querySelector('.preloader').innerHTML = htmlpreloader
         this.unitdisk.args.data = undefined
+        this.paths.isSelected = undefined
+        this.paths.isHovered= undefined
         this.unitdisk.updateData()
 
         this.args.dataloader((d3h, t1)=> {

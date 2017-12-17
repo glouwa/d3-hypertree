@@ -34,9 +34,9 @@
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
             border: 1px solid $sliderMainColor;
-            height: 16px;
-            width: 16px;
-            border-radius: 8px;
+            height: 1.4em;
+            width: 1.4em;
+            border-radius: .7em;
             background: #222;
             cursor: pointer;
             margin-top: -6px; /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */            

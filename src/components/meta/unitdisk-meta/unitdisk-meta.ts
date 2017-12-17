@@ -9,11 +9,15 @@ var htmlinfo = `<div class="render-info">
     <div class="bar-bg"></div>
     <div class="label"> </div>  <div class="nodes slider">
                                     <p class="range-field">
-                                        <input type="range" min="2" max="500" value="150" class="slider" id="myRange">
+                                        <input type="range" min="2" max="500" value="160" class="slider" id="myRange">
                                     </p>
                                 </div> <div class="q"></div> <div class="qmax"></div> <div class="info i3"></div>
     <div class="bar-bg"></div>
-    <div class="label"> </div> <div class="nodes"></div> <div class="q"></div> <div class="qmax"></div> <div class="info i4"></div>
+    <div class="label"> </div> <div class="nodes slider">
+                                    <p class="range-field">
+                                        <input type="range" min="2" max="500" value="160" class="slider" id="myRange">
+                                    </p>
+                                </div> <div class="q"></div> <div class="qmax"></div> <div class="info i4"></div>
     <div class="bar-bg"></div>
     <div class="label"> </div> <div class="nodes"></div> <div class="q"></div> <div class="qmax"></div> <div class="info i5"></div>
     <div class="bar-bg"></div>
@@ -136,8 +140,7 @@ export function InfoArea(args)
 
     ui.updateLayout = (cache, Δ)=> {
         updateBar(layoutBar, [Δ].map(e=> e*mag), ['#2196f3'])
-        layoutLabel.innerHTML = `Layout`
-        layoutInfo.innerHTML  = `${cache.N} nodes`
+        layoutLabel.innerHTML = `Layout`        
         layoutQ.innerHTML     = `${Δ.toFixed()}`
         layoutQmax.innerHTML  = `<sub>ms</sub>`
     }
