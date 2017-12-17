@@ -62,10 +62,22 @@ export class LayerStack
 
     public updatePath()
     {
-        if (this.layers.cells)    this.layers.cells.updateData()
-        if (this.layers.links)    this.layers.links.updateColor()
-        if (this.layers.nodes)    this.layers.nodes.updateColor()
-        if (this.layers.captions) this.layers.captions.updateData()
+        this.updateTransformation()
+        return
+        
+        //if (this.layers.cells && this.layers.cells.layer)       this.layers.cells.updateData()
+        //if (this.layers.links && this.layers.links.layer)       this.layers.links.updateColor()
+        //if (this.layers.nodes && this.layers.nodes.layer)       this.layers.nodes.updateColor()
+        if (this.layers.captions && this.layers.captions.layer) this.layers.captions.updateData()
+
+        if (this.layers['path-links'] && this.layers['path-links'].layer) {
+            console.log('path-links update')
+            this.layers['path-links'].updateData()
+        }
+        if (this.layers['path-arcs']  && this.layers['path-arcs'].layer) {
+            console.log('path-arcs update')
+            this.layers['path-arcs'].updateData()
+        }
         //Materialize.toast("updatePath", 2500)
     }
 }

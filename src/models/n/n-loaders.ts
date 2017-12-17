@@ -78,7 +78,7 @@ export function nTreeAtFirst(ok, max=10) {
     })
 }
 
-export function nTree(ok, depth=10, childs=2) {
+export function nTree(ok, depth=14, childs=2) {
     oneNode(d=> {
         function processNode(parent, l)
         {

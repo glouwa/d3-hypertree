@@ -119,7 +119,7 @@ export class UnitDiskNav implements IUnitDisk
         this.cache = this.view.cache
         this.layerStack = this.view.layerStack
 
-        var usedLayers = [1,0,0,0,0,0,1,0,0,0,0,0,0,1,1]
+        var usedLayers = [1,0,0,0,1,0,1,0,0,0,0,0,0,1,1]
         this.navBackground = new UnitDisk({
             parent:             args.parent,
             className:          'nav-background-disc',
@@ -219,7 +219,8 @@ export class UnitDiskNav implements IUnitDisk
         this.navParameter.updateTransformation()
     }
     public updateSelection() {
-        this.view.updateSelection(); /*navBackground.updateSelection();*/
+        this.view.updateSelection()
+        this.navBackground.updateSelection()        
     }        
 }
 

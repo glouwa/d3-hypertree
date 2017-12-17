@@ -203,6 +203,7 @@ export class Hypertree
 
         //this.ui.updateSelection()
         requestAnimationFrame(()=> this.unitdisk.updateTransformation())
+        //requestAnimationFrame(()=> this.unitdisk.updateSelection())
     }
 
     private updateWeights() : void {

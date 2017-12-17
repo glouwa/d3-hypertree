@@ -11,7 +11,7 @@ export interface SymbolLayerArgs
     clip?:     string,
 }
 
-var symbol = d3.symbol().size(.001)
+var symbol = d3.symbol().size(.004)
 var d_star = symbol.type(d3['symbolStar'])()
 
 export class SymbolLayer implements ILayer
