@@ -202,8 +202,8 @@ export class Hypertree
                 pn[pathId] = n
 
         //this.ui.updateSelection()
-        requestAnimationFrame(()=> this.unitdisk.updateTransformation())
-        //requestAnimationFrame(()=> this.unitdisk.updateSelection())
+        //requestAnimationFrame(()=> this.unitdisk.updateTransformation())
+        requestAnimationFrame(()=> this.unitdisk.updateSelection())
     }
 
     private updateWeights() : void {
