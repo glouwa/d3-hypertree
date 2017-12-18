@@ -25,7 +25,7 @@ export function LayerInfo(parent, unitdisk, cls)
 
         var name = layer.name        
         var checked = !layer.args.invisible
-        var checked2 = !layer.args.invisibleOnDrag
+        var checked2 = !layer.args.hideOnDrag
 
         const layerViews = {
             label:       HTML.parse<HTMLElement>(labelHtml(pos, checked))(),
