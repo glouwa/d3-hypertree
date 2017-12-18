@@ -96,9 +96,9 @@ $nodeStroke:    #90caf9;
 
         .nav-parameter-disc {            
             .node {
-                fill: rgba(255, 255, 255, .8); //fill: #BBDEFB;
-                stroke-width: .015;
-                stroke: #777;
+                fill: #252525;
+                stroke-width: .016;
+                stroke: #666;
             }
             .node:first-child {
                 fill:rgba(255, 255, 255, .02);
@@ -110,7 +110,7 @@ $nodeStroke:    #90caf9;
                 fill: none;
             }
             .caption {
-                fill: #444; //darken($leafcolor, 5%);
+                fill: #fff; //darken($leafcolor, 5%);                
                 //stroke: opacify($w, .5);
                 //stroke-width: .4;
                 //stroke-opacity:.6;

@@ -119,7 +119,7 @@ export class UnitDiskNav implements IUnitDisk
         this.cache = this.view.cache
         this.layerStack = this.view.layerStack
 
-        var usedLayers = [1,0,0,0,1,0,1,0,0,0,0,0,0,1,1]
+        var usedLayers = [1,0,0,0,0,0,1,0,0,0,0,1,1,0]
         this.navBackground = new UnitDisk({
             parent:             args.parent,
             className:          'nav-background-disc',
@@ -143,8 +143,8 @@ export class UnitDiskNav implements IUnitDisk
             (d.name === 'λ' ? ' rotate(-30)' : ' rotate(0)')
         var deltaMap = {
             P:{ re:.0025, im:.05 }, 
-            θ:{ re:.0025, im:.03 }, 
-            λ:{ re:.0025, im:-.0005 }
+            θ:{ re:.0025, im:.019 }, 
+            λ:{ re:.0025, im:.013 }
         }
         var Pscale =  ud=> d=>
             lengthDilledation(d)
@@ -167,7 +167,7 @@ export class UnitDiskNav implements IUnitDisk
                                     (ud:UnitDisk)=> new LabelLayer({
                                         name:        'labels',
                                         data:        ()=> ud.cache.unculledNodes,
-                                        text:        d=> ({ P:'+', θ:'🗘', λ:'⚲' })[d.name],
+                                        text:        d=> ({ P:'+', θ:'🠆', λ:'⚲' })[d.name],
                                         delta:       d=> deltaMap[d.name],
                                         transform:   (d, delta)=> 
                                                         ` translate(${d.cache.re+delta.re} ${d.cache.im+delta.im})` 
@@ -200,8 +200,8 @@ export class UnitDiskNav implements IUnitDisk
             transform:          (n:any)=> CmulR(n, -1),
 
             caption:            (n:N)=> undefined,
-            nodeRadius:         .21,
-            clipRadius:         1.5
+            nodeRadius:         .16,
+            clipRadius:         1.7
         })
     }
 
@@ -219,7 +219,7 @@ export class UnitDiskNav implements IUnitDisk
         this.navParameter.updateTransformation()
     }
     public updateSelection() {
-        this.view.updateSelection()
+        this.view.updateTransformation()
         this.navBackground.updateSelection()        
     }        
 }
