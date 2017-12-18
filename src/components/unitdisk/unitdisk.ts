@@ -12,6 +12,7 @@ import { NegTransformation }             from '../../hyperbolic-transformation'
 import { TransformationCache }           from '../../hyperbolic-transformation'
 import { ILayer }                        from '../layerstack/layer'
 import { NodeLayer }                     from '../layerstack/layers/node-layer'
+import { CellLayer }                     from '../layerstack/layers/cell-layer'
 import { LabelLayer }                    from '../layerstack/layers/text-rect-layer'
 import { InteractionLayer }              from '../layerstack/layers/interaction-layer'
 import { LayerStack }                    from '../layerstack/layerstack'
@@ -158,6 +159,10 @@ export class UnitDiskNav implements IUnitDisk
             hypertree:          args.hypertree,
             data:               obj2data(args.transformation.state),
             layers:             [
+                                    (ud:UnitDisk)=> new CellLayer({
+                                        data:       ()=> ud.cache.cells,
+                                        clip:       '#circle-clip'+ud.args.clipRadius,                            
+                                    }), 
                                     (ud:UnitDisk)=> new NodeLayer({
                                         name:        'nodes',
                                         data:        ()=> ud.cache.unculledNodes,
@@ -194,6 +199,7 @@ export class UnitDiskNav implements IUnitDisk
                                         n.transformStrCache = ` translate(${n.strCache})`
                                     }
                                     cache.voronoiDiagram = ud.voronoiLayout(cache.unculledNodes)
+                                    cache.cells = cache.voronoiDiagram.polygons()            
                                     //try { cache.voronoiDiagram = ud.voronoiLayout(cache.unculledNodes) } catch(e) {}
                                 },
             transformation:     navTransformation,

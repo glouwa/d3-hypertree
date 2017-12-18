@@ -2,6 +2,26 @@
 
 .render-info {
     color: rgba(darken(#a5d6a7, 30%), .6);
+
+    div {
+        
+        $leafcolor:     #a5d6a7;        
+        $sliderMainColor: darken($leafcolor, 5%);
+
+        input[type=range]::-webkit-slider-thumb {            
+            border: 1px solid $sliderMainColor;
+            background: #fff;            
+        }
+        
+        input[type=range] + .thumb {
+            background-color: #eee;
+                        
+            .value {
+                color: #000;  
+            }
+        }
+    }
+
     .bar-bg {
         background-color:#f8f8f8;        
     }

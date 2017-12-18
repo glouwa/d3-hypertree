@@ -30,16 +30,13 @@
             border: none;        
         }
 
-        $sliderMainColor: #666;
         input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            border: 1px solid $sliderMainColor;
+            -webkit-appearance: none;            
             height: 1.4em;
             width: 1.4em;
-            border-radius: .7em;
-            background: #222;
+            border-radius: .7em;            
             cursor: pointer;
-            margin-top: -6px; /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */            
+            margin-top: -6px; /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */                        
         }
 
         input[type=range]::-webkit-slider-runnable-track {
@@ -48,7 +45,6 @@
         }
         
         input[type=range] + .thumb {
-            background-color: $sliderMainColor;
             z-index: 101;
         }
     }

@@ -1,7 +1,16 @@
 @import "layerstack-meta";
 
 .layer-info {
-    color: #777;    
+    color: #777;  
+    
+    $leafcolor:     #a5d6a7;        
+    $sliderMainColor: darken($leafcolor, 5%);
+
+    .switch {
+        border-color: $sliderMainColor;
+        background-color: #fff;        
+    }
+
     .bar-bg {    
         background-color:#f8f8f8;    
     }

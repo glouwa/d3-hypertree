@@ -38,7 +38,10 @@ export class ArcLayer implements ILayer
             className:         'arc',
             elementType:       this.args.curvature == 'l' ? 'line' : 'path',
             create:            s=> {},
-            updateColor:       s=> this.args.classed(s),
+            updateColor:       s=> {
+                                    this.args.classed(s)
+                                    s.attr("stroke-width",   d=> this.args.width(d))
+                                },
             updateTransform:   s=> {
                 if (this.args.curvature == 'l')
                     s.attr('x1',             d=> d.cache.re)

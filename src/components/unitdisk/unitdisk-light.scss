@@ -65,9 +65,9 @@ $nodeStroke:    #90caf9;
         .selected.node  { stroke: darken($selectedcolor, 5%);                                                     }
 
         .background-circle {
-            fill-opacity: .05;
-            stroke: darken($nodeStroke, 4%); //#f8fcfe;
-            stroke-width: .0001;
+            fill-opacity: .01;
+            //stroke: darken($nodeStroke, 4%); //#f8fcfe;
+            //stroke-width: .0001;
         }
         .mouse-circle {
             fill: none;
@@ -102,7 +102,7 @@ $nodeStroke:    #90caf9;
                 stroke-width: .003;
             }
             .cell {
-                stroke: black;
+                stroke: #999;
                 fill: none;
             }
             .caption {
