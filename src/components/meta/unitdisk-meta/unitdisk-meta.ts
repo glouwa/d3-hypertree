@@ -170,7 +170,7 @@ export function InfoArea(args)
         dataInfo.title  += `○ max: ?\n`
         dataInfo.title  += `○ μ: ${ø.toPrecision(2)}\n`
         dataInfo.title  += `○ ⌀: ?\n`
-        dataQ.innerHTML     = `${t/1000}`
+        dataQ.innerHTML     = `${(t/1000).toFixed(1)}`
         dataQmax.innerHTML  = `<sub>s</sub>`
     }
 
