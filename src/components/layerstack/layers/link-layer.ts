@@ -10,7 +10,7 @@ export interface ArcLayerArgs
     data:      ()=> any,
     name:      string,
     curvature: ArcCurvature,
-    classed:   (s)=> void,
+    classed:   (s,w)=> void,
     width,
     clip?:     string,
 }
@@ -38,10 +38,7 @@ export class ArcLayer implements ILayer
             className:         'arc',
             elementType:       this.args.curvature == 'l' ? 'line' : 'path',
             create:            s=> {},
-            updateColor:       s=> {
-                                    this.args.classed(s)
-                                    s.attr("stroke-width",   d=> this.args.width(d))
-                                },
+            updateColor:       s=> this.args.classed(s, this.args.width),
             updateTransform:   s=> {
                 if (this.args.curvature == 'l')
                     s.attr('x1',             d=> d.cache.re)
