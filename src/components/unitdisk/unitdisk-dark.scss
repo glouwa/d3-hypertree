@@ -68,30 +68,14 @@ $nodeStroke:    #90caf9;
         .selected-path.arc { stroke: rgba($selectedcolor, .2);                                                       }
         .selected.cell     { stroke: rgba($selectedcolor, .2);           fill: rgba(lighten($selectedcolor, 0%), .1); }
         .selected.node     { stroke: darken($selectedcolor, 5%);                                                       }
-
-        .background-circle {
-            fill-opacity: .08;
-            //stroke: darken($nodeStroke, 4%); //#f8fcfe;
-            //stroke-width: .0001;            
-        }
+        
         .mouse-circle {
             fill: none;
-           // stroke: lighten($nodeStroke, 7%); //#f0f8fe;
-           // stroke-width: .0004;            
         }
         .focus-circle {        
             fill:rgba(255, 255, 255, .0);
             stroke: darken($nodeStroke, 25%);
-            stroke-width: .0005;
-            /*// einfacher kreis
-            fill: none;
-            stroke: $nodeStroke; //#f8fcfe;
-            stroke-width: .0004;*/            
-        }
-        .nav-background-disc {
-            .background-circle {                
-                stroke: none;                
-            }
+            stroke-width: .0005;            
         }
 
         .nav-parameter-disc {            
@@ -110,13 +94,9 @@ $nodeStroke:    #90caf9;
                 fill: none;
             }
             .caption {
-                fill: #fff; //darken($leafcolor, 5%);                
-                //stroke: opacify($w, .5);
-                //stroke-width: .4;
-                //stroke-opacity:.6;
+                fill: #fff;
             }
-            .caption.P {
-                //fill: darken($nodeStroke, 25%);
+            .caption.P {                
                 fill: #fff;
             }            
             .background-circle {                
@@ -125,8 +105,7 @@ $nodeStroke:    #90caf9;
             }
             .mouse-circle {
                 fill: none;
-                stroke: none; //$nodeStroke;
-                stroke-width: .001;
+                stroke: none; //$nodeStroke;                
             }
         }
     }

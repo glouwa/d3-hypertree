@@ -65,29 +65,15 @@ $nodeStroke:    #90caf9;
         .selected.node  { stroke: darken($selectedcolor, 5%);                                                     }
 
         .background-circle {
-            fill-opacity: .1;
-            //stroke: darken($nodeStroke, 4%); //#f8fcfe;
-            //stroke-width: .0001;
+            fill-opacity: .5;
         }
         .mouse-circle {
             fill: none;
-           // stroke: lighten($nodeStroke, 7%); //#f0f8fe;
-           // stroke-width: .0004;            
         }
         .focus-circle {        
             fill:rgba(255, 255, 255, .55);
             stroke: darken($nodeStroke, 25%);
             stroke-width: .0005;
-            /*// einfacher kreis
-            fill: none;
-            stroke: $nodeStroke; //#f8fcfe;
-            stroke-width: .0004;*/            
-        }
-
-        .nav-background-disc {
-            .background-circle {                
-                stroke: none;
-            }
         }
 
         .nav-parameter-disc {
@@ -106,11 +92,9 @@ $nodeStroke:    #90caf9;
                 fill: none;
             }
             .caption {
-                fill: #666; //darken($leafcolor, 5%);
-                //stroke: opacify($w, .5);                
+                fill: #666; 
             }
-            .caption.P {
-                //fill: darken($nodeStroke, 25%);
+            .caption.P {                
                 fill: #666;
             }
             .caption-background {
@@ -122,8 +106,7 @@ $nodeStroke:    #90caf9;
             }
             .mouse-circle {
                 fill: none;
-                stroke: none; //$nodeStroke;
-                stroke-width: .001;                
+                stroke: none; //$nodeStroke;                
             }
         }
     }
