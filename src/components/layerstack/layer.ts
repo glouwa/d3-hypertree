@@ -74,32 +74,43 @@ export class D3UpdateLayer
         this.update.call(this.all)
         
 // extrashit
-        //if (this.args.name === 'labels')
-        //    this.addTextBackgroundRects()
+        if (this.args.name === 'labels')
+            this.addTextBackgroundRects()
     }
 
     private addTextBackgroundRects()
-    {
+    { 
         this.rootSVG.selectAll('rect').remove()
 
         var svgRootHere = this.rootSVG
-        this.rootSVG.selectAll("text").each(function(d:N, i, v:SVGTextElement[])
+        var T = this
+        
+        if (T.args.layersArgs.ud) 
         {
-            var view:any = v[i]
-            var w = d.labellen = d.labellen || view.getComputedTextLength()
-            var h = 0.045
-            var paddingLeftRight = .08
-            var paddingTopBottom = .02
-            svgRootHere.insert('rect', d=> this)
-                //.attr("x",         x=> view.attributes.dx.value - paddingLeftRight*.5 - w*.5)
-                //.attr("y",         x=> view.attributes.dy.value - paddingTopBottom*.5 - h*.75)
-                .attr("rx",        x=> .012)
-                .attr("ry",        x=> .012)
-                .attr("width",     x=> w + paddingLeftRight)
-                .attr("height",    x=> h + paddingTopBottom)
-                .attr("transform", x=> d.transformStrCache + d.scaleStrText)
-                .classed('caption-background', true)
-        })
+            this.rootSVG.selectAll("text").each(function(d:N, i, v:SVGTextElement[])
+            {              
+                if (   d === T.args.layersArgs.ud.cache.centerNode 
+                    /*|| d.cachep.r < 0.6*/)
+                {
+                    var view:any = v[i]
+                    var w = d.labellen = d.labellen || view.getComputedTextLength()
+                    var h = 0.04
+                    var paddingLeftRight = .08
+                    var paddingTopBottom = .02
+
+                    svgRootHere.insert('rect', d=> this)
+                        .attr("x",         x=> - paddingLeftRight/2)
+                        .attr("y",         x=> - paddingTopBottom*2)
+                        .attr("rx",        x=> .01)
+                        .attr("ry",        x=> .01)
+                        .attr("width",     x=> w + paddingLeftRight)
+                        .attr("height",    x=> h + paddingTopBottom)
+                        .attr("transform", x=> view.attributes.transform.value)//d.transformStrCache + d.scaleStrText)
+                        .classed('caption-background', true)
+                    
+                }
+            })
+        }
     }
 }
 
