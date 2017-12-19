@@ -36,28 +36,7 @@ var htmlpreloader = `
         </div>
     </div>`
 
-var bubbleSvgDefOld =
-    `<defs>
-        <radialGradient id="exampleGradient">            
-            <stop offset="50%"   stop-color="#ffffff"/>      
-            <stop offset="92%"   stop-color="#606060"/>
-            <stop offset="99.8%" stop-color="#242424"/>      
-            <stop offset="100%"  stop-color="#232323"/>      
-        </radialGradient>
-    </defs>`
-
-var bubbleSvgDefLight =
-    `<defs>
-        <radialGradient id="exampleGradient">            
-            <stop offset="50%"   stop-color="rgba(255,255,255,1)"/>      
-            <stop offset="75%"   stop-color="rgba(255,255,255,0)"/>
-            <stop offset="92%"   stop-color="rgba(0,0,0,.009)"/>
-            <stop offset="99.8%" stop-color="rgba(0,0,0,.03)"/>
-            <stop offset="100%"  stop-color="rgba(0,0,0,.1)"/>
-        </radialGradient>
-    </defs>`
-
-var bubbleSvgDefDark =
+var bubbleSvgDef =
     `<defs>
         <radialGradient id="exampleGradient">            
             <stop offset="60%"   stop-color="rgba(255,255,255, .08)"/>            
@@ -66,8 +45,6 @@ var bubbleSvgDefDark =
             <stop offset="100%"  stop-color="rgba( 35, 35, 35, .08)"/>
         </radialGradient>
     </defs>` 
-
-var bubbleSvgDef = bubbleSvgDefDark
 
 export interface HypertreeArgs
 {
