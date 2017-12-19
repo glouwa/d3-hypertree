@@ -11,7 +11,41 @@ var check1Html = (id, c)=>  `<div class="cbx">
 var barHtml    = (id, c)=>  `<div class="bar-bg"></div>`
 var html       =            `<div class="layer-info"></div>`
 
-export function LayerInfo(parent, unitdisk, cls)
+export class LayerInfo
+{
+    constructor({ view, model })
+    {
+        LayerInfo_(view.parent, model, view.className)
+    }
+
+    update = {
+        all: ()=> { 
+            //this.update.existance(); 
+            this.update.state(); 
+            this.update.counts(); 
+        },
+        existance: ()=> this.updateExistance(),
+        state: ()=> this.updateState(),
+        counts: ()=> this.updateCounts()        
+    }
+
+    private updateExistance()
+    {
+        
+    }
+
+    private updateState()
+    {
+
+    }
+
+    private updateCounts()
+    {
+        
+    }
+}
+
+export function LayerInfo_(parent, unitdisk, cls)
 {
     var ui = HTML.parse<HTMLElement & { updateInfo }>(html)()
     ui.classList.add(cls)

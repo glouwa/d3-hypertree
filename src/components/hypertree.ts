@@ -129,14 +129,16 @@ export class Hypertree
             nodeRadius:     this.args.ui.nodeRadius            
         })        
 
-        this.layerInfo = LayerInfo(this.args.parent, this.unitdisk, 'data')
+        this.layerInfo = new LayerInfo({
+            view: { parent:this.args.parent, className: 'data' },
+            model: this.unitdisk
+        })
         if (this.unitdisk.navParameter)
-            this.layerInfo = LayerInfo(
-                this.args.parent, 
-                this.unitdisk.navParameter, 
-                'nav'
-            ) // soltle nachher sein, erst dann ist klar ob 2 oder 4
-        
+            this.layerInfo = new LayerInfo({
+                view: { parent:this.args.parent, className: 'nav' },
+                model: this.unitdisk.navParameter
+            }) 
+            
         this.updateData()
         this.updateLang()
     }
