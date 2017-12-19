@@ -65,7 +65,7 @@ $nodeStroke:    #90caf9;
         .selected.node  { stroke: darken($selectedcolor, 5%);                                                     }
 
         .background-circle {
-            fill-opacity: .01;
+            fill-opacity: .1;
             //stroke: darken($nodeStroke, 4%); //#f8fcfe;
             //stroke-width: .0001;
         }

@@ -1,11 +1,13 @@
 @import "layerstack-meta";
 
+$headercolor: #252526;
+
 .layer-info {
     color: #777;
 
     .switch {
         border-color: #555;
-        background-color: #222;        
+        background-color: $headercolor;        
     }
 
     .bar-bg {

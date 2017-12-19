@@ -38,8 +38,28 @@ var htmlpreloader = `
 
 var bubbleSvgDef =
     `<defs>
-        <radialGradient id="exampleGradient">
-            <stop offset="50%"   stop-color="white"/>
+        <radialGradient id="exampleGradient">            
+            <stop offset="50%"   stop-color="white"/>            
+            <stop offset="92%"   stop-color="#606060"/>
+            <stop offset="99.8%" stop-color="#242424"/>
+            <stop offset="100%"  stop-color="#232323"/>
+        </radialGradient>
+    </defs>`
+
+var bubbleSvgDefDark =
+    `<defs>
+        <radialGradient id="exampleGradient">            
+            <stop offset="50%"   stop-color="white"/>            
+            <stop offset="92%"   stop-color="#606060"/>
+            <stop offset="99.8%" stop-color="#242424"/>
+            <stop offset="100%"  stop-color="#232323"/>
+        </radialGradient>
+    </defs>`
+
+var bubbleSvgDefLight =
+    `<defs>
+        <radialGradient id="exampleGradient">            
+            <stop offset="50%"   stop-color="white"/>            
             <stop offset="92%"   stop-color="#606060"/>
             <stop offset="99.8%" stop-color="#242424"/>
             <stop offset="100%"  stop-color="#232323"/>

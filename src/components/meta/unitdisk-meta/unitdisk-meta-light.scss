@@ -14,10 +14,11 @@
         }
         
         input[type=range] + .thumb {
-            background-color: #eee;
+            background-color: darken($leafcolor, 0%); //#eee;
                         
             .value {
-                color: #000;  
+                color: #fff; 
+                font-weight: 500; 
             }
         }
     }

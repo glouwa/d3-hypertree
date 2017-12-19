@@ -15,7 +15,7 @@
 
     .slider {
         position: relative; 
-        z-index: 100;
+        z-index: 102;
         height: 1em;
     }
 
@@ -27,7 +27,7 @@
         input {            
             margin-top: .0em;            
             margin-bottom: 0px;        
-            border: none;        
+            border: none;
         }
 
         input[type=range]::-webkit-slider-thumb {
@@ -36,12 +36,12 @@
             width: 1.4em;
             border-radius: .7em;            
             cursor: pointer;
-            margin-top: -6px; /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */                        
+            margin-top: -6px; /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */                                    
         }
 
         input[type=range]::-webkit-slider-runnable-track {
             cursor: pointer;
-            background: none; // $sliderMainColor;            
+            background: none; // $sliderMainColor;
         }
         
         input[type=range] + .thumb {
