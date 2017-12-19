@@ -55,12 +55,12 @@ $nodeStroke:    #90caf9;
         .exit.node      { stroke: rgba(darken($exitcolor, 50%), .5);                                              }
  
         //.hovered        { stroke: $hovercolor;                       fill: lighten($hovercolor, 25%);             }
-        .hovered.arc    { stroke: $hovercolor;                                                                    }
+        .hovered.arc    { stroke: $hovercolor;  fill:none;                                                          }
         //.hovered.cell   { stroke: lighten($hovercolor, 27%);         fill: rgba(lighten($hovercolor, 0%), .15);   }
         .hovered.node   { stroke: darken($hovercolor, 10%);                                                       }
  
         //.selected       { stroke: $selectedcolor;                    fill: lighten($selectedcolor, 25%);          }
-        .selected.arc     { stroke: $selectedcolor;                    fill: lighten($selectedcolor, 25%);          }
+        .selected.arc     { stroke: $selectedcolor;     fill:none;      }
         .selected.cell  { stroke: rgba($selectedcolor, .2);          fill: rgba(lighten($selectedcolor, 0%), .1); }
         .selected.node  { stroke: darken($selectedcolor, 5%);                                                     }
 
