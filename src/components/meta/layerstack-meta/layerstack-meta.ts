@@ -81,6 +81,8 @@ export function LayerInfo(parent, unitdisk, cls)
     if (cls !== 'nav')
         addSwitch()
 
+    //add(unitdisk.layerStack.layers[l])
+
     for (var l in unitdisk.layerStack.layers)            
         add(unitdisk.layerStack.layers[l])
     

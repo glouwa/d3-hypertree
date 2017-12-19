@@ -37,10 +37,8 @@ $nodeStroke:    #90caf9;
             //stroke-linecap: butt;
             //stroke-linejoin: miter;
         }
-        .caption-background {
-            fill: rgba(#333, .1);              
-            fill: rgba(#111111, .5);              
-            fill: none;            
+        .caption-background {            
+            fill: rgba(#111111, .3);
         }
 
         //.cell.leaf      { stroke: rgba($leafcolor, .05);               fill: rgba(lighten($leafcolor, 0%), .00);    }
