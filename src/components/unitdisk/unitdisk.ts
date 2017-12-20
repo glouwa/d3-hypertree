@@ -120,7 +120,7 @@ export class UnitDiskNav implements IUnitDisk
         this.cache = this.view.cache
         this.layerStack = this.view.layerStack
 
-        var usedLayers = [1,0,0,0,0,0,1,0,0,0,0,1,0,0]
+        var usedLayers = [1,0,0,0,0,0,1,0,0,1,0,0,0,0]
         this.navBackground = new UnitDisk({
             parent:             args.parent,
             className:          'nav-background-disc',
@@ -160,8 +160,9 @@ export class UnitDiskNav implements IUnitDisk
             data:               obj2data(args.transformation.state),
             layers:             [
                                     (ud:UnitDisk)=> new CellLayer({
-                                        data:       ()=> ud.cache.cells,
-                                        clip:       '#circle-clip'+ud.args.clipRadius,                            
+                                        invisible:  true,
+                                        clip:       '#circle-clip'+ud.args.clipRadius,
+                                        data:       ()=> ud.cache.cells,                                        
                                     }), 
                                     (ud:UnitDisk)=> new NodeLayer({
                                         name:        'nodes',
