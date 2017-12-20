@@ -20,27 +20,21 @@
     //grid-template-rows: repeat(10, 1fr);
     grid-gap: .0em;
 
-    .switch {
-        height: 1.5em;
-        width: 1.5em;
-        border-radius: .75em;        
-        border-width: 1px;
-        border-style: solid;        
-        cursor: pointer;
-        z-index: 100;
-        margin-left: .08em;         
-    }
-
-    .label {
-        text-transform: capitalize;
-    }
-
     div   { 
         align-self: end; 
         margin-bottom: -.1em; 
         margin-left: 0em; 
     }
+
+    .label {
+        text-transform: capitalize;
+    }
     
+    .nodes {
+        text-align: end;    
+        margin-right: .5em;
+    }
+
     .q {
         justify-self: end; 
         margin-right: .35em; 
@@ -54,6 +48,17 @@
             height:.25em;
             position: absolute;
         }
+    }
+
+    .switch {
+        height: 1.5em;
+        width: 1.5em;
+        border-radius: .75em;        
+        border-width: 1px;
+        border-style: solid;        
+        cursor: pointer;
+        z-index: 100;
+        margin-left: .08em;         
     }
 }
  

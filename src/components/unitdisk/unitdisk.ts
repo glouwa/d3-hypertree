@@ -141,7 +141,7 @@ export class UnitDiskNav implements IUnitDisk
             new NegTransformation(
                 new PanTransformation(args.transformation.state))
         var rotate = d=>
-            (d.name === 'λ' ? ' rotate(-30)' : ' rotate(0)')
+            (d.name === 'λ' ? ' rotate(-25)' : ' rotate(0)')
         var deltaMap = {
             P:{ re:.0025, im:.05 }, 
             θ:{ re:.0025, im:.019 }, 
