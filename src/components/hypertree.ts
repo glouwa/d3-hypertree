@@ -39,7 +39,7 @@ var htmlpreloader = `
 var bubbleSvgDef =
     `<defs>
         <radialGradient id="exampleGradient">            
-            <stop offset="60%"   stop-color="rgba(255,255,255, .08)"/>            
+            <stop offset="58%"   stop-color="rgba(255,255,255, .08)"/>            
             <stop offset="92%"   stop-color="rgba( 96, 96, 96, .08)"/>
             <stop offset="99.8%" stop-color="rgba( 36, 36, 36, .08)"/>
             <stop offset="100%"  stop-color="rgba( 35, 35, 35, .08)"/>
@@ -134,7 +134,7 @@ export class Hypertree
             model: this.unitdisk
         })
         if (this.unitdisk.navParameter)
-            this.layerInfo = new LayerInfo({
+            this.layerInfo2 = new LayerInfo({
                 view: { parent:this.args.parent, className: 'nav' },
                 model: this.unitdisk.navParameter
             }) 
@@ -233,6 +233,10 @@ export class Hypertree
     }
 
     public updateTransformation() : void {
+
+        this.layerInfo2.update.all()
+        this.layerInfo.update.all()
+
         requestAnimationFrame(()=> this.unitdisk.updateTransformation())
     } 
 
@@ -260,6 +264,9 @@ export class Hypertree
                 this.args.layout(this.data, this.args.ui.transformation.state)
                 this.unitdisk.updateData()
 
+                this.layerInfo2.update.all()
+                this.layerInfo.update.all()
+        
                 if (this.data
                     .leaves()
                     .reduce((max, n)=> Math.max(max, CktoCp(n.z).r), 0) > .995)

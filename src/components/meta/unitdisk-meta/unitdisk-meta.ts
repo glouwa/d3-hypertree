@@ -103,8 +103,7 @@ export function InfoArea(args)
         Δ = [0, l, n, t]
         
         updateBar(renderingBar, Δ.map(e=> e*mag_svg), typeColors)
-        renderingLabel.innerHTML = `SVG`
-        renderingInfo.innerHTML  = Δ.join(' / ')
+        renderingLabel.innerHTML = `SVG`        
         renderingInfo.title      = `${n} nodes \n${l} links \n${t} labels`
         renderingQ.innerHTML     = `${a}`
         renderingQmax.innerHTML  = `<sub>#</sub>`
@@ -159,7 +158,7 @@ export function InfoArea(args)
 
         updateBar(dataBar, Δ.map(e=>e/mag_load), ['#ff9800', '#2196f3', 'green'])
         dataLabel.innerHTML = `Load`
-        dataInfo.innerHTML  = `${n} nodes`
+        dataInfo.innerHTML  = `${n} raw nodes`
         dataInfo.title   = `download: ${Δ[0].toFixed(0)}ms\n`
         dataInfo.title  += `parse: ${Δ[1].toFixed(0)}ms\n`
         dataInfo.title  += `hierarchy and weights: ${Δ[2].toFixed(0)}ms\n`

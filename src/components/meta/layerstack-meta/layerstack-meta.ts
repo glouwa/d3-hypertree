@@ -13,9 +13,15 @@ var html       =            `<div class="layer-info"></div>`
 
 export class LayerInfo
 {
+    view
+    model
+    ui : HTMLElement
+
     constructor({ view, model })
     {
-        LayerInfo_(view.parent, model, view.className)
+        this.view = view
+        this.model = model
+        this.ui = LayerInfo_(view.parent, model, view.className)
     }
 
     update = {
@@ -24,24 +30,26 @@ export class LayerInfo
             this.update.state(); 
             this.update.counts(); 
         },
-        existance: ()=> this.updateExistance(),
+        existance: ()=> this.updateExistence(),
         state: ()=> this.updateState(),
         counts: ()=> this.updateCounts()        
     }
 
-    private updateExistance()
+    private updateExistence()
     {
-        
+        console.log('update existence')   
     }
 
     private updateState()
     {
-
+        //console.log('update state')
+        this.ui.updateSwitch()
     }
 
     private updateCounts()
     {
-        
+        //console.log('update counts')   
+        this.ui.updateCounts()
     }
 }
 
@@ -51,23 +59,30 @@ export function LayerInfo_(parent, unitdisk, cls)
     ui.classList.add(cls)
     parent.appendChild(ui)
     
-    var rows = ['name', 'type', 'count', 'time', 'enabled']
-    var cols = 'layers'
+    var rows = []
+    var cols = ['name', 'type', 'count', 'time', 'enabled']
 
     var  pos = 0
-    function add(layer) {
+    function addCheckboxes(layer) {
 
         var name = layer.name        
-        var checked = !layer.args.invisible
-        var checked2 = !layer.args.hideOnDrag
+        
+        var checked = ()=> !layer.args.invisible
+        var checked2 = ()=> !layer.args.hideOnDrag
+        var count = ()=> (layer.args.data?layer.args.data().length:1)
+        var type = ()=> (layer.args.elementType?layer.args.elementType.length:'')
 
         const layerViews = {
-            label:       HTML.parse<HTMLElement>(labelHtml(pos, checked))(),
-            count:       HTML.parse<HTMLElement>(countHtml(pos, checked))(),
-            checkNormal: HTML.parse<HTMLElement>(check1Html(`pos-${cls}-${pos}-normal`, checked))(),
-            checkDrag:   HTML.parse<HTMLElement>(check1Html(`pos-${cls}-${pos}-drag`, checked2))(),
-            bar:         HTML.parse<HTMLElement>(barHtml(pos, checked))(),
+            label:       HTML.parse<HTMLElement>(labelHtml(pos, checked()))(),
+            count:       HTML.parse<HTMLElement>(countHtml(pos, checked()))(),
+            checkNormal: HTML.parse<HTMLElement>(check1Html(`pos-${cls}-${pos}-normal`, checked()))(),
+            checkDrag:   HTML.parse<HTMLElement>(check1Html(`pos-${cls}-${pos}-drag`, checked2()))(),
+            bar:         HTML.parse<HTMLElement>(barHtml(pos, checked()))(),
+            updateCounts: () => {                
+                layerViews.count.innerHTML = checked()?`${count()} ${type()}`:``
+            }
         }
+        rows.push(layerViews)
 
         ui.appendChild(layerViews.label)
         ui.appendChild(layerViews.count)
@@ -78,15 +93,15 @@ export function LayerInfo_(parent, unitdisk, cls)
         ui.children[pos].innerHTML = name
         layerViews.checkNormal.querySelector('input').onchange = function() {            
             function updateCheck(checkBox, layer:ILayer, layerViews) {        
+                // on change
                 layer.args.invisible = !layer.args.invisible
-
-                var checked = !layer.args.invisible
-                var type = 'circle'
-                var count = layer.args.data?layer.args.data.length:1
-
-                layerViews.count.innerHTML = checked?`${count} ${type}`:``
+                
+                layerViews.count.innerHTML = checked()?`${count()} ${type()}`:``
+                
                 unitdisk.layerStack.updateLayers()
             }
+
+            // on create?
             updateCheck(this, layer, layerViews)
         }
 
@@ -118,7 +133,14 @@ export function LayerInfo_(parent, unitdisk, cls)
     //add(unitdisk.layerStack.layers[l])
 
     for (var l in unitdisk.layerStack.layers)            
-        add(unitdisk.layerStack.layers[l])
-    
+        addCheckboxes(unitdisk.layerStack.layers[l])
+
+    ui.updateSwitch = function(){
+
+    }
+    ui.updateCounts = function(){
+        rows.forEach(e=> e.updateCounts())
+    }
+
     return ui
 }
