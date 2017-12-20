@@ -168,6 +168,9 @@ export class Hypertree
             this.args.ui.transformation.cache.N = this.data.descendants().length
             this.updateWeights()
             this.updateLang_()
+            this.updateImgHref_()
+            
+
             this.infoUi.updateLayout(this.args.ui.transformation.cache, performance.now()-t3)
 
             this.animateUp()
@@ -189,6 +192,11 @@ export class Hypertree
         }
     }
 
+    private updateImgHref_() {
+        for (var n of dfsFlat(this.data, n=>true)) 
+            n.imageHref = app.iconmap.fileName2IconUrl(n.data.name, n.data.type)                    
+    }
+
     public updatePath(pathId:string, n:N)
     {
         var old_ =  this.paths[pathId]
@@ -203,8 +211,12 @@ export class Hypertree
             for (var pn of new_.ancestors()) 
                 pn[pathId] = n
 
-        //this.ui.updateSelection()
+        //this.ui.updateSelection()        
         //requestAnimationFrame(()=> this.unitdisk.updateTransformation())
+
+        this.layerInfo2.update.all()
+        this.layerInfo.update.all()
+
         requestAnimationFrame(()=> this.unitdisk.updateSelection())
     }
 
@@ -254,7 +266,7 @@ export class Hypertree
                 this.animation = false
             }
             else {
-                var λ = .01 + p * .98
+                var λ = .03 + p * .98
                 var π = Math.PI
                 var animλ = CptoCk({ θ:2*π*λ, r:1 })
                 this.args.ui.transformation.state.λ.re = animλ.re
