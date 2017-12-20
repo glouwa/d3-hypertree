@@ -39,6 +39,8 @@ $nodeStroke:    #90caf9;
         }
         .caption-background {            
             fill: rgba(#111111, .4);
+            //stroke: rgba(#fff, 1);
+            //stroke-width: .0002;
         }
 
         //.cell.leaf      { stroke: rgba($leafcolor, .05);               fill: rgba(lighten($leafcolor, 0%), .00);    }
