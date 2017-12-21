@@ -11,25 +11,30 @@ var check1Html = (id, c)=>  `<div class="cbx">
 var barHtml    = (id)=>     `<div class="bar-bg"></div>`
 var html       =            `<div class="layer-info"></div>`
 
+interface LayerStackMetaUi extends HTMLElement 
+{
+    updateSwitch,
+    updateCounts,
+    addSwitch,
+    addCheckboxes
+}
+
 export class LayerInfo
 {
-    view
-    model
-    ui : HTMLElement
+    private view
+    private model
+    private ui : LayerStackMetaUi
 
-    constructor({ view, model })
-    {
+    constructor({ view, model }) {
         this.view = view
         this.model = model
         this.ui = LayerInfo_({
             parent: view.parent,            
             className: view.className,
-            onCheckChange: ()=> { this.model.layerStack.updateLayers()
+            onCheckChange: ()=> this.model.layerStack.updateLayers()
         })
 
-        this.ui.addSwitch()
-        for (var l in this.model.layerStack.layers)            
-            this.ui.addCheckboxes(this.model.layerStack.layers[l])    
+        this.updateExistence()
     }
 
     update = {
@@ -39,31 +44,20 @@ export class LayerInfo
             this.update.counts(); 
         },
         existance: ()=> this.updateExistence(),
-        state:     ()=> this.updateState(),
-        counts:    ()=> this.updateCounts()        
+        state:     ()=> this.ui.updateSwitch(this.model.args.transformation.dST),
+        counts:    ()=> this.ui.updateCounts()
     }
 
-    private updateExistence()
-    {
-        console.log('update existence')   
-    }
-
-    private updateState()
-    {
-        //console.log('update state')
-        this.ui.updateSwitch(this.model.args.transformation.dST)
-    }
-
-    private updateCounts()
-    {
-        //console.log('update counts')   
-        this.ui.updateCounts()
+    private updateExistence() {        
+        for (var l in this.model.layerStack.layers)            
+            this.ui.addCheckboxes(this.model.layerStack.layers[l])    
+        this.ui.addSwitch()
     }
 }
 
 export function LayerInfo_({ parent, onCheckChange, className })
 {
-    var ui = HTML.parse<HTMLElement & { updateInfo }>(html)()
+    var ui = HTML.parse<LayerStackMetaUi>(html)()
     ui.classList.add(className)
     parent.appendChild(ui)
     
@@ -110,7 +104,6 @@ export function LayerInfo_({ parent, onCheckChange, className })
             // on create?
             updateCheck(this, layer, layerViews)
         }
-
         pos += 5
     }
 
@@ -134,15 +127,11 @@ export function LayerInfo_({ parent, onCheckChange, className })
         ui.appendChild(stateViews.view)        
         ui.appendChild(stateViews.bar)
 
-        stateViews.label.innerHTML = "Σ" //∑
-        //stateViews.count.innerHTML = "323"
-
+        stateViews.label.innerHTML = "Σ"
         pos += 4
     }
        
-    ui.updateSwitch = function(onOff) {
-        //switchRow.view.style.visibility =  onOff ? 'hidden':'visible'
-        //switchRow.drag.style.visibility = !onOff ? 'hidden':'visible'
+    ui.updateSwitch = function(onOff) {        
         switchRow.view.style.marginLeft = onOff ? '1.95em' : '.08em'
     }
     ui.updateCounts = function() {

@@ -211,11 +211,11 @@ export class Hypertree
 
         //this.ui.updateSelection()        
         //requestAnimationFrame(()=> this.unitdisk.updateTransformation())
-
-        this.layerInfo2.update.all()
-        this.layerInfo.update.all()
-
-        requestAnimationFrame(()=> this.unitdisk.updateSelection())
+        requestAnimationFrame(()=> {
+            this.layerInfo2.update.all()
+            this.layerInfo.update.all()
+            this.unitdisk.updateSelection()
+        })
     }
 
     private updateWeights() : void {
@@ -243,11 +243,11 @@ export class Hypertree
     }
 
     public updateTransformation() : void {
-
-        this.layerInfo2.update.all()
-        this.layerInfo.update.all()
-
-        requestAnimationFrame(()=> this.unitdisk.updateTransformation())
+        requestAnimationFrame(()=> {
+            this.layerInfo2.update.all()
+            this.layerInfo.update.all()
+            this.unitdisk.updateTransformation() 
+        })
     } 
 
     private animateUp()
@@ -274,15 +274,16 @@ export class Hypertree
                 this.args.layout(this.data, this.args.ui.transformation.state)
                 this.unitdisk.updateData()
 
-                this.layerInfo2.update.all()
-                this.layerInfo.update.all()
-        
                 if (this.data
                     .leaves()
                     .reduce((max, n)=> Math.max(max, CktoCp(n.z).r), 0) > .995)
                     this.animation = false
                 else
-                    requestAnimationFrame(()=> frame())
+                    requestAnimationFrame(()=> {
+                        this.layerInfo2.update.all()
+                        this.layerInfo.update.all()
+                        frame()
+                    })
             }
         }
         requestAnimationFrame(()=> frame())
