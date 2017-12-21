@@ -1,14 +1,14 @@
 import { HTML } from 'ducd'
 import { ILayer } from '../../layerstack/layer'
 
-var labelHtml  = (id, c)=>  `<div class="label"></div> `
-var countHtml  = (id, c)=>  `<div class="nodes"></div> `
-var switchHtml = (id, c)=>  `<div class="switch"></div> `
+var labelHtml  = (id)=>     `<div class="label"></div> `
+var countHtml  = (id)=>     `<div class="nodes"></div> `
+var switchHtml = (id)=>     `<div class="switch"></div> `
 var check1Html = (id, c)=>  `<div class="cbx">           
                                 <input type="checkbox" id="${id}" class="filled-in" ${c?'checked':''}/>
                                 <label for="${id}"></label>
                              </div>`
-var barHtml    = (id, c)=>  `<div class="bar-bg"></div>`
+var barHtml    = (id)=>     `<div class="bar-bg"></div>`
 var html       =            `<div class="layer-info"></div>`
 
 export class LayerInfo
@@ -21,7 +21,15 @@ export class LayerInfo
     {
         this.view = view
         this.model = model
-        this.ui = LayerInfo_(view.parent, model, view.className)
+        this.ui = LayerInfo_({
+            parent: view.parent,            
+            className: view.className,
+            onCheckChange: ()=> { this.model.layerStack.updateLayers()
+        })
+
+        this.ui.addSwitch()
+        for (var l in this.model.layerStack.layers)            
+            this.ui.addCheckboxes(this.model.layerStack.layers[l])    
     }
 
     update = {
@@ -31,8 +39,8 @@ export class LayerInfo
             this.update.counts(); 
         },
         existance: ()=> this.updateExistence(),
-        state: ()=> this.updateState(),
-        counts: ()=> this.updateCounts()        
+        state:     ()=> this.updateState(),
+        counts:    ()=> this.updateCounts()        
     }
 
     private updateExistence()
@@ -43,7 +51,7 @@ export class LayerInfo
     private updateState()
     {
         //console.log('update state')
-        this.ui.updateSwitch()
+        this.ui.updateSwitch(this.model.args.transformation.dST)
     }
 
     private updateCounts()
@@ -53,33 +61,34 @@ export class LayerInfo
     }
 }
 
-export function LayerInfo_(parent, unitdisk, cls)
+export function LayerInfo_({ parent, onCheckChange, className })
 {
     var ui = HTML.parse<HTMLElement & { updateInfo }>(html)()
-    ui.classList.add(cls)
+    ui.classList.add(className)
     parent.appendChild(ui)
     
     var rows = []
     var cols = ['name', 'type', 'count', 'time', 'enabled']
 
     var  pos = 0
-    function addCheckboxes(layer) {
+    ui.addCheckboxes = function(layer) {
 
         var name = layer.name        
-        
         var checked = ()=> !layer.args.invisible
         var checked2 = ()=> !layer.args.hideOnDrag
         var count = ()=> (layer.args.data?layer.args.data().length:1)
         var type = ()=> (layer.args.elementType?layer.args.elementType.length:'')
 
         const layerViews = {
-            label:       HTML.parse<HTMLElement>(labelHtml(pos, checked()))(),
-            count:       HTML.parse<HTMLElement>(countHtml(pos, checked()))(),
-            checkNormal: HTML.parse<HTMLElement>(check1Html(`pos-${cls}-${pos}-normal`, checked()))(),
-            checkDrag:   HTML.parse<HTMLElement>(check1Html(`pos-${cls}-${pos}-drag`, checked2()))(),
-            bar:         HTML.parse<HTMLElement>(barHtml(pos, checked()))(),
-            updateCounts: () => {                
-                layerViews.count.innerHTML = checked()?`${count()} ${type()}`:``
+            label:       HTML.parse<HTMLElement>(labelHtml(pos))(),
+            count:       HTML.parse<HTMLElement>(countHtml(pos))(),
+            checkNormal: HTML.parse<HTMLElement>(check1Html(`pos-${className}-${pos}-normal`, checked()))(),
+            checkDrag:   HTML.parse<HTMLElement>(check1Html(`pos-${className}-${pos}-drag`, checked2()))(),
+            bar:         HTML.parse<HTMLElement>(barHtml(pos))(),
+            updateCounts: () => {     
+                var count_ = checked()?count():0
+                sum += count_
+                layerViews.count.innerHTML = checked()?`${count_} ${type()}`:``           
             }
         }
         rows.push(layerViews)
@@ -94,13 +103,10 @@ export function LayerInfo_(parent, unitdisk, cls)
         layerViews.checkNormal.querySelector('input').onchange = function() {            
             function updateCheck(checkBox, layer:ILayer, layerViews) {        
                 // on change
-                layer.args.invisible = !layer.args.invisible
-                
-                layerViews.count.innerHTML = checked()?`${count()} ${type()}`:``
-                
-                unitdisk.layerStack.updateLayers()
+                layer.args.invisible = !layer.args.invisible                
+                onCheckChange()   
+                ui.updateCounts()             
             }
-
             // on create?
             updateCheck(this, layer, layerViews)
         }
@@ -108,38 +114,41 @@ export function LayerInfo_(parent, unitdisk, cls)
         pos += 5
     }
 
-    function addSwitch()
+    var switchRow = null
+    var sum = 0
+    ui.addSwitch = function()
     {
         const stateViews = {
-            view: HTML.parse<HTMLElement>(switchHtml(pos, true))(),
-            drag: HTML.parse<HTMLElement>(switchHtml(pos, true))(),
-            bar:  HTML.parse<HTMLElement>(barHtml(pos, false))(),
+            label: HTML.parse<HTMLElement>(labelHtml(pos))(),
+            count: HTML.parse<HTMLElement>(countHtml(pos))(),
+            view: HTML.parse<HTMLElement>(switchHtml(pos))(),            
+            bar:  HTML.parse<HTMLElement>(barHtml(pos))(),
+            updateCounts: () => {                
+                stateViews.count.innerHTML = sum
+            }
         }
+        switchRow = stateViews
 
-        ui.appendChild(document.createElement('div'))
-        ui.appendChild(document.createElement('div'))
-        ui.appendChild(stateViews.view)
-        ui.appendChild(stateViews.drag)        
+        ui.appendChild(stateViews.label)
+        ui.appendChild(stateViews.count)
+        ui.appendChild(stateViews.view)        
         ui.appendChild(stateViews.bar)
 
-        stateViews.drag.style.visibility = 'hidden'
+        stateViews.label.innerHTML = "Σ" //∑
+        //stateViews.count.innerHTML = "323"
 
-        pos += 5
+        pos += 4
     }
-
-    if (cls !== 'nav')
-        addSwitch()
-
-    //add(unitdisk.layerStack.layers[l])
-
-    for (var l in unitdisk.layerStack.layers)            
-        addCheckboxes(unitdisk.layerStack.layers[l])
-
-    ui.updateSwitch = function(){
-
+       
+    ui.updateSwitch = function(onOff) {
+        //switchRow.view.style.visibility =  onOff ? 'hidden':'visible'
+        //switchRow.drag.style.visibility = !onOff ? 'hidden':'visible'
+        switchRow.view.style.marginLeft = onOff ? '1.95em' : '.08em'
     }
-    ui.updateCounts = function(){
+    ui.updateCounts = function() {
+        sum = 0
         rows.forEach(e=> e.updateCounts())
+        switchRow.updateCounts()
     }
 
     return ui

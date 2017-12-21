@@ -120,6 +120,10 @@ export class InteractionLayer implements ILayer
         
         if (dist < .006)
             this.onClick(n, e) // sollte on click sein und auch timer berücksichtigen oder?        
+
+        // immer?
+        this.args.unitdisk.args.transformation.onDragEnd(e)
+        this.args.unitdisk.args.hypertree.updateTransformation()
     }
 
     private animationTimer = null
@@ -136,10 +140,12 @@ export class InteractionLayer implements ILayer
         var md = CktoCp(m), initR = md.r, step = 0, steps = 20
         this.animationTimer = d3.timer(()=> {            
             md.r = initR * (1 - sigmoid(step++/steps))
-            if (step > steps) 
+            if (step > steps) {
                 this.cancelAnimationTimer()            
+                this.onDragEnd(n, m, CptoCk(md))
+            }
             else  
-                this.onDragByNode(null, m, CptoCk(md))
+                this.onDragByNode(n, m, CptoCk(md))
         },1)
     }
 

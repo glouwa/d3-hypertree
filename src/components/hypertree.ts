@@ -169,8 +169,6 @@ export class Hypertree
             this.updateWeights()
             this.updateLang_()
             this.updateImgHref_()
-            
-
             this.infoUi.updateLayout(this.args.ui.transformation.cache, performance.now()-t3)
 
             this.animateUp()

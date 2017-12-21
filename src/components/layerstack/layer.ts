@@ -101,8 +101,8 @@ export class D3UpdateLayer
                     svgRootHere.insert('rect', d=> this)
                         .attr("x",         x=> - paddingLeftRight/2)
                         .attr("y",         x=> - paddingTopBottom*2)
-                        .attr("rx",        x=> .01)
-                        .attr("ry",        x=> .01)
+                        .attr("rx",        x=> .01) //.009
+                        .attr("ry",        x=> .03)  //.009
                         .attr("width",     x=> w + paddingLeftRight)
                         .attr("height",    x=> h + paddingTopBottom)
                         .attr("transform", x=> view.attributes.transform.value)//d.transformStrCache + d.scaleStrText)
