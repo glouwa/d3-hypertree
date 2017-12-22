@@ -1,3 +1,4 @@
+import * as d3  from 'd3'
 import { HTML } from 'ducd'
 import { ILayer } from '../../layerstack/layer'
 
@@ -8,7 +9,7 @@ var check1Html = (id, c)=>  `<div class="cbx">
                                 <input type="checkbox" id="${id}" class="filled-in" ${c?'checked':''}/>
                                 <label for="${id}"></label>
                              </div>`
-var barHtml    = (id)=>     `<div class="bar-bg"></div>`
+var barHtml    = (id)=>     `<div class="bar-bg"><div class="bar"></div></div>`
 var html       =            `<div class="layer-info"></div>`
 
 interface LayerStackMetaUi extends HTMLElement 
@@ -63,10 +64,17 @@ export function LayerInfo_({ parent, onCheckChange, className })
     
     var rows = []
     var cols = ['name', 'type', 'count', 'time', 'enabled']
+ 
+    var colores = d3.schemeCategory10
+    var colores = ["#3366cc", "#dc3912", "#ff9900", "#109618", "#990099", "#0099c6", "#dd4477", "#66aa00", "#b82e2e", "#316395", "#994499", "#22aa99", "#aaaa11", "#6633cc", "#e67300", "#8b0707", "#651067", "#329262", "#5574a6", "#3b3eac"];
+    var maxElementCount = 300        
+    var maxElementCountGlobal = 1000        
 
     var  pos = 0
+    var cc = 0
     ui.addCheckboxes = function(layer) {
 
+        var ccidx = (colores.length-5+cc++)%colores.length
         var name = layer.name        
         var checked = ()=> !layer.args.invisible
         var checked2 = ()=> !layer.args.hideOnDrag
@@ -82,7 +90,10 @@ export function LayerInfo_({ parent, onCheckChange, className })
             updateCounts: () => {     
                 var count_ = checked()?count():0
                 sum += count_
-                layerViews.count.innerHTML = checked()?`${count_} ${type()}`:``           
+                layerViews.count.innerHTML = checked()?`${count_} ${type()}`:``  
+                
+                layerViews.bar.children[0].style.width = (count_/maxElementCount*100)+'%'
+                layerViews.bar.children[0].style.backgroundColor = colores[ccidx]
             }
         }
         rows.push(layerViews)
@@ -118,6 +129,9 @@ export function LayerInfo_({ parent, onCheckChange, className })
             bar:  HTML.parse<HTMLElement>(barHtml(pos))(),
             updateCounts: () => {                
                 stateViews.count.innerHTML = sum
+
+                stateViews.bar.children[0].style.width = (sum/maxElementCountGlobal*100)+'%'
+                stateViews.bar.children[0].style.backgroundColor = colores[0]
             }
         }
         switchRow = stateViews

@@ -18,7 +18,7 @@
     grid-template-rows: repeat(20, auto);
     grid-template-columns: auto auto 1.95em 1.7em;//repeat(4, auto);
     //grid-template-rows: repeat(10, 1fr);
-    grid-gap: .0em;
+    grid-gap: .075em;
 
     div   { 
         align-self: end; 
@@ -44,8 +44,10 @@
         height:.25em;        
         margin-bottom: .15em;
         grid-column: 1 / 5;        
+        position: relative;
         .bar {
-            height:.25em;
+            height:.25em; 
+            //right: 0;           
             position: absolute;
         }
     }

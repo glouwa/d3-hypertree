@@ -84,8 +84,8 @@ export function InfoArea(args)
         var c=0
         var l = vec.map((e, i, v)=> { c+=e; return c-e; })
         var data = t([vec, cvec, l])
-        var diff = d3.select(view).selectAll('div').data(data)
         var cursor = 0
+        var diff = d3.select(view).selectAll('div').data(data)        
         diff.enter().append('div')
             .attr('class', 'bar')
             .merge(diff)

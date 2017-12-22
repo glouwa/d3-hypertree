@@ -9,7 +9,7 @@
     font-size: .8em;
 
     display: grid; 
-    grid-gap: .0em;
+    grid-gap: .075em;
     grid-template-rows: repeat(10, auto);
     grid-template-columns: 5.4em auto auto auto .0em;;
 
@@ -58,8 +58,9 @@
         height:.25em;        
         margin-bottom: .15em;
         grid-column: 1 / 6; 
+        position: relative;
         .bar {
-            height:.25em;
+            height:.25em;            
             position: absolute;
         }
     } 
