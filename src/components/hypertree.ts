@@ -201,13 +201,19 @@ export class Hypertree
         this.paths[pathId] = n
         var new_ =  this.paths[pathId]
 
-        if (old_ && old_.ancestors) 
-            for (var pn of old_.ancestors())
-                pn[pathId] = undefined
+        if (old_)
+            if (old_.ancestors) 
+                for (var pn of old_.ancestors())
+                    pn[pathId] = undefined
+            else
+                old_[pathId] = undefined
 
-        if (new_ && new_.ancestors) 
-            for (var pn of new_.ancestors()) 
-                pn[pathId] = n
+        if (new_)
+            if (new_.ancestors) 
+                for (var pn of new_.ancestors()) 
+                    pn[pathId] = true // könnte alles sein oder?
+            else
+                new_[pathId] = true // könnte alles sein oder?
 
         //this.ui.updateSelection()        
         //requestAnimationFrame(()=> this.unitdisk.updateTransformation())
@@ -248,7 +254,7 @@ export class Hypertree
             this.layerInfo.update.all()
             this.unitdisk.updateTransformation() 
         })
-    } 
+    }
 
     private animateUp()
     {

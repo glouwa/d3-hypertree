@@ -38,8 +38,13 @@ export class NodeLayer implements ILayer
                                     .classed("leaf",      d=> d.parent)
                                     .classed("exit",      d=> (!d.children || !d.children.length)
                                                               && d.data && d.data.numLeafs),
-            updateColor:       s=> s.classed("hovered",   d=> d.isHovered && d.parent)
-                                    .classed("selected",  d=> d.isSelected && d.parent),
+            updateColor:       s=> s.classed("hovered",   d=> {
+
+             d.isHovered/* && d.parent removed wegen nav on hover*/
+            })
+                                    .classed("selected",  d=> d.isSelected/* && d.parent*/),
+            //updateColor:       s=> s.classed("hovered",   d=> d.isHovered && d.parent)
+            //                        .classed("selected",  d=> d.isSelected && d.parent),
             updateTransform:   s=> s.attr("transform",    d=> this.args.transform(d))
                                     .attr("r",            d=> this.args.r(d)),
         })

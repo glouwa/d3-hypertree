@@ -223,11 +223,12 @@ export class UnitDiskNav implements IUnitDisk
 
     public updateTransformation() {
         this.view.updateTransformation()
-        this.navParameter.updateTransformation()
+        this.navParameter.updateTransformation()        
     }
     public updateSelection() {
         this.view.updateTransformation()
-        this.navBackground.updateSelection()        
+        this.navBackground.updateSelection()
+        this.navParameter.updateSelection() // wegen node hover
     }        
 }
 

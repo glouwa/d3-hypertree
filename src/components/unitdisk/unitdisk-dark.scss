@@ -89,6 +89,9 @@ $nodeStroke:    #90caf9;
                 stroke: darken($nodeStroke, 25%);
                 stroke-width: .003;
             }
+            .hovered.node {
+                 stroke: red; 
+            }
             .cell {
                 stroke: #999;
                 fill: none;
