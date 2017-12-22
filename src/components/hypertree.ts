@@ -153,7 +153,7 @@ export class Hypertree
 
         this.args.dataloader((d3h, t1)=> {
             var t2 = performance.now()
-            var ncount = 0
+            var ncount = 1
             var model = <N & d3.HierarchyNode<N>>d3
                             .hierarchy(d3h)
                             .each((n:any)=> n.mergeId = ncount++)

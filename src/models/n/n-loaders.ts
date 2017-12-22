@@ -118,10 +118,12 @@ export function deepStar(ok, arms=4, depth=30) {
  */
 export function obj2data(o)
 {
+    var mergeId = 1
     var cur = null
-    var root = null
+    var root = null    
     for (var name in o) {
         var newN = o[name]
+        newN.mergeId = mergeId++
         newN.name = name
         //newN.parent = cur
         newN.children = []

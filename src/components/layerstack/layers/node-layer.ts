@@ -35,13 +35,10 @@ export class NodeLayer implements ILayer
             create:            s=> s.attr("r",            d=> this.args.r(d))
                                     .classed("root",      d=> !d.parent)
                                     .classed("lazy",      d=> d.hasOutChildren)
-                                    .classed("leaf",      d=> d.parent)
+                                    .classed("leaf",      d=> d.parent)                                        
                                     .classed("exit",      d=> (!d.children || !d.children.length)
                                                               && d.data && d.data.numLeafs),
-            updateColor:       s=> s.classed("hovered",   d=> {
-
-             d.isHovered/* && d.parent removed wegen nav on hover*/
-            })
+            updateColor:       s=> s.classed("hovered",   d=> d.isHovered/* && d.parent removed wegen nav on hover*/)
                                     .classed("selected",  d=> d.isSelected/* && d.parent*/),
             //updateColor:       s=> s.classed("hovered",   d=> d.isHovered && d.parent)
             //                        .classed("selected",  d=> d.isSelected && d.parent),
