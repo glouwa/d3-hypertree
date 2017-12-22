@@ -46,8 +46,8 @@ export class LayerInfo
             this.update.counts(); 
         },
         existance: ()=> this.updateExistence(),
-        state:     ()=> this.ui.updateSwitch(this.model.args.transformation.dST),
-        counts:    ()=> this.ui.updateCounts()
+        state:     ()=> this.ui.updateSwitch(this.model.args.hypertree.isAnimationRunning()),
+        counts:    ()=> this.ui.updateCounts(this.model.args.hypertree.isAnimationRunning())
     }
 
     private updateExistence() {        
@@ -77,10 +77,10 @@ export function LayerInfo_({ parent, onCheckChange, className })
 
         var ccidx = (colores.length-5+cc++)%colores.length
         var name = layer.name        
-        var checked = ()=> !layer.args.invisible
+        var checked =  ()=> !layer.args.invisible
         var checked2 = ()=> !layer.args.hideOnDrag
-        var count = ()=> (layer.args.data?layer.args.data().length:1)
-        var type = ()=> (layer.args.elementType?layer.args.elementType.length:'')
+        var count =    ()=> (layer.args.data?layer.args.data().length:1)
+        var type =     ()=> (layer.args.elementType?layer.args.elementType.length:'')
 
         const layerViews = {
             label:       HTML.parse<HTMLElement>(labelHtml(pos))(),
@@ -88,10 +88,17 @@ export function LayerInfo_({ parent, onCheckChange, className })
             checkNormal: HTML.parse<HTMLElement>(check1Html(`pos-${className}-${pos}-normal`, checked()))(),
             checkDrag:   HTML.parse<HTMLElement>(check1Html(`pos-${className}-${pos}-drag`, checked2()))(),
             bar:         HTML.parse<HTMLElement>(barHtml(pos))(),
-            updateCounts: () => {     
-                var count_ = checked()?count():0
-                sum += count_
-                layerViews.count.innerHTML = checked()?`${count_} ${type()}`:``  
+            updateCounts: (animationRunning) => {     
+                if (!animationRunning) {
+                    var count_ = checked()?count():0
+                    sum += count_
+                    layerViews.count.innerHTML = checked()?`${count_} ${type()}`:``  
+                }
+                else {
+                    var count_ = checked2()?count():0
+                    sum += count_
+                    layerViews.count.innerHTML = checked2()?`${count_} ${type()}`:``  
+                }                
                 
                 layerViews.bar.children[0].style.width = (count_/maxElementCount*100)+'%'
                 layerViews.bar.children[0].style.backgroundColor = colores[ccidx]
@@ -110,6 +117,16 @@ export function LayerInfo_({ parent, onCheckChange, className })
             function updateCheck(checkBox, layer:ILayer, layerViews) {        
                 // on change
                 layer.args.invisible = !layer.args.invisible                
+                onCheckChange()   
+                ui.updateCounts()             
+            }
+            // on create?
+            updateCheck(this, layer, layerViews)
+        }
+        layerViews.checkDrag.querySelector('input').onchange = function() {            
+            function updateCheck(checkBox, layer:ILayer, layerViews) {        
+                // on change
+                layer.args.hideOnDrag = !layer.args.hideOnDrag
                 onCheckChange()   
                 ui.updateCounts()             
             }
@@ -149,9 +166,9 @@ export function LayerInfo_({ parent, onCheckChange, className })
     ui.updateSwitch = function(onOff) {        
         switchRow.view.style.marginLeft = onOff ? '1.95em' : '.08em'
     }
-    ui.updateCounts = function() {
+    ui.updateCounts = function(onOff) {
         sum = 0
-        rows.forEach(e=> e.updateCounts())
+        rows.forEach(e=> e.updateCounts(onOff))
         switchRow.updateCounts()
     }
 
