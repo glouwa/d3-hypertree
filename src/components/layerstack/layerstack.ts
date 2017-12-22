@@ -69,8 +69,10 @@ export class LayerStack
         //if (this.layers.cells && this.layers.cells.layer)       this.layers.cells.updateData()
         if (this.layers['link-arcs'] && this.layers['link-arcs'].layer)  
             this.layers['link-arcs'].updateColor()
+
         if (this.layers['link-lines'] && this.layers['link-lines'].layer)       
             this.layers['link-lines'].updateColor()
+            
         if (this.layers.nodes && this.layers.nodes.layer)       
             this.layers.nodes.updateColor()
         /*

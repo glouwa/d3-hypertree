@@ -43,7 +43,7 @@ export class D3UpdateLayer
         this.rootSVG = args.parent.append('g')
             .attr("clip-path", this.args.clip ? `url(${this.args.clip})` : undefined)
 
-        this.data = this.args.data
+        this.data = this.mayEval(this.args.data)
         this.update =
             this.rootSVG
                 .selectAll(this.args.elementType)
@@ -55,6 +55,14 @@ export class D3UpdateLayer
             .call(this.args.create)
             .call(this.all)
     }
+    
+    private mayEval(d)
+    {
+        if (typeof d === 'function')
+            return d()
+        else
+            return d
+    }
 
     updateData() {
         var oldElements = this.update
@@ -63,10 +71,10 @@ export class D3UpdateLayer
         var isAnimating = this.args.layer.layerStack.args.unitdisk.args.hypertree.isAnimationRunning()
 
         if (!isAnimating && !this.args.layer.args.invisible)
-            this.data = this.args.data
+            this.data = this.mayEval(this.args.data)
 
         if (isAnimating && !this.args.layer.args.hideOnDrag)
-            this.data = this.args.data
+            this.data = this.mayEval(this.args.data)
 
         this.update =
             this.update
@@ -107,10 +115,10 @@ export class D3UpdateLayer
                     var paddingTopBottom = .02
 
                     svgRootHere.insert('rect', d=> this)
-                        .attr("x",         x=> - paddingLeftRight/2)
-                        .attr("y",         x=> - paddingTopBottom*2)
+                        .attr("x",         x=> -paddingLeftRight/2)
+                        .attr("y",         x=> -paddingTopBottom*2)
                         .attr("rx",        x=> .01) //.009
-                        .attr("ry",        x=> .03)  //.009
+                        .attr("ry",        x=> .03) //.009
                         .attr("width",     x=> w + paddingLeftRight)
                         .attr("height",    x=> h + paddingTopBottom)
                         .attr("transform", x=> view.attributes.transform.value)//d.transformStrCache + d.scaleStrText)

@@ -79,7 +79,7 @@ export function LayerInfo_({ parent, onCheckChange, className })
         var name = layer.name        
         var checked =  ()=> !layer.args.invisible
         var checked2 = ()=> !layer.args.hideOnDrag
-        var count =    ()=> (layer.args.data?layer.args.data().length:1)
+        var count =    ()=> (layer.layer && layer.layer.data ? layer.layer.data.length : 1)
         var type =     ()=> (layer.args.elementType?layer.args.elementType.length:'')
 
         const layerViews = {
@@ -89,16 +89,10 @@ export function LayerInfo_({ parent, onCheckChange, className })
             checkDrag:   HTML.parse<HTMLElement>(check1Html(`pos-${className}-${pos}-drag`, checked2()))(),
             bar:         HTML.parse<HTMLElement>(barHtml(pos))(),
             updateCounts: (animationRunning) => {     
-                if (!animationRunning) {
-                    var count_ = checked()?count():0
-                    sum += count_
-                    layerViews.count.innerHTML = checked()?`${count_} ${type()}`:``  
-                }
-                else {
-                    var count_ = checked2()?count():0
-                    sum += count_
-                    layerViews.count.innerHTML = checked2()?`${count_} ${type()}`:``  
-                }                
+                var checker = animationRunning ? checked2() : checked()                
+                var count_ = checker ? count() : 0
+                sum += count_
+                layerViews.count.innerHTML = checker?`${count_} ${type()}`:``                                  
                 
                 layerViews.bar.children[0].style.width = (count_/maxElementCount*100)+'%'
                 layerViews.bar.children[0].style.backgroundColor = colores[ccidx]

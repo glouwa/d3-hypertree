@@ -69,7 +69,9 @@ export function InfoArea(args)
     var dataBar        = <HTMLElement>ui.children[29]
 
     var colors = ["#3366cc", "#dc3912", "#ff9900", "#109618", "#990099", "#0099c6", "#dd4477", "#66aa00", "#b82e2e", "#316395", "#994499", "#22aa99", "#aaaa11", "#6633cc", "#e67300", "#8b0707", "#651067", "#329262", "#5574a6", "#3b3eac"];
-    var typeColors     = colors.slice(5).concat(colors.slice(0, 5)) //['#a5d6a7', '#b77d68', '#a5d6a7', '#666', '#a5d6a7', '#b77d68', '#a5d6a7', '#666']
+    var shift = 5    
+    var typeColors     = colors.slice(shift).concat(colors.slice(0, shift)) 
+    //['#a5d6a7', '#b77d68', '#a5d6a7', '#666', '#a5d6a7', '#b77d68', '#a5d6a7', '#666']
     var mag_svg        = .1
     var mag_load       = 10
     var mag            = 2
@@ -96,18 +98,32 @@ export function InfoArea(args)
         diff.exit().remove()
     }
 
-    ui.updateSvgInfo = (cache, Δ)=> {        
-        var n = cache.leafOrLazy.length
-        var l = cache.unculledNodes.length        
-        var t = cache.labels.length
-        var a = n+l+t // n * 2 if cells
-        Δ = [0, l, n, t]
+    ui.updateSvgInfo = (cache, Δ, layerStack)=> {        
+        Δ = []
+        if (layerStack)
+            for (var l in layerStack.layers) {            
+                var layer = layerStack.layers[l].layer                
+                var elemCount = layer ? layer.data.length : 1
+                Δ.push(elemCount)
+            }
+        var a = Δ.reduce((a,e)=> a+e, 0).toFixed(0)
         
         updateBar(renderingBar, Δ.map(e=> e*mag_svg), typeColors)
-        renderingLabel.innerHTML = `SVG`        
-        renderingInfo.title      = `${n} nodes \n${l} links \n${t} labels`
+        renderingLabel.innerHTML = `SVG`                
         renderingQ.innerHTML     = `${a}`
         renderingQmax.innerHTML  = `<sub>#</sub>`
+    }
+ 
+    ui.updateD3Info = (max, Δ, cache, layerlist)=> {
+        var t = Δ.reduce((a,e)=> a+e).toFixed(0)
+
+        D3Label.innerHTML = `D<sub>3</sub>`
+        D3Info.innerHTML  = `${cache.unculledNodes.length} unc. nodes`
+        D3Info.title      = Δ.map((e, i)=> `${layerlist[i]}: ${e.toFixed(1)}ms`).join('\n')
+        D3Q.innerHTML     = `${t}`
+        D3Qmax.innerHTML  = `<sub>ms</sub>`
+
+        updateBar(D3Bar, Δ.map(e=> e*mag), typeColors)
     }
 
     ui.updateTransformationInfo = (cache, minWeigth, Δ)=> {
@@ -124,18 +140,6 @@ export function InfoArea(args)
         transformInfo.title     += `${Δms[0]} culling\n${Δms[1]} lazysearch\n${Δms[2]} voronoi\n${Δms[3]} labels`
         transformQ.innerHTML     = `${t}`
         transformQmax.innerHTML  = `<sub>ms</sub>`
-    }
-    
-    ui.updateD3Info = (max, Δ, cache, layerlist)=> {
-        var t = Δ.reduce((a,e)=> a+e).toFixed(0)
-
-        D3Label.innerHTML = `D<sub>3</sub>`
-        D3Info.innerHTML  = `${cache.unculledNodes.length} unc. nodes`
-        D3Info.title      = Δ.map((e, i)=> `${layerlist[i]}: ${e.toFixed(1)}ms`).join('\n')
-        D3Q.innerHTML     = `${t}`
-        D3Qmax.innerHTML  = `<sub>ms</sub>`
-
-        updateBar(D3Bar, Δ.map(e=> e*mag), typeColors)
     }
 
     ui.updateLayout = (cache, Δ)=> {
