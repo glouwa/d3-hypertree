@@ -59,7 +59,11 @@ export class D3UpdateLayer
     updateData() {
         var oldElements = this.update
 
-        this.data = this.args.data
+        this.data = []
+        if (this.args.layersArgs && !this.args.layersArgs.invisible)
+            this.data = this.args.data
+        //if (!this.args.invisible)
+
         this.update =
             this.update
                 .data(this.data, d=> d.mergeId)

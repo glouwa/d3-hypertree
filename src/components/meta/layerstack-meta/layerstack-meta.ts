@@ -32,7 +32,8 @@ export class LayerInfo
         this.ui = LayerInfo_({
             parent: view.parent,            
             className: view.className,
-            onCheckChange: ()=> this.model.layerStack.updateLayers()
+            //onCheckChange: ()=> this.model.layerStack.updateLayers()
+            onCheckChange: ()=> this.model.layerStack.updateTransformation()
         })
 
         this.updateExistence()

@@ -27,7 +27,8 @@ export class ImageLayer implements ILayer
 
     public attach(parent) {
         this.layer = new D3UpdateLayer({
-            parent:            parent,            
+            parent:            parent,  
+            layersArgs:        this.args,          
             data:              this.args.data,
             name:              this.args.name,
             className:         'node',

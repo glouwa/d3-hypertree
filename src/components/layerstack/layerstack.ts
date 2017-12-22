@@ -27,13 +27,13 @@ export class LayerStack
         this.updateLayers()
     }
 
-    public updateLayers() : void
+    private updateLayers() : void
     {        
         this.layersSvg.selectAll('*').remove();
 
         for (var l in this.layers) {
             var layer = this.layers[l]
-            if (!layer.args.invisible)
+            //if (!layer.args.invisible)
                 layer.attach(this.layersSvg)            
         }
     }
@@ -47,7 +47,7 @@ export class LayerStack
             var beginTime = performance.now()
 
             var layer = this.layers[l]
-            if (!layer.args.invisible) 
+            //if (!layer.args.invisible) 
                 layer.updateData()
 
             timings.push(performance.now() - beginTime)
