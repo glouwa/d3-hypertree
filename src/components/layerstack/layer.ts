@@ -60,9 +60,13 @@ export class D3UpdateLayer
         var oldElements = this.update
 
         this.data = []
-        if (this.args.layersArgs && !this.args.layersArgs.invisible)
+        var isAnimating = this.args.layer.layerStack.args.unitdisk.args.hypertree.isAnimationRunning()
+
+        if (!isAnimating && !this.args.layer.args.invisible)
             this.data = this.args.data
-        //if (!this.args.invisible)
+
+        if (isAnimating && !this.args.layer.args.hideOnDrag)
+            this.data = this.args.data
 
         this.update =
             this.update
@@ -89,11 +93,11 @@ export class D3UpdateLayer
         var svgRootHere = this.rootSVG
         var T = this
         
-        if (T.args.layersArgs.ud) 
+        if (T.args.layer.args.ud) 
         {
             this.rootSVG.selectAll("text").each(function(d:N, i, v:SVGTextElement[])
             {              
-                if (   d === T.args.layersArgs.ud.cache.centerNode 
+                if (   d === T.args.layer.args.ud.cache.centerNode 
                     /*|| d.cachep.r < 0.6*/)
                 {
                     var view:any = v[i]

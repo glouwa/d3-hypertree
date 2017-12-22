@@ -21,7 +21,8 @@ export class LayerStack
         this.layers = {}
         this.layersSvg = this.args.parent.append('g')        
         for (var layerfactoryfunc of this.args.unitdisk.args.layers) {            
-            var layer = layerfactoryfunc(this.args.unitdisk)                        
+            var layer = layerfactoryfunc(this.args.unitdisk)
+            layer.layerStack = this
             this.layers[layer.name] = layer
         }
         this.updateLayers()

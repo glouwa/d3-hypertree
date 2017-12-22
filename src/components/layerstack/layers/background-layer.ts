@@ -20,8 +20,8 @@ export class BackgroundLayer implements ILayer
 
     public attach(parent) {
         this.layer = new D3UpdateLayer({
-            parent:            parent,
-            layersArgs:        this.args,
+            parent:            parent,            
+            layer:             this,
             data:              [1],
             name:              this.name,
             className:         'background-circle',

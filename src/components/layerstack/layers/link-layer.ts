@@ -32,7 +32,7 @@ export class ArcLayer implements ILayer
     public attach(parent) {
         this.layer = new D3UpdateLayer({
             parent:            parent,
-            layersArgs:        this.args,
+            layer:             this,
             clip:              this.args.clip,
             data:              this.args.data,
             name:              this.name,
