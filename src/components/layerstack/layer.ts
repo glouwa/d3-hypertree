@@ -42,6 +42,7 @@ export class D3UpdateLayer
         this.args = args
         this.rootSVG = args.parent.append('g')
             .attr("clip-path", this.args.clip ? `url(${this.args.clip})` : undefined)
+            .attr("transform", "translateZ(0)")
 
         this.data = this.mayEval(this.args.data)
         this.update =
