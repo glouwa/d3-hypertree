@@ -7,10 +7,10 @@ export interface BackgroundLayerArgs
 
 export class BackgroundLayer implements ILayer
 {    
-    args: BackgroundLayerArgs
-    d3updatePattern: D3UpdatePattern
+    args:             BackgroundLayerArgs
+    d3updatePattern:  D3UpdatePattern
     name =            'background'  
-    updateData =      ()=> this.d3updatePattern.updateData()
+    updateData =      ()=> this.d3updatePattern.update.data()
     updateTransform = ()=> this.d3updatePattern.updateTransform()
     updateColor =     ()=> this.d3updatePattern.updateColor()
 

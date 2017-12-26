@@ -19,19 +19,33 @@ export interface D3UpdatePatternArgs
 export class D3UpdatePattern
 {
     args    : D3UpdatePatternArgs
-    rootSVG : d3.Selection<SVGElement, N, SVGElement, undefined>
-    update  : any
     data    : any
+    private rootSVG : d3.Selection<SVGElement, N, SVGElement, undefined>
+    private elements  : any    
+    private mayEval = d=> typeof d === 'function' ? d() : d
 
-    all             = ()=> this.update.call(this.args.updateTransform)
+    /*all             = ()=> this.elements.call(this.args.updateTransform)
                                       .call(this.args.updateColor)
-    updateAll       = ()=> this.update.call(this.all)
-    updateTransform = ()=> this.update.call(this.args.updateTransform)
-    updateColor     = ()=> this.update.call(this.args.updateColor)
+    updateAll       = ()=> this.elements.call(this.all)*/
+    updateTransform = ()=> this.elements.call(this.args.updateTransform)
+    updateColor     = ()=> this.elements.call(this.args.updateColor)
+
+    
+    update = {
+        parent:         ()=> {},
+        content:        ()=> this.update.data(),
+        data:           ()=> this.updateData(),
+        transformation: ()=> this.elements.call(this.args.updateTransform),
+        style:          ()=> this.elements.call(this.args.updateColor)
+    }
 
     constructor(args : D3UpdatePatternArgs) {
         this.args = args
-        this.rootSVG = args.parent.append('g')
+        this.updateParent()
+    }
+
+    private updateParent() {
+        this.rootSVG = this.args.parent.append('g')
             .attr('clip-path', (this.args.clip ? `url(${this.args.clip})` : undefined))
             .style('transform', 'translateZ(0)')  
             // rotateZ(360deg)
@@ -41,28 +55,21 @@ export class D3UpdatePattern
             // -webkit-font-smoothing: antialiased;
 
         this.data = this.mayEval(this.args.data)
-        this.update =
+        this.elements =
             this.rootSVG
                 .selectAll(this.args.elementType)
                     .data(this.data, (d:any)=> d.mergeId)
-                        .enter().append(args.elementType)
+                        .enter().append(this.args.elementType)
 
-        this.update
+        this.elements
             .attr("class", this.args.className)
-            .call(this.args.create)
-            .call(this.all)
+            .call(this.args.create)            
+            .call(this.args.updateTransform)
+            .call(this.args.updateColor)
     }
     
-    private mayEval(d)
-    {
-        if (typeof d === 'function')
-            return d()
-        else
-            return d
-    }
-
-    updateData() {
-        var oldElements = this.update
+    private updateData() {
+        var oldElements = this.elements
 
         this.data = []
         var isAnimating = this.args.layer.layerStack.args.unitdisk.args.hypertree.isAnimationRunning()
@@ -73,18 +80,21 @@ export class D3UpdatePattern
         if (isAnimating && !this.args.layer.args.hideOnDrag)
             this.data = this.mayEval(this.args.data)
 
-        this.update =
-            this.update
+        this.elements =
+            this.elements
                 .data(this.data, d=> d.mergeId)
 
-        this.update.exit().remove()
-        var n = this.update
+        this.elements.exit().remove()
+        var n = this.elements
             .enter().append(this.args.elementType)
                 .attr("class", this.args.className)
                 .call(this.args.create)
 
-        this.update = this.update.merge(n)
-        this.update.call(this.all)
+        this.elements = this.elements.merge(n)
+        this.elements
+            //.call(this.all)
+            .call(this.args.updateTransform)
+            .call(this.args.updateColor)
         
 // extrashit
         if (this.args.name === 'labels')

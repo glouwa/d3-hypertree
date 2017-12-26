@@ -1,4 +1,4 @@
-import { ILayer }        from '../layer'
+import { ILayer }          from '../layer'
 import { D3UpdatePattern } from '../d3updatePattern'
 
 export interface CellLayerArgs
@@ -13,9 +13,9 @@ export class CellLayer implements ILayer
     args: CellLayerArgs
     d3updatePattern: D3UpdatePattern
     name =            'cells'
-    updateData =      ()=> this.d3updatePattern.updateData()
-    updateTransform = ()=> this.d3updatePattern.updateTransform()
-    updateColor =     ()=> this.d3updatePattern.updateColor()
+    updateData =      ()=> this.d3updatePattern.update.data()
+    updateTransform = ()=> this.d3updatePattern.update.transformation() 
+    updateColor =     ()=> this.d3updatePattern.update.style()
 
     constructor(args: CellLayerArgs) {
         this.args = args
