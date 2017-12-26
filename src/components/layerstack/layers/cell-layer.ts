@@ -2,9 +2,10 @@ import { ILayer }        from '../layer'
 import { D3UpdatePattern } from '../d3updatePattern'
 
 export interface CellLayerArgs
-{
-    data:  ()=> any,
-    clip?: string,
+{    
+    invisible: boolean,
+    clip?:     string,
+    data:      ()=> any,
 }
 
 export class CellLayer implements ILayer

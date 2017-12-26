@@ -23,7 +23,7 @@ var htmlinfo = `<div class="render-info">
     <div class="bar-bg"></div>
 </div>`
 
-export function InfoArea(args)
+export function UnitdiskMeta(args, className)
 {
     var ui = HTML.parse<HTMLElement & { updateModel, updateLayout, updateCachInfo }>(htmlinfo)()
     args.parent.appendChild(ui)

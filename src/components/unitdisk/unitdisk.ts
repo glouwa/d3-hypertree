@@ -27,6 +27,7 @@ export interface IUnitDisk
 
     updateData:           ()=> void
     updateTransformation: ()=> void 
+    updateSelection:      ()=> void 
 }
 
 export interface UnitDiskArgs
@@ -200,7 +201,7 @@ export class UnitDiskNav implements IUnitDisk
                                         n.transformStrCache = ` translate(${n.strCache})`
                                     }
                                     cache.voronoiDiagram = ud.voronoiLayout(cache.unculledNodes)
-                                    cache.cells = cache.voronoiDiagram.polygons()            
+                                    cache.cells = <any>cache.voronoiDiagram.polygons()            
                                     //try { cache.voronoiDiagram = ud.voronoiLayout(cache.unculledNodes) } catch(e) {}
                                 },
             transformation:     navTransformation,

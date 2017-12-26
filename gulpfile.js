@@ -9,6 +9,8 @@ var merge       = require('merge2')
 var del         = require('del')
 var webpack     = require('webpack-stream')
 
+var debug = false // conditional pipe element? how?
+
 var paths = {
     src: './src/',
     dist: './dist/'
@@ -22,7 +24,7 @@ var files = {
 
 var scss = (t)=> gulp.src(paths.src + `**/*${t}.scss`)
     .pipe(plumber())
-    .pipe(debug())
+    //.pipe(debug())
     .pipe(sass())
     .pipe(concat(files[t+'css']))
     .pipe(gulp.dest(paths.dist))

@@ -18,7 +18,7 @@ import { UnitDiskArgs }        from './unitdisk/unitdisk'
 import { UnitDisk }            from './unitdisk/unitdisk'
 import { IUnitDisk }           from './unitdisk/unitdisk'
 
-import { InfoArea }            from './meta/unitdisk-meta/unitdisk-meta'
+import { UnitdiskMeta }            from './meta/unitdisk-meta/unitdisk-meta'
 import { LayerStackMeta }           from './meta/layerstack-meta/layerstack-meta'
 
 var htmlpreloader = `
@@ -48,8 +48,9 @@ var bubbleSvgDef =
 
 export interface HypertreeArgs
 {
-    parent:         any
+    parent:         any,
 
+    iconmap:        any,
     dataloader:     LoaderFunction,
     langloader:     (lang)=> (ok)=> void,
 
@@ -96,8 +97,9 @@ export class Hypertree
 {
     args           : HypertreeArgs
     unitdisk       : IUnitDisk
-    infoUi         : HTMLElement & { msg, updateModel, updateLayout }
-    layerStackMeta : HTMLElement & { updateModel }
+    unitdiskMeta   : HTMLElement & { msg, updateModel, updateLayout }
+    layerStackMeta : LayerStackMeta
+    layerStackMeta2 : LayerStackMeta
     data           : N
     langMap        : {}
     view           : HTMLElement
@@ -109,7 +111,7 @@ export class Hypertree
 
     constructor(args : HypertreeArgs) {
         this.args = args
-        this.infoUi = InfoArea(args, 'data')
+        this.unitdiskMeta = UnitdiskMeta(args, 'data')
         
         this.view = HTML.parse<HTMLElement>(hypertreehtml)()
         args.parent.appendChild(this.view)
@@ -160,7 +162,7 @@ export class Hypertree
                             //.sum(this.args.weight) // this.updateWeights()
 
             this.view.querySelector('.preloader').innerHTML = ''
-            this.infoUi.updateModel(model, [t1-t0, t2-t1, performance.now()-t2])
+            this.unitdiskMeta.updateModel(model, [t1-t0, t2-t1, performance.now()-t2])
 
             var t3 = performance.now()
             this.data = this.args.layout(model, this.args.ui.transformation.state)
@@ -169,7 +171,7 @@ export class Hypertree
             this.updateWeights()
             this.updateLang_()
             this.updateImgHref_()
-            this.infoUi.updateLayout(this.args.ui.transformation.cache, performance.now()-t3)
+            this.unitdiskMeta.updateLayout(this.args.ui.transformation.cache, performance.now()-t3)
 
             this.animateUp()
         })
@@ -192,7 +194,7 @@ export class Hypertree
 
     private updateImgHref_() {
         for (var n of dfsFlat(this.data, n=>true)) 
-            n.imageHref = app.iconmap.fileName2IconUrl(n.data.name, n.data.type)                    
+            n.imageHref = this.args.iconmap.fileName2IconUrl(n.data.name, n.data.type)                    
     }
 
     public updatePath(pathId:string, n:N)
@@ -238,7 +240,7 @@ export class Hypertree
         var t0 = performance.now()
 
         this.args.layout(this.data, this.args.ui.transformation.state)        
-        this.infoUi.updateLayout(this.args.ui.transformation.cache, performance.now() - t0)
+        this.unitdiskMeta.updateLayout(this.args.ui.transformation.cache, performance.now() - t0)
         
         if (this.args.ui.transformation.cache.centerNode) {
             this.args.ui.transformation.state.P.re = -this.args.ui.transformation.cache.centerNode.z.re
