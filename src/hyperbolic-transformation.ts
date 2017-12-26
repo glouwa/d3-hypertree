@@ -11,6 +11,7 @@ import { N } from './models/n/n'
 export interface Transformation<OT>
 {    
     state:          T, // state: T,
+    isMoving:       ()=> boolean,
     cache: TransformationCache,
 
     transformPoint: (n:C)=> C,
@@ -38,6 +39,7 @@ export class HyperbolicTransformation implements Transformation<N>
 
     onDragStart =    (m:C)=> this.dST = clone(this.state)
     onDragEnd =      (m:C)=> this.dST = undefined
+    isMoving=        ()=>    this.dST !== undefined
     onDragP =        (s:C, e:C)=> CassignC(this.state.P, compose(this.dST, shift(this.dST, s, maxR(e, this.maxMouseR))).P)
     onDragθ:         (s:C, e:C)=> {}
     onDragλ =        (s:C, e:C)=> CassignC(this.state.λ, setR(e, 1))    
@@ -62,6 +64,7 @@ export class PanTransformation implements Transformation<N>
 
     onDragStart =    (m:C)=> this.dST = clone(this.state)
     onDragEnd =      (m:C)=> this.dST = undefined
+    isMoving=        ()=>    this.dST !== undefined
     onDragP =        (s:C, e:C)=> CassignC(this.state.P, maxR(CaddC(this.dST.P, CsubC(e, s)), .999))
     onDragθ =        (s:C, e:C)=> CassignC(this.state.θ, setR(e, 1))
     onDragλ =        (s:C, e:C)=> CassignC(this.state.λ, setR(e, 1))    
@@ -85,10 +88,11 @@ export class NegTransformation implements Transformation<N>
 
     onDragStart =    (m:C)=>      this.decorated.onDragStart(CmulR(m,-1))
     onDragEnd =      (m:C)=>      this.decorated.onDragEnd(CmulR(m,-1))
+    isMoving=        ()=>         this.decorated.isMoving()
     onDragP =        (s:C, e:C)=> this.decorated.onDragP(CmulR(s,-1), CmulR(e,-1))
     onDragθ =        (s:C, e:C)=> this.decorated.onDragθ(CmulR(s,-1), CmulR(e,-1))
     onDragλ =        (s:C, e:C)=> this.decorated.onDragλ(CmulR(s,-1), CmulR(e,-1))
-}
+} 
 
 export class TransformationCache
 {

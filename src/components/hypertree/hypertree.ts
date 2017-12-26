@@ -298,9 +298,9 @@ export class Hypertree
     }
 
     public isAnimationRunning() {
-        var view = this.unitdisk.args.transformation.dST
+        var view = this.unitdisk.args.transformation.isMoving()
         var nav = this.unitdisk.navParameter 
-               && this.unitdisk.navParameter.args.transformation.decorated.dST
+               && this.unitdisk.navParameter.args.transformation.isMoving()
         return view || nav
     }
 }

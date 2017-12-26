@@ -1,4 +1,4 @@
-export { Hypertree } from "./components/hypertree"
+export { Hypertree } from "./components/hypertree/hypertree"
 
 export * from './hyperbolic-math'
 export * from './hyperbolic-transformation'
