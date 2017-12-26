@@ -1,4 +1,4 @@
-import { ILayer }        from '../layer'
+import { ILayer }          from '../layer'
 import { D3UpdatePattern } from '../d3updatePattern'
 
 export interface FocusLayerArgs
@@ -8,8 +8,8 @@ export interface FocusLayerArgs
 
 export class FocusLayer implements ILayer
 {    
-    args: FocusLayerArgs
-    d3updatePattern: D3UpdatePattern
+    args:             FocusLayerArgs
+    d3updatePattern:  D3UpdatePattern
     name =            'focus'
    
     update = {

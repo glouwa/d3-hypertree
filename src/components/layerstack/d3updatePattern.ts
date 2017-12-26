@@ -19,19 +19,8 @@ export interface D3UpdatePatternArgs
 
 export class D3UpdatePattern
 {
-    args    : D3UpdatePatternArgs
-    data    : any
-    private rootSVG : d3.Selection<SVGElement, N, SVGElement, undefined>
-    private elements  : any    
-    private mayEval = d=> typeof d === 'function' ? d() : d
-
-    /*all             = ()=> this.elements.call(this.args.updateTransform)
-                                      .call(this.args.updateColor)
-    updateAll       = ()=> this.elements.call(this.all)*/
-    updateTransform = ()=> this.elements.call(this.args.updateTransform)
-    updateColor     = ()=> this.elements.call(this.args.updateColor)
-
-    
+    args                 : D3UpdatePatternArgs
+    data                 : any    
     update = {
         parent:         ()=> this.updateParent(),        
         data:           ()=> this.updateData(),
@@ -39,13 +28,18 @@ export class D3UpdatePattern
         style:          ()=> this.elements.call(this.args.updateColor)
     }
 
+    private mainSvgGroup : d3.Selection<SVGElement, N, SVGElement, undefined>
+    private elements     : any    
+    
     constructor(args : D3UpdatePatternArgs) {
         this.args = args
         this.updateParent()
     }
 
+    private mayEval = d=> typeof d === 'function' ? d() : d
+
     private updateParent() {
-        this.rootSVG = this.args.parent.append('g')
+        this.mainSvgGroup = this.args.parent.append('g')
             .attr('clip-path', (this.args.clip ? `url(${this.args.clip})` : undefined))
             .style('transform', 'translateZ(0)')  
             // rotateZ(360deg)
@@ -56,7 +50,7 @@ export class D3UpdatePattern
 
         this.data = this.mayEval(this.args.data)
         this.elements =
-            this.rootSVG
+            this.mainSvgGroup
                 .selectAll(this.args.elementType)
                     .data(this.data, (d:any)=> d.mergeId)
                         .enter().append(this.args.elementType)
@@ -96,15 +90,13 @@ export class D3UpdatePattern
 
     private addTextBackgroundRects()
     { 
-        this.rootSVG.selectAll('rect').remove()
+        this.mainSvgGroup.selectAll('rect').remove()
 
-        var svgRootHere = this.rootSVG
+        var svgRootHere = this.mainSvgGroup
         var T = this
         
-        if (T.args.layer.args.ud) 
-        {
-            this.rootSVG.selectAll("text").each(function(d:N, i, v:SVGTextElement[])
-            {              
+        if (T.args.layer.args.ud) {
+            this.mainSvgGroup.selectAll("text").each(function(d:N, i, v:SVGTextElement[]) {
                 if (   d === T.args.layer.args.ud.cache.centerNode 
                     /*|| d.cachep.r < 0.6*/)
                 {
@@ -122,8 +114,7 @@ export class D3UpdatePattern
                         .attr("width",     x=> w + paddingLeftRight)
                         .attr("height",    x=> h + paddingTopBottom)
                         .attr("transform", x=> view.attributes.transform.value)//d.transformStrCache + d.scaleStrText)
-                        .classed('caption-background', true)
-                    
+                        .classed('caption-background', true)                    
                 }
             })
         }

@@ -11,15 +11,15 @@ export interface LayerStackArgs
 
 export class LayerStack
 {
-    args:      LayerStackArgs
-    layersSvg: any
-    layers:    { [key:string]: ILayer }
+    args:         LayerStackArgs
+    mainSvgGroup: any
+    layers:       { [key:string]: ILayer }
     
     constructor(args: LayerStackArgs)
     {
         this.args = args
         this.layers = {}
-        this.layersSvg = this.args.parent.append('g')        
+        this.mainSvgGroup = this.args.parent.append('g')        
         for (var layerfactoryfunc of this.args.unitdisk.args.layers) {            
             var layer = layerfactoryfunc(this.args.unitdisk)
             layer.layerStack = this
@@ -30,26 +30,23 @@ export class LayerStack
 
     private updateLayers() : void
     {        
-        this.layersSvg.selectAll('*').remove();
+        this.mainSvgGroup.selectAll('*').remove();
 
         for (var l in this.layers) {
-            var layer = this.layers[l]
-            //if (!layer.args.invisible)
-                layer.attach(this.layersSvg)            
+            var layer = this.layers[l]            
+            layer.attach(this.mainSvgGroup)            
         }
     }
 
-    public updateTransformation()
-    {
+    public updateTransformation() {
         var timings = []
         var names = []
 
         for (var l in this.layers) {
             var beginTime = performance.now()
 
-            var layer = this.layers[l]
-            //if (!layer.args.invisible) 
-                layer.update.data()
+            var layer = this.layers[l]            
+            layer.update.data()
 
             timings.push(performance.now() - beginTime)
             names.push(layer.name)
@@ -61,31 +58,9 @@ export class LayerStack
             )
     }
 
-    public updatePath()
-    {
-        //this.updateTransformation()
-        //return
-        
-        //if (this.layers.cells && this.layers.cells.layer)       this.layers.cells.updateData()
-        if (this.layers['link-arcs'] && this.layers['link-arcs'])  
-            this.layers['link-arcs'].update.style()
-
-        if (this.layers['link-lines'] && this.layers['link-lines'])       
-            this.layers['link-lines'].update.style()
-            
-        if (this.layers.nodes && this.layers.nodes)       
-            this.layers.nodes.update.style()
-        /*
-        if (this.layers.captions && this.layers.captions.layer) this.layers.captions.updateData()
-
-        if (this.layers['path-links'] && this.layers['path-links'].layer) {
-            console.log('path-links update')
-            this.layers['path-links'].updateData()
-        }
-        if (this.layers['path-arcs']  && this.layers['path-arcs'].layer) {
-            console.log('path-arcs update')
-            this.layers['path-arcs'].updateData()
-        }*/
-        //Materialize.toast("updatePath", 2500)
+    public updatePath() {
+        if (this.layers['link-arcs']) this.layers['link-arcs'].update.style()
+        if (this.layers['link-lines']) this.layers['link-lines'].update.style()            
+        if (this.layers.nodes) this.layers.nodes.update.style()        
     }
 }

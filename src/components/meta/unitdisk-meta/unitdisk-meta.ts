@@ -2,26 +2,51 @@ import * as d3  from 'd3'
 import { HTML } from 'ducd'
 import { t }    from 'ducd'
 
-var htmlinfo = `<div class="render-info">
-    <div class="label"> </div> <div class="nodes"></div> <div class="q"></div> <div class="qmax"></div> <div class="info i1"></div>
-    <div class="bar-bg"></div>
-    <div class="label"> </div> <div class="nodes"></div> <div class="q"></div> <div class="qmax"></div> <div class="info i2"></div>
-    <div class="bar-bg"></div>
-    <div class="label"> </div>  <div class="nodes slider">
-                                    <p class="range-field">
-                                        <input type="range" min="2" max="500" value="160" class="slider" id="myRange">
-                                    </p>
-                                </div> <div class="q"></div> <div class="qmax"></div> <div class="info i3"></div>
-    <div class="bar-bg"></div>
-    <div class="label"> </div> <div class="nodes slider">
-                                    <p class="range-field">
-                                        <input type="range" min="2" max="500" value="160" class="slider" id="myRange">
-                                    </p>
-                                </div> <div class="q"></div> <div class="qmax"></div> <div class="info i4"></div>
-    <div class="bar-bg"></div>
-    <div class="label"> </div> <div class="nodes"></div> <div class="q"></div> <div class="qmax"></div> <div class="info i5"></div>
-    <div class="bar-bg"></div>
-</div>`
+var htmlinfo = 
+    `<div class="render-info">
+        <div class="label"></div> 
+        <div class="nodes"></div> 
+        <div class="q"></div> 
+        <div class="qmax"></div> 
+        <div class="info i1"></div>
+        <div class="bar-bg"></div>
+
+        <div class="label"></div> 
+        <div class="nodes"></div> 
+        <div class="q"></div> 
+        <div class="qmax"></div> 
+        <div class="info i2"></div>
+        <div class="bar-bg"></div>
+
+        <div class="label"> </div> 
+        <div class="nodes slider">
+            <p class="range-field">
+                <input type="range" min="2" max="500" value="160" class="slider" id="myRange">
+            </p>
+        </div> 
+        <div class="q"></div> 
+        <div class="qmax"></div> 
+        <div class="info i3"></div>
+        <div class="bar-bg"></div>
+
+        <div class="label"> </div> 
+        <div class="nodes slider">
+            <p class="range-field">
+                <input type="range" min="2" max="500" value="160" class="slider" id="myRange">
+            </p>
+        </div> 
+        <div class="q"></div> 
+        <div class="qmax"></div>
+        <div class="info i4"></div>
+        <div class="bar-bg"></div>
+
+        <div class="label"> </div> 
+        <div class="nodes"></div> 
+        <div class="q"></div> 
+        <div class="qmax"></div> 
+        <div class="info i5"></div>
+        <div class="bar-bg"></div>
+    </div>`
 
 export function UnitdiskMeta(args, className)
 {

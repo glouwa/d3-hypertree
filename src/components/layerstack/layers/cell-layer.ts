@@ -10,10 +10,9 @@ export interface CellLayerArgs
 
 export class CellLayer implements ILayer
 {    
-    args: CellLayerArgs
-    d3updatePattern: D3UpdatePattern
-    name =            'cells'
-  
+    args:             CellLayerArgs
+    d3updatePattern:  D3UpdatePattern
+    name =            'cells'  
     update = {
         parent:         ()=> this.attach(null),      
         data:           ()=> this.d3updatePattern.update.data(),
