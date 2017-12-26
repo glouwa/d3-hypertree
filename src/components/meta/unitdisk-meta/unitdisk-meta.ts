@@ -102,8 +102,8 @@ export function InfoArea(args)
         Δ = []
         if (layerStack)
             for (var l in layerStack.layers) {            
-                var layer = layerStack.layers[l].layer                
-                var elemCount = layer ? layer.data.length : 1
+                var d3updatePattern = layerStack.layers[l].d3updatePattern                
+                var elemCount = d3updatePattern ? d3updatePattern.data.length : 1
                 Δ.push(elemCount)
             }
         var a = Δ.reduce((a,e)=> a+e, 0).toFixed(0)

@@ -13,7 +13,7 @@ import { sigmoid }             from '../hyperbolic-math'
 import { Transformation }      from '../hyperbolic-transformation'
 
 import { ILayer }              from './layerstack/layer'
-import { LayerArgs }           from './layerstack/layer'
+import { D3UpdatePatternArgs } from './layerstack/d3updatePattern'
 import { UnitDiskArgs }        from './unitdisk/unitdisk'
 import { UnitDisk }            from './unitdisk/unitdisk'
 import { IUnitDisk }           from './unitdisk/unitdisk'

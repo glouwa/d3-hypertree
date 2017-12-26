@@ -1,5 +1,5 @@
-import { ILayer }        from '../layer'
-import { D3UpdateLayer } from '../layer'
+import { ILayer }          from '../layer'
+import { D3UpdatePattern } from '../d3updatePattern'
 
 export interface NodeLayerArgs
 {
@@ -13,11 +13,11 @@ export interface NodeLayerArgs
 export class NodeLayer implements ILayer
 {    
     args: NodeLayerArgs
-    layer: D3UpdateLayer
+    d3updatePattern: D3UpdatePattern
     name: string
-    updateData =      ()=> this.layer.updateData()
-    updateTransform = ()=> this.layer.updateTransform()
-    updateColor =     ()=> this.layer.updateColor()
+    updateData =      ()=> this.d3updatePattern.updateData()
+    updateTransform = ()=> this.d3updatePattern.updateTransform()
+    updateColor =     ()=> this.lad3updatePatternyer.updateColor()
 
     constructor(args: NodeLayerArgs) {
         this.args = args
@@ -25,7 +25,7 @@ export class NodeLayer implements ILayer
     }
 
     public attach(parent) {
-        this.layer = new D3UpdateLayer({
+        this.d3updatePattern = new D3UpdatePattern({
             parent:            parent,
             layer:             this,
             clip:              this.args.clip,

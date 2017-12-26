@@ -1,5 +1,5 @@
 import { ILayer }        from '../layer'
-import { D3UpdateLayer } from '../layer'
+import { D3UpdatePattern } from '../d3updatePattern'
 
 export interface FocusLayerArgs
 {
@@ -9,18 +9,18 @@ export interface FocusLayerArgs
 export class FocusLayer implements ILayer
 {    
     args: FocusLayerArgs
-    layer: D3UpdateLayer
+    d3updatePattern: D3UpdatePattern
     name =            'focus'
-    updateData =      ()=> this.layer.updateData()
-    updateTransform = ()=> this.layer.updateTransform()
-    updateColor =     ()=> this.layer.updateColor()
+    updateData =      ()=> this.d3updatePattern.updateData()
+    updateTransform = ()=> this.d3updatePattern.updateTransform()
+    updateColor =     ()=> this.d3updatePattern.updateColor()
 
     constructor(args : FocusLayerArgs) {        
         this.args = args        
     }
 
     public attach(parent) {
-        this.layer = new D3UpdateLayer({
+        this.d3updatePattern = new D3UpdatePattern({
             parent:            parent,
             layer:             this,
             data:              [1],

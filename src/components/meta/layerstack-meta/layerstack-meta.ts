@@ -79,7 +79,7 @@ export function LayerInfo_({ parent, onCheckChange, className })
         var name = layer.name        
         var checked =  ()=> !layer.args.invisible
         var checked2 = ()=> !layer.args.hideOnDrag
-        var count =    ()=> (layer.layer && layer.layer.data ? layer.layer.data.length : 1)
+        var count =    ()=> (layer.d3updatePattern && layer.d3updatePattern.data ? layer.d3updatePattern.data.length : 1)
         var type =     ()=> (layer.args.elementType?layer.args.elementType.length:'')
 
         const layerViews = {

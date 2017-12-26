@@ -8,7 +8,7 @@ export * from './models/n/n-loaders'
 export * from './models/n/n-layouts'
 
 export * from './components/layerstack/layerstack'
-export * from './components/layerstack/layer'
+export * from './components/layerstack/d3updatePattern'
 import * as cell from './components/layerstack/layers/cell-layer'
 import * as arc  from './components/layerstack/layers/link-layer'
 import * as node from './components/layerstack/layers/node-layer'

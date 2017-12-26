@@ -67,13 +67,13 @@ export class LayerStack
         //return
         
         //if (this.layers.cells && this.layers.cells.layer)       this.layers.cells.updateData()
-        if (this.layers['link-arcs'] && this.layers['link-arcs'].layer)  
+        if (this.layers['link-arcs'] && this.layers['link-arcs'])  
             this.layers['link-arcs'].updateColor()
 
-        if (this.layers['link-lines'] && this.layers['link-lines'].layer)       
+        if (this.layers['link-lines'] && this.layers['link-lines'])       
             this.layers['link-lines'].updateColor()
             
-        if (this.layers.nodes && this.layers.nodes.layer)       
+        if (this.layers.nodes && this.layers.nodes)       
             this.layers.nodes.updateColor()
         /*
         if (this.layers.captions && this.layers.captions.layer) this.layers.captions.updateData()

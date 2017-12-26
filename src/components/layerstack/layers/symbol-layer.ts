@@ -1,6 +1,6 @@
-import * as d3           from 'd3'
-import { ILayer }        from '../layer'
-import { D3UpdateLayer } from '../layer'
+import * as d3             from 'd3'
+import { ILayer }          from '../layer'
+import { D3UpdatePattern } from '../d3updatePattern'
 
 export interface SymbolLayerArgs
 {
@@ -17,11 +17,11 @@ var d_star = symbol.type(d3['symbolStar'])()
 export class SymbolLayer implements ILayer
 {    
     args: SymbolLayerArgs
-    layer: D3UpdateLayer
+    d3updatePattern: D3UpdatePattern
     name: string
-    updateData =      ()=> this.layer.updateData()
-    updateTransform = ()=> this.layer.updateTransform()
-    updateColor =     ()=> this.layer.updateColor()
+    updateData =      ()=> this.d3updatePattern.updateData()
+    updateTransform = ()=> this.d3updatePattern.updateTransform()
+    updateColor =     ()=> this.d3updatePattern.updateColor()
 
     constructor(args: SymbolLayerArgs) {
         this.args = args
@@ -29,7 +29,7 @@ export class SymbolLayer implements ILayer
     }
 
     public attach(parent) {
-        this.layer = new D3UpdateLayer({
+        this.d3updatePattern = new D3UpdatePattern({
             parent:            parent,     
             layer:             this,     
             data:              this.args.data,

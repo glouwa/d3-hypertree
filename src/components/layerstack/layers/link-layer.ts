@@ -2,7 +2,7 @@ import { N }              from '../../../models/n/n'
 import { CsubC, CktoCp }  from '../../../hyperbolic-math'
 import { arcCenter }      from '../../../hyperbolic-math'
 import { ILayer }         from '../layer'
-import { D3UpdateLayer }  from '../layer'
+import { D3UpdatePattern }from '../d3updatePattern'
 
 export type ArcCurvature = '+' | '0' | '-' | 'l'
 export interface ArcLayerArgs
@@ -18,11 +18,11 @@ export interface ArcLayerArgs
 export class ArcLayer implements ILayer
 {    
     args: ArcLayerArgs
-    layer: D3UpdateLayer
+    d3updatePattern: D3UpdatePattern
     name:             string
-    updateData =      ()=> this.layer.updateData()
-    updateTransform = ()=> this.layer.updateTransform()
-    updateColor =     ()=> this.layer.updateColor()
+    updateData =      ()=> this.d3updatePattern.updateData()
+    updateTransform = ()=> this.d3updatePattern.updateTransform()
+    updateColor =     ()=> this.d3updatePattern.updateColor()
 
     constructor(args: ArcLayerArgs) {
         this.args = args
@@ -30,7 +30,7 @@ export class ArcLayer implements ILayer
     }
 
     public attach(parent) {
-        this.layer = new D3UpdateLayer({
+        this.d3updatePattern = new D3UpdatePattern({
             parent:            parent,
             layer:             this,
             clip:              this.args.clip,
