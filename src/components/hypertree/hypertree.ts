@@ -4,22 +4,22 @@
 
 import * as d3                 from 'd3'
 import { HTML }                from 'ducd'
-import { N }                   from '../models/n/n'
-import { LoaderFunction }      from '../models/n/n-loaders'
-import { LayoutFunction }      from '../models/n/n-layouts'
-import { dfsFlat }             from '../hyperbolic-math'
-import { C, CktoCp, CptoCk }   from '../hyperbolic-math'
-import { sigmoid }             from '../hyperbolic-math'
-import { Transformation }      from '../hyperbolic-transformation'
+import { N }                   from '../../models/n/n'
+import { LoaderFunction }      from '../../models/n/n-loaders'
+import { LayoutFunction }      from '../../models/n/n-layouts'
+import { dfsFlat }             from '../../hyperbolic-math'
+import { C, CktoCp, CptoCk }   from '../../hyperbolic-math'
+import { sigmoid }             from '../../hyperbolic-math'
+import { Transformation }      from '../../hyperbolic-transformation'
 
-import { ILayer }              from './layerstack/layer'
-import { D3UpdatePatternArgs } from './layerstack/d3updatePattern'
-import { UnitDiskArgs }        from './unitdisk/unitdisk'
-import { UnitDisk }            from './unitdisk/unitdisk'
-import { IUnitDisk }           from './unitdisk/unitdisk'
+import { ILayer }              from '../layerstack/layer'
+import { D3UpdatePatternArgs } from '../layerstack/d3updatePattern'
+import { UnitDiskArgs }        from '../unitdisk/unitdisk'
+import { UnitDisk }            from '../unitdisk/unitdisk'
+import { IUnitDisk }           from '../unitdisk/unitdisk'
 
-import { UnitdiskMeta }            from './meta/unitdisk-meta/unitdisk-meta'
-import { LayerStackMeta }           from './meta/layerstack-meta/layerstack-meta'
+import { UnitdiskMeta }            from '../meta/unitdisk-meta/unitdisk-meta'
+import { LayerStackMeta }           from '../meta/layerstack-meta/layerstack-meta'
 
 var htmlpreloader = `
     <div class="preloader-wrapper big active">

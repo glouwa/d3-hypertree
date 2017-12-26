@@ -31,8 +31,13 @@ export class D3UpdatePattern
     constructor(args : D3UpdatePatternArgs) {
         this.args = args
         this.rootSVG = args.parent.append('g')
-            .attr("clip-path", this.args.clip ? `url(${this.args.clip})` : undefined)
-            .attr("transform", "translateZ(0)")
+            .attr('clip-path', (this.args.clip ? `url(${this.args.clip})` : undefined))
+            .style('transform', 'translateZ(0)')  
+            // rotateZ(360deg)
+            // scale(1, 1)
+            // translateZ(0)
+            // translate3d(0,0,0)
+            // -webkit-font-smoothing: antialiased;
 
         this.data = this.mayEval(this.args.data)
         this.update =
