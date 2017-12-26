@@ -17,7 +17,7 @@ export class NodeLayer implements ILayer
     name: string
     updateData =      ()=> this.d3updatePattern.updateData()
     updateTransform = ()=> this.d3updatePattern.updateTransform()
-    updateColor =     ()=> this.lad3updatePatternyer.updateColor()
+    updateColor =     ()=> this.d3updatePattern.updateColor()
 
     constructor(args: NodeLayerArgs) {
         this.args = args

@@ -20,7 +20,7 @@ interface LayerStackMetaUi extends HTMLElement
     addCheckboxes
 }
 
-export class LayerInfo
+export class LayerStackMeta
 {
     private view
     private model

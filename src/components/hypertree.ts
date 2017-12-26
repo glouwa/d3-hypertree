@@ -19,7 +19,7 @@ import { UnitDisk }            from './unitdisk/unitdisk'
 import { IUnitDisk }           from './unitdisk/unitdisk'
 
 import { InfoArea }            from './meta/unitdisk-meta/unitdisk-meta'
-import { LayerInfo }           from './meta/layerstack-meta/layerstack-meta'
+import { LayerStackMeta }           from './meta/layerstack-meta/layerstack-meta'
 
 var htmlpreloader = `
     <div class="preloader-wrapper big active">
@@ -97,7 +97,7 @@ export class Hypertree
     args           : HypertreeArgs
     unitdisk       : IUnitDisk
     infoUi         : HTMLElement & { msg, updateModel, updateLayout }
-    layerInfo      : HTMLElement & { updateModel }
+    layerStackMeta : HTMLElement & { updateModel }
     data           : N
     langMap        : {}
     view           : HTMLElement
@@ -129,12 +129,12 @@ export class Hypertree
             nodeRadius:     this.args.ui.nodeRadius            
         })        
 
-        this.layerInfo = new LayerInfo({
+        this.layerStackMeta = new LayerStackMeta({
             view: { parent:this.args.parent, className: 'data' },
             model: this.unitdisk
         })
         if (this.unitdisk.navParameter)
-            this.layerInfo2 = new LayerInfo({
+            this.layerStackMeta2 = new LayerStackMeta({
                 view: { parent:this.args.parent, className: 'nav' },
                 model: this.unitdisk.navParameter
             }) 
@@ -218,8 +218,8 @@ export class Hypertree
         //this.ui.updateSelection()        
         //requestAnimationFrame(()=> this.unitdisk.updateTransformation())
         requestAnimationFrame(()=> {
-            this.layerInfo2.update.all()
-            this.layerInfo.update.all()
+            this.layerStackMeta2.update.all()
+            this.layerStackMeta.update.all()
             this.unitdisk.updateSelection()
         })
     }
@@ -250,8 +250,8 @@ export class Hypertree
 
     public updateTransformation() : void {
         requestAnimationFrame(()=> {
-            this.layerInfo2.update.all()
-            this.layerInfo.update.all()
+            this.layerStackMeta2.update.all()
+            this.layerStackMeta.update.all()
             this.unitdisk.updateTransformation() 
         })
     }
@@ -286,8 +286,8 @@ export class Hypertree
                     this.animation = false
                 else
                     requestAnimationFrame(()=> {
-                        this.layerInfo2.update.all()
-                        this.layerInfo.update.all()
+                        this.layerStackMeta2.update.all()
+                        this.layerStackMeta.update.all()
                         frame()
                     })
             }
