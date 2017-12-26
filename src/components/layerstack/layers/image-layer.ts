@@ -14,11 +14,15 @@ export interface ImageLayerArgs
 export class ImageLayer implements ILayer
 {    
     args:             ImageLayerArgs
-    d3updatePattern:            D3UpdatePattern
+    d3updatePattern:  D3UpdatePattern
     name:             string
-    updateData =      ()=> this.d3updatePattern.updateData()
-    updateTransform = ()=> this.d3updatePattern.updateTransform()
-    updateColor =     ()=> this.d3updatePattern.updateColor()
+   
+    update = {
+        parent:         ()=> this.attach(null),      
+        data:           ()=> this.d3updatePattern.update.data(),
+        transformation: ()=> this.d3updatePattern.update.transformation(),
+        style:          ()=> this.d3updatePattern.update.style()
+    }
 
     constructor(args: ImageLayerArgs) {
         this.args = args

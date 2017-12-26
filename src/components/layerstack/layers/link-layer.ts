@@ -20,9 +20,13 @@ export class ArcLayer implements ILayer
     args: ArcLayerArgs
     d3updatePattern: D3UpdatePattern
     name:             string
-    updateData =      ()=> this.d3updatePattern.updateData()
-    updateTransform = ()=> this.d3updatePattern.updateTransform()
-    updateColor =     ()=> this.d3updatePattern.updateColor()
+  
+    update = {
+        parent:         ()=> this.attach(null),      
+        data:           ()=> this.d3updatePattern.update.data(),
+        transformation: ()=> this.d3updatePattern.update.transformation(),
+        style:          ()=> this.d3updatePattern.update.style()
+    }
 
     constructor(args: ArcLayerArgs) {
         this.args = args

@@ -5,6 +5,7 @@ export interface D3UpdatePatternArgs
 {
     parent:          any,
     layer:           ILayer,
+
     name:            string,    
     className:       string,
     elementType:     string,
@@ -32,8 +33,7 @@ export class D3UpdatePattern
 
     
     update = {
-        parent:         ()=> {},
-        content:        ()=> this.update.data(),
+        parent:         ()=> this.updateParent(),        
         data:           ()=> this.updateData(),
         transformation: ()=> this.elements.call(this.args.updateTransform),
         style:          ()=> this.elements.call(this.args.updateColor)
@@ -69,28 +69,21 @@ export class D3UpdatePattern
     }
     
     private updateData() {
-        var oldElements = this.elements
-
         this.data = []
         var isAnimating = this.args.layer.layerStack.args.unitdisk.args.hypertree.isAnimationRunning()
-
         if (!isAnimating && !this.args.layer.args.invisible)
             this.data = this.mayEval(this.args.data)
-
         if (isAnimating && !this.args.layer.args.hideOnDrag)
             this.data = this.mayEval(this.args.data)
 
-        this.elements =
-            this.elements
-                .data(this.data, d=> d.mergeId)
+        this.elements = this.elements.data(this.data, d=> d.mergeId)
 
         this.elements.exit().remove()
-        var n = this.elements
-            .enter().append(this.args.elementType)
+        var newElements = this.elements.enter().append(this.args.elementType)
                 .attr("class", this.args.className)
                 .call(this.args.create)
 
-        this.elements = this.elements.merge(n)
+        this.elements = this.elements.merge(newElements)
         this.elements
             //.call(this.all)
             .call(this.args.updateTransform)

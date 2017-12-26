@@ -13,9 +13,13 @@ export class CellLayer implements ILayer
     args: CellLayerArgs
     d3updatePattern: D3UpdatePattern
     name =            'cells'
-    updateData =      ()=> this.d3updatePattern.update.data()
-    updateTransform = ()=> this.d3updatePattern.update.transformation() 
-    updateColor =     ()=> this.d3updatePattern.update.style()
+  
+    update = {
+        parent:         ()=> this.attach(null),      
+        data:           ()=> this.d3updatePattern.update.data(),
+        transformation: ()=> this.d3updatePattern.update.transformation(),
+        style:          ()=> this.d3updatePattern.update.style()
+    }
 
     constructor(args: CellLayerArgs) {
         this.args = args

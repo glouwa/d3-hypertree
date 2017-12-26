@@ -19,9 +19,13 @@ export class InteractionLayer implements ILayer
     parent
     args:             InteractionLayerArgs    
     name =            'interaction'
-    updateData =      ()=> {}
-    updateTransform = ()=> {}
-    updateColor =     ()=> {}
+   
+    update = {
+        parent:         ()=> {},        
+        data:           ()=> {},
+        transformation: ()=> {},
+        style:          ()=> {}
+    }
 
     constructor(args : InteractionLayerArgs) {        
         this.args = args 

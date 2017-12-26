@@ -49,7 +49,7 @@ export class LayerStack
 
             var layer = this.layers[l]
             //if (!layer.args.invisible) 
-                layer.updateData()
+                layer.update.data()
 
             timings.push(performance.now() - beginTime)
             names.push(layer.name)
@@ -68,13 +68,13 @@ export class LayerStack
         
         //if (this.layers.cells && this.layers.cells.layer)       this.layers.cells.updateData()
         if (this.layers['link-arcs'] && this.layers['link-arcs'])  
-            this.layers['link-arcs'].updateColor()
+            this.layers['link-arcs'].update.style()
 
         if (this.layers['link-lines'] && this.layers['link-lines'])       
-            this.layers['link-lines'].updateColor()
+            this.layers['link-lines'].update.style()
             
         if (this.layers.nodes && this.layers.nodes)       
-            this.layers.nodes.updateColor()
+            this.layers.nodes.update.style()
         /*
         if (this.layers.captions && this.layers.captions.layer) this.layers.captions.updateData()
 

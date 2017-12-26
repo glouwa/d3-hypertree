@@ -10,9 +10,13 @@ export class BackgroundLayer implements ILayer
     args:             BackgroundLayerArgs
     d3updatePattern:  D3UpdatePattern
     name =            'background'  
-    updateData =      ()=> this.d3updatePattern.update.data()
-    updateTransform = ()=> this.d3updatePattern.updateTransform()
-    updateColor =     ()=> this.d3updatePattern.updateColor()
+   
+    update = {
+        parent:         ()=> this.attach(null),      
+        data:           ()=> this.d3updatePattern.update.data(),
+        transformation: ()=> this.d3updatePattern.update.transformation(),
+        style:          ()=> this.d3updatePattern.update.style()
+    }
 
     constructor(args : BackgroundLayerArgs) {        
         this.args = args

@@ -8,15 +8,11 @@ export interface ILayer
     updateTime?:     number,
     
     attach:          (parent)=> void,
-    updateData:      ()=> void,
-    updateTransform: ()=> void,
-    updateColor:     ()=> void,
-/*
+   
     update: {
         parent:         ()=> void,
-        content:        ()=> void,
         data:           ()=> void,
         transformation: ()=> void,
-        color:          ()=> void,
-    }*/
+        style:          ()=> void,
+    }
 }
