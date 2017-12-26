@@ -9,10 +9,11 @@ export interface D3UpdatePatternArgs
     className:       string,
     elementType:     string,
     data:            any,
+    clip?:           string,
+
     create:          (s)=> any,
     updateTransform: (s)=> any,
-    updateColor:     (s)=> any,
-    clip?:           string,
+    updateColor:     (s)=> any,    
 }
 
 export class D3UpdatePattern
