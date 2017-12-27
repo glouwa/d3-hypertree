@@ -1,6 +1,7 @@
 import * as d3  from 'd3'
 import { HTML } from 'ducd'
 import { ILayer } from '../../layerstack/layer'
+import { IUnitDisk } from '../../unitdisk/unitdisk'
 
 var labelHtml  = (id)=>     `<div class="label"></div> `
 var countHtml  = (id)=>     `<div class="nodes"></div> `
@@ -23,7 +24,7 @@ interface LayerStackMetaUi extends HTMLElement
 export class LayerStackMeta
 {
     private view
-    private model
+    private model : IUnitDisk
     private ui    : LayerStackMetaUi
 
     constructor({ view, model }) {
@@ -34,16 +35,14 @@ export class LayerStackMeta
 
     update = {
         parent: ()=> this.updateParent(),
-        data: ()=> { 
-            //this.update.existance(); 
-            this.update.state(); 
-            this.update.counts(); 
-        },        
-        state:     ()=> this.ui.updateSwitch(this.model.args.hypertree.isAnimationRunning()),
-        counts:    ()=> this.ui.updateCounts(this.model.args.hypertree.isAnimationRunning())
+        data: ()=> {             
+            this.ui.updateSwitch(this.model.args.hypertree.isAnimationRunning())
+            this.ui.updateCounts(this.model.args.hypertree.isAnimationRunning())
+        }
     }
 
     private updateParent() {
+
         this.ui = LayerInfo_({
             parent: this.view.parent,            
             className: this.view.className,
@@ -53,6 +52,7 @@ export class LayerStackMeta
 
         for (var l in this.model.layerStack.layers)            
             this.ui.addCheckboxes(this.model.layerStack.layers[l])    
+
         this.ui.addSwitch()
     }
 }

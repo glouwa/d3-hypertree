@@ -1,6 +1,7 @@
 import * as d3  from 'd3'
 import { HTML } from 'ducd'
 import { t }    from 'ducd'
+import { IUnitDisk } from '../../unitdisk/unitdisk'
 
 var htmlinfo = 
     `<div class="render-info">
@@ -55,15 +56,23 @@ export class UnitdiskMeta
         all:                ()=> { 
             // ... 
         },        
-        svgInfo:            (cache, Δ, layerStack)=> this.ui.updateSvgInfo(cache, Δ, layerStack),
-        d3Info:             (max, Δ, cache, layerlist)=> this.ui.updateD3Info(max, Δ, cache, layerlist),
+        svgInfo:            (cache, Δ, layerStack)=> this.ui.updateSvgInfo(layerStack),
+        d3Info:             (max, Δ, cache, layerlist)=> this.ui.updateD3Info(Δ, cache, layerlist),
         transformationInfo: (cache, minWeigth, Δ)=> this.ui.updateTransformationInfo(cache, minWeigth, Δ),         
         layout:             (cache, Δ)=> this.ui.updateLayout(cache, Δ),
         model:              (model, Δ)=> this.ui.updateModel(model, Δ)
+
+        /*
+        svgInfo:            ()=> this.ui.updateSvgInfo(this.model),
+        d3Info:             ()=> this.ui.updateD3Info(this.model),
+        transformationInfo: ()=> this.ui.updateTransformationInfo(this.model),         
+        layout:             ()=> this.ui.updateLayout(this.model),
+        model:              ()=> this.ui.updateModel(this.model)
+        */
     }
 
     private view
-    private model
+    private model : IUnitDisk
     private ui    : HTMLElement & UnitdiskMeta_UI
 
     constructor({ view, model }) {
@@ -145,8 +154,8 @@ function UnitdiskMeta_({ parent, model, className })
         diff.exit().remove()
     }
 
-    ui.updateSvgInfo = (cache, Δ, layerStack)=> {        
-        Δ = []
+    ui.updateSvgInfo = (layerStack)=> {        
+        var Δ = []
         if (layerStack)
             for (var l in layerStack.layers) {            
                 var d3updatePattern = layerStack.layers[l].d3updatePattern                
@@ -161,7 +170,7 @@ function UnitdiskMeta_({ parent, model, className })
         rows.rendering.qMax.innerHTML  = `<sub>#</sub>`
     }
  
-    ui.updateD3Info = (max, Δ, cache, layerlist)=> {
+    ui.updateD3Info = (Δ, cache, layerlist)=> {
         var t = Δ.reduce((a,e)=> a+e).toFixed(0)
 
         rows.d3.label.innerHTML = `D<sub>3</sub>`
