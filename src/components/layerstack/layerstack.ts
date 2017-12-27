@@ -53,7 +53,7 @@ export class LayerStack
         }
 
         if (this.args.unitdisk.cache.unculledNodes.length != 3)
-            this.args.unitdisk.args.hypertree.unitdiskMeta.updateD3Info(
+            this.args.unitdisk.args.hypertree.unitdiskMeta.update.d3Info(
                 10, timings, this.args.unitdisk.cache, names
             )
     }

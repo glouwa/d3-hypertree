@@ -24,33 +24,33 @@ export class LayerStackMeta
 {
     private view
     private model
-    private ui : LayerStackMetaUi
+    private ui    : LayerStackMetaUi
 
     constructor({ view, model }) {
         this.view = view
         this.model = model
-        this.ui = LayerInfo_({
-            parent: view.parent,            
-            className: view.className,
-            //onCheckChange: ()=> this.model.layerStack.updateLayers()
-            onCheckChange: ()=> this.model.layerStack.updateTransformation()
-        })
-
-        this.updateExistence()
+        this.updateParent()
     }
 
     update = {
-        all: ()=> { 
+        parent: ()=> this.updateParent(),
+        data: ()=> { 
             //this.update.existance(); 
             this.update.state(); 
             this.update.counts(); 
-        },
-        existance: ()=> this.updateExistence(),
+        },        
         state:     ()=> this.ui.updateSwitch(this.model.args.hypertree.isAnimationRunning()),
         counts:    ()=> this.ui.updateCounts(this.model.args.hypertree.isAnimationRunning())
     }
 
-    private updateExistence() {        
+    private updateParent() {
+        this.ui = LayerInfo_({
+            parent: this.view.parent,            
+            className: this.view.className,
+            //onCheckChange: ()=> this.model.layerStack.updateLayers()
+            onCheckChange: ()=> this.model.layerStack.updateTransformation()
+        })
+
         for (var l in this.model.layerStack.layers)            
             this.ui.addCheckboxes(this.model.layerStack.layers[l])    
         this.ui.addSwitch()

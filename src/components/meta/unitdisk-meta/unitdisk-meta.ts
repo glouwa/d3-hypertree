@@ -48,10 +48,52 @@ var htmlinfo =
         <div class="bar-bg"></div>
     </div>`
 
-export function UnitdiskMeta(args, className)
+export class UnitdiskMeta 
 {
-    var ui = HTML.parse<HTMLElement & { updateModel, updateLayout, updateCachInfo }>(htmlinfo)()
-    args.parent.appendChild(ui)
+    update = {
+        parent: ()=> this.updateParent(),
+        all: ()=> { 
+            // ... 
+        },        
+        svgInfo:            (cache, Δ, layerStack)=> this.ui.updateSvgInfo(cache, Δ, layerStack),
+        d3Info:             (max, Δ, cache, layerlist)=> this.ui.updateD3Info(max, Δ, cache, layerlist),
+        transformationInfo: (cache, minWeigth, Δ)=> this.ui.updateTransformationInfo(cache, minWeigth, Δ),         
+        layout:             (cache, Δ)=> this.ui.updateLayout(cache, Δ),
+        model:              (model, Δ)=> this.ui.updateModel(model, Δ)
+    }
+
+    private view
+    private model
+    private ui    : HTMLElement & UnitdiskMeta_UI
+
+    constructor({ view, model }) {
+        this.view = view
+        this.model = model
+        this.updateParent()
+    }
+
+    private updateParent() {
+        this.ui = UnitdiskMeta_({
+            parent: this.view.parent,            
+            className: this.view.className,
+            model: this.model
+        })
+    }
+}
+
+interface UnitdiskMeta_UI {
+    updateSvgInfo,
+    updateD3Info
+    updateModel, 
+    updateTransformationInfo
+    updateLayout, 
+    updateCachInfo 
+}
+
+function UnitdiskMeta_({ parent, model, className })
+{
+    var ui = HTML.parse<HTMLElement & UnitdiskMeta_UI>(htmlinfo)()
+    parent.appendChild(ui)
 
     //var rendering      = {}
     var renderingLabel = <HTMLElement>ui.children[0]
