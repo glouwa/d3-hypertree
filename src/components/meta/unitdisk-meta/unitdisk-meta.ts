@@ -51,8 +51,8 @@ var htmlinfo =
 export class UnitdiskMeta 
 {
     update = {
-        parent: ()=> this.updateParent(),
-        all: ()=> { 
+        parent:             ()=> this.updateParent(),
+        all:                ()=> { 
             // ... 
         },        
         svgInfo:            (cache, Δ, layerStack)=> this.ui.updateSvgInfo(cache, Δ, layerStack),
@@ -95,45 +95,25 @@ function UnitdiskMeta_({ parent, model, className })
     var ui = HTML.parse<HTMLElement & UnitdiskMeta_UI>(htmlinfo)()
     parent.appendChild(ui)
 
-    //var rendering      = {}
-    var renderingLabel = <HTMLElement>ui.children[0]
-    var renderingInfo  = <HTMLElement>ui.children[1]
-    var renderingQ     = <HTMLElement>ui.children[2]
-    var renderingQmax  = <HTMLElement>ui.children[3]
-    var renderingW     = <HTMLElement>ui.children[4]
-    var renderingBar   = <HTMLElement>ui.children[5]
+    class Row {                
+        label; info; q; qMax; w; bar
+        constructor(ui, offset) {
+            this.label = <HTMLElement>ui.children[offset+0]
+            this.info =  <HTMLElement>ui.children[offset+1]
+            this.q =     <HTMLElement>ui.children[offset+2]
+            this.qMax =  <HTMLElement>ui.children[offset+3]
+            this.w =     <HTMLElement>ui.children[offset+4]
+            this.bar =   <HTMLElement>ui.children[offset+5]
+        }
+    }
 
-    //var D3             = {}
-    var D3Label        = <HTMLElement>ui.children[6]
-    var D3Info         = <HTMLElement>ui.children[7]
-    var D3Q            = <HTMLElement>ui.children[8]
-    var D3Qmax         = <HTMLElement>ui.children[9]
-    var D3W            = <HTMLElement>ui.children[10]
-    var D3Bar          = <HTMLElement>ui.children[11]
-
-    //var transform      = {}
-    var transformLabel = <HTMLElement>ui.children[12]
-    var transformInfo  = <HTMLElement>ui.children[13]
-    var transformQ     = <HTMLElement>ui.children[14]
-    var transformQmax  = <HTMLElement>ui.children[15]
-    var transformW     = <HTMLElement>ui.children[16]
-    var transformBar   = <HTMLElement>ui.children[17]
-
-    //var layout         = {}
-    var layoutLabel    = <HTMLElement>ui.children[18]
-    var layoutInfo     = <HTMLElement>ui.children[19]
-    var layoutQ        = <HTMLElement>ui.children[20]
-    var layoutQmax     = <HTMLElement>ui.children[21]
-    var layoutW        = <HTMLElement>ui.children[22]
-    var layoutBar      = <HTMLElement>ui.children[23]
-
-    //var data           = {}
-    var dataLabel      = <HTMLElement>ui.children[24]
-    var dataInfo       = <HTMLElement>ui.children[25]
-    var dataQ          = <HTMLElement>ui.children[26]
-    var dataQmax       = <HTMLElement>ui.children[27]
-    var dataW          = <HTMLElement>ui.children[28]
-    var dataBar        = <HTMLElement>ui.children[29]
+    var rows = {        
+        rendering: new Row(ui, 0),
+        d3:        new Row(ui, 6),
+        transform: new Row(ui, 12),
+        layout:    new Row(ui, 18),
+        data:      new Row(ui, 24),
+    }
 
     var colors = ["#3366cc", "#dc3912", "#ff9900", "#109618", "#990099", "#0099c6", "#dd4477", "#66aa00", "#b82e2e", "#316395", "#994499", "#22aa99", "#aaaa11", "#6633cc", "#e67300", "#8b0707", "#651067", "#329262", "#5574a6", "#3b3eac"];
     var shift = 5    
@@ -155,7 +135,7 @@ function UnitdiskMeta_({ parent, model, className })
         var l = vec.map((e, i, v)=> { c+=e; return c-e; })
         var data = t([vec, cvec, l])
         var cursor = 0
-        var diff = d3.select(view).selectAll('div').data(data)        
+        var diff = d3.select(view).selectAll('div').data(data)
         diff.enter().append('div')
             .attr('class', 'bar')
             .merge(diff)
@@ -175,22 +155,22 @@ function UnitdiskMeta_({ parent, model, className })
             }
         var a = Δ.reduce((a,e)=> a+e, 0).toFixed(0)
         
-        updateBar(renderingBar, Δ.map(e=> e*mag_svg), typeColors)
-        renderingLabel.innerHTML = `SVG`                
-        renderingQ.innerHTML     = `${a}`
-        renderingQmax.innerHTML  = `<sub>#</sub>`
+        updateBar(rows.rendering.bar, Δ.map(e=> e*mag_svg), typeColors)
+        rows.rendering.label.innerHTML = `SVG`                
+        rows.rendering.q.innerHTML     = `${a}`
+        rows.rendering.qMax.innerHTML  = `<sub>#</sub>`
     }
  
     ui.updateD3Info = (max, Δ, cache, layerlist)=> {
         var t = Δ.reduce((a,e)=> a+e).toFixed(0)
 
-        D3Label.innerHTML = `D<sub>3</sub>`
-        D3Info.innerHTML  = `${cache.unculledNodes.length} unc. nodes`
-        D3Info.title      = Δ.map((e, i)=> `${layerlist[i]}: ${e.toFixed(1)}ms`).join('\n')
-        D3Q.innerHTML     = `${t}`
-        D3Qmax.innerHTML  = `<sub>ms</sub>`
+        rows.d3.label.innerHTML = `D<sub>3</sub>`
+        rows.d3.info.innerHTML  = `${cache.unculledNodes.length} unc. nodes`
+        rows.d3.info.title      = Δ.map((e, i)=> `${layerlist[i]}: ${e.toFixed(1)}ms`).join('\n')
+        rows.d3.q.innerHTML     = `${t}`
+        rows.d3.qMax.innerHTML  = `<sub>ms</sub>`
 
-        updateBar(D3Bar, Δ.map(e=> e*mag), typeColors)
+        updateBar(rows.d3.bar, Δ.map(e=> e*mag), typeColors)
     }
 
     ui.updateTransformationInfo = (cache, minWeigth, Δ)=> {
@@ -199,21 +179,21 @@ function UnitdiskMeta_({ parent, model, className })
         var hwexits = minWeigth.map(n=>n.toFixed(1)).join(' ⟶ ')
         var Δms = Δ.map(n=>n.toFixed(1))
         
-        updateBar(transformBar, Δ.map(e=> e*mag), ['#2196f3', '#ffc107', '#673ab7', '#4caf50'])
-        transformLabel.innerHTML = `Transf.`
+        updateBar(rows.transform.bar, Δ.map(e=> e*mag), ['#2196f3', '#ffc107', '#673ab7', '#4caf50'])
+        rows.transform.label.innerHTML = `Transf.`
         //transformInfo.innerHTML  = `${na} nodes<sub>w > ${'...'}</sub>`
-        transformInfo.title      = `Visible node count: ${na}\n`        
-        transformInfo.title     += `Min weigth: ${hwexits}\n`
-        transformInfo.title     += `${Δms[0]} culling\n${Δms[1]} lazysearch\n${Δms[2]} voronoi\n${Δms[3]} labels`
-        transformQ.innerHTML     = `${t}`
-        transformQmax.innerHTML  = `<sub>ms</sub>`
+        rows.transform.info.title      = `Visible node count: ${na}\n`        
+        rows.transform.info.title     += `Min weigth: ${hwexits}\n`
+        rows.transform.info.title     += `${Δms[0]} culling\n${Δms[1]} lazysearch\n${Δms[2]} voronoi\n${Δms[3]} labels`
+        rows.transform.q.innerHTML     = `${t}`
+        rows.transform.qMax.innerHTML  = `<sub>ms</sub>`
     }
 
     ui.updateLayout = (cache, Δ)=> {
-        updateBar(layoutBar, [Δ].map(e=> e*mag), ['#2196f3'])
-        layoutLabel.innerHTML = `Layout`        
-        layoutQ.innerHTML     = `${Δ.toFixed()}`
-        layoutQmax.innerHTML  = `<sub>ms</sub>`
+        updateBar(rows.layout.bar, [Δ].map(e=> e*mag), ['#2196f3'])
+        rows.layout.label.innerHTML = `Layout`        
+        rows.layout.q.innerHTML     = `${Δ.toFixed()}`
+        rows.layout.qMax.innerHTML  = `<sub>ms</sub>`
     }
 
     ui.updateModel = (model, Δ)=> {
@@ -228,21 +208,21 @@ function UnitdiskMeta_({ parent, model, className })
         var h = model.height
         var ø = 0; model.each(cn=> ø += (cn.children||[]).length/i)
 
-        updateBar(dataBar, Δ.map(e=>e/mag_load), ['#ff9800', '#2196f3', 'green'])
-        dataLabel.innerHTML = `Load`
-        dataInfo.innerHTML  = `${n} raw nodes`
-        dataInfo.title   = `download: ${Δ[0].toFixed(0)}ms\n`
-        dataInfo.title  += `parse: ${Δ[1].toFixed(0)}ms\n`
-        dataInfo.title  += `hierarchy and weights: ${Δ[2].toFixed(0)}ms\n`
-        dataInfo.title  += `${lp} leaves\n`
-        dataInfo.title  += `↕ max: ${h}\n`
-        dataInfo.title  += `↕ μ: ?\n`
-        dataInfo.title  += `↕ ⌀: ?\n`
-        dataInfo.title  += `○ max: ?\n`
-        dataInfo.title  += `○ μ: ${ø.toPrecision(2)}\n`
-        dataInfo.title  += `○ ⌀: ?\n`
-        dataQ.innerHTML     = `${(t/1000).toFixed(1)}`
-        dataQmax.innerHTML  = `<sub>s</sub>`
+        updateBar(rows.data.bar, Δ.map(e=>e/mag_load), ['#ff9800', '#2196f3', 'green'])
+        rows.data.label.innerHTML = `Load`
+        rows.data.info.innerHTML  = `${n} raw nodes`
+        rows.data.info.title   = `download: ${Δ[0].toFixed(0)}ms\n`
+        rows.data.info.title  += `parse: ${Δ[1].toFixed(0)}ms\n`
+        rows.data.info.title  += `hierarchy and weights: ${Δ[2].toFixed(0)}ms\n`
+        rows.data.info.title  += `${lp} leaves\n`
+        rows.data.info.title  += `↕ max: ${h}\n`
+        rows.data.info.title  += `↕ μ: ?\n`
+        rows.data.info.title  += `↕ ⌀: ?\n`
+        rows.data.info.title  += `○ max: ?\n`
+        rows.data.info.title  += `○ μ: ${ø.toPrecision(2)}\n`
+        rows.data.info.title  += `○ ⌀: ?\n`
+        rows.data.q.innerHTML     = `${(t/1000).toFixed(1)}`
+        rows.data.qMax.innerHTML  = `<sub>s</sub>`
     }
 
     ui.update = ()=> {}

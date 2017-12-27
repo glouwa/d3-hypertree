@@ -287,9 +287,9 @@ export class Hypertree
 
                 if (this.data
                     .leaves()
-                    .reduce((max, n)=> Math.max(max, CktoCp(n.z).r), 0) > .995)
+                    .reduce((max, n)=> Math.max(max, CktoCp(n.z).r), 0) > .95) 
                     this.animation = false
-                else
+                else 
                     requestAnimationFrame(()=> {
                         this.layerStackMeta2.update.data()
                         this.layerStackMeta.update.data()

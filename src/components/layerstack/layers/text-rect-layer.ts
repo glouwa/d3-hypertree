@@ -15,8 +15,7 @@ export class LabelLayer implements ILayer
 {    
     args:            LabelLayerArgs
     d3updatePattern: D3UpdatePattern
-    name:            string
-   
+    name:            string   
     update = {
         parent:         ()=> this.attach(null),      
         data:           ()=> this.d3updatePattern.update.data(),
