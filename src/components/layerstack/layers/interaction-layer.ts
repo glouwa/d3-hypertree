@@ -66,6 +66,7 @@ export class InteractionLayer implements ILayer
 
         var zoom = d3.zoom()
             .scaleExtent([.51, 1.49])
+            //.transform().scale)this.args.unitdisk.transformation.state.λ)
             .filter(()=> d3.event.type=='wheel')
          /*   .filter(()=> {
                 return d3.event.type=='wheel'

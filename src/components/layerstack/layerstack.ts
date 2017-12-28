@@ -14,13 +14,14 @@ export class LayerStack
     args:         LayerStackArgs
     mainSvgGroup: any
     layers:       { [key:string]: ILayer }
-    
+    d3meta
+
     constructor(args: LayerStackArgs)
     {
         this.args = args
         this.mainSvgGroup = this.args.parent.append('g')        
 
-        this.layers = {}        
+        this.layers = {}
         for (var layerfactoryfunc of this.args.unitdisk.args.layers) {            
             var layer = layerfactoryfunc(this.args.unitdisk)
             layer.layerStack = this
@@ -52,10 +53,7 @@ export class LayerStack
             names.push(layer.name)
         }
 
-        this.d3Meta = {
-            Δ: timings,
-            names: names
-        }
+        this.d3meta = { Δ: timings, names: names }
     }
 
     public updatePath() {

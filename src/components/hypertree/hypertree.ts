@@ -108,6 +108,8 @@ export class Hypertree
         isSelected?:N, 
         isHovered?:N 
     }              = {}    
+    modelMeta
+    layoutMeta
 
     constructor(args : HypertreeArgs) {
         this.args = args        

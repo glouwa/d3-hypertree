@@ -189,8 +189,8 @@ function UnitdiskMeta_({ parent, ud, className })
     ui.updateD3Info = ()=> {
  
         var cache = ud.args.transformation.cache
-        var Δ = ud.layerStack.d3Meta.Δ 
-        var layerlist = ud.layerStack.d3Meta.names
+        var Δ = ud.layerStack.d3meta.Δ 
+        var layerlist = ud.layerStack.d3meta.names
 
         var t = Δ.reduce((a,e)=> a+e).toFixed(0)
 
