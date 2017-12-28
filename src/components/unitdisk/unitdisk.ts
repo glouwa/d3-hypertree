@@ -20,8 +20,7 @@ import { LayerStack }                    from '../layerstack/layerstack'
 export interface IUnitDisk
 {
     args:                 UnitDiskArgs
-    cache
-    cacheMeta
+    cache    
     layerStack:           LayerStack
 
     navParameter?:        UnitDisk,
@@ -114,8 +113,6 @@ export class UnitDiskNav implements IUnitDisk
     view          : UnitDisk
     navBackground : UnitDisk
     navParameter  : UnitDisk
-
-    get cacheMeta() { return this.view.cacheMeta }
 
     constructor(args : UnitDiskArgs) {
         this.args = args

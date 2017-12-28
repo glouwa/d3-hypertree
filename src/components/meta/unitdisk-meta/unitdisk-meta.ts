@@ -77,16 +77,6 @@ export class UnitdiskMeta
         transformationInfo: ()=> this.ui.updateTransformationInfo(),
         layout:             ()=> this.ui.updateLayout(),
         model:              ()=> this.ui.updateModel()
-
-        /*        
-        transformation: ()=> {
-            this.ui.updateSvgInfo(this.model)
-            this.ui.updateD3Info(this.model)
-            this.ui.updateTransformationInfo(this.model)
-        }
-        layout:             ()=> this.ui.updateLayout(this.model),
-        model:              ()=> this.ui.updateModel(this.model)
-        */
     }
 
     private updateParent() {
@@ -142,6 +132,21 @@ function UnitdiskMeta_({ parent, ud, className })
     var ms             = 50
     var maxd3layerTime = 10
 
+    /*
+    var slider = slider || $('.range-field > input')
+    ud.args.hypertree.magic = 1/slider.val()
+    slider.on('propertychange input', function (e) {
+        ud.args.hypertree.magic = 1/slider.val()
+        ud.args.hypertree.updateTransformation()
+    })*/        
+    
+    var slider = ui.querySelector('.range-field > input')
+    ud.args.hypertree.magic = 1/slider.value
+    slider.oninput = function (e) { 
+        ud.args.hypertree.magic = 1/slider.value
+        ud.args.hypertree.updateTransformation()
+    }
+
     var colorScale = d3.scaleLinear<d3.ColorCommonInstance>()
         .domain([1, 10])
         .range([d3.rgb('#a5d6a7'), d3.rgb('#e53935')])
@@ -183,8 +188,6 @@ function UnitdiskMeta_({ parent, ud, className })
  
     ui.updateD3Info = ()=> {
  
-        if (!ud.layerStack.d3Meta) return
-
         var cache = ud.args.transformation.cache
         var Δ = ud.layerStack.d3Meta.Δ 
         var layerlist = ud.layerStack.d3Meta.names
@@ -202,8 +205,6 @@ function UnitdiskMeta_({ parent, ud, className })
 
     ui.updateTransformationInfo = ()=> {
         
-        if (!ud.cacheMeta) return 
-
         var cache = ud.args.transformation.cache
         var Δ = ud.cacheMeta.Δ  
         var minWeight = ud.cacheMeta.minWeight 
@@ -224,9 +225,7 @@ function UnitdiskMeta_({ parent, ud, className })
     }
 
     ui.updateLayout = ()=> {
-        //hypertree.layoutMeta.Δ
-        if (!ud.args.hypertree.lyoutMeta) return 
-
+        
         var Δ = ud.args.hypertree.layoutMeta.Δ
               
         updateBar(rows.layout.bar, [Δ].map(e=> e*mag), ['#2196f3'])
@@ -237,8 +236,6 @@ function UnitdiskMeta_({ parent, ud, className })
 
     ui.updateModel = ()=> {
         
-        if (!ud.args.hypertree.modelMeta) return 
-
         var Δ = ud.args.hypertree.modelMeta.Δ
         var model = ud.args.hypertree.data
 

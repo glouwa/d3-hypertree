@@ -167,7 +167,7 @@ export class Hypertree
             this.modelMeta = {
                 Δ: [t1-t0, t2-t1, performance.now()-t2]
             }
-            this.unitdiskMeta.update.model(this.data, [t1-t0, t2-t1, performance.now()-t2])
+            this.unitdiskMeta.update.model()
 
             var t3 = performance.now()
             this.data = this.args.layout(this.data, this.args.ui.transformation.state)
@@ -179,7 +179,7 @@ export class Hypertree
             this.layoutMeta = {
                 Δ: performance.now()-t3
             }
-            this.unitdiskMeta.update.layout(this.args.ui.transformation.cache, performance.now()-t3)
+            this.unitdiskMeta.update.layout()
 
             this.animateUp()
         })
@@ -225,13 +225,13 @@ export class Hypertree
             else
                 new_[pathId] = true // könnte alles sein oder?
 
-        //this.ui.updateSelection()        
+        //this.ui.updateSelection()
         //requestAnimationFrame(()=> this.unitdisk.updateTransformation())
         requestAnimationFrame(()=> {
-            this.unitdiskMeta.update.layout()
-            this.layerStackMeta2.update.data()
-            this.layerStackMeta.update.data()
             this.unitdisk.updateSelection()
+            this.unitdiskMeta.update.transformation()
+            this.layerStackMeta2.update.data()
+            this.layerStackMeta.update.data()            
         })
     }
 
@@ -258,15 +258,21 @@ export class Hypertree
             this.args.ui.transformation.state.P.im = -this.args.ui.transformation.cache.centerNode.z.im
         }
 
-        this.updateTransformation()
+        requestAnimationFrame(()=> {
+            this.unitdisk.updateTransformation() 
+            this.unitdiskMeta.update.layout()
+            this.unitdiskMeta.update.transformation()
+            this.layerStackMeta2.update.data()
+            this.layerStackMeta.update.data()            
+        })
     }
 
     public updateTransformation() : void {
         requestAnimationFrame(()=> {
-            this.unitdiskMeta.update.layout()
-            this.layerStackMeta2.update.data()
-            this.layerStackMeta.update.data()
             this.unitdisk.updateTransformation() 
+            this.unitdiskMeta.update.transformation()
+            this.layerStackMeta2.update.data()
+            this.layerStackMeta.update.data()            
         })
     }
 
@@ -292,19 +298,19 @@ export class Hypertree
 
                 //app.toast('Layout')
                 this.args.layout(this.data, this.args.ui.transformation.state)
-                this.unitdisk.updateData()
-
+                
                 if (this.data
                     .leaves()
                     .reduce((max, n)=> Math.max(max, CktoCp(n.z).r), 0) > .95) 
                     this.animation = false
                 else 
-                    requestAnimationFrame(()=> {
-                        this.unitdiskMeta.update.layout()
-                        this.layerStackMeta2.update.data()
-                        this.layerStackMeta.update.data()
-                        frame()
-                    })
+                    requestAnimationFrame(()=> frame())
+
+                this.unitdisk.updateData()
+                this.unitdiskMeta.update.layout()
+                this.unitdiskMeta.update.transformation()
+                this.layerStackMeta2.update.data()
+                this.layerStackMeta.update.data()
             }
         }
         requestAnimationFrame(()=> frame())
@@ -314,7 +320,7 @@ export class Hypertree
         var view = this.unitdisk.args.transformation.isMoving()
         var nav = this.unitdisk.navParameter 
                && this.unitdisk.navParameter.args.transformation.isMoving()
-        return view || nav
+        return view || nav || this.animation
     }
 }
 
