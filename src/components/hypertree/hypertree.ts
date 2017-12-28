@@ -110,12 +110,7 @@ export class Hypertree
     }              = {}    
 
     constructor(args : HypertreeArgs) {
-        this.args = args
-        this.unitdiskMeta = new UnitdiskMeta({ 
-            view: { parent:this.args.parent, className:'data' },
-            model: this.args 
-        })
-        
+        this.args = args        
         this.view = HTML.parse<HTMLElement>(hypertreehtml)()
         args.parent.appendChild(this.view)
 
@@ -132,8 +127,12 @@ export class Hypertree
             caption:        (n:N)=> this.args.ui.caption(this, n),
             clipRadius:     this.args.ui.clipRadius,
             nodeRadius:     this.args.ui.nodeRadius            
-        })        
+        })
 
+        this.unitdiskMeta = new UnitdiskMeta({ 
+            view: { parent:this.args.parent, className:'data' },
+            model: this.unitdisk.view
+        })
         this.layerStackMeta = new LayerStackMeta({
             view: { parent:this.args.parent, className: 'data' },
             model: this.unitdisk
@@ -159,21 +158,27 @@ export class Hypertree
         this.args.dataloader((d3h, t1)=> {
             var t2 = performance.now()
             var ncount = 1
-            var model = <N & d3.HierarchyNode<N>>d3
+            this.data = <N & d3.HierarchyNode<N>>d3
                             .hierarchy(d3h)
                             .each((n:any)=> n.mergeId = ncount++)
                             //.sum(this.args.weight) // this.updateWeights()
 
             this.view.querySelector('.preloader').innerHTML = ''
-            this.unitdiskMeta.update.model(model, [t1-t0, t2-t1, performance.now()-t2])
+            this.modelMeta = {
+                Δ: [t1-t0, t2-t1, performance.now()-t2]
+            }
+            this.unitdiskMeta.update.model(this.data, [t1-t0, t2-t1, performance.now()-t2])
 
             var t3 = performance.now()
-            this.data = this.args.layout(model, this.args.ui.transformation.state)
+            this.data = this.args.layout(this.data, this.args.ui.transformation.state)
             this.unitdisk.args.data = this.data
             this.args.ui.transformation.cache.N = this.data.descendants().length
             this.updateWeights()
             this.updateLang_()
-            this.updateImgHref_()
+            this.updateImgHref_()            
+            this.layoutMeta = {
+                Δ: performance.now()-t3
+            }
             this.unitdiskMeta.update.layout(this.args.ui.transformation.cache, performance.now()-t3)
 
             this.animateUp()
@@ -223,6 +228,7 @@ export class Hypertree
         //this.ui.updateSelection()        
         //requestAnimationFrame(()=> this.unitdisk.updateTransformation())
         requestAnimationFrame(()=> {
+            this.unitdiskMeta.update.layout()
             this.layerStackMeta2.update.data()
             this.layerStackMeta.update.data()
             this.unitdisk.updateSelection()
@@ -241,9 +247,11 @@ export class Hypertree
     private updateLayout() : void {        
         //app.toast('Layout')
         var t0 = performance.now()
-
         this.args.layout(this.data, this.args.ui.transformation.state)        
-        this.unitdiskMeta.update.layout(this.args.ui.transformation.cache, performance.now() - t0)
+        this.layoutMeta = {
+            Δ: performance.now()-t0
+        }
+        //this.unitdiskMeta.update.layout(this.args.ui.transformation.cache, performance.now() - t0)
         
         if (this.args.ui.transformation.cache.centerNode) {
             this.args.ui.transformation.state.P.re = -this.args.ui.transformation.cache.centerNode.z.re
@@ -255,6 +263,7 @@ export class Hypertree
 
     public updateTransformation() : void {
         requestAnimationFrame(()=> {
+            this.unitdiskMeta.update.layout()
             this.layerStackMeta2.update.data()
             this.layerStackMeta.update.data()
             this.unitdisk.updateTransformation() 
@@ -291,6 +300,7 @@ export class Hypertree
                     this.animation = false
                 else 
                     requestAnimationFrame(()=> {
+                        this.unitdiskMeta.update.layout()
                         this.layerStackMeta2.update.data()
                         this.layerStackMeta.update.data()
                         frame()

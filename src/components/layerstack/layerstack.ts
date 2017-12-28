@@ -18,8 +18,9 @@ export class LayerStack
     constructor(args: LayerStackArgs)
     {
         this.args = args
-        this.layers = {}
         this.mainSvgGroup = this.args.parent.append('g')        
+
+        this.layers = {}        
         for (var layerfactoryfunc of this.args.unitdisk.args.layers) {            
             var layer = layerfactoryfunc(this.args.unitdisk)
             layer.layerStack = this
@@ -43,13 +44,17 @@ export class LayerStack
         var names = []
 
         for (var l in this.layers) {
-            var beginTime = performance.now()
-
             var layer = this.layers[l]            
+            var beginTime = performance.now()
             layer.update.data()
 
             timings.push(performance.now() - beginTime)
             names.push(layer.name)
+        }
+
+        this.d3Meta = {
+            Δ: timings,
+            names: names
         }
 
         if (this.args.unitdisk.cache.unculledNodes.length != 3)

@@ -21,6 +21,7 @@ export interface IUnitDisk
 {
     args:                 UnitDiskArgs
     cache
+    cacheMeta
     layerStack:           LayerStack
 
     navParameter?:        UnitDisk,
@@ -55,14 +56,14 @@ export class UnitDisk implements IUnitDisk
     args          : UnitDiskArgs    
     voronoiLayout : d3.VoronoiLayout<N>    
     cache         : TransformationCache // zeigt auf transformation.cache
-
+    
     view          
     layerStack    : LayerStack
 
     constructor(args : UnitDiskArgs) {
         this.args = args
         this.cache = args.transformation.cache
-                
+                        
         this.view = d3.select(args.parent).append('g')
             .attr('class', this.args.className)
             .attr('transform', this.args.position)
@@ -107,18 +108,20 @@ export class UnitDisk implements IUnitDisk
 export class UnitDiskNav implements IUnitDisk
 {
     args          : UnitDiskArgs
-    cache         // redircteds NOT xD to view.cache
+    cache         // redircteds NOT xD to view.cache    
     layerStack
       
     view          : UnitDisk
     navBackground : UnitDisk
     navParameter  : UnitDisk
 
+    get cacheMeta() { return this.view.cacheMeta }
+
     constructor(args : UnitDiskArgs) {
         this.args = args
 
         this.view = new UnitDisk(args)
-        this.cache = this.view.cache
+        this.cache = this.view.cache        
         this.layerStack = this.view.layerStack
 
         var usedLayers = [1,0,0,0,0,0,1,0,0,1,0,0,0,0]
