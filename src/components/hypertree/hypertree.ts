@@ -18,8 +18,7 @@ import { UnitDiskArgs }        from '../unitdisk/unitdisk'
 import { UnitDisk }            from '../unitdisk/unitdisk'
 import { IUnitDisk }           from '../unitdisk/unitdisk'
 
-import { UnitdiskMeta }            from '../meta/unitdisk-meta/unitdisk-meta'
-import { LayerStackMeta }           from '../meta/layerstack-meta/layerstack-meta'
+import { HypertreeMeta }       from '../meta/hypertree-meta/hypertree-meta'
 
 var htmlpreloader = `
     <div class="preloader-wrapper big active">
@@ -97,9 +96,7 @@ export class Hypertree
 {
     args           : HypertreeArgs
     unitdisk       : IUnitDisk
-    unitdiskMeta   : UnitdiskMeta
-    layerStackMeta : LayerStackMeta
-    layerStackMeta2 : LayerStackMeta
+    hypertreeMeta  : HypertreeMeta
     data           : N
     langMap        : {}
     view           : HTMLElement
@@ -131,9 +128,14 @@ export class Hypertree
             nodeRadius:     this.args.ui.nodeRadius            
         })
 
+        this.hypertreeMeta = new this.unitdisk.HypertreeMetaType({ 
+            view: { parent:this.args.parent },
+            model: this
+        })
+        /*
         this.unitdiskMeta = new UnitdiskMeta({ 
             view: { parent:this.args.parent, className:'data' },
-            model: this.unitdisk.view
+            model: this.unitdisk
         })
         this.layerStackMeta = new LayerStackMeta({
             view: { parent:this.args.parent, className: 'data' },
@@ -144,9 +146,19 @@ export class Hypertree
                 view: { parent:this.args.parent, className: 'nav' },
                 model: this.unitdisk.navParameter
             }) 
-            
+        */    
+
         this.updateData()
         this.updateLang()
+    }
+
+    update = {
+        parent:         ()=> this.updateParent(),
+        data:           ()=> this.updateParent(),
+        lang:           ()=> this.updateParent(),        
+        layout:         ()=> this.updateParent(),
+        transformation: ()=> this.updateParent(),
+        pathes:         ()=> this.updateParent()
     }
 
     public updateData() : void {
@@ -161,15 +173,15 @@ export class Hypertree
             var t2 = performance.now()
             var ncount = 1
             this.data = <N & d3.HierarchyNode<N>>d3
-                            .hierarchy(d3h)
-                            .each((n:any)=> n.mergeId = ncount++)
-                            //.sum(this.args.weight) // this.updateWeights()
+                .hierarchy(d3h)
+                .each((n:any)=> n.mergeId = ncount++)
+                //.sum(this.args.weight) // this.updateWeights()
 
             this.view.querySelector('.preloader').innerHTML = ''
-            this.modelMeta = {
-                Δ: [t1-t0, t2-t1, performance.now()-t2]
-            }
-            this.unitdiskMeta.update.model()
+            this.modelMeta = { Δ: [t1-t0, t2-t1, performance.now()-t2] }
+            //this.unitdiskMeta.update.model()
+            //this.unitdisk.update.ajax()
+            this.hypertreeMeta.update.data()
 
             var t3 = performance.now()
             this.data = this.args.layout(this.data, this.args.ui.transformation.state)
@@ -178,10 +190,9 @@ export class Hypertree
             this.updateWeights()
             this.updateLang_()
             this.updateImgHref_()            
-            this.layoutMeta = {
-                Δ: performance.now()-t3
-            }
-            this.unitdiskMeta.update.layout()
+            this.layoutMeta = { Δ: performance.now()-t3 }
+            //this.unitdisk.update.layoutMeta()
+            this.hypertreeMeta.update.layout()
 
             this.animateUp()
         })
@@ -205,36 +216,6 @@ export class Hypertree
     private updateImgHref_() {
         for (var n of dfsFlat(this.data, n=>true)) 
             n.imageHref = this.args.iconmap.fileName2IconUrl(n.data.name, n.data.type)                    
-    }
-
-    public updatePath(pathId:string, n:N)
-    {
-        var old_ =  this.paths[pathId]
-        this.paths[pathId] = n
-        var new_ =  this.paths[pathId]
-
-        if (old_)
-            if (old_.ancestors) 
-                for (var pn of old_.ancestors())
-                    pn[pathId] = undefined
-            else
-                old_[pathId] = undefined
-
-        if (new_)
-            if (new_.ancestors) 
-                for (var pn of new_.ancestors()) 
-                    pn[pathId] = true // könnte alles sein oder?
-            else
-                new_[pathId] = true // könnte alles sein oder?
-
-        //this.ui.updateSelection()
-        //requestAnimationFrame(()=> this.unitdisk.updateTransformation())
-        requestAnimationFrame(()=> {
-            this.unitdisk.updateSelection()
-            this.unitdiskMeta.update.transformation()
-            this.layerStackMeta2.update.data()
-            this.layerStackMeta.update.data()            
-        })
     }
 
     private updateWeights() : void {
@@ -262,19 +243,53 @@ export class Hypertree
 
         requestAnimationFrame(()=> {
             this.unitdisk.updateTransformation() 
-            this.unitdiskMeta.update.layout()
-            this.unitdiskMeta.update.transformation()
-            this.layerStackMeta2.update.data()
-            this.layerStackMeta.update.data()            
+            this.hypertreeMeta.update.layout()
+            this.hypertreeMeta.update.transformation()
+            //this.unitdiskMeta.update.layout()
+            //this.unitdiskMeta.update.transformation()
+            //this.layerStackMeta2.update.data()
+            //this.layerStackMeta.update.data()            
         })
     }
 
     public updateTransformation() : void {
         requestAnimationFrame(()=> {
             this.unitdisk.updateTransformation() 
-            this.unitdiskMeta.update.transformation()
-            this.layerStackMeta2.update.data()
-            this.layerStackMeta.update.data()            
+            this.hypertreeMeta.update.transformation()
+            //this.unitdiskMeta.update.transformation()
+            //this.layerStackMeta2.update.data()
+            //this.layerStackMeta.update.data()            
+        })
+    }
+
+    public updatePath(pathId:string, n:N)
+    {
+        var old_ =  this.paths[pathId]
+        this.paths[pathId] = n
+        var new_ =  this.paths[pathId]
+
+        if (old_)
+            if (old_.ancestors) 
+                for (var pn of old_.ancestors())
+                    pn[pathId] = undefined
+            else
+                old_[pathId] = undefined
+
+        if (new_)
+            if (new_.ancestors) 
+                for (var pn of new_.ancestors()) 
+                    pn[pathId] = true // könnte alles sein oder?
+            else
+                new_[pathId] = true // könnte alles sein oder?
+
+        //this.ui.updateSelection()
+        //requestAnimationFrame(()=> this.unitdisk.updateTransformation())
+        requestAnimationFrame(()=> {
+            this.unitdisk.updateSelection()
+            this.hypertreeMeta.update.transformation()
+            //this.unitdiskMeta.update.transformation()
+            //this.layerStackMeta2.update.data()
+            //this.layerStackMeta.update.data()            
         })
     }
 
@@ -309,10 +324,11 @@ export class Hypertree
                     requestAnimationFrame(()=> frame())
 
                 this.unitdisk.updateData()
-                this.unitdiskMeta.update.layout()
-                this.unitdiskMeta.update.transformation()
-                this.layerStackMeta2.update.data()
-                this.layerStackMeta.update.data()
+                this.hypertreeMeta.update.transformation()
+                //this.unitdiskMeta.update.layout()
+                //this.unitdiskMeta.update.transformation()
+                //this.layerStackMeta2.update.data()
+                //this.layerStackMeta.update.data()
             }
         }
         requestAnimationFrame(()=> frame())

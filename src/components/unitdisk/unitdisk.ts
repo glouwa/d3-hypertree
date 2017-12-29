@@ -16,12 +16,16 @@ import { CellLayer }                     from '../layerstack/layers/cell-layer'
 import { LabelLayer }                    from '../layerstack/layers/text-rect-layer'
 import { InteractionLayer }              from '../layerstack/layers/interaction-layer'
 import { LayerStack }                    from '../layerstack/layerstack'
+import { HypertreeMeta }                 from '../meta/hypertree-meta/hypertree-meta'
+import { HypertreeMetaNav }               from '../meta/hypertree-meta/hypertree-meta'
 
 export interface IUnitDisk
 {
     args:                 UnitDiskArgs
     cache    
     layerStack:           LayerStack
+
+    HypertreeMetaType
 
     navParameter?:        UnitDisk,
 
@@ -59,6 +63,8 @@ export class UnitDisk implements IUnitDisk
     view          
     layerStack    : LayerStack
 
+    HypertreeMetaType = HypertreeMeta
+
     constructor(args : UnitDiskArgs) {
         this.args = args
         this.cache = args.transformation.cache
@@ -79,26 +85,49 @@ export class UnitDisk implements IUnitDisk
         
         this.args.cacheUpdate(this, this.cache)
 
-        this.layerStack = new LayerStack({
+        this.layerStack = new LayerStack({ 
             parent: this.view,
             unitdisk: this
         })
+/*
+        this.unitdiskMeta = new UnitdiskMeta({ 
+            view: { parent:this.args.parent.parentNode, className:'data' },
+            model: this
+        })
+        this.layerStackMeta = new LayerStackMeta({
+            view: { parent:this.args.parent.parentNode, className: 'data' },
+            model: this
+        })       */
+    }
+
+    update = {
+        ajax:       ()=> this.updateData(),
+        layoutMeta: ()=> this.unitdiskMeta.update.layout()
     }
 
     public updateData() {        
         this.args.cacheUpdate(this, this.cache)
-
         this.layerStack.updateTransformation()
+
+  //      this.unitdiskMeta.update.transformation()        
+        //this.layerStackMeta.update.data()     
     }
 
     public updateTransformation() {
         this.args.cacheUpdate(this, this.cache)
-
         this.layerStack.updateTransformation()
+
+//        this.unitdiskMeta.update.transformation()        
+//        this.layerStackMeta.update.data()     
     }
 
-    public updateSelection() {
-        this.layerStack.updatePath()
+    public updateSelection() { 
+        //this.layerStack.updatePath()         TODO
+        this.args.cacheUpdate(this, this.cache)
+        this.layerStack.updateTransformation()
+
+//        this.unitdiskMeta.update.transformation()        
+//        this.layerStackMeta.update.data()     
     }
 }
 
@@ -113,6 +142,8 @@ export class UnitDiskNav implements IUnitDisk
     view          : UnitDisk
     navBackground : UnitDisk
     navParameter  : UnitDisk
+
+    HypertreeMetaType = HypertreeMetaNav
 
     constructor(args : UnitDiskArgs) {
         this.args = args
@@ -187,6 +218,7 @@ export class UnitDiskNav implements IUnitDisk
                                     })
                                 ],
             cacheUpdate:        (ud:UnitDisk, cache:TransformationCache)=> {
+                                    var t0 = performance.now()
                                     cache.unculledNodes = dfsFlat(ud.args.data)
                                     for (var n of cache.unculledNodes) {
                                         n.cache = n.cache || { re:0, im:0 }
@@ -202,6 +234,8 @@ export class UnitDiskNav implements IUnitDisk
                                     }
                                     cache.voronoiDiagram = ud.voronoiLayout(cache.unculledNodes)
                                     cache.cells = <any>cache.voronoiDiagram.polygons()            
+
+                                    ud.cacheMeta = { minWeight:[0], Δ:[performance.now()-t0] }
                                     //try { cache.voronoiDiagram = ud.voronoiLayout(cache.unculledNodes) } catch(e) {}
                                 },
             transformation:     navTransformation,
@@ -216,20 +250,23 @@ export class UnitDiskNav implements IUnitDisk
     public updateData() {
         this.navBackground.args.data = this.args.data
         this.view.args.data = this.args.data
-
+        
         this.navBackground.updateTransformation()
-        this.view.updateTransformation()
-        this.navParameter.updateTransformation()
-    }
-
-    public updateTransformation() {
         this.view.updateTransformation()
         this.navParameter.updateTransformation()        
     }
-    public updateSelection() {
+
+    public updateTransformation() 
+    {
         this.view.updateTransformation()
+        this.navParameter.updateTransformation()        
+    }
+    public updateSelection() 
+    {
+        this.view.updateTransformation()                
         this.navBackground.updateSelection()
         this.navParameter.updateSelection() // wegen node hover
+        
     }        
 }
 

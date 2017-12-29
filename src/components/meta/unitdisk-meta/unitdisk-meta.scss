@@ -1,8 +1,14 @@
+.render-info.data {
+    bottom:1em;
+}
+.render-info.nav {
+    //top:1em;
+    bottom:13em;
+}
 .render-info {
     z-index: 1000;
     position: absolute;
-    left:1em;
-    bottom:1em;
+    left:1em;    
     width:18em;
     padding-left:.3em;
     padding-bottom:.1em;    

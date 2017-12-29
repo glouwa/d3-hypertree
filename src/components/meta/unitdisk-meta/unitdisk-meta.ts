@@ -100,6 +100,7 @@ interface UnitdiskMeta_UI {
 function UnitdiskMeta_({ parent, ud, className })
 {
     var ui = HTML.parse<HTMLElement & UnitdiskMeta_UI>(htmlinfo)()
+    ui.classList.add(className)
     parent.appendChild(ui)
 
     class Row {                
