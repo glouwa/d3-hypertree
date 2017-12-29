@@ -167,7 +167,7 @@ export class Hypertree
         this.unitdisk.args.data = undefined
         this.paths.isSelected = undefined
         this.paths.isHovered= undefined
-        this.unitdisk.updateData()
+        this.unitdisk.update.layoutBoth()
 
         this.args.dataloader((d3h, t1)=> {
             var t2 = performance.now()
@@ -242,7 +242,7 @@ export class Hypertree
         }
 
         requestAnimationFrame(()=> {
-            this.unitdisk.updateTransformation() 
+            this.unitdisk.update.transformation() 
             this.hypertreeMeta.update.layout()
             this.hypertreeMeta.update.transformation()
             //this.unitdiskMeta.update.layout()
@@ -254,7 +254,7 @@ export class Hypertree
 
     public updateTransformation() : void {
         requestAnimationFrame(()=> {
-            this.unitdisk.updateTransformation() 
+            this.unitdisk.update.transformation() 
             this.hypertreeMeta.update.transformation()
             //this.unitdiskMeta.update.transformation()
             //this.layerStackMeta2.update.data()
@@ -285,7 +285,7 @@ export class Hypertree
         //this.ui.updateSelection()
         //requestAnimationFrame(()=> this.unitdisk.updateTransformation())
         requestAnimationFrame(()=> {
-            this.unitdisk.updateSelection()
+            this.unitdisk.update.pathes()
             this.hypertreeMeta.update.transformation()
             //this.unitdiskMeta.update.transformation()
             //this.layerStackMeta2.update.data()
@@ -323,7 +323,7 @@ export class Hypertree
                 else 
                     requestAnimationFrame(()=> frame())
 
-                this.unitdisk.updateData()
+                this.unitdisk.update.layoutBoth()
                 this.hypertreeMeta.update.transformation()
                 //this.unitdiskMeta.update.layout()
                 //this.unitdiskMeta.update.transformation()

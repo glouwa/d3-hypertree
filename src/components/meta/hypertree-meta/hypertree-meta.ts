@@ -67,18 +67,21 @@ export class HypertreeMetaNav
             this.udView.update.model() 
             this.udNav.update.model() 
             this.lsView.update.data()
+            this.lsNav.update.data()
             this.lsNavParam.update.data()
         },
         layout:         ()=> {
             this.udView.update.layout()           
             this.udNav.update.layout()           
             this.lsView.update.data()
+            this.lsNav.update.data()
             this.lsNavParam.update.data()
         },
         transformation: ()=> {
             this.udView.update.transformation() 
             this.udNav.update.transformation()           
             this.lsView.update.data()
+            this.lsNav.update.data()
             this.lsNavParam.update.data()
         }
     }

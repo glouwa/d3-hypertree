@@ -100,21 +100,35 @@ export class UnitDisk implements IUnitDisk
         })       */
     }
 
-    update = {
-        ajax:       ()=> this.updateData(),
-        layoutMeta: ()=> this.unitdiskMeta.update.layout()
+    public calcCache()
+    {
+        this.args.cacheUpdate(this, this.cache)
     }
 
-    public updateData() {        
-        this.args.cacheUpdate(this, this.cache)
+    update = {
+        layoutBoth:     ()=> this.update.layout(),
+        layout:         ()=> { 
+            this.args.cacheUpdate(this, this.cache)
+            this.updateData()
+        },
+        transformation: ()=> {
+            this.args.cacheUpdate(this, this.cache)
+            this.updateTransformation()
+        },
+        pathes:         ()=> {
+            this.args.cacheUpdate(this, this.cache)
+            this.updateSelection()
+        }
+    }
+
+    public updateData() {                
         this.layerStack.updateTransformation()
 
   //      this.unitdiskMeta.update.transformation()        
         //this.layerStackMeta.update.data()     
     }
 
-    public updateTransformation() {
-        this.args.cacheUpdate(this, this.cache)
+    public updateTransformation() {        
         this.layerStack.updateTransformation()
 
 //        this.unitdiskMeta.update.transformation()        
@@ -122,9 +136,8 @@ export class UnitDisk implements IUnitDisk
     }
 
     public updateSelection() { 
-        //this.layerStack.updatePath()         TODO
-        this.args.cacheUpdate(this, this.cache)
-        this.layerStack.updateTransformation()
+        //this.layerStack.updatePath()         TODO        
+        this.layerStack.updatePath()
 
 //        this.unitdiskMeta.update.transformation()        
 //        this.layerStackMeta.update.data()     
@@ -245,6 +258,28 @@ export class UnitDiskNav implements IUnitDisk
             nodeRadius:         .16,
             clipRadius:         1.7
         })
+    }
+    
+    update = {
+        layoutBoth:     ()=> { 
+            this.view.calcCache()
+            this.navParameter.calcCache()
+            this.updateData()
+        },
+        layout:         ()=> { 
+            this.view.calcCache()
+            this.navParameter.calcCache()
+            this.updateData()
+        },
+        transformation: ()=> {
+            this.view.calcCache()
+            this.navParameter.calcCache()
+            this.updateTransformation()
+        },
+        pathes:         ()=> {
+            this.view.calcCache()            
+            this.updateSelection()
+        }
     }
 
     public updateData() {
