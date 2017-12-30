@@ -167,7 +167,7 @@ export class Hypertree
         this.unitdisk.args.data = undefined
         this.paths.isSelected = undefined
         this.paths.isHovered= undefined
-        this.unitdisk.update.layoutBoth()
+        this.unitdisk.update.data()
 
         this.args.dataloader((d3h, t1)=> {
             var t2 = performance.now()
@@ -331,7 +331,7 @@ export class Hypertree
                 else 
                     requestAnimationFrame(()=> frame())
 
-                this.unitdisk.update.layoutBoth()
+                this.unitdisk.update.data()
                 this.hypertreeMeta.update.transformation()
                 //this.unitdiskMeta.update.layout()
                 //this.unitdiskMeta.update.transformation()

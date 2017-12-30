@@ -64,14 +64,14 @@ $nodeStroke:    #90caf9;
         //.hovered        { stroke: $hovercolor;                         fill: lighten($hovercolor, 25%);             }
         .hovered.arc      { stroke: rgba($hovercolor, 1);                                                          }
         .hovered-path.arc { stroke: rgba($hovercolor, .2);                                                          }
-        .hovered-path-nav.arc { stroke: rgba($hovercolor, .8);                                                          }
+        .hovered-path-nav.arc { stroke: rgba(red, .5);                                                          }
         //.hovered.cell   { stroke: rgba($hovercolor, .05);              fill: rgba($hovercolor, .0)                  }
         .hovered.node     { stroke: darken($hovercolor, 10%);                                                         }
 
         //.selected       { stroke: $selectedcolor;                      fill: lighten($selectedcolor, 25%);          }
         .selected.arc      { stroke: rgba($selectedcolor, 1);                                                       }
         .selected-path.arc { stroke: rgba($selectedcolor, .2);                                                       }
-        .selected-path-nav.arc { stroke: rgba($selectedcolor, .8);                                                       }
+        .selected-path-nav.arc { stroke: rgba($selectedcolor, 1);                                                       }
         .selected.cell     { stroke: rgba($selectedcolor, .2);           fill: rgba(lighten($selectedcolor, 0%), .1); }
         .selected.node     { stroke: darken($selectedcolor, 5%);                                                       }
         
@@ -97,7 +97,7 @@ $nodeStroke:    #90caf9;
             }
             .node:first-child {
                 fill:rgba(255, 255, 255, .02);
-                stroke: darken($nodeStroke, 25%);
+                stroke: rgba(#fff, .5);
                 stroke-width: .004;
             }
             .hovered.node {

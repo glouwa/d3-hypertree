@@ -100,8 +100,8 @@ export class UnitDisk implements IUnitDisk
     }
 
     update = {
-        layoutBoth:     ()=> this.update.layout(),
-        layout:         ()=> { 
+        data: ()=> this.update.layout(),
+        layout: ()=> { 
             this.args.cacheUpdate(this, this.cache)
             this.updateData()
         },
@@ -109,7 +109,7 @@ export class UnitDisk implements IUnitDisk
             this.args.cacheUpdate(this, this.cache)
             this.updateTransformation()
         },
-        pathes:         ()=> {
+        pathes: ()=> {
             this.args.cacheUpdate(this, this.cache)
             this.updateSelection()
         }
@@ -185,7 +185,8 @@ export class UnitDiskNav implements IUnitDisk
                                         name:       'link-arcs-focus',                            
                                         className:  'arc-focus',
                                         curvature:  '-', // + - 0 l
-                                        data:       ()=> ud.cache.links.filter(n=> n.cachep.r < .6),  
+                                        data:       ()=> ud.cache.links
+                                                        .filter(n=> n.parent.cachep.r < .6),  
                                         nodePos:    n=> n.zRef || n.z,
                                         nodePosStr: n=> n.strCacheZref || n.strCacheZ,
                                         width:      d=> arcWidth(d) + (.005 * d.dampedDistScale),
@@ -254,6 +255,8 @@ export class UnitDiskNav implements IUnitDisk
                                         transform:   d=> d.transformStrCache,
                                     }),
                                     (ud:UnitDisk)=> new LabelLayer({
+                                        invisible:  true,
+                                        hideOnDrag: true,   
                                         name:        'labels',
                                         data:        ()=> ud.cache.unculledNodes,
                                         text:        d=> ({ P:'+', θ:'🠆', λ:'⚲' })[d.name],
@@ -299,49 +302,40 @@ export class UnitDiskNav implements IUnitDisk
     }
     
     update = {
-        layoutBoth: ()=> { 
-            this.view.calcCache()
-            this.navParameter.calcCache()
-            this.updateData()
+        data: ()=> { 
+            this.navBackground.args.data = this.args.data
+            this.view.args.data = this.args.data
+
+            this.update.layout()
         },
         layout: ()=> { 
             this.view.calcCache()
             this.navParameter.calcCache()
-            this.updateData()
+
+            this.navBackground.updateTransformation() 
+            this.view.updateTransformation()
+            this.navParameter.updateTransformation()        
         },
         transformation: ()=> {
             this.view.calcCache()
             this.navParameter.calcCache()
-            this.updateTransformation()
+
+            this.view.updateTransformation()        
+            this.navParameter.updateTransformation()        
+            this.navBackground.updateSelection()
         },
         pathes: ()=> {
             this.view.calcCache()            
-            this.updateSelection()
+
+            this.view.updateTransformation()                
+            this.navBackground.updateSelection()
+            this.navParameter.updateTransformation() // wegen node hover
         }
     }
-
-    public updateData() {
-        this.navBackground.args.data = this.args.data
-        this.view.args.data = this.args.data
-        
-        this.navBackground.updateTransformation()
-        this.view.updateTransformation()
-        this.navParameter.updateTransformation()        
-    }
-
-    public updateTransformation() 
-    {
-        this.view.updateTransformation()        
-        this.navParameter.updateTransformation()        
-        this.navBackground.updateSelection()
-    }
-    public updateSelection() 
-    {
-        this.view.updateTransformation()                
-        this.navBackground.updateSelection()
-        this.navParameter.updateSelection() // wegen node hover
-        
-    }        
+    
+    // updateData()           => this.layerStack.updateTransformation()  
+    // updateTransformation() => this.layerStack.updateTransformation()      
+    // updateSelection()      => this.layerStack.updatePath()            
 }
 
 
