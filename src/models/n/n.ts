@@ -39,6 +39,7 @@ export interface N {
     ancestors,
     descendants,
     leaves,
+    each,
 
     sum,
 

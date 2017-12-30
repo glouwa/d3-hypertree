@@ -1,5 +1,6 @@
 import { N }              from '../../../models/n/n'
 import { CsubC, CktoCp }  from '../../../hyperbolic-math'
+import { C }              from '../../../hyperbolic-math'
 import { arcCenter }      from '../../../hyperbolic-math'
 import { ILayer }         from '../layer'
 import { D3UpdatePattern }from '../d3updatePattern'
@@ -7,12 +8,15 @@ import { D3UpdatePattern }from '../d3updatePattern'
 export type ArcCurvature = '+' | '0' | '-' | 'l'
 export interface ArcLayerArgs
 {
-    data:      ()=> any,
-    name:      string,
-    curvature: ArcCurvature,
-    classed:   (s,w)=> void,
+    data:       ()=> any,
+    name:       string,
+    className:  string,
+    curvature:  ArcCurvature,
+    nodePos:    (n)=> C,
+    nodePosStr: (n)=> string,
+    classed:    (s,w)=> void,
     width,
-    clip?:     string,
+    clip?:      string,
 }
 
 export class ArcLayer implements ILayer
@@ -21,16 +25,16 @@ export class ArcLayer implements ILayer
     d3updatePattern: D3UpdatePattern
     name:             string
   
+    constructor(args: ArcLayerArgs) {
+        this.args = args
+        this.name = args.name
+    }
+
     update = {
         parent:         ()=> this.attach(null),      
         data:           ()=> this.d3updatePattern.update.data(),
         transformation: ()=> this.d3updatePattern.update.transformation(),
         style:          ()=> this.d3updatePattern.update.style()
-    }
-
-    constructor(args: ArcLayerArgs) {
-        this.args = args
-        this.name = args.name
     }
 
     public attach(parent) {
@@ -40,16 +44,16 @@ export class ArcLayer implements ILayer
             clip:              this.args.clip,
             data:              this.args.data,
             name:              this.name,
-            className:         'arc',
+            className:         this.args.className,
             elementType:       this.args.curvature == 'l' ? 'line' : 'path',
             create:            s=> {},
             updateColor:       s=> this.args.classed(s, this.args.width),
-            updateTransform:   s=> {
+            updateTransform:   s=> {                
                 if (this.args.curvature == 'l')
-                    s.attr('x1',             d=> d.cache.re)
-                     .attr('y1',             d=> d.cache.im)
-                     .attr('x2',             d=> d.parent.cache.re)
-                     .attr('y2',             d=> d.parent.cache.im)
+                    s.attr('x1',             d=> this.args.nodePos(d).re)
+                     .attr('y1',             d=> this.args.nodePos(d).im)
+                     .attr('x2',             d=> this.args.nodePos(d.parent).re)
+                     .attr('y2',             d=> this.args.nodePos(d.parent).im)
                      .attr("stroke-width",   d=> this.args.width(d))
                      .attr("stroke-linecap", d=> "round")
                 else
@@ -68,29 +72,30 @@ export class ArcLayer implements ILayer
         return this.arcOptions[this.args.curvature](d)
     }
 
+    private arcOptions = {
+        '+': this.svgArc('1', '0'),
+        '-': this.svgArc('0', '1'),
+        '0': this.svgArcLine,
+    }
+
     private svgArc(a:string, b:string) : (d:N)=> string {
+        var $this = this        
         return function(d) : string {
-            var arcP1 = d.cache
-            var arcP2 = d.parent.cache
+            var arcP1 = $this.args.nodePos(d)
+            var arcP2 = $this.args.nodePos(d.parent)
             var arcC = arcCenter(arcP1, arcP2)
 
-            var r = CktoCp(CsubC(arcP2, arcC.c)).r; if (isNaN(r)) r = 0;
-            var s = d.strCache
+            var r = CktoCp(CsubC(arcP2, arcC.c)).r; if (isNaN(r)) r = 0;            
             var f = arcC.d>0 ? a : b
-            var e = d.parent.strCache
+            var s = $this.args.nodePosStr(d)
+            var e = $this.args.nodePosStr(d.parent)
             return `M ${s} A ${r} ${r}, 0, 0, ${f}, ${e}`
         }
     }
 
     private svgArcLine(d) {
-        var s = d.strCache
-        var e = d.parent.strCache
+        var s = this.args.nodePosStr(d)
+        var e = this.args.nodePosStr(d.parent)
         return `M ${s} L ${e}`
-    }
-
-    private arcOptions = {
-        '+': this.svgArc('1', '0'),
-        '-': this.svgArc('0', '1'),
-        '0': this.svgArcLine,
     }
 }

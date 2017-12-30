@@ -57,8 +57,10 @@ export class LayerStack
     }
 
     public updatePath() {
-        if (this.layers['link-arcs']) this.layers['link-arcs'].update.style()
-        if (this.layers['link-lines']) this.layers['link-lines'].update.style()            
-        if (this.layers.nodes) this.layers.nodes.update.style()        
+        if (this.layers['path-arcs']) this.layers['path-arcs'].update.data()
+        if (this.layers['link-arcs-focus']) this.layers['link-arcs-focus'].update.data()
+
+        //if (this.layers['link-lines']) this.layers['link-lines'].update.style()            
+        //if (this.layers.nodes) this.layers.nodes.update.style()        
     }
 }

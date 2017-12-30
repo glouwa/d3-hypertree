@@ -13,11 +13,14 @@ import { TransformationCache }           from '../../hyperbolic-transformation'
 import { ILayer }                        from '../layerstack/layer'
 import { NodeLayer }                     from '../layerstack/layers/node-layer'
 import { CellLayer }                     from '../layerstack/layers/cell-layer'
+import { BackgroundLayer }               from '../layerstack/layers/background-layer'
+import { SymbolLayer }                   from '../layerstack/layers/symbol-layer'
+import { ArcLayer }                      from '../layerstack/layers/link-layer'
 import { LabelLayer }                    from '../layerstack/layers/text-rect-layer'
 import { InteractionLayer }              from '../layerstack/layers/interaction-layer'
 import { LayerStack }                    from '../layerstack/layerstack'
 import { HypertreeMeta }                 from '../meta/hypertree-meta/hypertree-meta'
-import { HypertreeMetaNav }               from '../meta/hypertree-meta/hypertree-meta'
+import { HypertreeMetaNav }              from '../meta/hypertree-meta/hypertree-meta'
 
 export interface IUnitDisk
 {
@@ -89,15 +92,6 @@ export class UnitDisk implements IUnitDisk
             parent: this.view,
             unitdisk: this
         })
-/*
-        this.unitdiskMeta = new UnitdiskMeta({ 
-            view: { parent:this.args.parent.parentNode, className:'data' },
-            model: this
-        })
-        this.layerStackMeta = new LayerStackMeta({
-            view: { parent:this.args.parent.parentNode, className: 'data' },
-            model: this
-        })       */
     }
 
     public calcCache()
@@ -122,25 +116,16 @@ export class UnitDisk implements IUnitDisk
     }
 
     public updateData() {                
-        this.layerStack.updateTransformation()
-
-  //      this.unitdiskMeta.update.transformation()        
-        //this.layerStackMeta.update.data()     
+        this.layerStack.updateTransformation()  
     }
 
     public updateTransformation() {        
-        this.layerStack.updateTransformation()
-
-//        this.unitdiskMeta.update.transformation()        
-//        this.layerStackMeta.update.data()     
+        this.layerStack.updateTransformation()  
     }
 
     public updateSelection() { 
         //this.layerStack.updatePath()         TODO        
         this.layerStack.updatePath()
-
-//        this.unitdiskMeta.update.transformation()        
-//        this.layerStackMeta.update.data()     
     }
 }
 
@@ -164,15 +149,67 @@ export class UnitDiskNav implements IUnitDisk
         this.view = new UnitDisk(args)
         this.cache = this.view.cache        
         this.layerStack = this.view.layerStack
+        
+        var arcWidth = d=>
+            .022
+            * d.distScale
+            * d.weightScale
 
-        var usedLayers = [1,0,0,0,0,0,1,0,0,1,0,0,0,0]
         this.navBackground = new UnitDisk({
             parent:             args.parent,
             className:          'nav-background-disc',
             position:           'translate(120,120) scale(60)',
             hypertree:          args.hypertree,
             data:               args.data,
-            layers:             args.layers.filter((l, idx)=> usedLayers[idx]),
+            //layers:             args.layers.filter((l, idx)=> usedLayers[idx]),
+            layers:             [
+                                    (ud:UnitDisk)=> new BackgroundLayer({}),
+                                    (ud:UnitDisk)=> new CellLayer({
+                                        invisible:  true,
+                                        hideOnDrag: true,                    
+                                        clip:       '#circle-clip' + ud.args.clipRadius,                            
+                                        data:       ()=> ud.cache.cells,      
+                                        // TODO: read d.z                      
+                                    }),
+                                    (ud:UnitDisk)=> new ArcLayer({                                        
+                                        name:       'link-arcs',                            
+                                        className:  'arc',
+                                        curvature:  '-', // + - 0 l
+                                        data:       ()=> ud.cache.links,  
+                                        nodePos:    n=> n.zRef || n.z,
+                                        nodePosStr: n=> n.strCacheZref || n.strCacheZ,
+                                        width:      d=> arcWidth(d),
+                                        classed:    (s,w)=> {}
+                                    }),
+                                    (ud:UnitDisk)=> new ArcLayer({                                        
+                                        name:       'link-arcs-focus',                            
+                                        className:  'arc-focus',
+                                        curvature:  '-', // + - 0 l
+                                        data:       ()=> ud.cache.links.filter(n=> n.cachep.r < .6),  
+                                        nodePos:    n=> n.zRef || n.z,
+                                        nodePosStr: n=> n.strCacheZref || n.strCacheZ,
+                                        width:      d=> arcWidth(d) + (.005 * d.dampedDistScale),
+                                        classed:    (s,w)=> {}
+                                    }),
+                                    (ud:UnitDisk)=> new ArcLayer({                                        
+                                        name:       'path-arcs',                
+                                        className:  'arc',
+                                        curvature:  '-', // + - 0 l
+                                        data:       ()=> ud.cache.paths,       
+                                        nodePos:    n=> n.zRef || n.z,
+                                        nodePosStr: n=> n.strCacheZref || n.strCacheZ,
+                                        width:      d=> arcWidth(d) + (.013 * d.dampedDistScale),
+                                        classed:    s=> s.classed("hovered-path-nav",  d=> d.isHovered)
+                                                         .classed("selected-path-nav", d=> d.isSelected)
+                                    }),                                    
+                                    (ud:UnitDisk)=> new SymbolLayer({
+                                        name:       'symbols',
+                                        data:       ()=> ud.cache.spezialNodes,                                        
+                                        r:          d=> .03,
+                                        transform:  d=> d.transformStrCache 
+                                                        + ` scale(${d.dampedDistScale})`,
+                                    }),
+                                ],
             cacheUpdate:        args.cacheUpdate,
             transformation:     args.transformation,
             transform:          (n:N)=> n.z,
@@ -211,6 +248,7 @@ export class UnitDiskNav implements IUnitDisk
                                     }), 
                                     (ud:UnitDisk)=> new NodeLayer({
                                         name:        'nodes',
+                                        className:   'node',
                                         data:        ()=> ud.cache.unculledNodes,
                                         r:           d=> ud.args.nodeRadius * (d.name==='P' ? Pscale(ud)(d) : 1),
                                         transform:   d=> d.transformStrCache,
@@ -261,12 +299,12 @@ export class UnitDiskNav implements IUnitDisk
     }
     
     update = {
-        layoutBoth:     ()=> { 
+        layoutBoth: ()=> { 
             this.view.calcCache()
             this.navParameter.calcCache()
             this.updateData()
         },
-        layout:         ()=> { 
+        layout: ()=> { 
             this.view.calcCache()
             this.navParameter.calcCache()
             this.updateData()
@@ -276,7 +314,7 @@ export class UnitDiskNav implements IUnitDisk
             this.navParameter.calcCache()
             this.updateTransformation()
         },
-        pathes:         ()=> {
+        pathes: ()=> {
             this.view.calcCache()            
             this.updateSelection()
         }
@@ -293,8 +331,9 @@ export class UnitDiskNav implements IUnitDisk
 
     public updateTransformation() 
     {
-        this.view.updateTransformation()
+        this.view.updateTransformation()        
         this.navParameter.updateTransformation()        
+        this.navBackground.updateSelection()
     }
     public updateSelection() 
     {

@@ -303,10 +303,12 @@ export class Hypertree
         var frame = ()=>
         {
             var p = step++/steps
-            if (step > steps) {
+            if (step > steps) 
+            {
                 this.animation = false
             }
-            else {
+            else 
+            {
                 var λ = .03 + p * .98
                 var π = Math.PI
                 var animλ = CptoCk({ θ:2*π*λ, r:1 })
@@ -318,8 +320,14 @@ export class Hypertree
                 
                 if (this.data
                     .leaves()
-                    .reduce((max, n)=> Math.max(max, CktoCp(n.z).r), 0) > .95) 
+                    .reduce((max, n)=> Math.max(max, CktoCp(n.z).r), 0) > .95)                     
+                {
                     this.animation = false
+                    this.data.each((n:any)=> { 
+                        n.zRef = n.z
+                        n.strCacheZref = `${n.z.re} ${n.z.im}`
+                    })
+                }
                 else 
                     requestAnimationFrame(()=> frame())
 
