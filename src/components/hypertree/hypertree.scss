@@ -12,6 +12,13 @@
             margin-top: .27em;
             padding:0;
         }
+
+        .tool-seperator {
+            margin-top: .6em;
+        }
+        .tool-active {
+            background-color: #333;
+        }
     }
 
     svg {

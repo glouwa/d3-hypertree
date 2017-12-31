@@ -15,8 +15,10 @@ import { Transformation }      from '../../hyperbolic-transformation'
 import { ILayer }              from '../layerstack/layer'
 import { D3UpdatePatternArgs } from '../layerstack/d3updatePattern'
 import { UnitDiskArgs }        from '../unitdisk/unitdisk'
-import { UnitDisk }            from '../unitdisk/unitdisk'
 import { IUnitDisk }           from '../unitdisk/unitdisk'
+import { UnitDisk }            from '../unitdisk/unitdisk'
+import { UnitDiskNav }         from '../unitdisk/unitdisk'
+
 
 import { HypertreeMeta }       from '../meta/hypertree-meta/hypertree-meta'
 import { NoHypertreeMeta }     from '../meta/hypertree-meta/hypertree-meta'
@@ -79,35 +81,41 @@ export interface IHypertree
     updateTransformation: (T)=> void
 }
 
-var htmlHomeBtn =
-    `<button id="btnhome" class="btn btn-small waves-effect waves-orange pn">
-        <i class="material-icons btn-icon-home">home</i>
+var btn = (name, icon, classes='')=>
+    `<button id="${name}" class="btn btn-small waves-effect waves-orange pn ${classes}">        
+        <i class="material-icons">${icon}</i>
     </button>`
 
-var htmlNavBtn =
-    `<button id="btnnav" class="btn btn-small waves-effect waves-orange pn">
-        <i class="material-icons">near_me</i>        
-    </button>`
+// explore | near_me | fingerprint
+// edit | content_cut | border_color | edit_location
+// pan_tool | open_with | search | settings_overscan
 
-var htmlMetaBtn =
-    `<button id="btnmeta" class="btn btn-small waves-effect waves-orange pn">
-        <!--<i class="material-icons">fingerprint</i>-->
-        <!--<i class="material-icons">blur_on</i>-->
-        <!--<i class="material-icons">memory</i>-->
-        <i class="material-icons">layers</i>
-    </button>`
+//${btn('btnupload', 'cloud_upload')}
+//${btn('btndownload', 'cloud_download')}                   
 
 var hypertreehtml =
     `<div class="unitdisk-nav">        
         <div class=tool-bar>
-            ${htmlHomeBtn}
-            ${htmlNavBtn}
-            ${htmlMetaBtn}        
-        </div>
+            ${btn('btnundo', 'undo')}
+            ${btn('btncommit', 'check')}
+            ${btn('btnnav', 'near_me', 'tool-seperator')}
+            ${btn('btnmeta', 'layers')}
+            ${btn('btnhome', 'home', 'tool-seperator')}
+            ${btn('btnsearch', 'search')}
+            ${btn('btndownload', 'file_download')}
+            <!--${btn('btncut', 'content_cut')}
+            ${btn('btncopy', 'content_copy')}
+            ${btn('btnpaste', 'content_paste')}
+            ${btn('btnbrowse', 'open_with', 'tool-seperator tool-active')}
+            ${btn('btnadd', 'add')}
+            ${btn('btnedit', 'border_color')}
+            ${btn('btndelte', 'delete')}-->
+        </div> 
         <svg width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">
             ${bubbleSvgDef}
         </svg>        
         <div class="preloader"></div>        
+        <div id="meta"></div>        
     </div>`
 
 /**
@@ -136,34 +144,59 @@ export class Hypertree
     constructor(args : HypertreeArgs) {
         this.args = args        
         this.update.parent()
-
-        this.view.querySelector('#btnmeta').onclick = ()=> {
-            this.noHypertreeMeta = NoHypertreeMeta
-            this.noHypertreeMeta = undefined
-            this.update.parent()
-        }
     }
 
     update = {
         parent:         ()=> this.updateParent(),
-        data:           ()=> this.updateParent(),
-        lang:           ()=> this.updateParent(),        
-        layout:         ()=> this.updateParent(),
-        transformation: ()=> this.updateParent(),
-        pathes:         ()=> this.updateParent()
+        unitdiskView:   ()=> { this.updateUnitdiskView(); this.updateMetaView(); },
+        metaView:       ()=> this.updateMetaView(),
+
+        data:           ()=> this.updateData(),
+        lang:           ()=> this.updateLang(),        
+        layout:         ()=> this.updateLayout(),
+        transformation: ()=> this.updateTransformation(),
+        pathes:         ()=> this.updatePath()
     }
 
     private updateParent()
     {
         this.view = HTML.parse<HTMLElement>(hypertreehtml)()
+        this.args.parent.innerHTML = ''
         this.args.parent.appendChild(this.view)
 
+        this.view.querySelector('#btnmeta').onclick = ()=> {
+            this.noHypertreeMeta = this.noHypertreeMeta ? undefined : new NoHypertreeMeta()            
+            this.update.metaView()
+            this.hypertreeMeta.update.data()
+            this.hypertreeMeta.update.layout()
+            this.hypertreeMeta.update.transformation()
+        }
+        this.view.querySelector('#btnnav').onclick = ()=> {
+            this.args.decorator = this.args.decorator === UnitDiskNav ? UnitDisk : UnitDiskNav
+            this.update.unitdiskView()
+            this.unitdisk.update.data()
+            this.hypertreeMeta.update.data()
+            this.hypertreeMeta.update.layout()
+            this.hypertreeMeta.update.transformation()
+        }
+
+        this.updateUnitdiskView()
+        this.updateMetaView()        
+
+        this.updateData()
+        this.updateLang()
+    }
+
+    private updateUnitdiskView()
+    {
+        var p = this.view.querySelector('.unitdisk-nav > svg')
+        p.innerHTML = bubbleSvgDef
         this.unitdisk = new this.args.decorator({
-            parent:         this.view.querySelector('.unitdisk-nav > svg'),
+            parent:         p,
             className:      'unitDisc',
             position:       'translate(520,500) scale(470)',
             hypertree:      this,
-            data:           undefined,            
+            data:           this.data,            
             transformation: this.args.ui.transformation,
             transform:      (n:N)=> this.unitdisk.args.transformation.transformPoint(n.z),
             layers:         this.args.ui.layers,
@@ -172,14 +205,18 @@ export class Hypertree
             clipRadius:     this.args.ui.clipRadius,
             nodeRadius:     this.args.ui.nodeRadius            
         })
+    }
 
-        this.hypertreeMeta = this.noHypertreeMeta || new this.unitdisk.HypertreeMetaType({ 
-            view: { parent:this.args.parent },
-            model: this
-        })
-
-        this.updateData()
-        this.updateLang()
+    private updateMetaView()
+    {
+        var p = this.view.querySelector('.unitdisk-nav > #meta')
+        p.innerHTML = ''
+        this.hypertreeMeta = 
+            this.noHypertreeMeta ||
+            new this.unitdisk.HypertreeMetaType({ 
+                view: { parent:p },
+                model: this
+            })
     }
 
     public updateData() : void {

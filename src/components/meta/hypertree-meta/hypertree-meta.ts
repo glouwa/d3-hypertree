@@ -2,7 +2,17 @@ import { UnitdiskMeta }   from '../unitdisk-meta/unitdisk-meta'
 import { LayerStackMeta } from '../layerstack-meta/layerstack-meta'
 import { Hypertree }      from '../../hypertree/hypertree'
 
-export class HypertreeMeta 
+export class NoHypertreeMeta
+{
+    public update = {
+        parent:         ()=> {},
+        data:           ()=> {},
+        layout:         ()=> {},
+        transformation: ()=> {}
+    }
+}
+
+export class HypertreeMeta
 {
     private view
     private model      : Hypertree
@@ -16,12 +26,15 @@ export class HypertreeMeta
     }
 
     update = {
-        parent:         ()=> this.updateParent(),        
-        data:           ()=> {
+        parent: ()=> this.updateParent(),    
+        all: ()=> {
+// TODO:
+        }, 
+        data: ()=> {
             this.udView.update.model() 
             this.lsView.update.data()
         },
-        layout:         ()=> {
+        layout: ()=> {
             this.udView.update.layout()           
             this.lsView.update.data()
         },
@@ -115,20 +128,3 @@ export class HypertreeMetaNav
     }
 }
 
-export class NoHypertreeMetaNav
-{
-    private view
-    private model : Hypertree
-    
-    constructor({ view, model }) {
-        this.view = view
-        this.model = model        
-    }
-
-    update = {
-        parent:         ()=> {},
-        data:           ()=> {},
-        layout:         ()=> {},
-        transformation: ()=> {}
-    }
-}
