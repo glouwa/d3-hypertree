@@ -16,7 +16,7 @@ import { CellLayer }                     from '../layerstack/layers/cell-layer'
 import { BackgroundLayer }               from '../layerstack/layers/background-layer'
 import { SymbolLayer }                   from '../layerstack/layers/symbol-layer'
 import { ArcLayer }                      from '../layerstack/layers/link-layer'
-import { LabelLayer }                    from '../layerstack/layers/text-rect-layer'
+import { LabelLayer }                    from '../layerstack/layers/label-layer'
 import { InteractionLayer }              from '../layerstack/layers/interaction-layer'
 import { LayerStack }                    from '../layerstack/layerstack'
 import { HypertreeMeta }                 from '../meta/hypertree-meta/hypertree-meta'
@@ -32,9 +32,16 @@ export interface IUnitDisk
 
     navParameter?:        UnitDisk,
 
+    update: {
+        data: ()=> void,
+        layout: ()=> void,
+        transformation: ()=> void,
+        pathes: ()=> void
+    }
+/*
     updateData:           ()=> void
     updateTransformation: ()=> void 
-    updateSelection:      ()=> void 
+    updateSelection:      ()=> void */
 }
 
 export interface UnitDiskArgs
@@ -67,6 +74,8 @@ export class UnitDisk implements IUnitDisk
     layerStack    : LayerStack
 
     HypertreeMetaType = HypertreeMeta
+
+    cacheMeta
 
     constructor(args : UnitDiskArgs) {
         this.args = args

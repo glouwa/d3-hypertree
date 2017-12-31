@@ -3,12 +3,14 @@ import { D3UpdatePattern } from '../d3updatePattern'
 
 export interface LabelLayerArgs
 {
-    name:      string,
-    data:      ()=> any,    
+    name:        string,
+    invisible?:  boolean,
+    hideOnDrag?: boolean,
+    data:        ()=> any,    
     delta,
     transform,
     text,
-    clip?:     string,
+    clip?:       string,
 }
 
 export class LabelLayer implements ILayer

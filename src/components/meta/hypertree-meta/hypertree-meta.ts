@@ -1,6 +1,7 @@
 import { UnitdiskMeta }   from '../unitdisk-meta/unitdisk-meta'
 import { LayerStackMeta } from '../layerstack-meta/layerstack-meta'
 import { Hypertree }      from '../../hypertree/hypertree'
+import { UnitDiskNav } from '../../../index';
 
 export class NoHypertreeMeta
 {
@@ -103,22 +104,22 @@ export class HypertreeMetaNav
         
         this.udView = new UnitdiskMeta({ 
             view: { parent:this.view.parent, className:'data' },
-            model: this.model.unitdisk.view
+            model: (<UnitDiskNav>this.model.unitdisk).view
         })
 
         this.udNav = new UnitdiskMeta({ 
             view: { parent:this.view.parent, className:'nav' },
-            model: this.model.unitdisk.navParameter
+            model: (<UnitDiskNav>this.model.unitdisk).navParameter
         })
         
         this.lsView = new LayerStackMeta({
             view: { parent:this.view.parent, className: 'data' },
-            model: this.model.unitdisk.view
+            model: (<UnitDiskNav>this.model.unitdisk).view
         })
         
         this.lsNav = new LayerStackMeta({
             view: { parent:this.view.parent, className: 'navBg' },
-            model: this.model.unitdisk.navBackground
+            model: (<UnitDiskNav>this.model.unitdisk).navBackground
         })
 
         this.lsNavParam = new LayerStackMeta({

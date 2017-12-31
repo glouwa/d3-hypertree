@@ -3,10 +3,11 @@ import { D3UpdatePattern } from '../d3updatePattern'
 
 export interface CellLayerArgs
 {    
-    invisible: boolean,
-    clip?:     string,
-    data:      ()=> any,
-}
+    invisible?:  boolean,
+    hideOnDrag?: boolean,    
+    clip?:       string,
+    data:        ()=> any,
+} 
 
 export class CellLayer implements ILayer
 {    

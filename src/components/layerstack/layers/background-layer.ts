@@ -3,6 +3,7 @@ import { D3UpdatePattern } from '../d3updatePattern'
 
 export interface BackgroundLayerArgs
 {
+    
 }
 
 export class BackgroundLayer implements ILayer

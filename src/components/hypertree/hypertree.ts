@@ -66,9 +66,9 @@ export interface HypertreeArgs
         clipRadius:     number,
         nodeRadius:     number,
         transformation: Transformation<N>,
-        cacheUpdate:    (cache:UnitDisk)=> void,
+        cacheUpdate:    (cache:IUnitDisk)=> void,
         caption:        (hypertree:Hypertree, n:N)=> string,       
-        layers:         ((ls:UnitDisk)=> ILayer)[],
+        layers:         ((ls:IUnitDisk)=> ILayer)[],
     }
 }
 
@@ -155,7 +155,7 @@ export class Hypertree
         lang:           ()=> this.updateLang(),        
         layout:         ()=> this.updateLayout(),
         transformation: ()=> this.updateTransformation(),
-        pathes:         ()=> this.updatePath()
+        pathes:         ()=> this.updatePath(null, null)
     }
 
     private updateParent()
@@ -164,14 +164,14 @@ export class Hypertree
         this.args.parent.innerHTML = ''
         this.args.parent.appendChild(this.view)
 
-        this.view.querySelector('#btnmeta').onclick = ()=> {
+        (<HTMLButtonElement>this.view.querySelector('#btnmeta')).onclick = ()=> {
             this.noHypertreeMeta = this.noHypertreeMeta ? undefined : new NoHypertreeMeta()            
             this.update.metaView()
             this.hypertreeMeta.update.data()
             this.hypertreeMeta.update.layout()
             this.hypertreeMeta.update.transformation()
         }
-        this.view.querySelector('#btnnav').onclick = ()=> {
+        (<HTMLButtonElement>this.view.querySelector('#btnnav')).onclick = ()=> {
             this.args.decorator = this.args.decorator === UnitDiskNav ? UnitDisk : UnitDiskNav
             this.update.unitdiskView()
             this.unitdisk.update.data()

@@ -3,24 +3,6 @@ import { HTML } from 'ducd'
 import { ILayer } from '../../layerstack/layer'
 import { IUnitDisk } from '../../unitdisk/unitdisk'
 
-var labelHtml  = (id)=>     `<div class="label"></div> `
-var countHtml  = (id)=>     `<div class="nodes"></div> `
-var switchHtml = (id)=>     `<div class="switch"></div> `
-var check1Html = (id, c)=>  `<div class="cbx">           
-                                <input type="checkbox" id="${id}" class="filled-in" ${c?'checked':''}/>
-                                <label for="${id}"></label>
-                             </div>`
-var barHtml    = (id)=>     `<div class="bar-bg"><div class="bar"></div></div>`
-var html       =            `<div class="layer-info"></div>`
-
-interface LayerStackMetaUi extends HTMLElement 
-{
-    updateSwitch,
-    updateCounts,
-    addSwitch,
-    addCheckboxes
-}
-
 export class LayerStackMeta
 {
     private view
@@ -55,6 +37,23 @@ export class LayerStackMeta
 
         this.ui.addSwitch()
     }
+}
+var labelHtml  = (id)=>     `<div class="label"></div> `
+var countHtml  = (id)=>     `<div class="nodes"></div> `
+var switchHtml = (id)=>     `<div class="switch"></div> `
+var check1Html = (id, c)=>  `<div class="cbx">           
+                                <input type="checkbox" id="${id}" class="filled-in" ${c?'checked':''}/>
+                                <label for="${id}"></label>
+                             </div>`
+var barHtml    = (id)=>     `<div class="bar-bg"><div class="bar"></div></div>`
+var html       =            `<div class="layer-info"></div>`
+
+interface LayerStackMetaUi extends HTMLElement 
+{
+    updateSwitch,
+    updateCounts,
+    addSwitch,
+    addCheckboxes
 }
 
 export function LayerInfo_({ parent, onCheckChange, className })
