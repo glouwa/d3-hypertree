@@ -19,6 +19,7 @@ import { UnitDisk }            from '../unitdisk/unitdisk'
 import { IUnitDisk }           from '../unitdisk/unitdisk'
 
 import { HypertreeMeta }       from '../meta/hypertree-meta/hypertree-meta'
+import { NoHypertreeMeta }     from '../meta/hypertree-meta/hypertree-meta'
 
 var htmlpreloader = `
     <div class="preloader-wrapper big active">
@@ -78,10 +79,33 @@ export interface IHypertree
     updateTransformation: (T)=> void
 }
 
+var htmlHomeBtn =
+    `<button id="btnhome" class="btn btn-small waves-effect waves-orange pn">
+        <i class="material-icons btn-icon-home">home</i>
+    </button>`
+
+var htmlNavBtn =
+    `<button id="btnnav" class="btn btn-small waves-effect waves-orange pn">
+        <i class="material-icons">near_me</i>        
+    </button>`
+
+var htmlMetaBtn =
+    `<button id="btnmeta" class="btn btn-small waves-effect waves-orange pn">
+        <!--<i class="material-icons">fingerprint</i>-->
+        <!--<i class="material-icons">blur_on</i>-->
+        <!--<i class="material-icons">memory</i>-->
+        <i class="material-icons">layers</i>
+    </button>`
+
 var hypertreehtml =
     `<div class="unitdisk-nav">        
+        <div class=tool-bar>
+            ${htmlHomeBtn}
+            ${htmlNavBtn}
+            ${htmlMetaBtn}        
+        </div>
         <svg width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">
-            ${bubbleSvgDef}            
+            ${bubbleSvgDef}
         </svg>        
         <div class="preloader"></div>        
     </div>`
@@ -107,13 +131,34 @@ export class Hypertree
     }              = {}    
     modelMeta
     layoutMeta
+    noHypertreeMeta
 
     constructor(args : HypertreeArgs) {
         this.args = args        
-        this.view = HTML.parse<HTMLElement>(hypertreehtml)()
-        args.parent.appendChild(this.view)
+        this.update.parent()
 
-        this.unitdisk = new args.decorator({
+        this.view.querySelector('#btnmeta').onclick = ()=> {
+            this.noHypertreeMeta = NoHypertreeMeta
+            this.noHypertreeMeta = undefined
+            this.update.parent()
+        }
+    }
+
+    update = {
+        parent:         ()=> this.updateParent(),
+        data:           ()=> this.updateParent(),
+        lang:           ()=> this.updateParent(),        
+        layout:         ()=> this.updateParent(),
+        transformation: ()=> this.updateParent(),
+        pathes:         ()=> this.updateParent()
+    }
+
+    private updateParent()
+    {
+        this.view = HTML.parse<HTMLElement>(hypertreehtml)()
+        this.args.parent.appendChild(this.view)
+
+        this.unitdisk = new this.args.decorator({
             parent:         this.view.querySelector('.unitdisk-nav > svg'),
             className:      'unitDisc',
             position:       'translate(520,500) scale(470)',
@@ -128,37 +173,13 @@ export class Hypertree
             nodeRadius:     this.args.ui.nodeRadius            
         })
 
-        this.hypertreeMeta = new this.unitdisk.HypertreeMetaType({ 
+        this.hypertreeMeta = this.noHypertreeMeta || new this.unitdisk.HypertreeMetaType({ 
             view: { parent:this.args.parent },
             model: this
         })
-        /*
-        this.unitdiskMeta = new UnitdiskMeta({ 
-            view: { parent:this.args.parent, className:'data' },
-            model: this.unitdisk
-        })
-        this.layerStackMeta = new LayerStackMeta({
-            view: { parent:this.args.parent, className: 'data' },
-            model: this.unitdisk
-        })
-        if (this.unitdisk.navParameter)
-            this.layerStackMeta2 = new LayerStackMeta({
-                view: { parent:this.args.parent, className: 'nav' },
-                model: this.unitdisk.navParameter
-            }) 
-        */    
 
         this.updateData()
         this.updateLang()
-    }
-
-    update = {
-        parent:         ()=> this.updateParent(),
-        data:           ()=> this.updateParent(),
-        lang:           ()=> this.updateParent(),        
-        layout:         ()=> this.updateParent(),
-        transformation: ()=> this.updateParent(),
-        pathes:         ()=> this.updateParent()
     }
 
     public updateData() : void {

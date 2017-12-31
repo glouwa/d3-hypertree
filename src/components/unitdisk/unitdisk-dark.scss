@@ -91,19 +91,20 @@ $nodeStroke:    #90caf9;
 
         .nav-parameter-disc {            
             .node {
-                fill: #252526;
-                stroke-width: .016;
+                fill: none;
+                stroke-width: 0;
                 stroke: #666;
             }
+            .hovered.node {
+                fill: #252526;
+                stroke: #666; 
+                stroke-width: .016;
+           }
             .node:first-child {
                 fill:rgba(255, 255, 255, .02);
                 stroke: rgba(#fff, .5);
                 stroke-width: .004;
-            }
-            .hovered.node {
-                 stroke: #fff; 
-                 //stroke-width: .016;
-            }
+            }            
             .cell {
                 stroke: #999;
                 fill: none;

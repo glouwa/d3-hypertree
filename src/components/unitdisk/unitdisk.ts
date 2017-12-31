@@ -158,7 +158,7 @@ export class UnitDiskNav implements IUnitDisk
         this.navBackground = new UnitDisk({
             parent:             args.parent,
             className:          'nav-background-disc',
-            position:           'translate(120,120) scale(60)',
+            position:           'translate(95,95) scale(70)',
             hypertree:          args.hypertree,
             data:               args.data,
             //layers:             args.layers.filter((l, idx)=> usedLayers[idx]),
@@ -238,7 +238,7 @@ export class UnitDiskNav implements IUnitDisk
         this.navParameter = new UnitDisk({
             parent:             args.parent,
             className:          'nav-parameter-disc',
-            position:           'translate(120,120) scale(60)',
+            position:           'translate(95,95) scale(70)',
             hypertree:          args.hypertree,
             data:               obj2data(args.transformation.state),
             layers:             [

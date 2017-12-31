@@ -114,3 +114,21 @@ export class HypertreeMetaNav
         }) 
     }
 }
+
+export class NoHypertreeMetaNav
+{
+    private view
+    private model : Hypertree
+    
+    constructor({ view, model }) {
+        this.view = view
+        this.model = model        
+    }
+
+    update = {
+        parent:         ()=> {},
+        data:           ()=> {},
+        layout:         ()=> {},
+        transformation: ()=> {}
+    }
+}
