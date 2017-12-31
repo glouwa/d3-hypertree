@@ -163,19 +163,21 @@ export class Hypertree
         this.view = HTML.parse<HTMLElement>(hypertreehtml)()
         this.args.parent.innerHTML = ''
         this.args.parent.appendChild(this.view)
+        var btnMeta = <HTMLButtonElement>this.view.querySelector('#btnmeta')
+        var btnNav = <HTMLButtonElement>this.view.querySelector('#btnnav')
 
-        (<HTMLButtonElement>this.view.querySelector('#btnmeta')).onclick = ()=> {
+        btnMeta.onclick = ()=> {
             this.noHypertreeMeta = this.noHypertreeMeta ? undefined : new NoHypertreeMeta()            
             this.update.metaView()
-            this.hypertreeMeta.update.data()
+            this.hypertreeMeta.update.model()
             this.hypertreeMeta.update.layout()
             this.hypertreeMeta.update.transformation()
         }
-        (<HTMLButtonElement>this.view.querySelector('#btnnav')).onclick = ()=> {
+        btnNav.onclick = ()=> {
             this.args.decorator = this.args.decorator === UnitDiskNav ? UnitDisk : UnitDiskNav
             this.update.unitdiskView()
             this.unitdisk.update.data()
-            this.hypertreeMeta.update.data()
+            this.hypertreeMeta.update.model()
             this.hypertreeMeta.update.layout()
             this.hypertreeMeta.update.transformation()
         }
@@ -237,10 +239,7 @@ export class Hypertree
 
             this.view.querySelector('.preloader').innerHTML = ''
             this.modelMeta = { Δ: [t1-t0, t2-t1, performance.now()-t2] }
-            //this.unitdiskMeta.update.model()
-            //this.unitdisk.update.ajax()
-            this.hypertreeMeta.update.data()
-
+            
             var t3 = performance.now()
             this.data = this.args.layout(this.data, this.args.ui.transformation.state)
             this.unitdisk.args.data = this.data
@@ -249,9 +248,8 @@ export class Hypertree
             this.updateLang_()
             this.updateImgHref_()            
             this.layoutMeta = { Δ: performance.now()-t3 }
-            //this.unitdisk.update.layoutMeta()
-            this.hypertreeMeta.update.layout()
-
+            
+            this.hypertreeMeta.update.model()
             this.animateUp()
         })
     }

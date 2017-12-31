@@ -7,7 +7,7 @@ export class NoHypertreeMeta
 {
     public update = {
         parent:         ()=> {},
-        data:           ()=> {},
+        model:          ()=> {},
         layout:         ()=> {},
         transformation: ()=> {}
     }
@@ -31,7 +31,7 @@ export class HypertreeMeta
         all: ()=> {
 // TODO:
         }, 
-        data: ()=> {
+        model: ()=> {
             this.udView.update.model() 
             this.lsView.update.data()
         },
@@ -77,7 +77,7 @@ export class HypertreeMetaNav
 
     update = {
         parent:         ()=> this.updateParent(),        
-        data:           ()=> {
+        model:          ()=> {
             this.udView.update.model() 
             this.udNav.update.model() 
             this.lsView.update.data()

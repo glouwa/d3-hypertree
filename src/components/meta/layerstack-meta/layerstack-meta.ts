@@ -74,7 +74,7 @@ export function LayerInfo_({ parent, onCheckChange, className })
     var cc = 0
     ui.addCheckboxes = function(layer) {
 
-        var ccidx = (colores.length-5+cc++)%colores.length
+        var ccidx = (colores.length+cc++)%colores.length
         var name = layer.name        
         var checked =  ()=> !layer.args.invisible
         var checked2 = ()=> !layer.args.hideOnDrag

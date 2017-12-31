@@ -18,19 +18,21 @@ export class UnitdiskMeta
     update = {
         parent:             ()=> this.updateParent(),
         all:                ()=> { 
-            // ... 
+            // ... model & lang
+        },
+        model:              ()=> { 
+            this.ui.updateModel()
+            this.update.layout()
+        },
+        layout:             ()=> { 
+            this.ui.updateLayout()
+            this.update.transformation()
         },
         transformation:     ()=> { 
-            this.update.svgInfo()
-            this.update.d3Info()
-            this.update.transformationInfo()
-
-        },        
-        svgInfo:            ()=> this.ui.updateSvgInfo(),
-        d3Info:             ()=> this.ui.updateD3Info(),
-        transformationInfo: ()=> this.ui.updateTransformationInfo(),
-        layout:             ()=> this.ui.updateLayout(),
-        model:              ()=> this.ui.updateModel()
+            this.ui.updateSvgInfo()
+            this.ui.updateD3Info()
+            this.ui.updateTransformationInfo()
+        }
     }
 
     private updateParent() {
@@ -130,7 +132,8 @@ function UnitdiskMeta_({ parent, ud, className })
 
     var colors         = ["#3366cc", "#dc3912", "#ff9900", "#109618", "#990099", "#0099c6", "#dd4477", "#66aa00", "#b82e2e", "#316395", "#994499", "#22aa99", "#aaaa11", "#6633cc", "#e67300", "#8b0707", "#651067", "#329262", "#5574a6", "#3b3eac"];
     var shift          = 5    
-    var typeColors     = colors.slice(shift).concat(colors.slice(0, shift)) 
+    //var typeColors     = colors.slice(shift).concat(colors.slice(0, shift)) 
+    var typeColors     = colors
     //['#a5d6a7', '#b77d68', '#a5d6a7', '#666', '#a5d6a7', '#b77d68', '#a5d6a7', '#666']
     var mag_svg        = .1
     var mag_load       = 10
