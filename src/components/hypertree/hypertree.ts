@@ -96,9 +96,9 @@ var btn = (name, icon, classes='')=>
 var hypertreehtml =
     `<div class="unitdisk-nav">        
         <div class=tool-bar>
-            ${btn('btnundo', 'undo')}
-            ${btn('btncommit', 'check')}
-            ${btn('btnnav', 'near_me', 'tool-seperator')}
+            <!--${btn('btnundo', 'undo')}
+            ${btn('btncommit', 'check')}-->
+            ${btn('btnnav', 'explore', 'tool-seperator')}
             ${btn('btnmeta', 'layers')}
             ${btn('btnhome', 'home', 'tool-seperator')}
             ${btn('btnsearch', 'search')}
