@@ -57,9 +57,16 @@ export class LayerStack
     }
 
     public updatePath() {
+        var t0 = performance.now()
         if (this.layers['path-arcs']) this.layers['path-arcs'].update.data()
+        var t1 = performance.now()
         if (this.layers['link-arcs-focus']) this.layers['link-arcs-focus'].update.data()
+        var t2 = performance.now()
 
+        this.d3meta = { 
+            Δ:[t0-t1, t2-t1], 
+            names:['path-arcs', 'link-arcs-focus'] 
+        }
         //if (this.layers['link-lines']) this.layers['link-lines'].update.style()            
         //if (this.layers.nodes) this.layers.nodes.update.style()        
     }
