@@ -8,6 +8,7 @@
 .render-info {
     z-index: 1000;
     position: absolute;
+    overflow: hidden;
     left:1em;    
     width:18em;
     padding-left:.3em;
@@ -16,7 +17,7 @@
 
     display: grid; 
     grid-gap: .075em;
-    grid-template-rows: repeat(10, auto);
+    //grid-template-rows: repeat(8, auto);
     grid-template-columns: 5.4em auto auto auto .0em;;
 
     .slider {

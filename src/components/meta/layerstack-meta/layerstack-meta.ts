@@ -67,8 +67,15 @@ export function LayerInfo_({ parent, onCheckChange, className })
  
     var colores = d3.schemeCategory10
     var colores = ["#3366cc", "#dc3912", "#ff9900", "#109618", "#990099", "#0099c6", "#dd4477", "#66aa00", "#b82e2e", "#316395", "#994499", "#22aa99", "#aaaa11", "#6633cc", "#e67300", "#8b0707", "#651067", "#329262", "#5574a6", "#3b3eac"];
-    var maxElementCount = 300        
-    var maxElementCountGlobal = 1000        
+    
+    const maxElementCount = 300        
+    const maxElementCountGlobal = 1000        
+    const maxTimeLayer = 20
+    const maxTimeLayerstack = 25
+
+    var sum = 0
+    var sumtime = 0
+    
 
     var  pos = 0
     var cc = 0
@@ -78,7 +85,7 @@ export function LayerInfo_({ parent, onCheckChange, className })
         var name = layer.name        
         var checked =  ()=> !layer.args.invisible
         var checked2 = ()=> !layer.args.hideOnDrag
-        var count =    ()=> (layer.d3updatePattern && layer.d3updatePattern.data ? layer.d3updatePattern.data.length : 1)
+        var count =    ()=> (layer.d3updatePattern && layer.d3updatePattern.data ? layer.d3updatePattern.data.length : 1)        
         var type =     ()=> (layer.args.elementType?layer.args.elementType.length:'')
 
         const layerViews = {
@@ -91,9 +98,18 @@ export function LayerInfo_({ parent, onCheckChange, className })
                 var checker = animationRunning ? checked2() : checked()                
                 var count_ = checker ? count() : 0
                 sum += count_
-                layerViews.count.innerHTML = checker?`${count_} ${type()}`:``                                  
                 
-                layerViews.bar.children[0].style.width = (count_/maxElementCount*100)+'%'
+                layerViews.count.innerHTML = checker?`${count_} ${type()}`:``                                  
+        
+                const lsmeta = layer.layerStack.d3meta
+                console.assert(layer.name)
+                const pos = lsmeta.names.indexOf(layer.name)
+                const time = lsmeta.Δ[pos] 
+                const maxLayerTime = 20
+
+                sumtime += time
+
+                layerViews.bar.children[0].style.width = (time/maxLayerTime*100)+'%'
                 layerViews.bar.children[0].style.backgroundColor = colores[ccidx]
             }
         }
@@ -129,8 +145,7 @@ export function LayerInfo_({ parent, onCheckChange, className })
         pos += 5
     }
 
-    var switchRow = null
-    var sum = 0
+    var switchRow = null    
     ui.addSwitch = function()
     {
         const stateViews = {
@@ -141,7 +156,7 @@ export function LayerInfo_({ parent, onCheckChange, className })
             updateCounts: () => {                
                 stateViews.count.innerHTML = sum
 
-                stateViews.bar.children[0].style.width = (sum/maxElementCountGlobal*100)+'%'
+                stateViews.bar.children[0].style.width = (sumtime/maxTimeLayerstack*100)+'%'
                 stateViews.bar.children[0].style.backgroundColor = colores[0]
             }
         }
@@ -161,6 +176,7 @@ export function LayerInfo_({ parent, onCheckChange, className })
     }
     ui.updateCounts = function(onOff) {
         sum = 0
+        sumtime = 0 
         rows.forEach(e=> e.updateCounts(onOff))
         switchRow.updateCounts()
     }

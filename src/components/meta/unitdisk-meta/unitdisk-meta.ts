@@ -53,53 +53,42 @@ interface UnitdiskMeta_UI {
     updateCachInfo 
 }
 
+var row = `
+    <div class="label"></div> 
+    <div class="nodes"></div> 
+    <div class="q"></div> 
+    <div class="qmax"></div> 
+    <div class="info"></div>
+    <div class="bar-bg"></div>`
+
+var sliderrow = (id, classes='')=> `
+    <div class="label"> </div> 
+    <div class="nodes slider">
+        <p class="range-field">
+            <input type="range" min="2" max="500" value="160" class="slider" id="myRange">
+        </p>
+    </div> 
+    <div class="q"></div> 
+    <div class="qmax"></div> 
+    <div class="info"></div>
+    <div class="bar-bg"></div>`
+
 var htmlinfo = 
     `<div class="render-info">
-        <div class="label"></div> 
-        <div class="nodes"></div> 
-        <div class="q"></div> 
-        <div class="qmax"></div> 
-        <div class="info i1"></div>
-        <div class="bar-bg"></div>
-
-        <div class="label"></div> 
-        <div class="nodes"></div> 
-        <div class="q"></div> 
-        <div class="qmax"></div> 
-        <div class="info i2"></div>
-        <div class="bar-bg"></div>
-
-        <div class="label"> </div> 
-        <div class="nodes slider">
-            <p class="range-field">
-                <input type="range" min="2" max="500" value="160" class="slider" id="myRange">
-            </p>
-        </div> 
-        <div class="q"></div> 
-        <div class="qmax"></div> 
-        <div class="info i3"></div>
-        <div class="bar-bg"></div>
-
-        <div class="label"> </div> 
-        <div class="nodes slider">
-            <p class="range-field">
-                <input type="range" min="2" max="500" value="160" class="slider" id="myRange">
-            </p>
-        </div> 
-        <div class="q"></div> 
-        <div class="qmax"></div>
-        <div class="info i4"></div>
-        <div class="bar-bg"></div>
-
-        <div class="label"> </div> 
-        <div class="nodes"></div> 
-        <div class="q"></div> 
-        <div class="qmax"></div> 
-        <div class="info i5"></div>
-        <div class="bar-bg"></div>
+        ${row}
+        ${row}
+        ${sliderrow('')}
+        ${sliderrow('')}
+        ${row}
     </div>`
+    
+const colors         = ["#3366cc", "#dc3912", "#ff9900", "#109618", "#990099", "#0099c6", "#dd4477", "#66aa00", "#b82e2e", "#316395", "#994499", "#22aa99", "#aaaa11", "#6633cc", "#e67300", "#8b0707", "#651067", "#329262", "#5574a6", "#3b3eac"];
+const typeColors     = colors
+const mag_svg        = .1 // 1000#  ?
+const mag_load       = 10 // 1000ms
+const mag_time       = 4  // 25ms
 
-function hypertreeMeta_()
+function hypertreeMeta_({ parent, ud, className })
 {
 
 }
@@ -122,6 +111,17 @@ function UnitdiskMeta_({ parent, ud, className })
         }
     }
 
+    class SliderRow {                
+        label; info; q; qMax; w; bar
+        constructor(ui, offset) {
+            this.label = <HTMLElement>ui.children[offset+0]
+            this.info =  <HTMLElement>ui.children[offset+1]
+            this.q =     <HTMLElement>ui.children[offset+2]
+            this.qMax =  <HTMLElement>ui.children[offset+3]
+            this.w =     <HTMLElement>ui.children[offset+4]            
+        }
+    }
+
     var rows = {        
         rendering: new Row(ui, 0),
         d3:        new Row(ui, 6),
@@ -129,25 +129,6 @@ function UnitdiskMeta_({ parent, ud, className })
         layout:    new Row(ui, 18),
         data:      new Row(ui, 24),
     }
-
-    var colors         = ["#3366cc", "#dc3912", "#ff9900", "#109618", "#990099", "#0099c6", "#dd4477", "#66aa00", "#b82e2e", "#316395", "#994499", "#22aa99", "#aaaa11", "#6633cc", "#e67300", "#8b0707", "#651067", "#329262", "#5574a6", "#3b3eac"];
-    var shift          = 5    
-    //var typeColors     = colors.slice(shift).concat(colors.slice(0, shift)) 
-    var typeColors     = colors
-    //['#a5d6a7', '#b77d68', '#a5d6a7', '#666', '#a5d6a7', '#b77d68', '#a5d6a7', '#666']
-    var mag_svg        = .1
-    var mag_load       = 10
-    var mag            = 2
-    var ms             = 50
-    var maxd3layerTime = 10
-
-    /*
-    var slider = slider || $('.range-field > input')
-    ud.args.hypertree.magic = 1/slider.val()
-    slider.on('propertychange input', function (e) {
-        ud.args.hypertree.magic = 1/slider.val()
-        ud.args.hypertree.updateTransformation()
-    })*/        
     
     var slider = ui.querySelector('.range-field > input')
     ud.args.hypertree.magic = 1/slider.value
@@ -209,7 +190,7 @@ function UnitdiskMeta_({ parent, ud, className })
         rows.d3.q.innerHTML     = `${t}`
         rows.d3.qMax.innerHTML  = `<sub>ms</sub>`
 
-        updateBar(rows.d3.bar, Δ.map(e=> e*mag), typeColors)
+        updateBar(rows.d3.bar, Δ.map(e=> e*mag_time), typeColors)
     }
 
     ui.updateTransformationInfo = ()=> {
@@ -223,7 +204,7 @@ function UnitdiskMeta_({ parent, ud, className })
         var hwexits = minWeight.map(n=>n.toFixed(1)).join(' ⟶ ')
         var Δms = Δ.map(n=>n.toFixed(1))
          
-        updateBar(rows.transform.bar, Δ.map(e=> e*mag), ['#2196f3', '#ffc107', '#673ab7', '#4caf50'])
+        updateBar(rows.transform.bar, Δ.map(e=> e*mag_time), ['#2196f3', '#ffc107', '#673ab7', '#4caf50'])
         rows.transform.label.innerHTML = `Transf.`
         //transformInfo.innerHTML  = `${na} nodes<sub>w > ${'...'}</sub>`
         rows.transform.info.title      = `Visible node count: ${na}\n`        
@@ -237,7 +218,7 @@ function UnitdiskMeta_({ parent, ud, className })
         
         var Δ = ud.args.hypertree.layoutMeta.Δ
               
-        updateBar(rows.layout.bar, [Δ].map(e=> e*mag), ['#2196f3'])
+        updateBar(rows.layout.bar, [Δ].map(e=> e*mag_time), ['#2196f3'])
         rows.layout.label.innerHTML = `Layout`        
         rows.layout.q.innerHTML     = `${Δ.toFixed()}`
         rows.layout.qMax.innerHTML  = `<sub>ms</sub>`
@@ -274,7 +255,5 @@ function UnitdiskMeta_({ parent, ud, className })
         rows.data.q.innerHTML     = `${(t/1000).toFixed(1)}`
         rows.data.qMax.innerHTML  = `<sub>s</sub>`
     }
-
-    ui.update = ()=> {}
     return ui
 }
