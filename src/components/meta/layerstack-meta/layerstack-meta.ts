@@ -71,7 +71,7 @@ export function LayerInfo_({ parent, onCheckChange, className })
     const maxElementCount = 300        
     const maxElementCountGlobal = 1000        
     const maxTimeLayer = 20
-    const maxTimeLayerstack = 25
+    const maxTimeLayerstack = 20
 
     var sum = 0
     var sumtime = 0
@@ -105,11 +105,10 @@ export function LayerInfo_({ parent, onCheckChange, className })
                 console.assert(layer.name)
                 const pos = lsmeta.names.indexOf(layer.name)
                 const time = lsmeta.Δ[pos] 
-                const maxLayerTime = 20
-
+                
                 sumtime += time
 
-                layerViews.bar.children[0].style.width = (time/maxLayerTime*100)+'%'
+                layerViews.bar.children[0].style.width = (time/maxTimeLayer*100)+'%'
                 layerViews.bar.children[0].style.backgroundColor = colores[ccidx]
             }
         }

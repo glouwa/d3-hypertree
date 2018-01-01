@@ -153,7 +153,7 @@ function UnitdiskMeta_({ parent, ud, className })
             .attr('class', 'bar')
             .merge(diff)
             .style('left', d=> d[2]+'%')
-            .style('width', d=> Math.max(d[0], 2)+'%')
+            .style('width', d=> d[0]+'%')
             .style('background-color', d=> d[1])
         diff.exit().remove()
     }
