@@ -138,6 +138,7 @@ export class Hypertree
         isHovered?:N 
     }              = {}    
     modelMeta
+    langMeta
     layoutMeta
     noHypertreeMeta
 
@@ -256,10 +257,11 @@ export class Hypertree
 
     public updateLang() : void {
         this.args.langloader(langMap=> {            
+            const t0 = performance.now()
             this.langMap = langMap
             this.updateLang_()
 
-            this.layoutMeta = { Δ: performance.now() }            
+            this.langMeta = { Δ: [performance.now()-t0], map:langMap }
             this.hypertreeMeta.update.lang()
 
             this.updateTransformation()

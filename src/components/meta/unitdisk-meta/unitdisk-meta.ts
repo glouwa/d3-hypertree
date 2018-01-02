@@ -123,7 +123,9 @@ function UnitdiskMeta_({ parent, ud, className })
             this.info =  <HTMLElement>ui.children[offset+1]
             this.q =     <HTMLElement>ui.children[offset+2]
             this.qMax =  <HTMLElement>ui.children[offset+3]
-            this.w =     <HTMLElement>ui.children[offset+4]            
+            this.w =     <HTMLElement>ui.children[offset+4]
+            
+            this.label.innerText = 'hallo'
         }
     }
 
@@ -133,6 +135,7 @@ function UnitdiskMeta_({ parent, ud, className })
         transform: new Row(ui, 12),
         layout:    new Row(ui, 18),
         data:      new Row(ui, 24),
+        lang:      new Row(ui, 30),
     }
     
     var slider = ui.querySelector('.range-field > input')
@@ -262,34 +265,16 @@ function UnitdiskMeta_({ parent, ud, className })
     }
     ui.updateLang = ()=> {
         
-        var Δ = ud.args.hypertree.modelMeta.Δ
+        var Δ = ud.args.hypertree.langMeta.Δ
         var model = ud.args.hypertree.data
 
         // do the hole DSIT STUFF!
+        const v = rows.lang
 
-        var n = model.descendants().length
-        var t = Δ.reduce((a,e)=> a+e).toFixed(0)
-        var l = model.leaves().length
-        var lp = (l / n).toPrecision(1)
-        var i = n - l
-        var h = model.height
-        var ø = 0; model.each(cn=> ø += (cn.children||[]).length/i)
-
-        updateBar(rows.data.bar, Δ.map(e=>e/mag_load), ['#ff9800', '#2196f3', 'green'])
-        rows.data.label.innerHTML = `Load`
-        rows.data.info.innerHTML  = `${n} raw nodes`
-        rows.data.info.title      = `download: ${Δ[0].toFixed(0)}ms\n`
-        rows.data.info.title     += `parse: ${Δ[1].toFixed(0)}ms\n`
-        rows.data.info.title     += `hierarchy and weights: ${Δ[2].toFixed(0)}ms\n`
-        rows.data.info.title     += `${lp} leaves\n`
-        rows.data.info.title     += `↕ max: ${h}\n`
-        rows.data.info.title     += `↕ μ: ?\n`
-        rows.data.info.title     += `↕ ⌀: ?\n`
-        rows.data.info.title     += `○ max: ?\n`
-        rows.data.info.title     += `○ μ: ${ø.toPrecision(2)}\n`
-        rows.data.info.title     += `○ ⌀: ?\n`
-        rows.data.q.innerHTML     = `${(t/1000).toFixed(1)}`
-        rows.data.qMax.innerHTML  = `<sub>s</sub>`
+        updateBar(v.bar, Δ.map(e=>e/mag_load), ['#ff9800', '#2196f3', 'green'])
+        v.label.innerHTML = `Lang`        
+        v.q.innerHTML     = `${(231/1000).toFixed(1)}`
+        v.qMax.innerHTML  = `<sub>s</sub>`
     }
 
     return ui

@@ -12,14 +12,14 @@
     position: absolute;
     right:-2.5em;
     
-    width:18em;
+    width:16.5em;
     padding-right:.3em;
     padding-bottom:.1em;    
     font-size: .8em;
 
     display: grid;
     grid-template-rows: repeat(20, auto);
-    grid-template-columns: auto auto 4em 1.9em 1.7em;//repeat(4, auto);
+    grid-template-columns: auto auto 2.7em 1.9em 1.7em;//repeat(4, auto);
     //grid-template-rows: repeat(10, 1fr);
     grid-gap: .075em;
 
