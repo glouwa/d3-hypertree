@@ -84,6 +84,10 @@ export class HypertreeMetaNav
             this.lsNav.update.data()
             this.lsNavParam.update.data()
         },
+        lang:          ()=> {
+            this.udView.update.lang() 
+            this.udNav.update.lang()             
+        },
         layout:         ()=> {
             this.udView.update.layout()           
             this.udNav.update.layout()           

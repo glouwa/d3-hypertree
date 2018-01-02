@@ -40,6 +40,7 @@ export class LayerStackMeta
 }
 var labelHtml  = (id)=>     `<div class="label"></div> `
 var countHtml  = (id)=>     `<div class="nodes"></div> `
+var timeHtml   = (id)=>     `<div class="time"></div> `
 var switchHtml = (id)=>     `<div class="switch"></div> `
 var check1Html = (id, c)=>  `<div class="cbx">           
                                 <input type="checkbox" id="${id}" class="filled-in" ${c?'checked':''}/>
@@ -73,6 +74,11 @@ export function LayerInfo_({ parent, onCheckChange, className })
     const maxTimeLayer = 20
     const maxTimeLayerstack = 20
 
+    const d3format_ = d3.format('.2s')
+    const d3format = (n)=> 
+                   (isNaN(n) || (n*1000).toFixed(0) === '0')
+                   ? '•' //•·
+                   : (n*1000).toFixed(0) + '<sub>ms</sub>'
     var sum = 0
     var sumtime = 0
     
@@ -91,6 +97,7 @@ export function LayerInfo_({ parent, onCheckChange, className })
         const layerViews = {
             label:       HTML.parse<HTMLElement>(labelHtml(pos))(),
             count:       HTML.parse<HTMLElement>(countHtml(pos))(),
+            time:        HTML.parse<HTMLElement>(timeHtml(pos))(),
             checkNormal: HTML.parse<HTMLElement>(check1Html(`pos-${className}-${pos}-normal`, checked()))(),
             checkDrag:   HTML.parse<HTMLElement>(check1Html(`pos-${className}-${pos}-drag`, checked2()))(),
             bar:         HTML.parse<HTMLElement>(barHtml(pos))(),
@@ -99,16 +106,20 @@ export function LayerInfo_({ parent, onCheckChange, className })
                 var count_ = checker ? count() : 0
                 sum += count_
                 
-                layerViews.count.innerHTML = checker?`${count_} ${type()}`:``                                  
+                layerViews.count.innerHTML = checker?`${count_} ${type()}`:``
         
                 const lsmeta = layer.layerStack.d3meta
                 console.assert(layer.name)                
                 const pos = lsmeta.names.indexOf(layer.name)
-                const time = lsmeta.Δ[pos] 
+                const time = lsmeta.Δ[pos]/1000
                 
-                sumtime += time
+                if (!isNaN(time))
+                    sumtime += time
 
-                layerViews.bar.children[0].style.width = (time/maxTimeLayer*100)+'%'
+                const timeStr = d3format(time) 
+                layerViews.time.innerHTML = checker ? timeStr : ``
+
+                layerViews.bar.children[0].style.width = (time/maxTimeLayer*100*1000)+'%'
                 layerViews.bar.children[0].style.backgroundColor = colores[ccidx]
             }
         }
@@ -116,6 +127,7 @@ export function LayerInfo_({ parent, onCheckChange, className })
 
         ui.appendChild(layerViews.label)
         ui.appendChild(layerViews.count)
+        ui.appendChild(layerViews.time)
         ui.appendChild(layerViews.checkNormal)
         ui.appendChild(layerViews.checkDrag)
         ui.appendChild(layerViews.bar)
@@ -141,7 +153,7 @@ export function LayerInfo_({ parent, onCheckChange, className })
             // on create?
             updateCheck(this, layer, layerViews)
         }
-        pos += 5
+        pos += 6
     }
 
     var switchRow = null    
@@ -150,12 +162,16 @@ export function LayerInfo_({ parent, onCheckChange, className })
         const stateViews = {
             label: HTML.parse<HTMLElement>(labelHtml(pos))(),
             count: HTML.parse<HTMLElement>(countHtml(pos))(),
+            time: HTML.parse<HTMLElement>(timeHtml(pos))(),
             view: HTML.parse<HTMLElement>(switchHtml(pos))(),            
             bar:  HTML.parse<HTMLElement>(barHtml(pos))(),
             updateCounts: () => {                
                 stateViews.count.innerHTML = sum
 
-                stateViews.bar.children[0].style.width = (sumtime/maxTimeLayerstack*100)+'%'
+                const timeStr = d3format(sumtime) 
+                stateViews.time.innerHTML = timeStr
+
+                stateViews.bar.children[0].style.width = (sumtime/maxTimeLayerstack*100*1000)+'%'
                 stateViews.bar.children[0].style.backgroundColor = colores[0]
             }
         }
@@ -163,11 +179,12 @@ export function LayerInfo_({ parent, onCheckChange, className })
 
         ui.appendChild(stateViews.label)
         ui.appendChild(stateViews.count)
+        ui.appendChild(stateViews.time)
         ui.appendChild(stateViews.view)        
         ui.appendChild(stateViews.bar)
 
         stateViews.label.innerHTML = "Σ"
-        pos += 4
+        pos += 5
     }
        
     ui.updateSwitch = function(onOff) {        

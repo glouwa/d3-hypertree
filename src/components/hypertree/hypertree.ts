@@ -258,6 +258,10 @@ export class Hypertree
         this.args.langloader(langMap=> {            
             this.langMap = langMap
             this.updateLang_()
+
+            this.layoutMeta = { Δ: performance.now() }            
+            this.hypertreeMeta.update.lang()
+
             this.updateTransformation()
         })
     }

@@ -24,6 +24,9 @@ export class UnitdiskMeta
             this.ui.updateModel()
             this.update.layout()
         },
+        lang:              ()=> { 
+            this.ui.updateLang()            
+        },
         layout:             ()=> { 
             this.ui.updateLayout()
             this.update.transformation()
@@ -48,6 +51,7 @@ interface UnitdiskMeta_UI {
     updateSvgInfo,
     updateD3Info
     updateModel, 
+    updateLang,
     updateTransformationInfo
     updateLayout, 
     updateCachInfo 
@@ -79,6 +83,7 @@ var htmlinfo =
         ${row}
         ${sliderrow('')}
         ${sliderrow('')}
+        ${row}
         ${row}
     </div>`
     
@@ -255,5 +260,37 @@ function UnitdiskMeta_({ parent, ud, className })
         rows.data.q.innerHTML     = `${(t/1000).toFixed(1)}`
         rows.data.qMax.innerHTML  = `<sub>s</sub>`
     }
+    ui.updateLang = ()=> {
+        
+        var Δ = ud.args.hypertree.modelMeta.Δ
+        var model = ud.args.hypertree.data
+
+        // do the hole DSIT STUFF!
+
+        var n = model.descendants().length
+        var t = Δ.reduce((a,e)=> a+e).toFixed(0)
+        var l = model.leaves().length
+        var lp = (l / n).toPrecision(1)
+        var i = n - l
+        var h = model.height
+        var ø = 0; model.each(cn=> ø += (cn.children||[]).length/i)
+
+        updateBar(rows.data.bar, Δ.map(e=>e/mag_load), ['#ff9800', '#2196f3', 'green'])
+        rows.data.label.innerHTML = `Load`
+        rows.data.info.innerHTML  = `${n} raw nodes`
+        rows.data.info.title      = `download: ${Δ[0].toFixed(0)}ms\n`
+        rows.data.info.title     += `parse: ${Δ[1].toFixed(0)}ms\n`
+        rows.data.info.title     += `hierarchy and weights: ${Δ[2].toFixed(0)}ms\n`
+        rows.data.info.title     += `${lp} leaves\n`
+        rows.data.info.title     += `↕ max: ${h}\n`
+        rows.data.info.title     += `↕ μ: ?\n`
+        rows.data.info.title     += `↕ ⌀: ?\n`
+        rows.data.info.title     += `○ max: ?\n`
+        rows.data.info.title     += `○ μ: ${ø.toPrecision(2)}\n`
+        rows.data.info.title     += `○ ⌀: ?\n`
+        rows.data.q.innerHTML     = `${(t/1000).toFixed(1)}`
+        rows.data.qMax.innerHTML  = `<sub>s</sub>`
+    }
+
     return ui
 }
