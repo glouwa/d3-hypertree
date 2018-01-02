@@ -3,7 +3,7 @@
 }
 .render-info.nav {
     //top:1em;
-    bottom:15em;
+    bottom:25em;
 }
 .render-info {
     z-index: 1000;
@@ -16,9 +16,9 @@
     font-size: .8em;
 
     display: grid; 
-    grid-gap: .075em;
+    grid-row-gap: .25em;
     //grid-template-rows: repeat(8, auto);
-    grid-template-columns: 5.4em auto auto auto .0em;;
+    grid-template-columns: 5em auto auto auto .25em  .125em;
 
     .slider {
         position: relative; 
@@ -63,16 +63,30 @@
     div   { align-self:   end;    margin-bottom: -.1em; margin-left: 0em; }    
     .q    { justify-self: end;    margin-right: .09em; }
     .qmax { justify-self: normal; margin-right: .0em; }
-    .info { justify-self: end;    margin: auto 0; /*grid-column: 5;*/ font-size: 1em; }
+    .info {        
+        background-color: #666;
+        width: 100%;
+        height: 100%;
+        grid-row: auto / span 2;
+    }
+    .info2{        
+        background-color: #fff;
+        width: 100%;
+        height: 100%;
+        grid-row: auto / span 2;
+    }
 
     .bar-bg {
-        height:.25em;        
-        margin-bottom: .15em;
-        grid-column: 1 / 6; 
+        height:.25em;
+        grid-column: 1 / 5; 
         position: relative;
         .bar {
             height:.25em;            
             position: absolute;
         }
     } 
+    .hidden {
+        height:0em;
+        visibility: collapse;
+    }
 }
