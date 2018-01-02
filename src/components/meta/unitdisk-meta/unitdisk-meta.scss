@@ -7,8 +7,7 @@
 }
 .render-info {
     z-index: 1000;
-    position: absolute;
-    overflow: hidden;
+    position: absolute;    
     left:1em;    
     width:18em;
     padding-left:.3em;
@@ -16,9 +15,10 @@
     font-size: .8em;
 
     display: grid; 
-    grid-row-gap: .25em;
+    grid-row-gap: 2px;
+    //grid-column-gap: 3px;
     //grid-template-rows: repeat(8, auto);
-    grid-template-columns: 5em auto auto auto .25em  .125em;
+    grid-template-columns: 5em auto auto auto auto auto;
 
     .slider {
         position: relative; 
@@ -52,7 +52,7 @@
 
         input[type=range]::-webkit-slider-runnable-track {
             cursor: pointer;
-            background: none; // $sliderMainColor;
+         //   background: none; // $sliderMainColor;
         }
         
         input[type=range] + .thumb {
@@ -60,33 +60,44 @@
         }
     }
 
-    div   { align-self:   end;    margin-bottom: -.1em; margin-left: 0em; }    
-    .q    { justify-self: end;    margin-right: .09em; }
-    .qmax { justify-self: normal; margin-right: .0em; }
+    div   { align-self:   end; margin-bottom: -.1em; margin-left: 0em; }    
+    .q    { justify-self: end; margin-right: .0em; }
+    .qmax { justify-self: end; margin-right: .0em; }
     .info {        
         background-color: #666;
-        width: 100%;
+        width: 3px;
+        height: 100%;
+        grid-row: auto / span 2;
+        margin-left: 3px;
+    }
+    .info2{        
+        background-color: none; // #fff;
+        width: 1px;        
         height: 100%;
         grid-row: auto / span 2;
     }
-    .info2{        
-        background-color: #fff;
+
+    .info-1 {        
+        background-color: none; // #666;
         width: 100%;
         height: 100%;
-        grid-row: auto / span 2;
+        grid-row: auto / auto;
+    }
+    .info2-1{        
+        background-color: none; // #fff;
+        width: 100%;
+        height: 100%;
+        grid-row: auto / auto;
     }
 
     .bar-bg {
         height:.25em;
         grid-column: 1 / 5; 
-        position: relative;
+        position: relative;        
+        overflow: hidden;
         .bar {
             height:.25em;            
             position: absolute;
         }
-    } 
-    .hidden {
-        height:0em;
-        visibility: collapse;
     }
 }

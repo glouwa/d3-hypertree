@@ -111,9 +111,8 @@ var work = `
     <div class="nodes"></div> 
     <div class="q"></div> 
     <div class="qmax"></div> 
-    <div class="info"></div>
-    <div class="info2"></div>
-    <div class="bar-bg hidden"></div>`
+    <div class="info-1"></div>
+    <div class="info2-1"></div>`
 
 var htmlinfo = 
     `<div class="render-info">
@@ -122,7 +121,7 @@ var htmlinfo =
         ${sliderrow('')}
         ${work}
         ${work}
-        ${sliderrow('')}        
+        ${row}        
         ${work}
         ${work}
         ${work}
@@ -144,17 +143,17 @@ function UnitdiskMeta_({ parent, ud, className })
     var e = 0
     var re = 7
     var rows = {                
-        rendering: new BarRow   (ui, e+=0,  'SVG',             '<sub>#</sub>'),
-        d3:        new BarRow   (ui, e+=re, 'D<sub>3</sub>',   '<sub>ms</sub>'),
-        transform: new BarRow   (ui, e+=re, 'Transf.',         '<sub>ms</sub>'),        
-        cullmaxw:  new SliderRow(ui, e+=re, 'W<sub>max</sub>', '<sub>6k</sub>'),
-        lambda:    new SliderRow(ui, e+=re, 'λ',               '<sub>1</sub>'),
-        layout:    new BarRow   (ui, e+=re, 'Layout',          '<sub>ms</sub>'),        
-        degree:    new SliderRow(ui, e+=re, 'Degrees',         '<sub>97</sub>'), 
-        weights:   new SliderRow(ui, e+=re, 'Weights',         '<sub>34k</sub>'),
-        heights:   new SliderRow(ui, e+=re, 'Heights',         '<sub>79</sub>'),
-        data:      new BarRow   (ui, e+=re, 'Ajax',            '<sub>s</sub>'),
-        lang:      new BarRow   (ui, e+=re, 'Lang',            '<sub>s</sub>'),
+        rendering: new BarRow   (ui, e+=0,  'SVG',                '<sub>#</sub>'),
+        d3:        new BarRow   (ui, e+=re, 'D<sub>3</sub>',      '<sub>ms</sub>'),
+        transform: new BarRow   (ui, e+=re, 'Transf.',            '<sub>ms</sub>'),     
+        cullmaxw:  new TextRow  (ui, e+=re, '<sub>W<sub>max</sub></sub>', '<sub>6k</sub>'),
+        lambda:    new TextRow  (ui, e+=6,  '<sub>λ</sub>',       '<sub>1</sub>'),
+        layout:    new BarRow   (ui, e+=6,  'Layout',             '<sub>ms</sub>'),        
+        degree:    new TextRow  (ui, e+=re, '<sub>Degrees</sub>', '<sub>97</sub>'), 
+        weights:   new TextRow  (ui, e+=6,  '<sub>Weights</sub>', '<sub>34k</sub>'),
+        heights:   new TextRow  (ui, e+=6,  '<sub>Heights</sub>', '<sub>79</sub>'),
+        data:      new BarRow   (ui, e+=6,  'Ajax',               '<sub>s</sub>'),
+        lang:      new BarRow   (ui, e+=re, 'Lang',               '<sub>s</sub>'),
     }
     
     // zu slider row
@@ -165,8 +164,7 @@ function UnitdiskMeta_({ parent, ud, className })
         ud.args.hypertree.updateTransformation()
     }
 
-    ui.updateSvgInfo = ()=> {       
-
+    ui.updateSvgInfo = ()=> {
         var layerStack = ud.layerStack
         var Δ = []
         if (layerStack)
@@ -178,7 +176,7 @@ function UnitdiskMeta_({ parent, ud, className })
         var a = Δ.reduce((a,e)=> a+e, 0).toFixed(0)
         
         updateBar(rows.rendering.bar, Δ.map(e=> e*mag_svg), typeColors)        
-        rows.rendering.q.innerHTML     = `${a}` 
+        rows.rendering.q.innerHTML = `${a}` 
     }
  
     ui.updateD3Info = ()=> { 
@@ -188,9 +186,9 @@ function UnitdiskMeta_({ parent, ud, className })
 
         var t = Δ.reduce((a,e)=> a+e).toFixed(0)
         
-        rows.d3.info.innerHTML  = `${cache.unculledNodes.length} nodes`
-        rows.d3.info.title      = Δ.map((e, i)=> `${layerlist[i]}: ${e.toFixed(1)}ms`).join('\n')
-        rows.d3.q.innerHTML     = `${t}`
+        rows.d3.info.innerHTML = `${cache.unculledNodes.length} nodes`
+        rows.d3.info.title     = Δ.map((e, i)=> `${layerlist[i]}: ${e.toFixed(1)}ms`).join('\n')
+        rows.d3.q.innerHTML    = `${t}`
         updateBar(rows.d3.bar, Δ.map(e=> e*mag_time), typeColors)
     }
 
@@ -205,9 +203,11 @@ function UnitdiskMeta_({ parent, ud, className })
         var Δms = Δ.map(n=>n.toFixed(1))
          
         updateBar(rows.transform.bar, Δ.map(e=> e*mag_time), ['#2196f3', '#ffc107', '#673ab7', '#4caf50'])        
+        rows.transform.useIndic.style.backgroundColor = true ? '#666' : 'none'
+        rows.transform.overuseIndic.style.backgroundColor = true ? 'red' : 'none'
         //transformInfo.innerHTML  = `${na} nodes<sub>w > ${'...'}</sub>`
         rows.transform.info.title      = `Visible node count: ${na}\n`        
-        rows.transform.info.title     += `Min weigth: ${hwexits}\n`
+        rows.transform.info.title     += `Min weigth: ${hwexits}\n` 
         rows.transform.info.title     += `${Δms[0]} culling\n${Δms[1]} lazysearch\n${Δms[2]} voronoi\n${Δms[3]} labels`
         rows.transform.q.innerHTML     = `${t}`        
     }
@@ -216,6 +216,7 @@ function UnitdiskMeta_({ parent, ud, className })
         var Δ = ud.args.hypertree.layoutMeta.Δ
               
         updateBar(rows.layout.bar, [Δ].map(e=> e*mag_time), ['#2196f3'])        
+        rows.layout.info.innerHTML     = `32 • 77 • 4k`
         rows.layout.q.innerHTML     = `${Δ.toFixed()}`        
     }
 
@@ -264,23 +265,9 @@ function UnitdiskMeta_({ parent, ud, className })
     return ui
 }
 
-class BarRow {                
-    label; info; q; qMax; w; bar
-    constructor(ui, offset, desc, unit) {
-        this.label = <HTMLElement>ui.children[offset+0]
-        this.info =  <HTMLElement>ui.children[offset+1]
-        this.q =     <HTMLElement>ui.children[offset+2]
-        this.qMax =  <HTMLElement>ui.children[offset+3]
-        this.w =     <HTMLElement>ui.children[offset+4]
-        this.bar =   <HTMLElement>ui.children[offset+5]
-
-        this.label.innerHTML = desc
-        this.qMax.innerHTML = unit
-    }
-}
-
-class SliderRow {                
-    label; info; q; qMax; w; bar
+class TextRow 
+{
+    label; info; q; qMax; w;
     constructor(ui, offset, desc, unit) {
         this.label = <HTMLElement>ui.children[offset+0]
         this.info =  <HTMLElement>ui.children[offset+1]
@@ -289,7 +276,27 @@ class SliderRow {
         this.w =     <HTMLElement>ui.children[offset+4]
         
         this.label.innerHTML = desc
+        // this.info.innerHTML = '0'
         this.qMax.innerHTML = unit
+    }
+}
+
+class BarRow extends TextRow
+{
+    bar; useIndic; overuseIndic;
+    constructor(ui, offset, desc, unit) {
+        super(ui, offset, desc, unit)        
+        this.bar          = <HTMLElement>ui.children[offset+6]
+        this.useIndic     = <HTMLElement>ui.children[offset+4]
+        this.overuseIndic = <HTMLElement>ui.children[offset+5]        
+    }
+}
+
+class SliderRow extends TextRow
+{
+    label; info; q; qMax; w; bar
+    constructor(ui, offset, desc, unit) {
+        super(ui, offset, desc, unit)
     }
 }
 
@@ -318,3 +325,4 @@ class HistRow {
         this.label.innerText = 'hallo' 
     }
 }
+
