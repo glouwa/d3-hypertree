@@ -52,6 +52,7 @@
         margin-bottom: .15em;
         grid-column: 1 / 6;        
         position: relative;
+        overflow: hidden;
         .bar {
             height:.25em; 
             //right: 0;           

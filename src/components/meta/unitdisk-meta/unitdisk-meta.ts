@@ -197,31 +197,30 @@ function UnitdiskMeta_({ parent, ud, className })
     }
 
     ui.updateSvgInfo = ()=> {
-        var layerStack = ud.layerStack
-        var Δ = []
+        const layerStack = ud.layerStack
+        const Δ = []
         if (layerStack)
             for (var l in layerStack.layers) {            
-                var d3updatePattern = layerStack.layers[l].d3updatePattern                
-                var elemCount = d3updatePattern ? d3updatePattern.data.length : 1
+                const d3updatePattern = layerStack.layers[l].d3updatePattern                
+                const elemCount = d3updatePattern ? d3updatePattern.data.length : 1
                 Δ.push(elemCount)
             }
-        var a = Δ.reduce((a,e)=> a+e, 0).toFixed(0)
+            const a = Δ.reduce((a,e)=> a+e, 0).toFixed(0)
                 
         const v = rows.rendering
         v.q.innerHTML = `${a}` 
         
         updateBar(v.bar, Δ.map(e=> e*mag_svg), typeColors)                
         ping(v.useIndic)
-        if (parseFloat(a) > maxSvg)
-            ping(v.overuseIndic)        
+        if (parseFloat(a) > maxSvg) ping(v.overuseIndic)        
     }
  
     ui.updateD3Info = ()=> { 
-        var cache = ud.args.transformation.cache
-        var Δ = ud.layerStack.d3meta.Δ 
-        var layerlist = ud.layerStack.d3meta.names
+        const cache = ud.args.transformation.cache
+        const Δ = ud.layerStack.d3meta.Δ 
+        const layerlist = ud.layerStack.d3meta.names
 
-        var t = Δ.reduce((a,e)=> a+e).toFixed(0)
+        const t = Δ.reduce((a,e)=> a+e).toFixed(0)
 
         const v = rows.d3
         
@@ -230,22 +229,19 @@ function UnitdiskMeta_({ parent, ud, className })
         v.q.innerHTML    = `${t}`
 
         updateBar(v.bar, Δ.map(e=> e*mag_time), typeColors)
-        //v.useIndic.style.backgroundColor = true ? '#666' : 'none'
-        //v.overuseIndic.style.backgroundColor = (parseFloat(t) > maxTime) ? 'red' : 'transparent'
         ping(v.useIndic)
-        if (parseFloat(t) > maxTime)
-            ping(v.overuseIndic)
+        if (parseFloat(t) > maxTime) ping(v.overuseIndic)
     }
 
     ui.updateTransformationInfo = ()=> {        
-        var cache = ud.args.transformation.cache
-        var Δ = ud.cacheMeta.Δ  
-        var minWeight = ud.cacheMeta.minWeight 
+        const cache = ud.args.transformation.cache
+        const Δ = ud.cacheMeta.Δ  
+        const minWeight = ud.cacheMeta.minWeight 
  
-        var t = Δ.reduce((a,e)=> a+e).toFixed(0)
-        var na = cache.unculledNodes.length
-        var hwexits = minWeight.map(n=>n.toFixed(1)).join(' ⟶ ')
-        var Δms = Δ.map(n=>n.toFixed(1))
+        const t = Δ.reduce((a,e)=> a+e).toFixed(0)
+        const na = cache.unculledNodes.length
+        const hwexits = minWeight.map(n=>n.toFixed(1)).join(' ⟶ ')
+        const Δms = Δ.map(n=>n.toFixed(1))
         
         const v = rows.transform
 
@@ -256,43 +252,37 @@ function UnitdiskMeta_({ parent, ud, className })
         v.q.innerHTML     = `${t}`        
 
         updateBar(v.bar, Δ.map(e=> e*mag_time), ['#2196f3', '#ffc107', '#673ab7', '#4caf50'])        
-        //v.useIndic.style.backgroundColor = true ? '#666' : 'none'
-        //v.overuseIndic.style.backgroundColor = (parseFloat(t) > maxTime) ? 'red' : 'transparent'
         ping(v.useIndic)
-        if (parseFloat(t) > maxTime)
-            ping(v.overuseIndic)
+        if (parseFloat(t) > maxTime) ping(v.overuseIndic)
     }
 
     ui.updateLayout = ()=> {        
-        var Δ = ud.args.hypertree.layoutMeta.Δ
+        const Δ = ud.args.hypertree.layoutMeta.Δ
         
         const v = rows.layout
 
         v.info.innerHTML  = `32 • 77 • 4k`
         v.q.innerHTML     = `${Δ.toFixed()}`        
 
-        updateBar(v.bar, [Δ].map(e=> e*mag_time), ['#2196f3'])        
-        //v.useIndic.style.backgroundColor = true ? '#666' : 'none'
-        //v.overuseIndic.style.backgroundColor = (parseFloat(Δ) > maxTime) ? 'red' : 'transparent'
+        updateBar(v.bar, [Δ].map(e=> e*mag_time), ['#2196f3'])                
         ping(v.useIndic)
-        if (parseFloat(Δ) > maxTime)
-            ping(v.overuseIndic)
+        if (parseFloat(Δ) > maxTime) ping(v.overuseIndic)
     }
 
     const d3format = d3.format('.3s')
     ui.updateModel = ()=> {        
-        var Δ = ud.args.hypertree.modelMeta.Δ
-        var model = ud.args.hypertree.data
+        const Δ = ud.args.hypertree.modelMeta.Δ
+        const model = ud.args.hypertree.data
 
         // do the hole DSIT STUFF!
 
-        var n = model.descendants().length
-        var t = Δ.reduce((a,e)=> a+e).toFixed(0)
-        var l = model.leaves().length
-        var lp = (l / n).toPrecision(1)
-        var i = n - l
-        var h = model.height
-        var ø = 0; model.each(cn=> ø += (cn.children||[]).length/i)
+        const n = model.descendants().length
+        const t = Δ.reduce((a,e)=> a+e).toFixed(0)
+        const l = model.leaves().length
+        const lp = (l / n).toPrecision(1)
+        const i = n - l
+        const h = model.height
+        let ø = 0; model.each(cn=> ø += (cn.children||[]).length/i)
 
         const v = rows.data
 
@@ -309,17 +299,14 @@ function UnitdiskMeta_({ parent, ud, className })
         v.info.title     += `○ ⌀: ?\n`
         v.q.innerHTML     = `${(t/1000).toFixed(1)}`        
 
-        updateBar(v.bar, Δ.map(e=>e/mag_load), ['#ff9800', '#2196f3', 'green'])        
-        //v.useIndic.style.backgroundColor = true ? '#666' : 'none'
-        //v.overuseIndic.style.backgroundColor = (parseFloat(t) > 1000) ? 'red' : 'transparent'
+        updateBar(v.bar, Δ.map(e=>e/mag_load), ['#ff9800', '#2196f3', 'green'])                
         ping(v.useIndic)
-        if (parseFloat(t) > 1000)
-            ping(v.overuseIndic)
+        if (parseFloat(t) > 1000) ping(v.overuseIndic)
     }
     
     ui.updateLang = ()=> {        
-        var Δ = ud.args.hypertree.langMeta.Δ 
-        var model = ud.args.hypertree.data
+        const Δ = ud.args.hypertree.langMeta.Δ 
+        const model = ud.args.hypertree.data
         const Δs = Δ/1000
 
         // do the hole DSIT STUFF!
@@ -329,11 +316,8 @@ function UnitdiskMeta_({ parent, ud, className })
         v.q.innerHTML     = Δs.toFixed(1)
 
         updateBar(v.bar, Δ.map(e=>e/mag_load), ['#ff9800', '#2196f3', 'green'])        
-//        v.useIndic.style.backgroundColor = true ? '#666' : 'none'
-  //      v.overuseIndic.style.backgroundColor = (Δ > 1000) ? 'red' : 'transparent'
         ping(v.useIndic)
-        if (Δ > 1000)
-            ping(v.overuseIndic)
+        if (Δ > 1000) ping(v.overuseIndic)
     }
 
     return ui

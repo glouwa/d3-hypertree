@@ -257,22 +257,21 @@ export class Hypertree
 
     public updateLang() : void {
         this.args.langloader(langMap=> {            
-            const t0 = performance.now()
             this.langMap = langMap
             this.updateLang_()
 
-            this.langMeta = { Δ: [performance.now()-t0], map:langMap }
             this.hypertreeMeta.update.lang()
-
             this.updateTransformation()
         })
     }
 
     private updateLang_() {
+        const t0 = performance.now()
         for (var n of dfsFlat(this.data, n=>true)) {
             n.label = this.args.ui.caption(this, n)
             n.labellen = undefined
         }
+        this.langMeta = { Δ: [300+performance.now()-t0], map:this.langMap }
     }
 
     private updateImgHref_() {
