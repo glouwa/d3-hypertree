@@ -18,7 +18,7 @@
     grid-row-gap: 4px;
     //grid-column-gap: 3px;
     //grid-template-rows: repeat(8, auto);
-    grid-template-columns: 4.4em auto auto auto auto auto auto;
+    grid-template-columns: 4.4em auto auto auto auto .5em auto;
 
     .slider {
         position: relative; 
@@ -77,12 +77,6 @@
         grid-row: auto / span 2;
         margin-left: 3px;
         opacity: 0;
-
-        animation: blink-animation 2s ease-out 0s 5;
-    }
-
-    .anim2 {
-        animation: blink-animation 2s ease-out 0s 5;
     }
 
     .info2{        
@@ -96,9 +90,10 @@
         //animation: blink-animation 3s;
     }
 
-    @keyframes blink-animation {
-        to   { opacity: 1; }        
-        0%   { opacity: 1; }
+    @keyframes blink-out {
+        from { opacity: 1; }
+        to   { opacity: 0; }
+        0%   { opacity: 1; }        
         100% { opacity: 0; }
     }
 

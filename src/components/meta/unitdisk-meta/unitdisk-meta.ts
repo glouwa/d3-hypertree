@@ -179,6 +179,16 @@ function UnitdiskMeta_({ parent, ud, className })
     
     function ping(v) {        
         //v.classList.add("anim2");
+        v.style.opacity = 1
+        v.style.animation = ""
+        //requestAnimationFrame(()=> v.style.opacity = 0)
+        requestAnimationFrame(()=> { 
+            //v.classList,remove("blink-out")
+            //v.classList.addClass('blink-out')
+            v.style.animation = "blink-out 2s ease-out"    
+            v.style.opacity = 0
+        })
+        
     }
 
     // zu slider row
@@ -223,8 +233,11 @@ function UnitdiskMeta_({ parent, ud, className })
         v.q.innerHTML    = `${t}`
 
         updateBar(v.bar, Δ.map(e=> e*mag_time), typeColors)
-        v.useIndic.style.backgroundColor = true ? '#666' : 'none'
-        v.overuseIndic.style.backgroundColor = (parseFloat(t) > maxTime) ? 'red' : 'transparent'
+        //v.useIndic.style.backgroundColor = true ? '#666' : 'none'
+        //v.overuseIndic.style.backgroundColor = (parseFloat(t) > maxTime) ? 'red' : 'transparent'
+        ping(v.useIndic)
+        if (parseFloat(t) > maxTime)
+            ping(v.overuseIndic)
     }
 
     ui.updateTransformationInfo = ()=> {        
@@ -246,8 +259,11 @@ function UnitdiskMeta_({ parent, ud, className })
         v.q.innerHTML     = `${t}`        
 
         updateBar(v.bar, Δ.map(e=> e*mag_time), ['#2196f3', '#ffc107', '#673ab7', '#4caf50'])        
-        v.useIndic.style.backgroundColor = true ? '#666' : 'none'
-        v.overuseIndic.style.backgroundColor = (parseFloat(t) > maxTime) ? 'red' : 'transparent'
+        //v.useIndic.style.backgroundColor = true ? '#666' : 'none'
+        //v.overuseIndic.style.backgroundColor = (parseFloat(t) > maxTime) ? 'red' : 'transparent'
+        ping(v.useIndic)
+        if (parseFloat(t) > maxTime)
+            ping(v.overuseIndic)
     }
 
     ui.updateLayout = ()=> {        
@@ -259,8 +275,11 @@ function UnitdiskMeta_({ parent, ud, className })
         v.q.innerHTML     = `${Δ.toFixed()}`        
 
         updateBar(v.bar, [Δ].map(e=> e*mag_time), ['#2196f3'])        
-        v.useIndic.style.backgroundColor = true ? '#666' : 'none'
-        v.overuseIndic.style.backgroundColor = (parseFloat(Δ) > maxTime) ? 'red' : 'transparent'
+        //v.useIndic.style.backgroundColor = true ? '#666' : 'none'
+        //v.overuseIndic.style.backgroundColor = (parseFloat(Δ) > maxTime) ? 'red' : 'transparent'
+        ping(v.useIndic)
+        if (parseFloat(Δ) > maxTime)
+            ping(v.overuseIndic)
     }
 
     const d3format = d3.format('.3s')
@@ -294,8 +313,11 @@ function UnitdiskMeta_({ parent, ud, className })
         v.q.innerHTML     = `${(t/1000).toFixed(1)}`        
 
         updateBar(v.bar, Δ.map(e=>e/mag_load), ['#ff9800', '#2196f3', 'green'])        
-        v.useIndic.style.backgroundColor = true ? '#666' : 'none'
-        v.overuseIndic.style.backgroundColor = (parseFloat(t) > 1000) ? 'red' : 'transparent'
+        //v.useIndic.style.backgroundColor = true ? '#666' : 'none'
+        //v.overuseIndic.style.backgroundColor = (parseFloat(t) > 1000) ? 'red' : 'transparent'
+        ping(v.useIndic)
+        if (parseFloat(t) > 1000)
+            ping(v.overuseIndic)
     }
     
     ui.updateLang = ()=> {        
@@ -310,8 +332,11 @@ function UnitdiskMeta_({ parent, ud, className })
         v.q.innerHTML     = Δs.toFixed(1)
 
         updateBar(v.bar, Δ.map(e=>e/mag_load), ['#ff9800', '#2196f3', 'green'])        
-        v.useIndic.style.backgroundColor = true ? '#666' : 'none'
-        v.overuseIndic.style.backgroundColor = (Δ > 1000) ? 'red' : 'transparent'
+//        v.useIndic.style.backgroundColor = true ? '#666' : 'none'
+  //      v.overuseIndic.style.backgroundColor = (Δ > 1000) ? 'red' : 'transparent'
+        ping(v.useIndic)
+        if (Δ > 1000)
+            ping(v.overuseIndic)
     }
 
     return ui
