@@ -62,15 +62,16 @@
     .switch {
         grid-column: 4 / 5;  
 
-        height: 1.5em;
-        width: 1.5em;
+        height: 1.2em;
+        width: 1.2em;
         border-radius: .75em;        
-        border-width: 1px;
-        border-style: solid;        
-        cursor: pointer;
+        border-width: .1em;
+        border-style: solid;                
         z-index: 100;
-        margin-left: .08em;         
+        margin-left: .4em;         
+        margin-bottom: .15em;         
         transition: margin-left 250ms ease-in-out;
+        cursor: pointer;
     }
 }
  

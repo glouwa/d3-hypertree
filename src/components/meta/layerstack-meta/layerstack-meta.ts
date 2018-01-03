@@ -188,7 +188,7 @@ export function LayerInfo_({ parent, onCheckChange, className })
     }
        
     ui.updateSwitch = function(onOff) {        
-        switchRow.view.style.marginLeft = onOff ? '1.95em' : '.08em'
+        switchRow.view.style.marginLeft = onOff ? '2.12em' : '.25em'
     }
     ui.updateCounts = function(onOff) {
         sum = 0
