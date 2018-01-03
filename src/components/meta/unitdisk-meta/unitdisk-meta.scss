@@ -3,7 +3,7 @@
 }
 .render-info.nav {
     //top:1em;
-    bottom:25em;
+    bottom:35em;
 }
 .render-info {
     z-index: 1000;
@@ -18,12 +18,15 @@
     grid-row-gap: 2px;
     //grid-column-gap: 3px;
     //grid-template-rows: repeat(8, auto);
-    grid-template-columns: 5em auto auto auto auto auto;
+    grid-template-columns: 4.2em auto auto auto auto auto auto;
 
     .slider {
         position: relative; 
         z-index: 102;
         height: 1em;
+        margin-left: .15em;
+        padding-right: .1em;
+        grid-column: auto / span 2;
     }
 
     div {
@@ -39,11 +42,11 @@
 
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;            
-            height: 1.5em;
-            width: 1.5em;
+            height: 1.2em;
+            width: 1.2em;
             border-radius: .75em;            
             cursor: pointer;
-            margin-top: -.9em; /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */                                    
+            margin-top: -.55em; /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */                                    
         }
 
         /*input[type=range]::-webkit-slider-thumb::before { 
@@ -52,7 +55,8 @@
 
         input[type=range]::-webkit-slider-runnable-track {
             cursor: pointer;
-         //   background: none; // $sliderMainColor;
+            background: #262626;
+            height: 1px;
         }
         
         input[type=range] + .thumb {
@@ -60,44 +64,85 @@
         }
     }
 
-    div   { align-self:   end; margin-bottom: -.1em; margin-left: 0em; }    
+    div   { align-self:   end; margin-bottom: .0em; margin-left: 0em; }   
+    .nodes{
+        grid-column: auto / span 2;        
+    } 
     .q    { justify-self: end; margin-right: .0em; }
-    .qmax { justify-self: end; margin-right: .0em; }
+    .qmax { justify-self: end; margin-left: .0em; }
     .info {        
         background-color: #666;
         width: 3px;
         height: 100%;
         grid-row: auto / span 2;
         margin-left: 3px;
+        opacity: 0;
+
+        animation: blink-animation 2s ease-out 0s 5;
     }
+
+    .anim2 {
+        animation: blink-animation 2s ease-out 0s 5;
+    }
+
     .info2{        
-        background-color: none; // #fff;
+        background-color: red; // #fff;
         width: 1px;        
         height: 100%;
         grid-row: auto / span 2;
+        margin-left: 2px;
+        opacity: 0;
+
+        //animation: blink-animation 3s;
     }
 
-    .info-1 {        
+    @keyframes blink-animation {
+        to   { opacity: 1; }        
+        0%   { opacity: 1; }
+        100% { opacity: 0; }
+    }
+
+    .info-oneRowSpan {        
         background-color: none; // #666;
         width: 100%;
         height: 100%;
         grid-row: auto / auto;
     }
-    .info2-1{        
+    .info2-oneRowSpan{        
         background-color: none; // #fff;
         width: 100%;
         height: 100%;
         grid-row: auto / auto;
     }
 
+    .hist {
+        grid-column: auto / span 2; 
+        padding: .01em .15em .35em .3em;
+        width: 100%;
+        height: 100%;
+        transform: scaleY(-1);
+
+        div {
+            float: left;            
+            margin-right: 2px;
+            width: .5em;
+            background-color: #272727;    
+        }
+    }
+
     .bar-bg {
         height:.25em;
-        grid-column: 1 / 5; 
+        grid-column: 1 / 6; 
+        margin-bottom: .25em;
+        margin-top: -.15em;
         position: relative;        
         overflow: hidden;
         .bar {
             height:.25em;            
             position: absolute;
         }
+    }
+    .bar-bg:last-child {
+        margin-bottom: 0em;
     }
 }
