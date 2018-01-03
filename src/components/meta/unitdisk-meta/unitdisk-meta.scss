@@ -9,16 +9,16 @@
     z-index: 1000;
     position: absolute;    
     left:1em;    
-    width:18em;
+    width:20em;
     padding-left:.3em;
     padding-bottom:.1em;    
     font-size: .8em;
 
     display: grid; 
-    grid-row-gap: 2px;
+    grid-row-gap: 4px;
     //grid-column-gap: 3px;
     //grid-template-rows: repeat(8, auto);
-    grid-template-columns: 4.2em auto auto auto auto auto auto;
+    grid-template-columns: 4.4em auto auto auto auto auto auto;
 
     .slider {
         position: relative; 
@@ -126,17 +126,19 @@
             float: left;            
             margin-right: 2px;
             width: .5em;
-            background-color: #272727;    
+            background-color: #333;// #272727;    
         }
     }
 
     .bar-bg {
         height:.25em;
-        grid-column: 1 / 6; 
-        margin-bottom: .25em;
-        margin-top: -.15em;
+        grid-column: 1 / 6;         
         position: relative;        
         overflow: hidden;
+
+        //margin-bottom: .25em;
+        margin-top: -3px;
+
         .bar {
             height:.25em;            
             position: absolute;

@@ -118,26 +118,19 @@ var work = `
     <div class="hist">
         <div style="height:100%"></div>
         <div style="height:70%"></div>
-
         <div style="height:30%"></div>
         <div style="height:45%"></div>
+
         <div style="height:70%"></div>
         <div style="height:60%"></div>
-
         <div style="height:80%"></div>
         <div style="height:65%"></div>
+
         <div style="height:30%"></div>
         <div style="height:20%"></div>
-
         <div style="height:25%"></div>
         <div style="height:15%"></div>
-        <div style="height:7%"></div>
-        <div style="height:8%"></div>
 
-        <div style="height:7%"></div>
-        <div style="height:5%"></div>
-        <div style="height:5%"></div>
-        <div style="height:5%"></div>
     </div> 
     <div class="qmax"></div> 
     <div class="info-oneRowSpan"></div>
@@ -171,17 +164,17 @@ function UnitdiskMeta_({ parent, ud, className })
     var e = 0
     var re = 7
     var rows = {                
-        rendering: new BarRow   (ui, e+=0,  'SVG',                         '<sub>#</sub>'),
-        d3:        new BarRow   (ui, e+=re, 'D<sub>3</sub>',               '<sub>ms</sub>'),
-        transform: new BarRow   (ui, e+=re, '∀<sub>visible</sub>',         '<sub>ms</sub>'),     
-        cullmaxw:  new SliderRow(ui, e+=re, '<sub>ω<sub>cull</sub></sub>', '<sub>.5k</sub>'),
-        lambda:    new SliderRow(ui, e+=6,  '<sub>λ</sub>',                '<sub>1</sub>'),
-        layout:    new BarRow   (ui, e+=6,  'Select',                      '<sub>ms</sub>'),        
-        degree:    new TextRow  (ui, e+=re, '<sub>δ</sub>',                '<sub>97</sub>'), 
-        weights:   new TextRow  (ui, e+=6,  '<sub>ω</sub>',                '<sub>34k</sub>'),
-        heights:   new TextRow  (ui, e+=6,  '<sub>τ</sub>',                '<sub>79</sub>'),
-        data:      new BarRow   (ui, e+=6,  'Load',                        '<sub>s</sub>'),
-        lang:      new BarRow   (ui, e+=re, 'Lang',                        '<sub>s</sub>'),
+        rendering: new BarRow   (ui, e+=0,  'SVG',                 '<sub>#</sub>'),
+        d3:        new BarRow   (ui, e+=re, 'D<sub>3</sub>',       '<sub>ms</sub>'),
+        transform: new BarRow   (ui, e+=re, '∀<sub>visible</sub>', '<sub>ms</sub>'),     
+        cullmaxw:  new SliderRow(ui, e+=re, 'ω<sub>cull</sub>',    '<sub>.5k</sub>'),
+        lambda:    new SliderRow(ui, e+=6,  'λ',                   '<sub>1</sub>'),
+        layout:    new BarRow   (ui, e+=6,  'Select',              '<sub>ms</sub>'),        
+        degree:    new TextRow  (ui, e+=re, 'δ',                   '<sub>97</sub>'), 
+        weights:   new TextRow  (ui, e+=6,  'ω',                   '<sub>34k</sub>'),
+        heights:   new TextRow  (ui, e+=6,  'τ',                   '<sub>79</sub>'),
+        data:      new BarRow   (ui, e+=6,  'Load',                '<sub>s</sub>'),
+        lang:      new BarRow   (ui, e+=re, 'Lang',                '<sub>s</sub>'),
     }
     
     function ping(v) {        
@@ -246,7 +239,7 @@ function UnitdiskMeta_({ parent, ud, className })
         
         const v = rows.transform
 
-        v.info.innerHTML  = `sets, voro, labels, ...`
+        v.info.innerHTML  = `state, sets, voro`
         v.info.title      = `Visible node count: ${na}\n`        
         v.info.title     += `Min weigth: ${hwexits}\n` 
         v.info.title     += `${Δms[0]} culling\n${Δms[1]} lazysearch\n${Δms[2]} voronoi\n${Δms[3]} labels`
