@@ -130,7 +130,6 @@ var work = `
         <div style="height:20%"></div>
         <div style="height:25%"></div>
         <div style="height:15%"></div>
-
     </div> 
     <div class="qmax"></div> 
     <div class="info-oneRowSpan"></div>
@@ -170,9 +169,9 @@ function UnitdiskMeta_({ parent, ud, className })
         cullmaxw:  new SliderRow(ui, e+=re, 'ω<sub>cull</sub>',    '<sub>.5k</sub>'),
         lambda:    new SliderRow(ui, e+=6,  'λ',                   '<sub>1</sub>'),
         layout:    new BarRow   (ui, e+=6,  'Select',              '<sub>ms</sub>'),        
-        degree:    new TextRow  (ui, e+=re, 'δ',                   '<sub>97</sub>'), 
-        weights:   new TextRow  (ui, e+=6,  'ω',                   '<sub>34k</sub>'),
-        heights:   new TextRow  (ui, e+=6,  'τ',                   '<sub>79</sub>'),
+        degree:    new HistRow  (ui, e+=re, 'δ',                   '<sub>97</sub>'), 
+        weights:   new HistRow  (ui, e+=6,  'ω',                   '<sub>34k</sub>'),
+        heights:   new HistRow  (ui, e+=6,  'τ',                   '<sub>79</sub>'),
         data:      new BarRow   (ui, e+=6,  'Load',                '<sub>s</sub>'),
         lang:      new BarRow   (ui, e+=re, 'Lang',                '<sub>s</sub>'),
     }
@@ -304,6 +303,11 @@ function UnitdiskMeta_({ parent, ud, className })
         updateBar(v.bar, Δ.map(e=>e/mag_load), ['#ff9800', '#2196f3', 'green'])                
         ping(v.useIndic)
         if (parseFloat(t) > 1000) ping(v.overuseIndic)
+        
+        rows.degree.q.innerHTML  = `<sub>${mysi(model.children.length)}</sub>`
+        rows.weights.q.innerHTML = `<sub>${mysi(model.value)}</sub>`
+        rows.heights.q.innerHTML = `<sub>${mysi(model.height)}</sub>`
+        //v2.qMax.innerHtml = model.height
     }
     
     ui.updateLang = ()=> {        
@@ -325,6 +329,27 @@ function UnitdiskMeta_({ parent, ud, className })
     return ui
 }
 
+
+const mysihelper = d3.format('.3s')
+function mysi(n) 
+{
+    const d3str = mysihelper(n)
+    const lastChar = d3str[d3str.length-1]    
+    const hasSiEx = lastChar == 'k'    
+    const pidx = d3str.indexOf('.')    
+    const hasDot = pidx !== -1
+    var x = d3str
+    
+    if (hasDot) 
+        x = x.slice(0, pidx)
+
+    var ex = ''
+    if (hasSiEx && hasDot)
+        ex = lastChar
+    
+    return x + ex
+}
+
 class TextRow 
 {
     label; info; q; qMax; w;
@@ -336,7 +361,6 @@ class TextRow
         this.w =     <HTMLElement>ui.children[offset+4]
         
         this.label.innerHTML = desc
-        // this.info.innerHTML = '0'
         this.qMax.innerHTML = unit
     }
 }
@@ -362,8 +386,20 @@ class SliderRow
         this.w =     <HTMLElement>ui.children[offset+4]
         
         this.label.innerHTML = desc
-        // this.info.innerHTML = '0'
         this.qMax.innerHTML = unit
+    }
+}
+
+class HistRow {                
+    label; info; hist; q; qMax; 
+    constructor(ui, offset, desc, unit) {
+        this.label = <HTMLElement>ui.children[offset+0]
+        this.info =  <HTMLElement>ui.children[offset+1]
+        this.hist =  <HTMLElement>ui.children[offset+2]
+        this.q =     <HTMLElement>ui.children[offset+3]        
+                
+        this.label.innerHTML = desc        
+        this.q.innerHTML = '-'
     }
 }
 
@@ -379,17 +415,3 @@ class BoxplotRow {
         this.label.innerText = 'hallo'
     }
 }
-
-class HistRow {                
-    label; info; q; qMax; w; bar
-    constructor(ui, offset) {
-        this.label = <HTMLElement>ui.children[offset+0]
-        this.info =  <HTMLElement>ui.children[offset+1]
-        this.q =     <HTMLElement>ui.children[offset+2]
-        this.qMax =  <HTMLElement>ui.children[offset+3]
-        this.w =     <HTMLElement>ui.children[offset+4]
-        
-        this.label.innerText = 'hallo' 
-    }
-}
-
