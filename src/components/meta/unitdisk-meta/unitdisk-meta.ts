@@ -177,15 +177,17 @@ function UnitdiskMeta_({ parent, ud, className })
         lang:      new BarRow   (ui, e+=re, 'Lang',                '<sub>s</sub>'),
     }
     
-    function ping(v) {                
-        v.style.opacity = 1
-        v.style.animation = ""        
-        requestAnimationFrame(()=> {             
-            //v.style.animation = "blink-out 750ms cubic-bezier(0.070, 0.065, 0.765, -0.135)"
-            //v.style.animation = "blink-out 2ms cubic-bezier(0.070, 0.455, 0.850, 0.420)"
-            v.style.animation = "blink-out 2s cubic-bezier(0.145, 1.130, 0.725, 0.590)"            
-            v.style.opacity = 0
-        })
+    function ping(v, cond = true) {   
+        if (cond) {             
+            v.style.opacity = 1
+            v.style.animation = ""        
+            requestAnimationFrame(()=> {             
+                //v.style.animation = "blink-out 750ms cubic-bezier(0.070, 0.065, 0.765, -0.135)"
+                //v.style.animation = "blink-out 2ms cubic-bezier(0.070, 0.455, 0.850, 0.420)"
+                v.style.animation = "blink-out 2s cubic-bezier(0.145, 1.130, 0.725, 0.590)"            
+                v.style.opacity = 0
+            })
+        }
     }
 
     // zu slider row
@@ -212,7 +214,7 @@ function UnitdiskMeta_({ parent, ud, className })
         
         updateBar(v.bar, Δ.map(e=> e*mag_svg), typeColors)                
         ping(v.useIndic)
-        if (parseFloat(a) > maxSvg) ping(v.overuseIndic)        
+        ping(v.overuseIndic, parseFloat(a) > maxSvg)        
     }
  
     ui.updateD3Info = ()=> { 

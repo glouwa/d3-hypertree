@@ -43,8 +43,8 @@ var bubbleSvgDef =
         <radialGradient id="exampleGradient">            
             <stop offset="58%"   stop-color="rgba(255,255,255, .08)"/>            
             <stop offset="92%"   stop-color="rgba( 96, 96, 96, .08)"/>
-            <stop offset="99.8%" stop-color="rgba( 36, 36, 36, .08)"/>
-            <stop offset="100%"  stop-color="rgba( 35, 35, 35, .08)"/>
+            <stop offset="98%"   stop-color="rgba( 36, 36, 36, .08)"/>
+            <stop offset="100%"  stop-color="rgba( 0, 0, 0, .08)"/>
         </radialGradient>
     </defs>` 
 

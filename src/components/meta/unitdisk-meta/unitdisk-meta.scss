@@ -70,6 +70,7 @@
     } 
     .q    { justify-self: end; margin-right: .0em; }
     .qmax { justify-self: end; margin-left: .0em; }
+
     .info {        
         background-color: #666;
         width: 3px;
@@ -81,13 +82,11 @@
 
     .info2{        
         background-color: red; // #fff;
-        width: 1px;        
+        width: 2px;        
         height: 100%;
         grid-row: auto / span 2;
         margin-left: 2px;
         opacity: 0;
-
-        //animation: blink-animation 3s;
     }
 
     @keyframes blink-out {
