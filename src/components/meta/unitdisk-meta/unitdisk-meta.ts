@@ -91,7 +91,7 @@ var colorScale = d3.scaleLinear<d3.ColorCommonInstance>()
         .interpolate(d3.interpolateHcl)
         .clamp(true)
 
-var row = `
+var barrow = `
     <div class="label"></div> 
     <div class="nodes"></div> 
     <div class="q"></div> 
@@ -112,7 +112,7 @@ var sliderrow = (id, classes='')=> `
     <div class="info-oneRowSpan"></div>
     <div class="info2-oneRowSpan"></div>`
 
-var work = `
+var histrow = `
     <div class="label"></div> 
     <div class="min"><sub>1</sub></div> 
     <div class="hist">
@@ -131,23 +131,24 @@ var work = `
         <div style="height:25%"></div>
         <div style="height:15%"></div>
     </div> 
+    <div class="q left-aligned"></div> 
     <div class="qmax"></div> 
     <div class="info-oneRowSpan"></div>
     <div class="info2-oneRowSpan"></div>`
 
 var htmlinfo = 
     `<div class="render-info">
-        ${row}
-        ${row}
-        ${row}        
+        ${barrow}
+        ${barrow}
+        ${barrow}        
         ${sliderrow('')}
         ${sliderrow('')}
-        ${row}        
-        ${work}
-        ${work}
-        ${work}
-        ${row}
-        ${row}
+        ${barrow}        
+        ${histrow}
+        ${histrow}
+        ${histrow}
+        ${barrow}
+        ${barrow}
     </div>`
 
 function hypertreeMeta_({ parent, ud, className })
@@ -161,7 +162,7 @@ function UnitdiskMeta_({ parent, ud, className })
     parent.appendChild(ui)
 
     var e = 0
-    var re = 7
+    var re = 7 
     var rows = {                
         rendering: new BarRow   (ui, e+=0,  'SVG',                 '<sub>#</sub>'),
         d3:        new BarRow   (ui, e+=re, 'D<sub>3</sub>',       '<sub>ms</sub>'),
@@ -169,10 +170,10 @@ function UnitdiskMeta_({ parent, ud, className })
         cullmaxw:  new SliderRow(ui, e+=re, 'ω<sub>cull</sub>',    '<sub>.5k</sub>'),
         lambda:    new SliderRow(ui, e+=6,  'λ',                   '<sub>1</sub>'),
         layout:    new BarRow   (ui, e+=6,  'Select',              '<sub>ms</sub>'),        
-        degree:    new HistRow  (ui, e+=re, 'δ',                   '<sub>97</sub>'), 
-        weights:   new HistRow  (ui, e+=6,  'ω',                   '<sub>34k</sub>'),
-        heights:   new HistRow  (ui, e+=6,  'τ',                   '<sub>79</sub>'),
-        data:      new BarRow   (ui, e+=6,  'Load',                '<sub>s</sub>'),
+        degree:    new HistRow  (ui, e+=re, 'δ<sup>+</sup>',       '<sub>97</sub>'), 
+        weights:   new HistRow  (ui, e+=7,  'ω',                   '<sub>34k</sub>'),
+        heights:   new HistRow  (ui, e+=7,  'τ',                   '<sub>79</sub>'),
+        data:      new BarRow   (ui, e+=7,  'Load',                '<sub>s</sub>'),
         lang:      new BarRow   (ui, e+=re, 'Lang',                '<sub>s</sub>'),
     }
     
@@ -225,7 +226,7 @@ function UnitdiskMeta_({ parent, ud, className })
 
         const v = rows.d3
         
-        v.info.innerHTML = `${cache.unculledNodes.length} nodes`
+        v.info.innerHTML = `${cache.unculledNodes.length}<sub>N</sub>`
         v.info.title     = Δ.map((e, i)=> `${layerlist[i]}: ${e.toFixed(1)}ms`).join('\n')
         v.q.innerHTML    = `${t}`
 
@@ -257,12 +258,13 @@ function UnitdiskMeta_({ parent, ud, className })
         if (parseFloat(t) > maxTime) ping(v.overuseIndic)
     }
 
+    const sep = '&nbsp; •&ensp;'
     ui.updateLayout = ()=> {        
         const Δ = ud.args.hypertree.layoutMeta.Δ
         
         const v = rows.layout
 
-        v.info.innerHTML  = `32 • 77 • 4k`
+        v.info.innerHTML  = `32<sub>P</sub>${sep}77<sub>Sel</sub>${sep}4<sub>k visible</sub>`
         v.q.innerHTML     = `${Δ.toFixed()}`        
 
         updateBar(v.bar, [Δ].map(e=> e*mag_time), ['#2196f3'])                
@@ -287,7 +289,7 @@ function UnitdiskMeta_({ parent, ud, className })
 
         const v = rows.data
 
-        v.info.innerHTML  = `${d3format(n)} nodes • 3kB` 
+        v.info.innerHTML  = `${mysi(n)}<sub>N</sub>${sep}3.1<sub>kB</sub>` 
         v.info.title      = `download: ${Δ[0].toFixed(0)}ms\n`
         v.info.title     += `parse: ${Δ[1].toFixed(0)}ms\n`
         v.info.title     += `hierarchy and weights: ${Δ[2].toFixed(0)}ms\n`
@@ -304,10 +306,21 @@ function UnitdiskMeta_({ parent, ud, className })
         ping(v.useIndic)
         if (parseFloat(t) > 1000) ping(v.overuseIndic)
         
-        rows.degree.q.innerHTML  = `<sub>${mysi(model.children.length)}</sub>`
+        const countChildren = n=> (n.children ? n.children.length : 0)
+
+        var δsum = 0; model.each(e=> δsum += countChildren(e))
+        var ωsum = 0; model.each(e=> ωsum += e.value)
+        var τsum = 0; model.each(e=> τsum += e.height)
+
+        rows.degree.qMax.innerHTML  = `<sub>μ${p1(δsum/n)}</sub>`
+        rows.weights.qMax.innerHTML = `<sub>μ${p1(ωsum/n)}</sub>`
+        rows.heights.qMax.innerHTML = `<sub>μ${p1(τsum/n)}</sub>`
+
+        var maxδ = 0
+        model.each(e=> maxδ = Math.max(maxδ, countChildren(e)))
+        rows.degree.q.innerHTML  = `<sub>${mysi(maxδ)}</sub>`
         rows.weights.q.innerHTML = `<sub>${mysi(model.value)}</sub>`
-        rows.heights.q.innerHTML = `<sub>${mysi(model.height)}</sub>`
-        //v2.qMax.innerHtml = model.height
+        rows.heights.q.innerHTML = `<sub>${mysi(model.height)}</sub>`        
     }
     
     ui.updateLang = ()=> {        
@@ -318,7 +331,8 @@ function UnitdiskMeta_({ parent, ud, className })
         // do the hole DSIT STUFF!
         const v = rows.lang
 
-        v.info.innerHTML  = `34k • 7k • 1k • 34`
+        v.info.innerHTML  = `7<sub>kT</sub>${sep}1<sub>k𝐖</sub>${sep}34<sub>◊</sub>${sep}34<sub>◱</sub>`
+        //v.info.innerHTML  = `7<sub>kT</sub>${sep}1<sub>k𝐖</sub>${sep}34<sub>◍</sub> 34<sub>▧</sub>`
         v.q.innerHTML     = Δs.toFixed(1)
 
         updateBar(v.bar, Δ.map(e=>e/mag_load), ['#ff9800', '#2196f3', 'green'])        
@@ -329,25 +343,30 @@ function UnitdiskMeta_({ parent, ud, className })
     return ui
 }
 
+const p1 = n=> n.toFixed(1)
 
 const mysihelper = d3.format('.3s')
-function mysi(n) 
+function mysi(n, p=0, u='') 
 {
     const d3str = mysihelper(n)
-    const lastChar = d3str[d3str.length-1]    
+    const lastChar = d3str.slice(-1)
     const hasSiEx = lastChar == 'k'    
     const pidx = d3str.indexOf('.')    
     const hasDot = pidx !== -1
-    var x = d3str
     
+    var nr = d3str    
     if (hasDot) 
-        x = x.slice(0, pidx)
+        nr = nr.slice(0, pidx+(p>0?p+1:0))
+
+    if (hasSiEx)
+        nr = nr.slice(-1)
 
     var ex = ''
-    if (hasSiEx && hasDot)
+    if (hasSiEx)
         ex = lastChar
     
-    return x + ex
+    return nr + `<sub>${ex}${u}</sub>`
+    //return nr + ex
 }
 
 class TextRow 
@@ -391,15 +410,17 @@ class SliderRow
 }
 
 class HistRow {                
-    label; info; hist; q; qMax; 
+    label; min; hist; q; qMax; 
     constructor(ui, offset, desc, unit) {
         this.label = <HTMLElement>ui.children[offset+0]
-        this.info =  <HTMLElement>ui.children[offset+1]
+        this.min =   <HTMLElement>ui.children[offset+1]
         this.hist =  <HTMLElement>ui.children[offset+2]
-        this.q =     <HTMLElement>ui.children[offset+3]        
+        this.q =     <HTMLElement>ui.children[offset+3]
+        this.qMax =  <HTMLElement>ui.children[offset+4]
                 
         this.label.innerHTML = desc        
         this.q.innerHTML = '-'
+        this.qMax.innerHTML = '-'
     }
 }
 

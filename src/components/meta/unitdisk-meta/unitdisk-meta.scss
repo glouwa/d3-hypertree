@@ -9,7 +9,7 @@
     z-index: 1000;
     position: absolute;    
     left:1em;    
-    width:20em;
+    width:22em;
     padding-left:.3em;
     padding-bottom:.1em;    
     font-size: .8em;
@@ -18,14 +18,14 @@
     grid-row-gap: 4px;
     //grid-column-gap: 3px;
     //grid-template-rows: repeat(8, auto);
-    grid-template-columns: 4.4em auto auto auto auto .5em auto;
+    grid-template-columns: 4.4em .8em auto auto 1.15em .5em auto;
 
     .slider {
         position: relative; 
         z-index: 102;
         height: 1em;
         margin-left: .15em;
-        padding-right: .1em;
+        padding-right: .4em;
         grid-column: auto / span 2;
     }
 
@@ -110,7 +110,7 @@
     }
 
     .hist {
-        grid-column: auto / span 2; 
+        grid-column: auto / span 1; 
         padding: .01em .15em .35em .3em;
         width: 100%;
         height: 100%;
@@ -140,5 +140,10 @@
     }
     .bar-bg:last-child {
         margin-bottom: 0em;
+    }
+
+    .left-aligned {
+        justify-self: baseline; 
+        margin-left: -1.55em;
     }
 }
