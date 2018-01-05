@@ -1,12 +1,12 @@
 import * as d3              from 'd3'
-import { ILayer }           from '../layer'
-import { LayerStack }       from '../layerstack'
-import { N }                from '../../../models/n/n'
+import { ILayer }           from '../layerstack/layer'
+import { LayerStack }       from '../layerstack/layerstack'
+import { N }                from '../../models/n/n'
 import { C, CptoCk, CktoCp,
     CassignC, ArrtoC,
     dfsFlat, CsubC,
     arcCenter, πify,
-    sigmoid }               from '../../../hyperbolic-math'
+    sigmoid }               from '../../hyperbolic-math'
 
 export interface InteractionLayerArgs
 {

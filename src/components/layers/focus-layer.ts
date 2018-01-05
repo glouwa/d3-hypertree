@@ -1,5 +1,5 @@
-import { ILayer }          from '../layer'
-import { D3UpdatePattern } from '../d3updatePattern'
+import { ILayer }          from '../layerstack/layer'
+import { D3UpdatePattern } from '../layerstack/d3updatePattern'
 
 export interface FocusLayerArgs
 {
