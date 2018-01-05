@@ -135,6 +135,7 @@ export class Hypertree
     langMap        : {}
     view           : HTMLElement
     animation      : boolean = false    
+    magic          = 1/160
     paths          : { 
         isSelected?:N, 
         isHovered?:N 
@@ -401,6 +402,7 @@ export class Hypertree
 
                 this.unitdisk.update.data()
                 this.hypertreeMeta.update.transformation()
+                this.hypertreeMeta.update.layout()
                 //this.unitdiskMeta.update.layout()
                 //this.unitdiskMeta.update.transformation()
                 //this.layerStackMeta2.update.data()

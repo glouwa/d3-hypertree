@@ -1,7 +1,9 @@
-import * as d3  from 'd3'
-import { HTML } from 'ducd'
-import { t }    from 'ducd'
-import { IUnitDisk } from '../../unitdisk/unitdisk'
+import * as d3            from 'd3'
+import { HTML }           from 'ducd'
+import { t }              from 'ducd'
+import { IUnitDisk }      from '../../unitdisk/unitdisk'
+import { CptoCk, CktoCp } from '../../../hyperbolic-math'
+import { πify }           from '../../../hyperbolic-math'
 
 export class UnitdiskMeta 
 {
@@ -30,6 +32,7 @@ export class UnitdiskMeta
         layout:             ()=> { 
             this.ui.updateLayout()
             this.update.transformation()
+            this.ui.updateλω()
         },
         transformation:     ()=> { 
             this.ui.updateSvgInfo()
@@ -54,7 +57,8 @@ interface UnitdiskMeta_UI {
     updateLang,
     updateTransformationInfo
     updateLayout, 
-    updateCachInfo 
+    updateCachInfo,
+    updateλω
 }
 
 const colors         = ["#3366cc", "#dc3912", "#ff9900", "#109618", "#990099", "#0099c6", "#dd4477", "#66aa00", "#b82e2e", "#316395", "#994499", "#22aa99", "#aaaa11", "#6633cc", "#e67300", "#8b0707", "#651067", "#329262", "#5574a6", "#3b3eac"];
@@ -100,12 +104,12 @@ var barrow = `
     <div class="info2"></div>
     <div class="bar-bg"></div>`
 
-var sliderrow = (id, classes='')=> `
+var sliderrow = (id, min, max, val, classes='')=> `
     <div class="label"> </div> 
     <div class="sm"><sub>2</sub></div> 
     <div class="slider">
         <p class="range-field">
-            <input type="range" min="2" max="500" value="160" class="slider" id="myRange">
+            <input type="range" min="${min}" max="${max}" value="${val}" class="slider" id="myRange" step="0.01">
         </p>
     </div>     
     <div class="qmax"></div> 
@@ -141,8 +145,8 @@ var htmlinfo =
         ${barrow}
         ${barrow}
         ${barrow}        
-        ${sliderrow('')}
-        ${sliderrow('')}
+        ${sliderrow('', 2, 500, 160)}
+        ${sliderrow('', .4, .9, .5)}
         ${barrow}        
         ${histrow}
         ${histrow}
@@ -161,14 +165,35 @@ function UnitdiskMeta_({ parent, ud, className })
     ui.classList.add(className)
     parent.appendChild(ui)
 
+    function λsliderInit(sliderHtml) {    
+        var π = Math.PI     
+        var slider = sliderHtml.querySelector('input')        
+        slider.value = 1 - πify(CktoCp(ud.args.transformation.state.λ).θ) / 2 / π
+        slider.oninput = function (e) {
+            const λk = CptoCk({ θ:(1-slider.value)*π*2, r:1})
+            ud.args.transformation.state.λ.re = λk.re
+            ud.args.transformation.state.λ.im = λk.im
+            ud.args.hypertree.updateLayout()
+        }
+    }
+
+    function ωsliderInit(sliderHtml) {        
+        var slider = sliderHtml.querySelector('input')
+        slider.value = 1 / ud.args.hypertree.magic
+        slider.oninput = function (e) { 
+            ud.args.hypertree.magic = 1 / slider.value
+            ud.args.hypertree.updateTransformation()
+        }
+    }
+
     var e = 0
     var re = 7 
     var rows = {                
         rendering: new BarRow   (ui, e+=0,  'SVG',                 '<sub>#</sub>'),
         d3:        new BarRow   (ui, e+=re, 'D<sub>3</sub>',       '<sub>ms</sub>'),
         transform: new BarRow   (ui, e+=re, '∀<sub>visible</sub>', '<sub>ms</sub>'),     
-        cullmaxw:  new SliderRow(ui, e+=re, 'ω<sub>cull</sub>',    '<sub>.5k</sub>'),
-        lambda:    new SliderRow(ui, e+=6,  'λ',                   '<sub>1</sub>'),
+        cullmaxw:  new SliderRow(ui, e+=re, 'ω<sub>cull</sub>',    '<sub>.5k</sub>', ωsliderInit, v=> `<sub>${v}</sub>`),
+        lambda:    new SliderRow(ui, e+=6,  'λ',                   '<sub>1</sub>', λsliderInit, v=> `<sub>.${v*10}</sub>`),
         layout:    new BarRow   (ui, e+=6,  'Select',              '<sub>ms</sub>'),        
         degree:    new HistRow  (ui, e+=re, 'δ<sup>+</sup>',       '<sub>97</sub>'), 
         weights:   new HistRow  (ui, e+=7,  'ω',                   '<sub>34k</sub>'),
@@ -190,12 +215,10 @@ function UnitdiskMeta_({ parent, ud, className })
         }
     }
 
-    // zu slider row
-    var slider = ui.querySelector('.range-field > input')
-    ud.args.hypertree.magic = 1/slider.value
-    slider.oninput = function (e) { 
-        ud.args.hypertree.magic = 1/slider.value
-        ud.args.hypertree.updateTransformation()
+    ui.updateλω = ()=> {
+        var π = Math.PI
+        rows.lambda.slider.querySelector('input').value = 1 - πify(CktoCp(ud.args.transformation.state.λ).θ) / 2 / π        
+        rows.cullmaxw.slider.querySelector('input').value = 1 / ud.args.hypertree.magic
     }
 
     ui.updateSvgInfo = ()=> {
@@ -397,15 +420,20 @@ class BarRow extends TextRow
 
 class SliderRow 
 {
-    label; info; q; qMax; w; bar
-    constructor(ui, offset, desc, unit) {
-        this.label = <HTMLElement>ui.children[offset+0]
-        this.info =  <HTMLElement>ui.children[offset+1]        
-        this.qMax =  <HTMLElement>ui.children[offset+3]
-        this.w =     <HTMLElement>ui.children[offset+4]
+    label; info; slider; q; qMax; w; bar
+    constructor(ui, offset, desc, unit, sliderInit, format) {
+        this.label =  <HTMLElement>ui.children[offset+0]
+        this.info =   <HTMLElement>ui.children[offset+1]        
+        this.slider = <HTMLElement>ui.children[offset+2]
+        this.qMax =   <HTMLElement>ui.children[offset+3]
+        this.w =      <HTMLElement>ui.children[offset+4]
         
         this.label.innerHTML = desc
-        this.qMax.innerHTML = unit
+        var sliderinput = this.slider.querySelector('input')    
+        this.info.innerHTML = format(sliderinput.min)
+        this.qMax.innerHTML = format(sliderinput.max)
+
+        sliderInit(this.slider)
     }
 }
 
