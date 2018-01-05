@@ -1,5 +1,6 @@
 import * as d3              from 'd3'
 import { ILayer }           from '../layer'
+import { LayerStack }       from '../layerstack'
 import { N }                from '../../../models/n/n'
 import { C, CptoCk, CktoCp,
     CassignC, ArrtoC,
@@ -18,10 +19,11 @@ export class InteractionLayer implements ILayer
 {
     parent
     args:             InteractionLayerArgs    
+    layerStack:       LayerStack
     name =            'interaction'
    
     update = {
-        parent:         ()=> {},        
+        parent:         ()=> {},
         data:           ()=> {},
         transformation: ()=> {},
         style:          ()=> {}
