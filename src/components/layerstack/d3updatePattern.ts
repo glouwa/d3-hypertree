@@ -121,7 +121,7 @@ export class D3UpdatePattern
     }
 }
 
-export var bboxOffset = (d, cacheId='labellen', θn=null)=> v=> {
+export var bboxOffset = (d, cacheId='labellen', θn=undefined)=> v=> {
     var w = d[cacheId] = d[cacheId] || v.getComputedTextLength()  //var bb = v.getBBox() war schlechter
     var h = .045
     var paddingLeftRight = .08
