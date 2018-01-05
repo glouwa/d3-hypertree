@@ -52,8 +52,12 @@
                 font-size: .005em;
             }
             .label-big {
-                font-size: .01em;
-                font-weight: 300;                
+                font-size: .012em;
+                font-weight: 400; 
+                fill: #fff;               
+                paint-order:stroke;
+                stroke: rgba(#111, 1);
+                stroke-width: .04;
             }
         }
 

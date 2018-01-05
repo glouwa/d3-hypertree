@@ -228,6 +228,7 @@ export class Hypertree
         var t0 = performance.now()
         this.view.querySelector('.preloader').innerHTML = htmlpreloader
         this.unitdisk.args.data = undefined
+        this.args.selection = []
         this.paths.isSelected = undefined
         this.paths.isHovered= undefined
         this.unitdisk.update.data()
@@ -391,6 +392,7 @@ export class Hypertree
                     this.animation = false
                     this.data.each((n:any)=> { 
                         n.zRef = n.z
+                        n.zRefp = CktoCp(n.z)
                         n.strCacheZref = `${n.z.re} ${n.z.im}`
                     })
                 }

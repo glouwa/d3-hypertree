@@ -121,14 +121,15 @@ export class D3UpdatePattern
     }
 }
 
-export var bboxOffset = (d, cacheId='labellen')=> v=> {
+export var bboxOffset = (d, cacheId='labellen', θn=null)=> v=> {
     var w = d[cacheId] = d[cacheId] || v.getComputedTextLength()  //var bb = v.getBBox() war schlechter
     var h = .045
     var paddingLeftRight = .08
     var paddingTopBottom = .02
+    const θ = θn ? θn.θ : d.cachep.θ
     return {
-        re:(paddingLeftRight/2 + w/2) * Math.cos(d.cachep.θ) - w/2,
-        im:(paddingTopBottom/2 + h/2) * Math.sin(d.cachep.θ) + h/3
+        re:(paddingLeftRight/2 + w/2) * Math.cos(θ) - w/2,
+        im:(paddingTopBottom/2 + h/2) * Math.sin(θ) + h/3
     }
 }
 

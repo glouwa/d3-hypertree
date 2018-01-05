@@ -168,7 +168,7 @@ export class UnitDiskNav implements IUnitDisk
 
         var navBgNodeR = .012
         var nodeRadiusOffset = ls=> d=>
-            CptoCk({ θ:d.cachep.θ, r:navBgNodeR })
+            CptoCk({ θ:d.zRefp ? d.zRefp.θ : CktoCp(d.z).θ, r:navBgNodeR })
 
         this.navBackground = new UnitDisk({
             parent:             args.parent,
@@ -225,10 +225,9 @@ export class UnitDiskNav implements IUnitDisk
                                         text:       (d)=> d.icon,
                                         delta:      (d, i, v)=> CaddC(
                                                         nodeRadiusOffset(ud)(d),
-                                                        bboxOffset(d, 'labellen-bg')(v[i])),
+                                                        bboxOffset(d, 'labellen-bg', d.zRefp || CktoCp(d.z))(v[i])),
                                         transform:  (d, delta)=> 
-                                                        ` translate(${(d.zRef ? d.zRef.re : d.z.re) + delta.re} ${d.zRef ? d.zRef.im : d.z.im})` 
-                                                        + d.scaleStrText                            
+                                                        ` translate(${(d.zRef ? d.zRef.re : d.z.re) + delta.re} ${d.zRef ? d.zRef.im : d.z.im})`                                                         
                                     }),             
                                     (ud:UnitDisk)=> new LabelLayer({
                                         name:       'labels',
@@ -237,10 +236,9 @@ export class UnitDiskNav implements IUnitDisk
                                         text:       (d)=> d.label,
                                         delta:      (d, i, v)=> CaddC(
                                                         nodeRadiusOffset(ud)(d),
-                                                        bboxOffset(d, 'labellen-bg')(v[i])),
+                                                        bboxOffset(d, 'labellen-bg', d.zRefp || CktoCp(d.z))(v[i])),
                                         transform:  (d, delta)=> 
-                                                        ` translate(${(d.zRef ? d.zRef.re : d.z.re) + delta.re} ${d.zRef ? d.zRef.im : d.z.im})` 
-                                                        + d.scaleStrText                            
+                                                        ` translate(${(d.zRef ? d.zRef.re : d.z.re) + delta.re} ${d.zRef ? d.zRef.im : d.z.im})`                                                         
                                     }),           
                                     (ud:UnitDisk)=> new SymbolLayer({
                                         name:       'symbols',
@@ -283,6 +281,7 @@ export class UnitDiskNav implements IUnitDisk
             layers:             [
                                     (ud:UnitDisk)=> new CellLayer({
                                         invisible:  true,
+                                        hideOnDrag: true,
                                         clip:       '#circle-clip'+ud.args.clipRadius,
                                         data:       ()=> ud.cache.cells,                                        
                                     }), 
