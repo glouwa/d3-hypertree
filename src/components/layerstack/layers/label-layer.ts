@@ -4,6 +4,7 @@ import { D3UpdatePattern } from '../d3updatePattern'
 export interface LabelLayerArgs
 {
     name:        string,
+    className:   string,
     invisible?:  boolean,
     hideOnDrag?: boolean,
     data:        ()=> any,    
@@ -37,7 +38,7 @@ export class LabelLayer implements ILayer
             clip:              this.args.clip,
             data:              this.args.data,
             name:              this.name,
-            className:         'caption',
+            className:         this.args.className,
             elementType:       'text',
             create:            s=> s.classed("P",            d=> d.name == 'P')
                                     .classed("caption-icon", d=> d.icon && navigator.platform.includes('inux'))

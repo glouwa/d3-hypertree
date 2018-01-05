@@ -62,10 +62,12 @@ export class LayerStack
         var t1 = performance.now()
         if (this.layers['link-arcs-focus']) this.layers['link-arcs-focus'].update.data()
         var t2 = performance.now()
+        if (this.layers['labels']) this.layers['labels'].update.data()
+        var t3 = performance.now()
 
         this.d3meta = { 
-            Δ:[t1-t0, t2-t1], 
-            names:['path-arcs', 'link-arcs-focus'] 
+            Δ:[t1-t0, t2-t1, t3-t2], 
+            names:['path-arcs', 'link-arcs-focus', 'labels'] 
         }
         //if (this.layers['link-lines']) this.layers['link-lines'].update.style()            
         //if (this.layers.nodes) this.layers.nodes.update.style()        

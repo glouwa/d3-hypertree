@@ -40,7 +40,7 @@ export class InteractionLayer implements ILayer
     currMousePosAsC = ()=> ArrtoC(this.currMousePosAsArr())
     findNodeByCell = ()=> {
         var m = this.currMousePosAsArr()
-        var find = this.args.unitdisk.cache.voronoiDiagram.find(m[0], m[1])
+        var find = this.layerStack.args.unitdisk.cache.voronoiDiagram.find(m[0], m[1])
         return find ? find.data : undefined
     }
 
@@ -87,8 +87,8 @@ export class InteractionLayer implements ILayer
             .attr("r", this.args.mouseRadius)
             .on("dblclick",  d=> this.onDblClick(this.findNodeByCell()))
             //.on("click",     d=> this.onClick(findNodeByCell()))
-            .on("mousemove", d=> this.args.unitdisk.args.hypertree.updatePath('isHovered', this.findNodeByCell()))
-            .on("mouseout",  d=> this.args.unitdisk.args.hypertree.updatePath('isHovered', undefined))
+            .on("mousemove", d=> this.layerStack.args.unitdisk.args.hypertree.updatePath('isHovered', this.findNodeByCell()))
+            .on("mouseout",  d=> this.layerStack.args.unitdisk.args.hypertree.updatePath('isHovered', undefined))
             .call(drag)
             .call(zoom)
     }
@@ -97,25 +97,25 @@ export class InteractionLayer implements ILayer
 
     private onDragStart = (n:N, m:C)=> {
         if (!this.animationTimer)
-            this.args.unitdisk.args.transformation.onDragStart(m)
+            this.layerStack.args.unitdisk.args.transformation.onDragStart(m)
     }
 
     private onDragλ = (s:C, e:C)=> {
-        this.args.unitdisk.args.transformation.onDragλ(s, e)
-        this.args.unitdisk.args.hypertree.updateLayout()
+        this.layerStack.args.unitdisk.args.transformation.onDragλ(s, e)
+        this.layerStack.args.unitdisk.args.hypertree.updateLayout()
     }
 
     private onDragByNode = (n:N, s:C, e:C)=> {
         if (n && n.name == 'θ') {
-            this.args.unitdisk.args.transformation.onDragθ(s, e)
-            this.args.unitdisk.args.hypertree.updateTransformation()
+            this.layerStack.args.unitdisk.args.transformation.onDragθ(s, e)
+            this.layerStack.args.unitdisk.args.hypertree.updateTransformation()
         }
         else if (n && n.name == 'λ') {
             this.onDragλ(s, e)
         }
         else {
-            this.args.unitdisk.args.transformation.onDragP(s, e)
-            this.args.unitdisk.args.hypertree.updateTransformation()
+            this.layerStack.args.unitdisk.args.transformation.onDragP(s, e)
+            this.layerStack.args.unitdisk.args.hypertree.updateTransformation()
         }
     }
 
@@ -127,8 +127,8 @@ export class InteractionLayer implements ILayer
             this.onClick(n, e) // sollte on click sein und auch timer berücksichtigen oder?        
 
         // immer?
-        this.args.unitdisk.args.transformation.onDragEnd(e)
-        this.args.unitdisk.args.hypertree.updateTransformation()
+        this.layerStack.args.unitdisk.args.transformation.onDragEnd(e)
+        this.layerStack.args.unitdisk.args.hypertree.updateTransformation()
     }
 
     private animationTimer = null
@@ -170,7 +170,7 @@ export class InteractionLayer implements ILayer
             this.dblClickTimer = setTimeout(() => {
                 this.dblClickTimer = null
                 
-                if (n != this.args.unitdisk.args.transformation.cache.centerNode)
+                if (n != this.layerStack.args.unitdisk.args.transformation.cache.centerNode)
                     this.animateTo(n, m)
                 else                
                     this.args.onClick(n, m)

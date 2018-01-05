@@ -60,6 +60,8 @@ export interface HypertreeArgs
     layout:         LayoutFunction,
     onNodeSelect:   (n:N) => void,
 
+    selection:      N[],
+
     decorator:      { new(a: UnitDiskArgs) : IUnitDisk },
 
     ui : {
@@ -132,7 +134,7 @@ export class Hypertree
     data           : N
     langMap        : {}
     view           : HTMLElement
-    animation      : boolean = false
+    animation      : boolean = false    
     paths          : { 
         isSelected?:N, 
         isHovered?:N 
@@ -328,6 +330,9 @@ export class Hypertree
         var old_ =  this.paths[pathId]
         this.paths[pathId] = n
         var new_ =  this.paths[pathId]
+
+        if (pathId === 'isSelected')
+            this.args.selection = [n]
 
         if (old_)
             if (old_.ancestors) 

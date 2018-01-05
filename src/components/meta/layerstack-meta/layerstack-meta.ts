@@ -130,7 +130,7 @@ export function LayerInfo_({ parent, onCheckChange, className })
                 const lsmeta = layer.layerStack.d3meta
                 console.assert(layer.name)                
                 const pos = lsmeta.names.indexOf(layer.name)
-                const time = lsmeta.Δ[pos]/1000
+                const time = checker ? lsmeta.Δ[pos]/1000 : 0
                 
                 if (!isNaN(time))
                     sumtime += time

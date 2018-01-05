@@ -2,7 +2,8 @@ import * as d3                           from 'd3'
 import { HTML }                          from 'ducd'
 import { N }                             from '../../models/n/n'
 import { obj2data }                      from '../../models/n/n-loaders'
-import { C, CktoCp, CmulR, CsubC }       from '../../hyperbolic-math'
+import { C, CktoCp, CptoCk }             from '../../hyperbolic-math'
+import { CmulR, CsubC, CaddC }           from '../../hyperbolic-math'
 import { dfsFlat, πify, CassignC }       from '../../hyperbolic-math'
 import { ArrAddR }                       from '../../hyperbolic-math'
 import { lengthDilledation }             from '../../hyperbolic-math'
@@ -21,6 +22,7 @@ import { InteractionLayer }              from '../layerstack/layers/interaction-
 import { LayerStack }                    from '../layerstack/layerstack'
 import { HypertreeMeta }                 from '../meta/hypertree-meta/hypertree-meta'
 import { HypertreeMetaNav }              from '../meta/hypertree-meta/hypertree-meta'
+import { bboxOffset }                    from '../layerstack/d3updatePattern'
 
 export interface IUnitDisk
 {
@@ -164,6 +166,10 @@ export class UnitDiskNav implements IUnitDisk
             * d.distScale
             * d.weightScale
 
+        var navBgNodeR = .012
+        var nodeRadiusOffset = ls=> d=>
+            CptoCk({ θ:d.cachep.θ, r:navBgNodeR })
+
         this.navBackground = new UnitDisk({
             parent:             args.parent,
             className:          'nav-background-disc',
@@ -211,12 +217,36 @@ export class UnitDiskNav implements IUnitDisk
                                         width:      d=> arcWidth(d) + (.013 * d.dampedDistScale),
                                         classed:    s=> s.classed("hovered-path-nav",  d=> d.isHovered)
                                                          .classed("selected-path-nav", d=> d.isSelected)
-                                    }),                                    
+                                    }),            
+                                    (ud:UnitDisk)=> new LabelLayer({
+                                        name:       'emojis',   
+                                        className:  'caption',
+                                        data:       ()=> ud.cache.emojis,
+                                        text:       (d)=> d.icon,
+                                        delta:      (d, i, v)=> CaddC(
+                                                        nodeRadiusOffset(ud)(d),
+                                                        bboxOffset(d, 'labellen-bg')(v[i])),
+                                        transform:  (d, delta)=> 
+                                                        ` translate(${(d.zRef ? d.zRef.re : d.z.re) + delta.re} ${d.zRef ? d.zRef.im : d.z.im})` 
+                                                        + d.scaleStrText                            
+                                    }),             
+                                    (ud:UnitDisk)=> new LabelLayer({
+                                        name:       'labels',
+                                        className:  'caption label-big', 
+                                        data:       ()=> ud.args.hypertree.args.selection,
+                                        text:       (d)=> d.label,
+                                        delta:      (d, i, v)=> CaddC(
+                                                        nodeRadiusOffset(ud)(d),
+                                                        bboxOffset(d, 'labellen-bg')(v[i])),
+                                        transform:  (d, delta)=> 
+                                                        ` translate(${(d.zRef ? d.zRef.re : d.z.re) + delta.re} ${d.zRef ? d.zRef.im : d.z.im})` 
+                                                        + d.scaleStrText                            
+                                    }),           
                                     (ud:UnitDisk)=> new SymbolLayer({
                                         name:       'symbols',
                                         data:       ()=> ud.cache.spezialNodes,                                        
                                         r:          d=> .03,
-                                        transform:  d=> d.transformStrCache 
+                                        transform:  d=>  ` translate(${d.strCacheZref || d.strCacheZ})`
                                                         + ` scale(${d.dampedDistScale})`,
                                     }),
                                 ],
@@ -225,7 +255,7 @@ export class UnitDiskNav implements IUnitDisk
             transform:          (n:N)=> n.z,
 
             caption:            (n:N)=> undefined,
-            nodeRadius:         .012,
+            nodeRadius:         navBgNodeR,
             clipRadius:         1
         })
 
@@ -267,6 +297,7 @@ export class UnitDiskNav implements IUnitDisk
                                         invisible:  true,
                                         hideOnDrag: true,   
                                         name:        'labels',
+                                        className:   'caption',
                                         data:        ()=> ud.cache.unculledNodes,
                                         text:        d=> ({ P:'+', θ:'🠆', λ:'⚲' })[d.name],
                                         delta:       d=> deltaMap[d.name],
