@@ -148,7 +148,7 @@ export class InteractionLayer implements ILayer
         this.animationTimer = d3.timer(()=> {            
             md.r = initR * (1 - sigmoid(step++/steps))
             if (step > steps) {
-                this.cancelAnimationTimer()            
+                this.cancelAnimationTimer()    
                 this.onDragEnd(n, m, CptoCk(md))
             }
             else  

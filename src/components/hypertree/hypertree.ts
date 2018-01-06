@@ -422,23 +422,22 @@ export class Hypertree
     api = {
         animateTo: (newP, newλ)=> 
         {   
-            this.animation = true
-            const initTS = clone(this.args.ui.transformation.state)
-            const Δ = this.args.ui.transformation.state.λ
+            if (this.animation) return
+            else this.animation = true
 
-            let step = 0
+            const initTS = clone(this.args.ui.transformation.state)            
             const steps = 16
-            const frame = ()=> {                
-                if (step++ > steps) 
-                    return this.animation = false                    
-                                
+            let step = 1
+
+            const frame = ()=> {                                                
                 const animP = CmulR(initTS.P, 1-sigmoid(step/steps))
                 CassignC(this.args.ui.transformation.state.P, animP)
                 
                 this.updateTransformation()
-                requestAnimationFrame(()=> frame())                
-            }
 
+                if (step++ > steps) this.animation = false                    
+                else requestAnimationFrame(()=> frame())                
+            }
             requestAnimationFrame(()=> frame())
         }        
     }
