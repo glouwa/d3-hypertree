@@ -117,7 +117,7 @@ var hypertreehtml =
             ${btn('btnedit', 'border_color')}
             ${btn('btndelte', 'delete')}-->
         </div> 
-        <svg width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">
+        <svg width="calc(100% - 3em)" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">
             ${bubbleSvgDef}
         </svg>        
         <div class="preloader"></div>        
