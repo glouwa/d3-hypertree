@@ -32,9 +32,9 @@ cd ..
 ```
 
 and download prebuild [data](https://drive.google.com/open?id=0B8M0Y20s74LkbG1XSHctME00NXc)
-and copy content to res/hierarchy/Open Tree of Life/.
+and copy content to res/hierarchy/Open-Tree-of-Life/.
 
-'res/hierarchy/Open Tree of Life/afrotheria/afrotheria.d3.json-de.lang.json'
+'res/hierarchy/Open-Tree-of-Life/afrotheria/afrotheria.d3.json-de.lang.json'
 should be a valid path if done correctly.
 
 
