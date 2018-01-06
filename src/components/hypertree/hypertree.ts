@@ -107,8 +107,8 @@ var hypertreehtml =
             ${btn('btnnav', 'explore', 'tool-seperator')}
             ${btn('btnmeta', 'layers')}
             ${btn('btnhome', 'home', 'tool-seperator')}
-            ${btn('btnsearch', 'search')}
-            ${btn('btndownload', 'file_download')}
+            ${btn('btnsearch', 'search', 'disabled')}
+            ${btn('btndownload', 'file_download', 'disabled')}
             <!--${btn('btncut', 'content_cut')}
             ${btn('btncopy', 'content_copy')}
             ${btn('btnpaste', 'content_paste')}
