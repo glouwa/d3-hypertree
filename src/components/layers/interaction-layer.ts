@@ -79,10 +79,20 @@ export class InteractionLayer implements ILayer
                 //return d3.event.type!=='dblclick' && d3.event.type!=='mousedown'
                 //return d3.event.type!=='dblclick' || d3.event.type=='touchstart'//&& d3.event.type!=='mousedown' && d3.event.type!=='touchstart'
             })*/
-            .on("zoom", ()=> this.onDragλ(
-                null,
-                CptoCk({ θ:d3.event.transform.k * Math.PI*2-Math.PI, r:1 }),
-            ))
+            .on("zoom", ()=> {                
+                const mΔ = d3.event.sourceEvent.deltaY
+                const λΔ = -mΔ/53*2*Math.PI/16                
+                const oldλp = CktoCp(this.layerStack.args.unitdisk.args.transformation.state.λ)
+                const newλp = { θ:πify(oldλp.θ+λΔ), r:1 }
+                
+                const min = .1 * Math.PI
+                const max = .8 * Math.PI*2
+                if (newλp.θ >= max) console.log('to big')
+                if (newλp.θ <= min) console.log('to small')
+
+                if (newλp.θ < max && newλp.θ > min) 
+                    this.onDragλ(null, CptoCk(newλp))
+            })
 
         this.parent.append('circle')
             .attr("class", "mouse-circle")
