@@ -4,11 +4,13 @@
 
 import * as d3                 from 'd3'
 import { HTML }                from 'ducd'
+import { clone }               from 'ducd'
 import { N }                   from '../../models/n/n'
 import { LoaderFunction }      from '../../models/n/n-loaders'
 import { LayoutFunction }      from '../../models/n/n-layouts'
 import { dfsFlat }             from '../../hyperbolic-math'
 import { C, CktoCp, CptoCk }   from '../../hyperbolic-math'
+import { CassignC, CmulR }     from '../../hyperbolic-math'
 import { sigmoid }             from '../../hyperbolic-math'
 import { Transformation }      from '../../hyperbolic-transformation'
 
@@ -22,6 +24,8 @@ import { UnitDiskNav }         from '../unitdisk/unitdisk'
 
 import { HypertreeMeta }       from '../meta/hypertree-meta/hypertree-meta'
 import { NoHypertreeMeta }     from '../meta/hypertree-meta/hypertree-meta'
+
+const π = Math.PI
 
 var htmlpreloader = `
     <div class="preloader-wrapper big active">
@@ -169,7 +173,9 @@ export class Hypertree
         this.args.parent.appendChild(this.view)
         var btnMeta = <HTMLButtonElement>this.view.querySelector('#btnmeta')
         var btnNav = <HTMLButtonElement>this.view.querySelector('#btnnav')
-
+        var btnHome = <HTMLButtonElement>this.view.querySelector('#btnhome')
+        
+        btnHome.onclick = ()=> this.api.animateTo({ re:0, im:0 }, null)
         btnMeta.onclick = ()=> {
             this.noHypertreeMeta = this.noHypertreeMeta ? undefined : new NoHypertreeMeta()            
             this.update.metaView()
@@ -234,7 +240,7 @@ export class Hypertree
         this.paths.isHovered= undefined
         this.unitdisk.update.data()
 
-        this.args.dataloader((d3h, t1)=> {
+        this.args.dataloader((d3h, t1, dl)=> {
             var t2 = performance.now()
             var ncount = 1
             this.data = <N & d3.HierarchyNode<N>>d3
@@ -243,7 +249,7 @@ export class Hypertree
                 //.sum(this.args.weight) // this.updateWeights()
 
             this.view.querySelector('.preloader').innerHTML = ''
-            this.modelMeta = { Δ: [t1-t0, t2-t1, performance.now()-t2] }
+            this.modelMeta = { Δ: [t1-t0, t2-t1, performance.now()-t2], filesize:dl }
             
             var t3 = performance.now()
             this.data = this.args.layout(this.data, this.args.ui.transformation.state)
@@ -260,22 +266,27 @@ export class Hypertree
     }
 
     public updateLang() : void {
-        this.args.langloader(langMap=> {            
+        this.args.langloader((langMap, t1, dl)=> {            
             this.langMap = langMap
-            this.updateLang_()
+            this.updateLang_(dl)
 
             this.hypertreeMeta.update.lang()
             this.updateTransformation()
         })
     }
 
-    private updateLang_() {
+    public updateLangData()
+    {
+        // das was von data und lang abhängt: wiki nodes in this file...
+    }
+
+    private updateLang_(dl=0) {
         const t0 = performance.now()
         for (var n of dfsFlat(this.data, n=>true)) {
             n.label = this.args.ui.caption(this, n)
             n.labellen = undefined
         }
-        this.langMeta = { Δ: [300+performance.now()-t0], map:this.langMap }
+        this.langMeta = { Δ: [300+performance.now()-t0], map:this.langMap, filesize:dl }
     }
 
     private updateImgHref_() {
@@ -296,9 +307,7 @@ export class Hypertree
         //app.toast('Layout')
         var t0 = performance.now()
         this.args.layout(this.data, this.args.ui.transformation.state)        
-        this.layoutMeta = {
-            Δ: performance.now()-t0
-        }
+        this.layoutMeta = { Δ: performance.now()-t0 }
         //this.unitdiskMeta.update.layout(this.args.ui.transformation.cache, performance.now() - t0)
         
         if (this.args.ui.transformation.cache.centerNode) {
@@ -371,14 +380,13 @@ export class Hypertree
         var frame = ()=>
         {
             var p = step++/steps
-            if (step > steps) 
-            {
+            if (step > steps)             
                 this.animation = false
-            }
+            
             else 
             {
+                // new P, λ values
                 var λ = .03 + p * .98
-                var π = Math.PI
                 var animλ = CptoCk({ θ:2*π*λ, r:1 })
                 this.args.ui.transformation.state.λ.re = animλ.re
                 this.args.ui.transformation.state.λ.im = animλ.im
@@ -390,26 +398,49 @@ export class Hypertree
                     .leaves()
                     .reduce((max, n)=> Math.max(max, CktoCp(n.z).r), 0) > .95)                     
                 {
+                    // on abort
                     this.animation = false
                     this.data.each((n:any)=> { 
                         n.zRef = n.z
                         n.zRefp = CktoCp(n.z)
                         n.strCacheZref = `${n.z.re} ${n.z.im}`
                     })
+                    // on abort - ui.update(s)
+                    this.hypertreeMeta.update.transformation()
+                    this.hypertreeMeta.update.layout()
                 }
                 else 
                     requestAnimationFrame(()=> frame())
 
+                // ui.update(s)
                 this.unitdisk.update.data()
-                this.hypertreeMeta.update.transformation()
-                this.hypertreeMeta.update.layout()
-                //this.unitdiskMeta.update.layout()
-                //this.unitdiskMeta.update.transformation()
-                //this.layerStackMeta2.update.data()
-                //this.layerStackMeta.update.data()
             }
         }
         requestAnimationFrame(()=> frame())
+    }
+
+    api = {
+        animateTo: (newP, newλ)=> 
+        {   
+            this.animation = true
+            const initTS = clone(this.args.ui.transformation.state)
+            const Δ = this.args.ui.transformation.state.λ
+
+            let step = 0
+            const steps = 16
+            const frame = ()=> {                
+                if (step++ > steps) 
+                    return this.animation = false                    
+                                
+                const animP = CmulR(initTS.P, 1-sigmoid(step/steps))
+                CassignC(this.args.ui.transformation.state.P, animP)
+                
+                this.updateTransformation()
+                requestAnimationFrame(()=> frame())                
+            }
+
+            requestAnimationFrame(()=> frame())
+        }        
     }
 
     public isAnimationRunning() {

@@ -298,6 +298,7 @@ function UnitdiskMeta_({ parent, ud, className })
     const d3format = d3.format('.3s')
     ui.updateModel = ()=> {        
         const Δ = ud.args.hypertree.modelMeta.Δ
+        const kb = (ud.args.hypertree.modelMeta.filesize/1024).toFixed(0)
         const model = ud.args.hypertree.data
 
         // do the hole DSIT STUFF!
@@ -312,7 +313,7 @@ function UnitdiskMeta_({ parent, ud, className })
 
         const v = rows.data
 
-        v.info.innerHTML  = `${mysi(n)}<sub>N</sub>${sep}3.1<sub>kB</sub>` 
+        v.info.innerHTML  = `${mysi(n)}<sub>N</sub>${sep}${kb}<sub>kB</sub>` 
         v.info.title      = `download: ${Δ[0].toFixed(0)}ms\n`
         v.info.title     += `parse: ${Δ[1].toFixed(0)}ms\n`
         v.info.title     += `hierarchy and weights: ${Δ[2].toFixed(0)}ms\n`
@@ -339,22 +340,25 @@ function UnitdiskMeta_({ parent, ud, className })
         rows.weights.qMax.innerHTML = `<sub>μ${p1(ωsum/n)}</sub>`
         rows.heights.qMax.innerHTML = `<sub>μ${p1(τsum/n)}</sub>`
 
-        var maxδ = 0
-        model.each(e=> maxδ = Math.max(maxδ, countChildren(e)))
+        var maxδ = 0; model.each(e=> maxδ = Math.max(maxδ, countChildren(e)))
         rows.degree.q.innerHTML  = `<sub>${mysi(maxδ)}</sub>`
         rows.weights.q.innerHTML = `<sub>${mysi(model.value)}</sub>`
         rows.heights.q.innerHTML = `<sub>${mysi(model.height)}</sub>`        
     }
     
     ui.updateLang = ()=> {        
-        const Δ = ud.args.hypertree.langMeta.Δ 
+        const Δ  = ud.args.hypertree.langMeta.Δ 
+        const kb = ud.args.hypertree.langMeta.filesize
+                 ? (ud.args.hypertree.langMeta.filesize/1024).toFixed(0)
+                 : '-'
         const model = ud.args.hypertree.data
         const Δs = Δ/1000
 
         // do the hole DSIT STUFF!
         const v = rows.lang
-
-        v.info.innerHTML  = `7<sub>kT</sub>${sep}1<sub>k𝐖</sub>${sep}34<sub>◊</sub>${sep}34<sub>◱</sub>`
+        
+        v.info.innerHTML  = `${kb}<sub>kB</sub>`
+        //v.info.innerHTML  = `7<sub>kT</sub>${sep}1<sub>k𝐖</sub>${sep}34<sub>◊</sub>${sep}34<sub>◱</sub>`
         //v.info.innerHTML  = `7<sub>kT</sub>${sep}1<sub>k𝐖</sub>${sep}34<sub>◍</sub> 34<sub>▧</sub>`
         v.q.innerHTML     = Δs.toFixed(1)
 

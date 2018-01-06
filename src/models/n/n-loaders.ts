@@ -4,7 +4,7 @@ import { stratify } from 'd3-hierarchy'
 import { request, json, csv } from 'd3-request'
 
 // todo loader MUSS ein generic sein
-export type LoaderFunction = (ok: (root:N, t0:number)=>void)=> void
+export type LoaderFunction = (ok: (root:N, t0:number, dl:number)=>void)=> void
 
 function oneNode(ok) {
     ok({
@@ -34,8 +34,17 @@ function star(ok, max) {
     })
 }
 function loadFromLangFile(ok, file) {
-    json(file, (error, langData) =>
-        ok(langData))
+    //json(file, (error, langData) =>
+    //    ok(langData))
+    var t0, dl
+    request(file)
+        .mimeType("application/json")
+        .response(xhr=> { 
+            t0 = performance.now()
+            dl = xhr.responseText.length
+            return JSON.parse(xhr.responseText)
+        })
+        .get((error, langData) => ok(langData, t0, dl))
 }
 
 function loadFromFile(ok, file) {
@@ -43,11 +52,15 @@ function loadFromFile(ok, file) {
         file.endsWith('.json') ||
         file.endsWith('.rdf'))
         if (file.endsWith('.d3.json') || file == "data/upload/user-uploaded.xml") {
-            var t0
+            var t0, dl
             request(file)
                 .mimeType("application/json")
-                .response(xhr=> { t0 = performance.now(); return JSON.parse(xhr.responseText); })
-                .get((error, treeData) => ok(treeData, t0))
+                .response(xhr=> { 
+                    t0 = performance.now()
+                    dl = xhr.responseText.length
+                    return JSON.parse(xhr.responseText)
+                })
+                .get((error, treeData) => ok(treeData, t0, dl))
         }
         else
             new Tree(ok, file)
@@ -55,7 +68,9 @@ function loadFromFile(ok, file) {
         csv(file, function(error, data) {
             if (error)
                 throw error;
-            ok(stratify().parentId((d:N)=> d.id.substring(0, d.id.lastIndexOf(".")))(data))
+            ok(stratify()
+                .parentId((d:N)=> d.id.substring(0, d.id.lastIndexOf(".")))
+                (data))
         })
 }
 
