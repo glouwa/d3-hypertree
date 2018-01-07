@@ -22,15 +22,15 @@ export class InteractionLayer implements ILayer
     layerStack:       LayerStack
     name =            'interaction'
    
+    constructor(args : InteractionLayerArgs) {        
+        this.args = args 
+    }
+
     update = {
         parent:         ()=> {},
         data:           ()=> {},
         transformation: ()=> {},
         style:          ()=> {}
-    }
-
-    constructor(args : InteractionLayerArgs) {        
-        this.args = args 
     }
 
     public attach(parent) {
@@ -66,10 +66,10 @@ export class InteractionLayer implements ILayer
                 this.currMousePosAsC()
             ))
 
-        var zoom = d3.zoom()
+        var zoom = d3.zoom() // zoomevents: start, end, mulitiple, 
             .scaleExtent([.51, 1.49])
             //.transform().scale)this.args.unitdisk.transformation.state.λ)
-            .filter(()=> d3.event.type=='wheel')
+            //.filter(()=> d3.event.type=='wheel')
          /*   .filter(()=> {
                 return d3.event.type=='wheel'
                 //console.log(d3.event.touches && d3.event.touches.length == 2)
@@ -81,9 +81,9 @@ export class InteractionLayer implements ILayer
             })*/
             .on("zoom", ()=> {                
                 const mΔ = d3.event.sourceEvent.deltaY
-                const λΔ = -mΔ/53*2*Math.PI/16                
+                const λΔ = mΔ/53*2*Math.PI/16                
                 const oldλp = CktoCp(this.layerStack.args.unitdisk.args.transformation.state.λ)
-                const newλp = { θ:πify(oldλp.θ+λΔ), r:1 }
+                const newλp = { θ:πify(oldλp.θ - λΔ), r:1 }
                 
                 const min = .1 * Math.PI
                 const max = .8 * Math.PI*2
@@ -93,6 +93,9 @@ export class InteractionLayer implements ILayer
                 if (newλp.θ < max && newλp.θ > min) 
                     this.onDragλ(null, CptoCk(newλp))
             })
+
+        //var transform = d3.zoomTransform(selection.node());
+        //var transform = d3.zoomTransform(this); in event sinks
 
         this.parent.append('circle')
             .attr("class", "mouse-circle")

@@ -154,6 +154,12 @@ export class Hypertree
         this.update.parent()
     }
 
+    /*
+    api: {
+
+    }
+    */
+
     update = {
         parent:         ()=> this.updateParent(),
         unitdiskView:   ()=> { this.updateUnitdiskView(); this.updateMetaView(); },
@@ -165,6 +171,8 @@ export class Hypertree
         transformation: ()=> this.updateTransformation(),
         pathes:         ()=> this.updatePath(null, null)
     }
+
+    // dann privates
 
     private updateParent()
     {
@@ -286,7 +294,12 @@ export class Hypertree
             n.label = this.args.ui.caption(this, n)
             n.labellen = undefined
         }
-        this.langMeta = { Δ: [300+performance.now()-t0], map:this.langMap, filesize:dl }
+        if (dl || !this.langMeta)
+            this.langMeta = {
+                Δ: [300+performance.now()-t0], 
+                map:this.langMap, 
+                filesize:dl 
+            }
     }
 
     private updateImgHref_() {
