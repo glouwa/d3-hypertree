@@ -49,7 +49,7 @@ export class InteractionLayer implements ILayer
     private initMouseStuff() {
         var dragStartPoint = null
         var dragStartElement = null
-        var drag = d3.drag()
+        /*var drag = d3.drag()
             //.filter(()=> console.log(d3.event.type); return true; )
             .on("start", ()=> this.onDragStart(
                 dragStartElement = this.findNodeByCell(),
@@ -64,35 +64,78 @@ export class InteractionLayer implements ILayer
                 dragStartElement,
                 dragStartPoint,
                 this.currMousePosAsC()
-            ))
+            ))*/
 
+        let lasttransform = null
         var zoom = d3.zoom() // zoomevents: start, end, mulitiple, 
-            .scaleExtent([.51, 1.49])
-            //.transform().scale)this.args.unitdisk.transformation.state.λ)
-            //.filter(()=> d3.event.type=='wheel')
-         /*   .filter(()=> {
-                return d3.event.type=='wheel'
-                //console.log(d3.event.touches && d3.event.touches.length == 2)
-                return d3.event.type=='wheel'// || ( d3.event.touches && d3.event.touches.length == 2)
-
-                //return d3.event.type==='wheel' //|| d3.event.type!=='touchstart'
-                //return d3.event.type!=='dblclick' && d3.event.type!=='mousedown'
-                //return d3.event.type!=='dblclick' || d3.event.type=='touchstart'//&& d3.event.type!=='mousedown' && d3.event.type!=='touchstart'
-            })*/
-            .on("zoom", ()=> {                
-                const mΔ = d3.event.sourceEvent.deltaY
-                const λΔ = mΔ/53*2*Math.PI/16                
-                const oldλp = CktoCp(this.layerStack.args.unitdisk.args.transformation.state.λ)
-                const newλp = { θ:πify(oldλp.θ - λΔ), r:1 }
+            .scaleExtent([.51, 1.49])      
+            .on("zoom", ()=> {
                 
-                const min = .1 * Math.PI
-                const max = .8 * Math.PI*2
-                if (newλp.θ >= max) console.log('to big')
-                if (newλp.θ <= min) console.log('to small')
+                if (d3.event && 
+                    d3.event.sourceEvent && 
+                    d3.event.sourceEvent.type === 'wheel')
+                {
+                    const mΔ = d3.event.sourceEvent.deltaY
+                    const λΔ = mΔ/53*2*Math.PI/16                
+                    const oldλp = CktoCp(this.layerStack.args.unitdisk.args.transformation.state.λ)
+                    const newλp = { θ:πify(oldλp.θ - λΔ), r:1 }
+                    
+                    const min = .1 * Math.PI
+                    const max = .8 * Math.PI*2
+                    if (newλp.θ >= max) console.log('to big')
+                    if (newλp.θ <= min) console.log('to small')
 
-                if (newλp.θ < max && newλp.θ > min) 
-                    this.onDragλ(null, CptoCk(newλp))
+                    if (newλp.θ < max && newλp.θ > min) 
+                        this.onDragλ(null, CptoCk(newλp))
+                }/*
+                if (d3.event && 
+                    d3.event.sourceEvent && 
+                    d3.event.sourceEvent.type === 'touchmove') {
+                    // :D                    
+                    if (d3.event.transform.k !== lasttransform) {
+                        lasttransform = d3.event.transform.k
+
+                        const newλp = { θ:πify(d3.event.transform.k+.5), r:1 }
+                        
+                        console.log('touch zoom', newλp.θ)
+                        const min = .1 * Math.PI
+                        const max = .8 * Math.PI*2
+                        if (newλp.θ >= max) console.log('to big')
+                        if (newλp.θ <= min) console.log('to small')
+
+                        if (newλp.θ < max && newλp.θ > min) 
+                            this.onDragλ(null, CptoCk(newλp))                        
+                    }
+                    else {
+                        console.log('touch drag')
+                        this.onDragByNode(
+                            dragStartElement,
+                            dragStartPoint,
+                            this.currMousePosAsC()
+                        )
+                    }
+                }
+                else*/ {
+                    this.onDragByNode(
+                        dragStartElement,
+                        dragStartPoint,
+                        this.currMousePosAsC()
+                    )
+                }
             })
+            .on("start", ()=> {
+                console.log('start')
+                this.onDragStart(
+                    dragStartElement = this.findNodeByCell(),
+                    dragStartPoint = this.currMousePosAsC()
+            )})
+            .on("end",   ()=> { 
+                console.log('end')
+                this.onDragEnd(
+                    dragStartElement,
+                    dragStartPoint,
+                    this.currMousePosAsC()
+            )})
 
         //var transform = d3.zoomTransform(selection.node());
         //var transform = d3.zoomTransform(this); in event sinks
@@ -104,8 +147,10 @@ export class InteractionLayer implements ILayer
             //.on("click",     d=> this.onClick(findNodeByCell()))
             .on("mousemove", d=> this.layerStack.args.unitdisk.args.hypertree.updatePath('isHovered', this.findNodeByCell()))
             .on("mouseout",  d=> this.layerStack.args.unitdisk.args.hypertree.updatePath('isHovered', undefined))
-            .call(drag)
+            //.call(drag)
             .call(zoom)
+            .on("dblclick.zoom", null)
+
     }
 
     //-----------------------------------------------------------------------------------------

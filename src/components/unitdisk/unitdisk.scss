@@ -27,6 +27,12 @@
             pointer-events: none;
 
             text-rendering: optimizeSpeed;
+            animation: fade-in 750ms ease-in-out;
+        }
+
+        @keyframes fade-in {
+            from { opacity: 0; }
+            to   { opacity: 1; }
         }
 
         .caption-background {
