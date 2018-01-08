@@ -26,7 +26,7 @@ export class LabelLayer implements ILayer
         style:          ()=> this.d3updatePattern.update.style()
     }
 
-    constructor(args: LabelLayerArgs) {
+    constructor(view:{ parent, layerstack }, args:LabelLayerArgs) {
         this.args = args  
         this.name = args.name      
     }

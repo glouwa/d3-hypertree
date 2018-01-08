@@ -24,7 +24,7 @@ export class NodeLayer implements ILayer
         style:          ()=> this.d3updatePattern.update.style()
     }
 
-    constructor(args: NodeLayerArgs) {
+    constructor(view:{ parent, layerstack }, args:NodeLayerArgs) {
         this.args = args
         this.name = args.name
     }

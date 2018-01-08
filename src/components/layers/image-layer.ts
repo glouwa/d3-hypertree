@@ -24,7 +24,7 @@ export class ImageLayer implements ILayer
         style:          ()=> this.d3updatePattern.update.style()
     }
 
-    constructor(args: ImageLayerArgs) {
+    constructor(view:{ parent, layerstack }, args: ImageLayerArgs) {
         this.args = args
         this.name = args.name
     }

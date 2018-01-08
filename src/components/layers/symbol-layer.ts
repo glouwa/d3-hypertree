@@ -27,7 +27,7 @@ export class SymbolLayer implements ILayer
         style:          ()=> this.d3updatePattern.update.style()
     }
 
-    constructor(args: SymbolLayerArgs) {
+    constructor(view:{ parent, layerstack }, args:SymbolLayerArgs) {
         this.args = args
         this.name = args.name
     }

@@ -19,7 +19,7 @@ export class FocusLayer implements ILayer
         style:          ()=> this.d3updatePattern.update.style()
     }
 
-    constructor(args : FocusLayerArgs) {        
+    constructor(view:{ parent, layerstack }, args : FocusLayerArgs) {        
         this.args = args        
     }
 

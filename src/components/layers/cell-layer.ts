@@ -21,7 +21,7 @@ export class CellLayer implements ILayer
         style:          ()=> this.d3updatePattern.update.style()
     }
 
-    constructor(args: CellLayerArgs) {
+    constructor(view:{ parent, layerstack }, args: CellLayerArgs) {
         this.args = args
     }
 

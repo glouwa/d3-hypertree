@@ -53,7 +53,7 @@ export interface UnitDiskArgs
     className:         string,
     hypertree,
     data:              N,
-    layers:            ((ls:IUnitDisk)=> ILayer)[],
+    layers:            ((v, ls:IUnitDisk)=> ILayer)[],
 
     cacheUpdate:       (ud:IUnitDisk, cache:TransformationCache)=> void,
     transformation:    Transformation<N>,
@@ -178,15 +178,15 @@ export class UnitDiskNav implements IUnitDisk
             data:               args.data,
             //layers:             args.layers.filter((l, idx)=> usedLayers[idx]),
             layers:             [
-                                    (ud:UnitDisk)=> new BackgroundLayer({}),
-                                    (ud:UnitDisk)=> new CellLayer({
+                                    (v, ud:UnitDisk)=> new BackgroundLayer(v, {}),
+                                    (v, ud:UnitDisk)=> new CellLayer(v, {
                                         invisible:  true,
                                         hideOnDrag: true,                    
                                         clip:       '#circle-clip' + ud.args.clipRadius,                            
                                         data:       ()=> ud.cache.cells,      
                                         // TODO: read d.z                      
                                     }),
-                                    (ud:UnitDisk)=> new ArcLayer({                                        
+                                    (v, ud:UnitDisk)=> new ArcLayer(v, {                                        
                                         name:       'link-arcs',                            
                                         className:  'arc',
                                         curvature:  '-', // + - 0 l
@@ -196,7 +196,7 @@ export class UnitDiskNav implements IUnitDisk
                                         width:      d=> arcWidth(d),
                                         classed:    (s,w)=> {}
                                     }),
-                                    (ud:UnitDisk)=> new ArcLayer({                                        
+                                    (v, ud:UnitDisk)=> new ArcLayer(v, {                                        
                                         name:       'link-arcs-focus',                            
                                         className:  'arc-focus',
                                         curvature:  '-', // + - 0 l
@@ -207,7 +207,7 @@ export class UnitDiskNav implements IUnitDisk
                                         width:      d=> arcWidth(d) + (.005 * d.dampedDistScale),
                                         classed:    (s,w)=> {}
                                     }),
-                                    (ud:UnitDisk)=> new ArcLayer({                                        
+                                    (v, ud:UnitDisk)=> new ArcLayer(v, {                                        
                                         name:       'path-arcs',                
                                         className:  'arc',
                                         curvature:  '-', // + - 0 l
@@ -218,7 +218,7 @@ export class UnitDiskNav implements IUnitDisk
                                         classed:    s=> s.classed("hovered-path-nav",  d=> d.isHovered)
                                                          .classed("selected-path-nav", d=> d.isSelected)
                                     }),            
-                                    (ud:UnitDisk)=> new LabelLayer({
+                                    (v, ud:UnitDisk)=> new LabelLayer(v, {
                                         name:       'emojis',   
                                         className:  'caption',
                                         data:       ()=> ud.cache.emojis,
@@ -229,7 +229,7 @@ export class UnitDiskNav implements IUnitDisk
                                         transform:  (d, delta)=> 
                                                         ` translate(${(d.zRef ? d.zRef.re : d.z.re) + delta.re} ${d.zRef ? d.zRef.im : d.z.im})`                                                         
                                     }),             
-                                    (ud:UnitDisk)=> new LabelLayer({
+                                    (v, ud:UnitDisk)=> new LabelLayer(v, {
                                         name:       'labels',
                                         className:  'caption label-big', 
                                         data:       ()=> ud.args.hypertree.args.selection,
@@ -240,7 +240,7 @@ export class UnitDiskNav implements IUnitDisk
                                         transform:  (d, delta)=> 
                                                         ` translate(${(d.zRef ? d.zRef.re : d.z.re) + delta.re} ${d.zRef ? d.zRef.im : d.z.im})`                                                         
                                     }),           
-                                    (ud:UnitDisk)=> new SymbolLayer({
+                                    (v, ud:UnitDisk)=> new SymbolLayer(v, {
                                         name:       'symbols',
                                         data:       ()=> ud.cache.spezialNodes,                                        
                                         r:          d=> .03,
@@ -279,20 +279,20 @@ export class UnitDiskNav implements IUnitDisk
             hypertree:          args.hypertree,
             data:               obj2data(args.transformation.state),
             layers:             [
-                                    (ud:UnitDisk)=> new CellLayer({
+                                    (v, ud:UnitDisk)=> new CellLayer(v, {
                                         invisible:  true,
                                         hideOnDrag: true,
                                         clip:       '#circle-clip'+ud.args.clipRadius,
                                         data:       ()=> ud.cache.cells,                                        
                                     }), 
-                                    (ud:UnitDisk)=> new NodeLayer({
+                                    (v, ud:UnitDisk)=> new NodeLayer(v, {
                                         name:        'nodes',
                                         className:   'node',
                                         data:        ()=> ud.cache.unculledNodes,
                                         r:           d=> ud.args.nodeRadius * (d.name==='P' ? Pscale(ud)(d) : 1),
                                         transform:   d=> d.transformStrCache,
                                     }),
-                                    (ud:UnitDisk)=> new LabelLayer({
+                                    (v, ud:UnitDisk)=> new LabelLayer(v, {
                                         invisible:  true,
                                         hideOnDrag: true,   
                                         name:        'labels',
@@ -304,7 +304,7 @@ export class UnitDiskNav implements IUnitDisk
                                                         ` translate(${d.cache.re+delta.re} ${d.cache.im+delta.im})` 
                                                         + rotate(d)
                                     }),
-                                    (ud:UnitDisk)=> new InteractionLayer({                                        
+                                    (v, ud:UnitDisk)=> new InteractionLayer(v, {                                        
                                         unitdisk:    ud,
                                         mouseRadius: 1.5,
                                         onClick:     (n:N, m:C)=> {}

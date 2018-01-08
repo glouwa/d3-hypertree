@@ -1,9 +1,38 @@
-import { ILayer }        from '../layerstack/layer'
-import { D3UpdatePattern } from '../layerstack/d3updatePattern'
+import { ILayer, ILayerArgs } from '../layerstack/layer'
+import { D3UpdatePattern }    from '../layerstack/d3updatePattern'
 
-export interface BackgroundLayerArgs
+interface U
 {
-    
+    all:    ()=>void
+    parent: ()=>void
+}
+
+interface M
+{
+}
+
+interface View<V, U=U, VParent=V>
+{
+    parent:   VParent,
+    children: ()=> View<any, U>,
+}
+
+class C<M, V, VParent>
+{
+    public model:   M 
+    public api:     {}
+    private view:   V    
+    private update: U
+
+    constructor(view:V, model:M)
+    {
+        this.model = model
+        this.view = view
+    }
+}
+
+export interface BackgroundLayerArgs extends ILayerArgs
+{    
 }
 
 export class BackgroundLayer implements ILayer
@@ -12,19 +41,20 @@ export class BackgroundLayer implements ILayer
     d3updatePattern:  D3UpdatePattern
     name =            'background'     
     update = {
-        parent:         ()=> this.attach(this.args.view.parent),      
+        parent:         ()=> this.attach(),      
         data:           ()=> this.d3updatePattern.update.data(),
         transformation: ()=> this.d3updatePattern.update.transformation(),
         style:          ()=> this.d3updatePattern.update.style()
     }
 
-    constructor(args : BackgroundLayerArgs) {        
+    constructor(view:{ parent, layerstack }, args:BackgroundLayerArgs) {
+        this.view = view
         this.args = args
     }
 
-    public attach(parent) {
+    public attach() {
         this.d3updatePattern = new D3UpdatePattern({
-            parent:            parent,            
+            parent:            this.parent,
             layer:             this,
             data:              [1],
             name:              this.name,
@@ -37,6 +67,3 @@ export class BackgroundLayer implements ILayer
         })
     }
 }
-
-
-

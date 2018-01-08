@@ -22,7 +22,7 @@ export class InteractionLayer implements ILayer
     layerStack: LayerStack
     name =      'interaction'
    
-    constructor(args : InteractionLayerArgs) {        
+    constructor(view:{ parent, layerstack }, args:InteractionLayerArgs) {        
         this.args = args 
     }
 

@@ -23,7 +23,9 @@ export class LayerStack
 
         this.layers = {}
         for (var layerfactoryfunc of this.args.unitdisk.args.layers) {            
-            var layer = layerfactoryfunc(this.args.unitdisk)
+            const view = { parent:this.mainSvgGroup, layerstack:this }
+            var layer = layerfactoryfunc(view, this.args.unitdisk)            
+            layer.parent = this.mainSvgGroup
             layer.layerStack = this
             this.layers[layer.name] = layer
         }
@@ -32,12 +34,9 @@ export class LayerStack
 
     private updateLayers() : void
     {        
-        this.mainSvgGroup.selectAll('*').remove();
-
-        for (var l in this.layers) {
-            var layer = this.layers[l]            
-            layer.attach(this.mainSvgGroup)            
-        }
+        this.mainSvgGroup.selectAll('*').remove()
+        for (var l in this.layers) 
+            this.layers[l].attach(this.mainSvgGroup)                    
     }
 
     public updateTransformation() {
@@ -60,14 +59,16 @@ export class LayerStack
         var t0 = performance.now()
         if (this.layers['path-arcs']) 
             this.layers['path-arcs'].update.data()
+
         var t1 = performance.now()
         if (this.layers['link-arcs-focus']) 
             this.layers['link-arcs-focus'].update.data()
+
         var t2 = performance.now()
         if (this.layers['labels']) 
             this.layers['labels'].update.data()
-        var t3 = performance.now()
 
+        var t3 = performance.now()
         this.d3meta = { 
             Δ:[t1-t0, t2-t1, t3-t2], 
             names:['path-arcs', 'link-arcs-focus', 'labels'] 

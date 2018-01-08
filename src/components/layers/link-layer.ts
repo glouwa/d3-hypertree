@@ -25,7 +25,7 @@ export class ArcLayer implements ILayer
     d3updatePattern: D3UpdatePattern
     name:             string
   
-    constructor(args: ArcLayerArgs) {
+    constructor(view:{ parent, layerstack }, args:ArcLayerArgs) {
         this.args = args
         this.name = args.name
     }
