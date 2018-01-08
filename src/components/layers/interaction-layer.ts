@@ -18,9 +18,9 @@ export interface InteractionLayerArgs
 export class InteractionLayer implements ILayer
 {
     parent
-    args:             InteractionLayerArgs    
-    layerStack:       LayerStack
-    name =            'interaction'
+    args:       InteractionLayerArgs    
+    layerStack: LayerStack
+    name =      'interaction'
    
     constructor(args : InteractionLayerArgs) {        
         this.args = args 

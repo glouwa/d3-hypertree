@@ -58,11 +58,14 @@ export class LayerStack
 
     public updatePath() {
         var t0 = performance.now()
-        if (this.layers['path-arcs']) this.layers['path-arcs'].update.data()
+        if (this.layers['path-arcs']) 
+            this.layers['path-arcs'].update.data()
         var t1 = performance.now()
-        if (this.layers['link-arcs-focus']) this.layers['link-arcs-focus'].update.data()
+        if (this.layers['link-arcs-focus']) 
+            this.layers['link-arcs-focus'].update.data()
         var t2 = performance.now()
-        if (this.layers['labels']) this.layers['labels'].update.data()
+        if (this.layers['labels']) 
+            this.layers['labels'].update.data()
         var t3 = performance.now()
 
         this.d3meta = { 
