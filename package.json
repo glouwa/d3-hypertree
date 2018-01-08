@@ -37,6 +37,7 @@
     "gulp-typescript": "^3.2.1",
     "gulp-util": "^3.0.8",
     "merge2": "^1.1.0",
+    "typescript": "^2.6.2",
     "webpack": "^3.7.1",
     "webpack-stream": "^4.0.0",
     "yargs": "^8.0.2"
