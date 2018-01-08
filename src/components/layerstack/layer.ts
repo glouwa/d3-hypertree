@@ -12,10 +12,10 @@ export interface ILayerArgs {
 }
 
 export interface ILayer
-{
-    name:        string,
+{    
     view:        ILayerView,
     args,    
+    name:        string,
     updateTime?: number,
    
     update: {

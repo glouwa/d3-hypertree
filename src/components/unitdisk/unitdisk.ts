@@ -40,10 +40,6 @@ export interface IUnitDisk
         transformation: ()=> void,
         pathes: ()=> void
     }
-/*
-    updateData:           ()=> void
-    updateTransformation: ()=> void 
-    updateSelection:      ()=> void */
 }
 
 export interface UnitDiskArgs
@@ -76,7 +72,6 @@ export class UnitDisk implements IUnitDisk
     layerStack    : LayerStack
 
     HypertreeMetaType = HypertreeMeta
-
     cacheMeta
 
     constructor(args : UnitDiskArgs) {
@@ -105,38 +100,21 @@ export class UnitDisk implements IUnitDisk
         })
     }
 
-    public calcCache()
-    {
-        this.args.cacheUpdate(this, this.cache)
-    }
-
     update = {
+        cache: ()=> this.args.cacheUpdate(this, this.cache),
         data: ()=> this.update.layout(),
         layout: ()=> { 
             this.args.cacheUpdate(this, this.cache)
-            this.updateData()
+            this.layerStack.update.transformation()  
         },
         transformation: ()=> {
             this.args.cacheUpdate(this, this.cache)
-            this.updateTransformation()
+            this.layerStack.update.transformation()  
         },
         pathes: ()=> {
             this.args.cacheUpdate(this, this.cache)
-            this.updateSelection()
+            this.layerStack.update.pathes()  
         }
-    }
-
-    public updateData() {                
-        this.layerStack.updateTransformation()  
-    }
-
-    public updateTransformation() {        
-        this.layerStack.updateTransformation()  
-    }
-
-    public updateSelection() { 
-        //this.layerStack.updatePath()         TODO        
-        this.layerStack.updatePath()
     }
 }
 
@@ -348,33 +326,27 @@ export class UnitDiskNav implements IUnitDisk
             this.update.layout()
         },
         layout: ()=> { 
-            this.view.calcCache()
-            this.navParameter.calcCache()
+            this.view.update.cache()
+            this.navParameter.update.cache()
 
-            this.navBackground.updateTransformation() 
-            this.view.updateTransformation()
-            this.navParameter.updateTransformation()        
+            this.navBackground.layerStack.update.transformation() 
+            this.view.layerStack.update.transformation()
+            this.navParameter.layerStack.update.transformation()        
         },
         transformation: ()=> {
-            this.view.calcCache()
-            this.navParameter.calcCache()
+            this.view.update.cache()
+            this.navParameter.update.cache()
 
-            this.view.updateTransformation()        
-            this.navParameter.updateTransformation()        
-            this.navBackground.updateSelection()
+            this.view.layerStack.update.transformation()        
+            this.navParameter.layerStack.update.transformation()        
+            this.navBackground.layerStack.update.pathes()
         },
         pathes: ()=> {
-            this.view.calcCache()            
+            this.view.update.cache()            
 
-            this.view.updateTransformation()                
-            this.navBackground.updateSelection()
-            this.navParameter.updateTransformation() // wegen node hover
+            this.view.layerStack.update.transformation()
+            this.navBackground.layerStack.update.pathes()
+            this.navParameter.layerStack.update.transformation() // wegen node hover
         }
     }
-    
-    // updateData()           => this.layerStack.updateTransformation()  
-    // updateTransformation() => this.layerStack.updateTransformation()      
-    // updateSelection()      => this.layerStack.updatePath()            
 }
-
-

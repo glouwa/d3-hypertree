@@ -15,16 +15,25 @@ export class LayerStack
     mainSvgGroup: any
     layers:       { [key:string]: ILayer }
     d3meta
+    public update = {
+        parent:         ()=> this.updateLayers(),
+        transformation: ()=> this.updateTransformation(),
+        pathes:         ()=> this.updatePath()
+    }
 
     constructor(args: LayerStackArgs)
     {
         this.args = args
         this.mainSvgGroup = this.args.parent.append('g')        
+        this.updateLayers()
+    }
 
+    private updateLayers() : void
+    {
         this.layers = {}
         for (var layerfactoryfunc of this.args.unitdisk.args.layers) {
-            const view = { 
-                parent:this.mainSvgGroup, 
+            const view = {
+                parent:this.mainSvgGroup,
                 layerstack:this,
                 unitdisk:this.args.unitdisk,
                 hypertree:this.args.unitdisk.args.hypertree
@@ -32,17 +41,13 @@ export class LayerStack
             const layer = layerfactoryfunc(view, this.args.unitdisk)            
             this.layers[layer.name] = layer
         }
-        this.updateLayers()
-    }
 
-    private updateLayers() : void
-    {        
         this.mainSvgGroup.selectAll('*').remove()
         for (var l in this.layers) 
             this.layers[l].update.parent()
     }
 
-    public updateTransformation() {
+    private updateTransformation() {
         const timings = []
         const names = []
 
@@ -58,7 +63,7 @@ export class LayerStack
         this.d3meta = { Δ: timings, names: names }
     }
 
-    public updatePath() {
+    private updatePath() {
         var t0 = performance.now()
         if (this.layers['path-arcs']) 
             this.layers['path-arcs'].update.data()
