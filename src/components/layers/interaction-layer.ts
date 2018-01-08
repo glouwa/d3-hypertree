@@ -1,5 +1,7 @@
 import * as d3              from 'd3'
-import { ILayer }           from '../layerstack/layer'
+import { ILayer }          from '../layerstack/layer'
+import { ILayerView }      from '../layerstack/layer'
+import { ILayerArgs }      from '../layerstack/layer'
 import { LayerStack }       from '../layerstack/layerstack'
 import { N }                from '../../models/n/n'
 import { C, CptoCk, CktoCp,
@@ -17,28 +19,24 @@ export interface InteractionLayerArgs
 
 export class InteractionLayer implements ILayer
 {
-    parent
+    view:       ILayerView
     args:       InteractionLayerArgs    
     layerStack: LayerStack
     name =      'interaction'
    
-    constructor(view:{ parent, layerstack }, args:InteractionLayerArgs) {        
+    constructor(view:ILayerView, args:InteractionLayerArgs) {        
+        this.view = view
         this.args = args 
     }
 
     update = {
-        parent:         ()=> {},
+        parent:         ()=> this.initMouseStuff(),
         data:           ()=> {},
         transformation: ()=> {},
         style:          ()=> {}
     }
 
-    public attach(parent) {
-        this.parent = parent        
-        this.initMouseStuff()
-    }
-
-    currMousePosAsArr = ()=> d3.mouse(this.parent._groups[0][0])
+    currMousePosAsArr = ()=> d3.mouse(this.view.parent.node())
     currMousePosAsC = ()=> ArrtoC(this.currMousePosAsArr())
     findNodeByCell = ()=> {
         var m = this.currMousePosAsArr()
@@ -134,13 +132,13 @@ export class InteractionLayer implements ILayer
                 this.onDragEnd(
                     dragStartElement,
                     dragStartPoint,
-                    this.currMousePosAsC()
+                    this.currMousePosAsC() 
             )})
 
         //var transform = d3.zoomTransform(selection.node());
         //var transform = d3.zoomTransform(this); in event sinks
 
-        this.parent.append('circle')
+        this.view.parent.append('circle')
             .attr("class", "mouse-circle")
             .attr("r", this.args.mouseRadius)
             .on("dblclick",  d=> this.onDblClick(this.findNodeByCell()))

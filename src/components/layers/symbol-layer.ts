@@ -1,5 +1,7 @@
 import * as d3             from 'd3'
 import { ILayer }          from '../layerstack/layer'
+import { ILayerView }      from '../layerstack/layer'
+import { ILayerArgs }      from '../layerstack/layer'
 import { D3UpdatePattern } from '../layerstack/d3updatePattern'
 
 export interface SymbolLayerArgs
@@ -15,26 +17,28 @@ var symbol = d3.symbol().size(.004)
 var d_star = symbol.type(d3['symbolStar'])()
 
 export class SymbolLayer implements ILayer
-{    
-    args: SymbolLayerArgs
+{  
+    view:            ILayerView  
+    args:            SymbolLayerArgs
     d3updatePattern: D3UpdatePattern
-    name: string
+    name:            string
    
     update = {
-        parent:         ()=> this.attach(null),      
+        parent:         ()=> this.attach(),      
         data:           ()=> this.d3updatePattern.update.data(),
         transformation: ()=> this.d3updatePattern.update.transformation(),
         style:          ()=> this.d3updatePattern.update.style()
     }
 
-    constructor(view:{ parent, layerstack }, args:SymbolLayerArgs) {
+    constructor(view:ILayerView, args:SymbolLayerArgs) {
+        this.view = view
         this.args = args
         this.name = args.name
     }
 
-    public attach(parent) {
+    private attach() {
         this.d3updatePattern = new D3UpdatePattern({
-            parent:            parent,     
+            parent:            this.view.parent,     
             layer:             this,     
             data:              this.args.data,
             name:              this.args.name,

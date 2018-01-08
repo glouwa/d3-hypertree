@@ -1,4 +1,6 @@
 import { ILayer }          from '../layerstack/layer'
+import { ILayerView }      from '../layerstack/layer'
+import { ILayerArgs }      from '../layerstack/layer'
 import { D3UpdatePattern } from '../layerstack/d3updatePattern'
 
 export interface NodeLayerArgs
@@ -13,25 +15,27 @@ export interface NodeLayerArgs
 
 export class NodeLayer implements ILayer
 {    
-    args: NodeLayerArgs
+    view:            ILayerView
+    args:            NodeLayerArgs
     d3updatePattern: D3UpdatePattern
-    name: string
+    name:            string
    
     update = {
-        parent:         ()=> this.attach(null),      
+        parent:         ()=> this.attach(),      
         data:           ()=> this.d3updatePattern.update.data(),
         transformation: ()=> this.d3updatePattern.update.transformation(),
         style:          ()=> this.d3updatePattern.update.style()
     }
 
-    constructor(view:{ parent, layerstack }, args:NodeLayerArgs) {
+    constructor(view:ILayerView, args:NodeLayerArgs) {
+        this.view = view
         this.args = args
         this.name = args.name
     }
 
-    public attach(parent) {
+    private attach() {
         this.d3updatePattern = new D3UpdatePattern({
-            parent:            parent,
+            parent:            this.view.parent,
             layer:             this,
             clip:              this.args.clip,
             data:              this.args.data,

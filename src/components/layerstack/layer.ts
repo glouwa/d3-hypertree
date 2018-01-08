@@ -1,17 +1,20 @@
 import { LayerStack } from './layerstack'
 
-export interface ILayerArgs {
 
+export interface ILayerView {    
+    parent,
+    layerstack
+}
+
+export interface ILayerArgs {
 }
 
 export interface ILayer
 {
-    name:                  string,
+    name:        string,
     args,
-    layerStack?:           LayerStack,
-    updateTime?:           number,
-   
-    attach:                (parent)=> void,
+    layerStack?: LayerStack,
+    updateTime?: number,
    
     update: {
         parent:         ()=> void,

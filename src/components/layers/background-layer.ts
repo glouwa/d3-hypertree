@@ -1,4 +1,6 @@
-import { ILayer, ILayerArgs } from '../layerstack/layer'
+import { ILayer }          from '../layerstack/layer'
+import { ILayerView }      from '../layerstack/layer'
+import { ILayerArgs }      from '../layerstack/layer'
 import { D3UpdatePattern }    from '../layerstack/d3updatePattern'
 
 interface U
@@ -37,6 +39,7 @@ export interface BackgroundLayerArgs extends ILayerArgs
 
 export class BackgroundLayer implements ILayer
 {    
+    view:             ILayerView
     args:             BackgroundLayerArgs
     d3updatePattern:  D3UpdatePattern
     name =            'background'     
@@ -52,9 +55,9 @@ export class BackgroundLayer implements ILayer
         this.args = args
     }
 
-    public attach() {
+    private attach() {
         this.d3updatePattern = new D3UpdatePattern({
-            parent:            this.parent,
+            parent:            this.view.parent,
             layer:             this,
             data:              [1],
             name:              this.name,
