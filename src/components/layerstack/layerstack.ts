@@ -22,11 +22,14 @@ export class LayerStack
         this.mainSvgGroup = this.args.parent.append('g')        
 
         this.layers = {}
-        for (var layerfactoryfunc of this.args.unitdisk.args.layers)
-        {            
-            const view = { parent:this.mainSvgGroup, layerstack:this }
-            var layer = layerfactoryfunc(view, this.args.unitdisk)                        
-            layer.layerStack = this
+        for (var layerfactoryfunc of this.args.unitdisk.args.layers) {
+            const view = { 
+                parent:this.mainSvgGroup, 
+                layerstack:this,
+                unitdisk:this.args.unitdisk,
+                hypertree:this.args.unitdisk.args.hypertree
+            }
+            const layer = layerfactoryfunc(view, this.args.unitdisk)            
             this.layers[layer.name] = layer
         }
         this.updateLayers()
@@ -40,8 +43,8 @@ export class LayerStack
     }
 
     public updateTransformation() {
-        var timings = []
-        var names = []
+        const timings = []
+        const names = []
 
         for (var l in this.layers) {
             var layer = this.layers[l]            

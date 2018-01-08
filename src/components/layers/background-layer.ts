@@ -39,10 +39,10 @@ export interface BackgroundLayerArgs extends ILayerArgs
 
 export class BackgroundLayer implements ILayer
 {    
-    view:             ILayerView
-    args:             BackgroundLayerArgs
-    d3updatePattern:  D3UpdatePattern
-    name =            'background'     
+    view:            ILayerView
+    args:            BackgroundLayerArgs
+    d3updatePattern: D3UpdatePattern
+    name =           'background'     
     update = {
         parent:         ()=> this.attach(),      
         data:           ()=> this.d3updatePattern.update.data(),
@@ -50,7 +50,7 @@ export class BackgroundLayer implements ILayer
         style:          ()=> this.d3updatePattern.update.style()
     }
 
-    constructor(view:{ parent, layerstack }, args:BackgroundLayerArgs) {
+    constructor(view:ILayerView, args:BackgroundLayerArgs) {
         this.view = view
         this.args = args
     }

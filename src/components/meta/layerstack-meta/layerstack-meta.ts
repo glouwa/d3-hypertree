@@ -127,7 +127,7 @@ export function LayerInfo_({ parent, onCheckChange, className })
                 
                 layerViews.count.innerHTML = checker?`${count_} ${type()}`:``
         
-                const lsmeta = layer.layerStack.d3meta
+                const lsmeta = layer.view.layerstack.d3meta
                 console.assert(layer.name)                
                 const pos = lsmeta.names.indexOf(layer.name)
                 const time = checker ? lsmeta.Δ[pos]/1000 : 0

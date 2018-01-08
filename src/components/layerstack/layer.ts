@@ -3,7 +3,9 @@ import { LayerStack } from './layerstack'
 
 export interface ILayerView {    
     parent,
-    layerstack
+    layerstack,
+    unitdisk,
+    hypertree
 }
 
 export interface ILayerArgs {
@@ -12,8 +14,8 @@ export interface ILayerArgs {
 export interface ILayer
 {
     name:        string,
-    args,
-    layerStack?: LayerStack,
+    view:        ILayerView,
+    args,    
     updateTime?: number,
    
     update: {

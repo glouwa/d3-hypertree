@@ -64,7 +64,7 @@ export class D3UpdatePattern
     
     private updateData() {
         this.data = []
-        var isAnimating = this.args.layer.layerStack.args.unitdisk.args.hypertree.isAnimationRunning()
+        var isAnimating = this.args.layer.view.hypertree.isAnimationRunning()
         if (!isAnimating && !this.args.layer.args.invisible)
             this.data = this.mayEval(this.args.data)
         if (isAnimating && !this.args.layer.args.hideOnDrag)

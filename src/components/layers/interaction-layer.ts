@@ -21,7 +21,6 @@ export class InteractionLayer implements ILayer
 {
     view:       ILayerView
     args:       InteractionLayerArgs    
-    layerStack: LayerStack
     name =      'interaction'
    
     constructor(view:ILayerView, args:InteractionLayerArgs) {        
@@ -40,7 +39,7 @@ export class InteractionLayer implements ILayer
     currMousePosAsC = ()=> ArrtoC(this.currMousePosAsArr())
     findNodeByCell = ()=> {
         var m = this.currMousePosAsArr()
-        var find = this.layerStack.args.unitdisk.cache.voronoiDiagram.find(m[0], m[1])
+        var find = this.view.unitdisk.cache.voronoiDiagram.find(m[0], m[1])
         return find ? find.data : undefined
     }
 
@@ -75,7 +74,7 @@ export class InteractionLayer implements ILayer
                 {
                     const mΔ = d3.event.sourceEvent.deltaY
                     const λΔ = mΔ/53*2*Math.PI/16                
-                    const oldλp = CktoCp(this.layerStack.args.unitdisk.args.transformation.state.λ)
+                    const oldλp = CktoCp(this.view.unitdisk.args.transformation.state.λ)
                     const newλp = { θ:πify(oldλp.θ - λΔ), r:1 }
                     
                     const min = .1 * Math.PI
@@ -143,8 +142,8 @@ export class InteractionLayer implements ILayer
             .attr("r", this.args.mouseRadius)
             .on("dblclick",  d=> this.onDblClick(this.findNodeByCell()))
             //.on("click",     d=> this.onClick(findNodeByCell()))
-            .on("mousemove", d=> this.layerStack.args.unitdisk.args.hypertree.updatePath('isHovered', this.findNodeByCell()))
-            .on("mouseout",  d=> this.layerStack.args.unitdisk.args.hypertree.updatePath('isHovered', undefined))
+            .on("mousemove", d=> this.view.hypertree.updatePath('isHovered', this.findNodeByCell()))
+            .on("mouseout",  d=> this.view.hypertree.updatePath('isHovered', undefined))
             //.call(drag)
             .call(zoom)
             .on("dblclick.zoom", null)
@@ -155,25 +154,25 @@ export class InteractionLayer implements ILayer
 
     private onDragStart = (n:N, m:C)=> {
         if (!this.animationTimer)
-            this.layerStack.args.unitdisk.args.transformation.onDragStart(m)
+            this.view.unitdisk.args.transformation.onDragStart(m)
     }
 
     private onDragλ = (s:C, e:C)=> {
-        this.layerStack.args.unitdisk.args.transformation.onDragλ(s, e)
-        this.layerStack.args.unitdisk.args.hypertree.updateLayout()
+        this.view.unitdisk.args.transformation.onDragλ(s, e)
+        this.view.hypertree.updateLayout()
     }
 
     private onDragByNode = (n:N, s:C, e:C)=> {
         if (n && n.name == 'θ') {
-            this.layerStack.args.unitdisk.args.transformation.onDragθ(s, e)
-            this.layerStack.args.unitdisk.args.hypertree.updateTransformation()
+            this.view.unitdisk.args.transformation.onDragθ(s, e)
+            this.view.hypertree.updateTransformation()
         }
         else if (n && n.name == 'λ') {
             this.onDragλ(s, e)
         }
         else {
-            this.layerStack.args.unitdisk.args.transformation.onDragP(s, e)
-            this.layerStack.args.unitdisk.args.hypertree.updateTransformation()
+            this.view.unitdisk.args.transformation.onDragP(s, e)
+            this.view.hypertree.updateTransformation()
         }
     }
 
@@ -185,8 +184,8 @@ export class InteractionLayer implements ILayer
             this.onClick(n, e) // sollte on click sein und auch timer berücksichtigen oder?        
 
         // immer?
-        this.layerStack.args.unitdisk.args.transformation.onDragEnd(e)
-        this.layerStack.args.unitdisk.args.hypertree.updateTransformation()
+        this.view.unitdisk.args.transformation.onDragEnd(e)
+        this.view.hypertree.updateTransformation()
     }
 
     private animationTimer = null
@@ -228,7 +227,7 @@ export class InteractionLayer implements ILayer
             this.dblClickTimer = setTimeout(() => {
                 this.dblClickTimer = null
                 
-                if (n != this.layerStack.args.unitdisk.args.transformation.cache.centerNode)
+                if (n != this.view.unitdisk.args.transformation.cache.centerNode)
                     this.animateTo(n, m)
                 else                
                     this.args.onClick(n, m)
