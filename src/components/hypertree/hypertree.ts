@@ -239,7 +239,9 @@ export class Hypertree
             })
     }
 
-    public updateData() : void {
+// hmmm, async updates?
+
+    private updateData() : void {
         var t0 = performance.now()
         this.view.querySelector('.preloader').innerHTML = htmlpreloader
         this.unitdisk.args.data = undefined
@@ -273,7 +275,7 @@ export class Hypertree
         })
     }
 
-    public updateLang() : void {
+    private updateLang() : void {
         this.args.langloader((langMap, t1, dl)=> {            
             this.langMap = langMap
             this.updateLang_(dl)
@@ -283,7 +285,9 @@ export class Hypertree
         })
     }
 
-    public updateLangData()
+// do this privates belong here?
+    
+    private updateLangData()
     {
         // das was von data und lang abhängt: wiki nodes in this file...
     }
@@ -306,6 +310,9 @@ export class Hypertree
         for (var n of dfsFlat(this.data, n=>true)) 
             n.imageHref = this.args.iconmap.fileName2IconUrl(n.data.name, n.data.type)                    
     }
+
+
+// the following are requestng animation fames
 
     private updateWeights() : void {
         this.data.sum(this.args.weight)
