@@ -452,7 +452,10 @@ export class Hypertree
                 else requestAnimationFrame(()=> frame())                
             }
             requestAnimationFrame(()=> frame())
-        }        
+        }
+        //toggleSelection (updatepath)
+        //setdata
+        //setlang        
     }
 
     public isAnimationRunning() {

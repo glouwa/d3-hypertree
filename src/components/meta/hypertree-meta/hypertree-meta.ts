@@ -114,7 +114,6 @@ export class HypertreeMetaNav
             view: { parent:this.view.parent, className:'data' },
             model: (<UnitDiskNav>this.model.unitdisk).view
         })
-
         this.udNav = new UnitdiskMeta({ 
             view: { parent:this.view.parent, className:'nav' },
             model: (<UnitDiskNav>this.model.unitdisk).navParameter
@@ -123,13 +122,11 @@ export class HypertreeMetaNav
         this.lsView = new LayerStackMeta({
             view: { parent:this.view.parent, className: 'data' },
             model: (<UnitDiskNav>this.model.unitdisk).view
-        })
-        
+        })        
         this.lsNav = new LayerStackMeta({
             view: { parent:this.view.parent, className: 'navBg' },
             model: (<UnitDiskNav>this.model.unitdisk).navBackground
         })
-
         this.lsNavParam = new LayerStackMeta({
             view: { parent:this.view.parent, className: 'nav' },
             model: this.model.unitdisk.navParameter

@@ -25,7 +25,7 @@ import { HypertreeMetaNav }        from '../meta/hypertree-meta/hypertree-meta'
 import { bboxOffset }              from '../layerstack/d3updatePattern'
 
 export interface IUnitdiskView {    
-    parent,    
+    parent,
     hypertree
 }
 
@@ -67,9 +67,9 @@ export interface IUnitDisk
 
 export class UnitDisk implements IUnitDisk
 {
-    public args          : UnitDiskArgs    
-    public voronoiLayout : d3.VoronoiLayout<N>    
+    public args          : UnitDiskArgs        
     public cache         : TransformationCache // zeigt auf transformation.cache
+    public voronoiLayout : d3.VoronoiLayout<N>    
     
     public layerStack    : LayerStack
     public HypertreeMetaType = HypertreeMeta
@@ -101,7 +101,7 @@ export class UnitDisk implements IUnitDisk
         }
     }
 
-    private updateParent(){
+    private updateParent() {        
         this.view = d3.select(this.args.parent).append('g')
             .attr('class', this.args.className)
             .attr('transform', this.args.position)
@@ -116,7 +116,7 @@ export class UnitDisk implements IUnitDisk
             .y(d=> d.cache.im)
             .extent([[-2,-2], [2,2]])
         
-        this.args.cacheUpdate(this, this.cache)
+        this.update.cache()
 
         this.layerStack = new LayerStack({ 
             parent: this.view,
@@ -129,15 +129,15 @@ export class UnitDisk implements IUnitDisk
 
 export class UnitDiskNav implements IUnitDisk
 {
-    args          : UnitDiskArgs
-    cache         // redircteds NOT xD to view.cache    
-    layerStack
+    public args          : UnitDiskArgs
+    public cache         // redircteds NOT xD to view.cache    
+    public layerStack
       
-    view          : UnitDisk
-    navBackground : UnitDisk
-    navParameter  : UnitDisk
+    public view          : UnitDisk // public wegen hypertreemeta
+    public navBackground : UnitDisk // public wegen hypertreemeta
+    public navParameter  : UnitDisk // public wegen hypertreemeta
 
-    HypertreeMetaType = HypertreeMetaNav
+    public HypertreeMetaType = HypertreeMetaNav
 
     constructor(args:UnitDiskArgs) {
         this.args = args
