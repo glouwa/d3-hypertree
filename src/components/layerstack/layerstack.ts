@@ -60,7 +60,7 @@ export class LayerStack
             names.push(layer.name)
         }
 
-        this.d3meta = { Δ: timings, names: names }
+        this.d3meta = { Δ:timings, names:names }
     }
 
     private updatePath() {

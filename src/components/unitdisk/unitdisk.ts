@@ -24,22 +24,9 @@ import { HypertreeMeta }           from '../meta/hypertree-meta/hypertree-meta'
 import { HypertreeMetaNav }        from '../meta/hypertree-meta/hypertree-meta'
 import { bboxOffset }              from '../layerstack/d3updatePattern'
 
-export interface IUnitDisk
-{
-    args:                 UnitDiskArgs
-    cache    
-    layerStack:           LayerStack
-
-    HypertreeMetaType
-
-    navParameter?:        UnitDisk,
-
-    update: {
-        data: ()=> void,
-        layout: ()=> void,
-        transformation: ()=> void,
-        pathes: ()=> void
-    }
+export interface IUnitdiskView {    
+    parent,    
+    hypertree
 }
 
 export interface UnitDiskArgs
@@ -60,25 +47,62 @@ export interface UnitDiskArgs
     clipRadius?:       number
 }
 
+export interface IUnitDisk
+{
+    args:               UnitDiskArgs
+    cache    
+    layerStack:         LayerStack
+    HypertreeMetaType
+    navParameter?:      UnitDisk,
+
+    update: {
+        data:           ()=> void,
+        layout:         ()=> void,
+        transformation: ()=> void,
+        pathes:         ()=> void
+    }
+}
+
 //----------------------------------------------------------------------------------------
 
 export class UnitDisk implements IUnitDisk
 {
-    args          : UnitDiskArgs    
-    voronoiLayout : d3.VoronoiLayout<N>    
-    cache         : TransformationCache // zeigt auf transformation.cache
+    public args          : UnitDiskArgs    
+    public voronoiLayout : d3.VoronoiLayout<N>    
+    public cache         : TransformationCache // zeigt auf transformation.cache
     
-    view          
-    layerStack    : LayerStack
+    public layerStack    : LayerStack
+    public HypertreeMetaType = HypertreeMeta
+    public cacheMeta
 
-    HypertreeMetaType = HypertreeMeta
-    cacheMeta
-
+    private view          
+    
     constructor(args : UnitDiskArgs) {
         this.args = args
-        this.cache = args.transformation.cache
-                        
-        this.view = d3.select(args.parent).append('g')
+        this.cache = args.transformation.cache                        
+        this.update.parent()
+    }
+    
+    public update = {
+        parent: ()=> this.updateParent(),
+        cache: ()=> this.args.cacheUpdate(this, this.cache),
+        data: ()=> this.update.layout(),
+        layout: ()=> { 
+            this.args.cacheUpdate(this, this.cache)
+            this.layerStack.update.transformation()  
+        },
+        transformation: ()=> {
+            this.args.cacheUpdate(this, this.cache)
+            this.layerStack.update.transformation()  
+        },
+        pathes: ()=> {
+            this.args.cacheUpdate(this, this.cache)
+            this.layerStack.update.pathes()  
+        }
+    }
+
+    private updateParent(){
+        this.view = d3.select(this.args.parent).append('g')
             .attr('class', this.args.className)
             .attr('transform', this.args.position)
         
@@ -99,23 +123,6 @@ export class UnitDisk implements IUnitDisk
             unitdisk: this
         })
     }
-
-    update = {
-        cache: ()=> this.args.cacheUpdate(this, this.cache),
-        data: ()=> this.update.layout(),
-        layout: ()=> { 
-            this.args.cacheUpdate(this, this.cache)
-            this.layerStack.update.transformation()  
-        },
-        transformation: ()=> {
-            this.args.cacheUpdate(this, this.cache)
-            this.layerStack.update.transformation()  
-        },
-        pathes: ()=> {
-            this.args.cacheUpdate(this, this.cache)
-            this.layerStack.update.pathes()  
-        }
-    }
 }
 
 //----------------------------------------------------------------------------------------
@@ -132,7 +139,7 @@ export class UnitDiskNav implements IUnitDisk
 
     HypertreeMetaType = HypertreeMetaNav
 
-    constructor(args : UnitDiskArgs) {
+    constructor(args:UnitDiskArgs) {
         this.args = args
 
         this.view = new UnitDisk(args)
@@ -156,7 +163,8 @@ export class UnitDiskNav implements IUnitDisk
             data:               args.data,
             //layers:             args.layers.filter((l, idx)=> usedLayers[idx]),
             layers:             [
-                                    (v, ud:UnitDisk)=> new BackgroundLayer(v, {}),
+                                    (v, ud:UnitDisk)=> new BackgroundLayer(v, {                                        
+                                    }),
                                     (v, ud:UnitDisk)=> new CellLayer(v, {
                                         invisible:  true,
                                         hideOnDrag: true,                    

@@ -13,10 +13,9 @@ export interface ILayerArgs {
 
 export interface ILayer
 {    
-    view:        ILayerView,
+    view: ILayerView,
     args,    
-    name:        string,
-    updateTime?: number,
+    name: string,
    
     update: {
         parent:         ()=> void,

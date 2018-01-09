@@ -29,7 +29,7 @@ export class LayerStackMeta
             parent: this.view.parent,            
             className: this.view.className,
             //onCheckChange: ()=> this.model.layerStack.updateLayers()
-            onCheckChange: ()=> this.model.layerStack.updateTransformation()
+            onCheckChange: ()=> this.model.layerStack.update.transformation()
         })
 
         for (var l in this.model.layerStack.layers)            
