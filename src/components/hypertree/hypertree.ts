@@ -155,11 +155,19 @@ export class Hypertree
     }
 
     /*
+    * this functions modyfy model/view (this class internal state)
+    * and call the according update function(s)
+    */
+    /*
     api: {
 
     }
     */
 
+    /*
+    * this functions assume the model/view (this class internal state)
+    * has changes, and call the according ui updates (animatin frames)
+    */
     update = {
         parent:         ()=> this.updateParent(),
         unitdiskView:   ()=> { this.updateUnitdiskView(); this.updateMetaView(); },
@@ -286,7 +294,7 @@ export class Hypertree
     }
 
 // do this privates belong here?
-    
+
     private updateLangData()
     {
         // das was von data und lang abhängt: wiki nodes in this file...

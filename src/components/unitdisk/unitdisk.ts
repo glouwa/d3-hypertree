@@ -38,8 +38,8 @@ export interface UnitDiskArgs
     data:              N,
     layers:            ((v, ls:IUnitDisk)=> ILayer)[],
 
-    cacheUpdate:       (ud:IUnitDisk, cache:TransformationCache)=> void,
     transformation:    Transformation<N>,
+    cacheUpdate:       (ud:IUnitDisk, cache:TransformationCache)=> void,    
     transform:         (n:N)=> C,
 
     caption:           (n:N)=> string,
