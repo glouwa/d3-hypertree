@@ -112,7 +112,7 @@ export class InteractionLayer implements ILayer
                         )
                     }
                 }
-                else*/ {
+                */else {
                     this.onDragByNode(
                         dragStartElement,
                         dragStartPoint,
