@@ -84,7 +84,8 @@ export class InteractionLayer implements ILayer
 
                     if (newλp.θ < max && newλp.θ > min) 
                         this.onDragλ(null, CptoCk(newλp))
-                }/*
+                }
+                /*
                 if (d3.event && 
                     d3.event.sourceEvent && 
                     d3.event.sourceEvent.type === 'touchmove') {

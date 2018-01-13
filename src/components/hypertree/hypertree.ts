@@ -184,16 +184,17 @@ export class Hypertree
 
     private updateParent()
     {
-        this.view = HTML.parse<HTMLElement>(hypertreehtml)()
+        this.view = HTML.parse<HTMLElement>(hypertreehtml)()        
         this.args.parent.innerHTML = ''
         this.args.parent.appendChild(this.view)
+        this.noHypertreeMeta = new NoHypertreeMeta()
         var btnMeta = <HTMLButtonElement>this.view.querySelector('#btnmeta')
         var btnNav = <HTMLButtonElement>this.view.querySelector('#btnnav')
         var btnHome = <HTMLButtonElement>this.view.querySelector('#btnhome')
         
         btnHome.onclick = ()=> this.api.animateTo({ re:0, im:0 }, null)
         btnMeta.onclick = ()=> {
-            this.noHypertreeMeta = this.noHypertreeMeta ? undefined : new NoHypertreeMeta()            
+            this.noHypertreeMeta = this.noHypertreeMeta ? undefined : new NoHypertreeMeta()
             this.update.metaView()
             this.hypertreeMeta.update.model()
             this.hypertreeMeta.update.layout()
