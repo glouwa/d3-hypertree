@@ -26,7 +26,7 @@ export class UnitdiskMeta
             this.ui.updateModel()
             this.update.layout()
         },
-        lang:              ()=> { 
+        lang:               ()=> { 
             this.ui.updateLang()            
         },
         layout:             ()=> { 

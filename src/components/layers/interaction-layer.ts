@@ -65,7 +65,7 @@ export class InteractionLayer implements ILayer
 
         let lasttransform = null
         var zoom = d3.zoom() // zoomevents: start, end, mulitiple, 
-            .scaleExtent([.51, 1.49])      
+            //.scaleExtent([.51, 1.49])      
             .on("zoom", ()=> {
                 
                 if (d3.event && 
@@ -84,8 +84,8 @@ export class InteractionLayer implements ILayer
 
                     if (newλp.θ < max && newλp.θ > min) 
                         this.onDragλ(null, CptoCk(newλp))
-                }
-                /*
+                } 
+                //               
                 if (d3.event && 
                     d3.event.sourceEvent && 
                     d3.event.sourceEvent.type === 'touchmove') {
@@ -113,7 +113,8 @@ export class InteractionLayer implements ILayer
                         )
                     }
                 }
-                */else {
+                //
+                else {
                     this.onDragByNode(
                         dragStartElement,
                         dragStartPoint,
