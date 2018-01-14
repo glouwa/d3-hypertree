@@ -86,7 +86,7 @@ export class InteractionLayer implements ILayer
                         this.onDragλ(null, CptoCk(newλp))
                 } 
                 //               
-                if (d3.event && 
+                else if (d3.event && 
                     d3.event.sourceEvent && 
                     d3.event.sourceEvent.type === 'touchmove') {
                     // :D                    
