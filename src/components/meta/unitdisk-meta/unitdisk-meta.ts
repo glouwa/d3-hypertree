@@ -50,51 +50,6 @@ export class UnitdiskMeta
     }
 }
 
-interface UnitdiskMeta_UI {
-    updateSvgInfo,
-    updateD3Info
-    updateModel, 
-    updateLang,
-    updateTransformationInfo
-    updateLayout, 
-    updateCachInfo,
-    updateλω
-}
-
-const colors         = ["#3366cc", "#dc3912", "#ff9900", "#109618", "#990099", "#0099c6", "#dd4477", "#66aa00", "#b82e2e", "#316395", "#994499", "#22aa99", "#aaaa11", "#6633cc", "#e67300", "#8b0707", "#651067", "#329262", "#5574a6", "#3b3eac"];
-const typeColors     = colors
-
-const maxTime = 25     // 25ms
-const maxSvg = 1000
-const maxD3 = maxTime  
-const maxLoad = 1000   // 1000ms
-
-
-const mag_svg        = .1 // 1000#  ?
-const mag_load       = 10 // 1000ms
-const mag_time       = 4  // 25ms 
-
-var updateBar = (view, vec, cvec)=> {
-    var c=0
-    var l = vec.map((e, i, v)=> { c+=e; return c-e; })
-    var data = t([vec, cvec, l])
-    var cursor = 0
-    var diff = d3.select(view).selectAll('div').data(data)
-    diff.enter().append('div')
-        .attr('class', 'bar')
-        .merge(diff)
-        .style('left', d=> d[2]+'%')
-        .style('width', d=> d[0]+'%')
-        .style('background-color', d=> d[1])
-    diff.exit().remove()
-}
-
-var colorScale = d3.scaleLinear<d3.ColorCommonInstance>()
-        .domain([1, 10])
-        .range([d3.rgb('#a5d6a7'), d3.rgb('#e53935')])
-        .interpolate(d3.interpolateHcl)
-        .clamp(true)
-
 var barrow = `
     <div class="label"></div> 
     <div class="nodes"></div> 
@@ -155,9 +110,59 @@ var htmlinfo =
         ${barrow}
     </div>`
 
+interface UnitdiskMeta_UI {
+    updateSvgInfo,
+    updateD3Info
+    updateModel, 
+    updateLang,
+    updateTransformationInfo
+    updateLayout, 
+    updateCachInfo,
+    updateλω
+}
+
 function hypertreeMeta_({ parent, ud, className })
 {
+    var ui = HTML.parse<HTMLElement & UnitdiskMeta_UI>(htmlinfo)()
+    ui.classList.add(className)
+    parent.appendChild(ui)
+
+    ui.updateModel = ()=>{}
+    ui.updateLang = ()=>{}
+    ui.updateLayout = ()=>{}
+    ui.updateTransformation = ()=>{}
+
+    return ui
 }
+/*
+function hypertreeMeta2_({ parent, ud, className })
+{
+    var ui = hypertreeMeta_({ parent, ud, className })
+    
+    areas = {
+        d3svg
+        transformationforAll // spezific
+        transformationSelect // general (must have)
+        modellang
+    }  
+    return ui
+}
+
+function hypertreeMeta2_({ parent, ud, className })
+{
+    var ui = hypertreeMeta_({ parent, ud, className })
+    
+    areas = {
+        d3svg
+        transformationforAll // spezific
+        transformationSelect // general (must have)
+        modellang
+    }  
+    return ui
+}
+*/
+
+var π = Math.PI     
 
 function UnitdiskMeta_({ parent, ud, className })
 {
@@ -165,11 +170,9 @@ function UnitdiskMeta_({ parent, ud, className })
     ui.classList.add(className)
     parent.appendChild(ui)
 
-    function λsliderInit(sliderHtml) {    
-        var π = Math.PI     
-        var slider = sliderHtml.querySelector('input')        
-        slider.value = 1 - πify(CktoCp(ud.args.transformation.state.λ).θ) / 2 / π
-        slider.oninput = function (e) {
+    const sliderBindingλ = {
+        toView: (slider)=> slider.value = 1 - πify(CktoCp(ud.args.transformation.state.λ).θ) / 2 / π,
+        fromView: (slider)=> {
             const λk = CptoCk({ θ:(1-slider.value)*π*2, r:1})
             ud.args.transformation.state.λ.re = λk.re
             ud.args.transformation.state.λ.im = λk.im
@@ -177,14 +180,22 @@ function UnitdiskMeta_({ parent, ud, className })
         }
     }
 
-    function ωsliderInit(sliderHtml) {        
-        var slider = sliderHtml.querySelector('input')
-        slider.value = 1 / ud.args.hypertree.magic
-        slider.oninput = function (e) { 
+    const sliderBindingω = {
+        toView: (slider)=> slider.value = 1 / ud.args.hypertree.magic,
+        fromView: (slider)=> {
             ud.args.hypertree.magic = 1 / slider.value
             ud.args.hypertree.updateTransformation()
         }
     }
+
+    function sliderInit(sliderHtml, binding) {        
+        var slider = sliderHtml.querySelector('input')        
+        binding.toView(slider)
+        slider.oninput = ()=> binding.fromView(slider)
+    }
+
+    const λsliderInit = (sliderHtml)=> sliderInit(sliderHtml, sliderBindingλ)
+    const ωsliderInit = (sliderHtml)=> sliderInit(sliderHtml, sliderBindingω)
 
     var e = 0
     var re = 7 
@@ -202,19 +213,6 @@ function UnitdiskMeta_({ parent, ud, className })
         lang:      new BarRow   (ui, e+=re, 'Lang',                '<sub>s</sub>'),
     }
     
-    function ping(v, cond = true) {   
-        if (cond) {             
-            v.style.opacity = 1
-            v.style.animation = ""        
-            requestAnimationFrame(()=> {             
-                //v.style.animation = "blink-out 750ms cubic-bezier(0.070, 0.065, 0.765, -0.135)"
-                //v.style.animation = "blink-out 2ms cubic-bezier(0.070, 0.455, 0.850, 0.420)"
-                v.style.animation = "blink-out 2s cubic-bezier(0.145, 1.130, 0.725, 0.590)"            
-                v.style.opacity = 0
-            })
-        }
-    }
-
     ui.updateλω = ()=> {
         var π = Math.PI
         rows.lambda.slider.querySelector('input').value = 1 - πify(CktoCp(ud.args.transformation.state.λ).θ) / 2 / π        
@@ -370,31 +368,6 @@ function UnitdiskMeta_({ parent, ud, className })
     return ui
 }
 
-const p1 = n=> n.toFixed(1)
-
-const mysihelper = d3.format('.3s')
-function mysi(n, p=0, u='') 
-{
-    const d3str = mysihelper(n)
-    const lastChar = d3str.slice(-1)
-    const hasSiEx = lastChar == 'k'    
-    const pidx = d3str.indexOf('.')    
-    const hasDot = pidx !== -1
-    
-    var nr = d3str    
-    if (hasDot) 
-        nr = nr.slice(0, pidx+(p>0?p+1:0))
-
-    if (hasSiEx)
-        nr = nr.slice(-1)
-
-    var ex = ''
-    if (hasSiEx)
-        ex = lastChar
-    
-    return nr + `<sub>${ex}${u}</sub>`
-    //return nr + ex
-}
 
 class TextRow 
 {
@@ -467,4 +440,78 @@ class BoxplotRow {
         
         this.label.innerText = 'hallo'
     }
+}
+
+
+
+const colors         = ["#3366cc", "#dc3912", "#ff9900", "#109618", "#990099", "#0099c6", "#dd4477", "#66aa00", "#b82e2e", "#316395", "#994499", "#22aa99", "#aaaa11", "#6633cc", "#e67300", "#8b0707", "#651067", "#329262", "#5574a6", "#3b3eac"];
+const typeColors     = colors
+
+const maxTime = 25     // 25ms
+const maxSvg = 1000
+const maxD3 = maxTime  
+const maxLoad = 1000   // 1000ms
+
+
+const mag_svg        = .1 // 1000#  ?
+const mag_load       = 10 // 1000ms
+const mag_time       = 4  // 25ms 
+
+var updateBar = (view, vec, cvec)=> {
+    var c=0
+    var l = vec.map((e, i, v)=> { c+=e; return c-e; })
+    var data = t([vec, cvec, l])
+    var cursor = 0
+    var diff = d3.select(view).selectAll('div').data(data)
+    diff.enter().append('div')
+        .attr('class', 'bar')
+        .merge(diff)
+        .style('left', d=> d[2]+'%')
+        .style('width', d=> d[0]+'%')
+        .style('background-color', d=> d[1])
+    diff.exit().remove()
+}
+
+var colorScale = d3.scaleLinear<d3.ColorCommonInstance>()
+        .domain([1, 10])
+        .range([d3.rgb('#a5d6a7'), d3.rgb('#e53935')])
+        .interpolate(d3.interpolateHcl)
+        .clamp(true)
+
+function ping(v, cond = true) {   
+    if (cond) {             
+        v.style.opacity = 1
+        v.style.animation = ""        
+        requestAnimationFrame(()=> {             
+            //v.style.animation = "blink-out 750ms cubic-bezier(0.070, 0.065, 0.765, -0.135)"
+            //v.style.animation = "blink-out 2ms cubic-bezier(0.070, 0.455, 0.850, 0.420)"
+            v.style.animation = "blink-out 2s cubic-bezier(0.145, 1.130, 0.725, 0.590)"            
+            v.style.opacity = 0
+        })
+    }
+}
+
+const p1 = n=> n.toFixed(1)
+const mysihelper = d3.format('.3s')
+function mysi(n, p=0, u='') 
+{
+    const d3str = mysihelper(n)
+    const lastChar = d3str.slice(-1)
+    const hasSiEx = lastChar == 'k'    
+    const pidx = d3str.indexOf('.')    
+    const hasDot = pidx !== -1
+    
+    var nr = d3str    
+    if (hasDot) 
+        nr = nr.slice(0, pidx+(p>0?p+1:0))
+
+    if (hasSiEx)
+        nr = nr.slice(-1)
+
+    var ex = ''
+    if (hasSiEx)
+        ex = lastChar
+    
+    return nr + `<sub>${ex}${u}</sub>`
+    //return nr + ex
 }

@@ -206,7 +206,7 @@ export class UnitDiskNav implements IUnitDisk
                                     }),            
                                     (v, ud:UnitDisk)=> new LabelLayer(v, {
                                         name:       'emojis',   
-                                        className:  'caption',
+                                        className:  'caption label-big',
                                         data:       ()=> ud.cache.emojis,
                                         text:       (d)=> d.icon,
                                         delta:      (d, i, v)=> CaddC(
@@ -214,12 +214,12 @@ export class UnitDiskNav implements IUnitDisk
                                                         bboxOffset(d, 'labellen-bg', d.zRefp || CktoCp(d.z))(v[i])),
                                         transform:  (d, delta)=> 
                                                         ` translate(${(d.zRef ? d.zRef.re : d.z.re) + delta.re} ${d.zRef ? d.zRef.im : d.z.im})`                                                         
-                                    }),             
+                                    }),
                                     (v, ud:UnitDisk)=> new LabelLayer(v, {
                                         name:       'labels',
                                         className:  'caption label-big', 
                                         data:       ()=> ud.args.hypertree.args.selection,
-                                        text:       (d)=> d.label,
+                                        text:       (d)=> d.txt,
                                         delta:      (d, i, v)=> CaddC(
                                                         nodeRadiusOffset(ud)(d),
                                                         bboxOffset(d, 'labellen-bg', d.zRefp || CktoCp(d.z))(v[i])),
