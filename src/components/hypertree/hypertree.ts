@@ -26,8 +26,7 @@ import { HypertreeMeta }       from '../meta/hypertree-meta/hypertree-meta'
 import { NoHypertreeMeta }     from '../meta/hypertree-meta/hypertree-meta'
 
 const π = Math.PI
-
-var htmlpreloader = `
+const htmlpreloader = `
     <div class="preloader-wrapper big active">
         <div class="spinner-layer spinner-red-only">
             <div class="circle-clipper left">
@@ -42,7 +41,7 @@ var htmlpreloader = `
         </div>
     </div>`
 
-var bubbleSvgDef =
+const bubbleSvgDef =
     `<defs>
         <radialGradient id="exampleGradient">            
             <stop offset="58%"   stop-color="rgba(255,255,255, .08)"/>            
@@ -51,6 +50,43 @@ var bubbleSvgDef =
             <stop offset="100%"  stop-color="rgba( 0, 0, 0, .08)"/>
         </radialGradient>
     </defs>` 
+
+const btn = (name, icon, classes='')=>
+    `<button id="${name}" class="btn btn-small waves-effect waves-orange pn ${classes}">        
+        <i class="material-icons">${icon}</i>
+    </button>`
+
+// explore | near_me | fingerprint
+// edit | content_cut | border_color | edit_location
+// pan_tool | open_with | search | settings_overscan
+
+//${btn('btnupload', 'cloud_upload')}
+//${btn('btndownload', 'cloud_download')}                   
+
+const hypertreehtml =
+    `<div class="unitdisk-nav">        
+        <div class=tool-bar>
+            <!--${btn('btnundo', 'undo')}
+            ${btn('btncommit', 'check')}-->
+            ${btn('btnnav', 'explore', 'tool-seperator')}
+            ${btn('btnmeta', 'layers')}
+            ${btn('btnhome', 'home', 'tool-seperator')}
+            ${btn('btnsearch', 'search', 'disabled')}
+            ${btn('btndownload', 'file_download', 'disabled')}
+            <!--${btn('btncut', 'content_cut')}
+            ${btn('btncopy', 'content_copy')}
+            ${btn('btnpaste', 'content_paste')}
+            ${btn('btnbrowse', 'open_with', 'tool-seperator tool-active')}
+            ${btn('btnadd', 'add')}
+            ${btn('btnedit', 'border_color')}
+            ${btn('btndelte', 'delete')}-->
+        </div> 
+        <svg width="calc(100% - 3em)" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">
+            ${bubbleSvgDef}
+        </svg>        
+        <div class="preloader"></div>        
+        <div id="meta"></div>        
+    </div>`
 
 export interface HypertreeArgs
 {
@@ -78,86 +114,14 @@ export interface HypertreeArgs
     }
 }
 
-var btn = (name, icon, classes='')=>
-    `<button id="${name}" class="btn btn-small waves-effect waves-orange pn ${classes}">        
-        <i class="material-icons">${icon}</i>
-    </button>`
-
-// explore | near_me | fingerprint
-// edit | content_cut | border_color | edit_location
-// pan_tool | open_with | search | settings_overscan
-
-//${btn('btnupload', 'cloud_upload')}
-//${btn('btndownload', 'cloud_download')}                   
-
-var hypertreehtml =
-    `<div class="unitdisk-nav">        
-        <div class=tool-bar>
-            <!--${btn('btnundo', 'undo')}
-            ${btn('btncommit', 'check')}-->
-            ${btn('btnnav', 'explore', 'tool-seperator')}
-            ${btn('btnmeta', 'layers')}
-            ${btn('btnhome', 'home', 'tool-seperator')}
-            ${btn('btnsearch', 'search', 'disabled')}
-            ${btn('btndownload', 'file_download', 'disabled')}
-            <!--${btn('btncut', 'content_cut')}
-            ${btn('btncopy', 'content_copy')}
-            ${btn('btnpaste', 'content_paste')}
-            ${btn('btnbrowse', 'open_with', 'tool-seperator tool-active')}
-            ${btn('btnadd', 'add')}
-            ${btn('btnedit', 'border_color')}
-            ${btn('btndelte', 'delete')}-->
-        </div> 
-        <svg width="calc(100% - 3em)" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">
-            ${bubbleSvgDef}
-        </svg>        
-        <div class="preloader"></div>        
-        <div id="meta"></div>        
-    </div>`
-
 /**
 * pipeline implementation:
 * ajax -> weights -> layout -> transformation -> unitdisk / langmaps
 *
 * states: pipeline, interaction*
 *
-*    api: {
-*        setLangloader (loader)
-*        setLang (langmap)
-*        setDataloader (loader)
-*        setData (N*)
-*        setLayout (l)
-*        setWeigths (w)
+* --> model (N, lang, layout, weights, nav, layers, pathes|selection, T)
 *
-*        toggleNav
-*        toggleMeta
-*
-*        toggleSelection (N, selId?)
-*
-*        addPath (p|[])
-*        removePath ([]|*)
-*
-*        gotoHome ()
-*        gotoT (TS)
-*
-*        beginAT (TS)
-*        AT (TS)
-*        endAT (TS)
-*    }
-*
-*    --> model (N, lang, layout, weights, nav, layers, pathes|selection, T)
-*
-*    update = {
-*        parent:         ()=> this.updateParent(),
-*        unitdiskView:   ()=> { this.updateUnitdiskView(); this.updateMetaView(); },
-*        metaView:       ()=> this.updateMetaView(),
-*
-*        data:           ()=> this.updateData(),
-*        lang:           ()=> this.updateLang(),        
-*        layout:         ()=> this.updateLayout(),
-*        transformation: ()=> this.updateTransformation(),
-*        pathes:         ()=> this.updatePath(null, null)
-*    }
 */
 export class Hypertree 
 {
@@ -237,7 +201,7 @@ export class Hypertree
     * this functions assume the model/view (this class internal state)
     * has changes, and call the according ui updates (animatin frames)
     */
-    update = {        
+    private update = {        
         view: {
             parent:     ()=> this.updateParent(),
             unitdisk:   ()=> { this.updateUnitdiskView(); this.updateMetaView(); },

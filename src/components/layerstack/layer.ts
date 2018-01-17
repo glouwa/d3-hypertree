@@ -1,14 +1,17 @@
 import { LayerStack } from './layerstack'
+import { UnitDisk }   from '../../index';
+import { Hypertree }  from '../../index';
 
-
-export interface ILayerView {    
+export interface ILayerView 
+{
     parent,
-    layerstack,
-    unitdisk,
-    hypertree
+    layerstack:LayerStack,
+    unitdisk:UnitDisk,
+    hypertree:Hypertree
 }
 
-export interface ILayerArgs {
+export interface ILayerArgs 
+{
 }
 
 export interface ILayer
