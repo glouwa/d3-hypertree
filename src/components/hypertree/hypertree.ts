@@ -21,7 +21,6 @@ import { IUnitDisk }           from '../unitdisk/unitdisk'
 import { UnitDisk }            from '../unitdisk/unitdisk'
 import { UnitDiskNav }         from '../unitdisk/unitdisk'
 
-
 import { HypertreeMeta }       from '../meta/hypertree-meta/hypertree-meta'
 import { NoHypertreeMeta }     from '../meta/hypertree-meta/hypertree-meta'
 
@@ -90,26 +89,34 @@ const hypertreehtml =
 
 export interface HypertreeArgs
 {
-    parent:         any,
+    parent:       HTMLElement,
 
-    iconmap:        any,
-    dataloader:     LoaderFunction,
-    langloader:     (lang)=> (ok)=> void,
+    iconmap:      any,
+    dataloader:   LoaderFunction,
+    data:         N,
+    langloader:   (lang)=> (ok)=> void,
+    langmap:      {},
+    weight:       (n:N) => number,
+    layout:       LayoutFunction,
 
-    weight:         (n:N) => number,
-    layout:         LayoutFunction,
-    onNodeSelect:   (n:N) => void,
+    caption:      (hypertree:Hypertree, n:N)=> string,       
+    onNodeSelect: (n:N)=> void,
+    decorator:    { new(a: UnitDiskArgs) : IUnitDisk },
 
-    selection:      N[],
+    objects: {
+        pathes: {
+            centerNode: N[],       // readonly
+            hover: N[],            // readonly
+            //['selection-*']: N[],
+        },
+        selection: N[],
+    },   
 
-    decorator:      { new(a: UnitDiskArgs) : IUnitDisk },
-
-    ui : {
+    geometry: {
         clipRadius:     number,
         nodeRadius:     number,
         transformation: Transformation<N>,
-        cacheUpdate:    (cache:IUnitDisk)=> void,
-        caption:        (hypertree:Hypertree, n:N)=> string,       
+        cacheUpdate:    (cache:IUnitDisk)=> void,        
         layers:         ((ls:IUnitDisk)=> ILayer)[],
     }
 }
@@ -252,13 +259,13 @@ export class Hypertree
             position:       'translate(520,500) scale(470)',
             hypertree:      this,
             data:           this.data,            
-            transformation: this.args.ui.transformation,
+            transformation: this.args.geometry.transformation,
             transform:      (n:N)=> this.unitdisk.args.transformation.transformPoint(n.z),
-            layers:         this.args.ui.layers,
-            cacheUpdate:    this.args.ui.cacheUpdate,
-            caption:        (n:N)=> this.args.ui.caption(this, n),
-            clipRadius:     this.args.ui.clipRadius,
-            nodeRadius:     this.args.ui.nodeRadius            
+            layers:         this.args.geometry.layers,
+            cacheUpdate:    this.args.geometry.cacheUpdate,
+            caption:        (n:N)=> this.args.caption(this, n),
+            clipRadius:     this.args.geometry.clipRadius,
+            nodeRadius:     this.args.geometry.nodeRadius            
         })
     }
 
@@ -282,7 +289,7 @@ export class Hypertree
         var t0 = performance.now()
         this.view.querySelector('.preloader').innerHTML = htmlpreloader
         this.unitdisk.args.data = undefined
-        this.args.selection = []
+        this.args.objects.selection = []
         this.paths.isSelected = undefined
         this.paths.isHovered= undefined
         this.unitdisk.update.data()
@@ -299,9 +306,9 @@ export class Hypertree
             this.modelMeta = { Δ: [t1-t0, t2-t1, performance.now()-t2], filesize:dl }
             
             var t3 = performance.now()
-            this.data = this.args.layout(this.data, this.args.ui.transformation.state)
+            this.data = this.args.layout(this.data, this.args.geometry.transformation.state)
             this.unitdisk.args.data = this.data
-            this.args.ui.transformation.cache.N = this.data.descendants().length
+            this.args.geometry.transformation.cache.N = this.data.descendants().length
             this.updateWeights()
             this.updateLang_()
             this.updateImgHref_()            
@@ -335,7 +342,7 @@ export class Hypertree
     private updateLang_(dl=0) {
         const t0 = performance.now()
         for (var n of dfsFlat(this.data, n=>true)) {
-            n.label = this.args.ui.caption(this, n)
+            n.label = this.args.caption(this, n)
             n.labellen = undefined
         }
         if (dl || !this.langMeta)
@@ -369,13 +376,14 @@ export class Hypertree
     private updateLayout() : void {        
         //app.toast('Layout')
         var t0 = performance.now()
-        this.args.layout(this.data, this.args.ui.transformation.state)        
+        this.args.layout(this.data, this.args.geometry.transformation.state)        
         this.layoutMeta = { Δ: performance.now()-t0 }
-        //this.unitdiskMeta.update.layout(this.args.ui.transformation.cache, performance.now() - t0)
+        //this.unitdiskMeta.update.layout(this.args.geometry.transformation.cache, performance.now() - t0)
         
-        if (this.args.ui.transformation.cache.centerNode) {
-            this.args.ui.transformation.state.P.re = -this.args.ui.transformation.cache.centerNode.z.re
-            this.args.ui.transformation.state.P.im = -this.args.ui.transformation.cache.centerNode.z.im
+        const t = this.args.geometry.transformation
+        if (t.cache.centerNode) {
+            t.state.P.re = -t.cache.centerNode.z.re
+            t.state.P.im = -t.cache.centerNode.z.im
         }
 
         requestAnimationFrame(()=> {
@@ -405,7 +413,7 @@ export class Hypertree
         var new_ =  this.paths[pathId]
 
         if (pathId === 'isSelected')
-            this.args.selection = [n]
+            this.args.objects.selection = [n]
 
         if (old_)
             if (old_.ancestors) 
@@ -433,8 +441,8 @@ export class Hypertree
     }
 
     private animateUp() {
-        this.args.ui.transformation.state.P.re = 0
-        this.args.ui.transformation.state.P.im = 0
+        this.args.geometry.transformation.state.P.re = 0
+        this.args.geometry.transformation.state.P.im = 0
 
         this.animation = true
         var step = 0, steps = 16
@@ -448,11 +456,11 @@ export class Hypertree
                 // new P, λ values
                 var λ = .03 + p * .98
                 var animλ = CptoCk({ θ:2*π*λ, r:1 })
-                this.args.ui.transformation.state.λ.re = animλ.re
-                this.args.ui.transformation.state.λ.im = animλ.im
+                this.args.geometry.transformation.state.λ.re = animλ.re
+                this.args.geometry.transformation.state.λ.im = animλ.im
 
                 //app.toast('Layout')
-                this.args.layout(this.data, this.args.ui.transformation.state)
+                this.args.layout(this.data, this.args.geometry.transformation.state)
                 
                 if (this.data.leaves()
                              .reduce((max, n)=> Math.max(max, CktoCp(n.z).r), 0) > .95)                     
@@ -482,13 +490,13 @@ export class Hypertree
         if (this.animation) return
         else this.animation = true
 
-        const initTS = clone(this.args.ui.transformation.state)            
+        const initTS = clone(this.args.geometry.transformation.state)            
         const steps = 16
         let step = 1
 
         const frame = ()=> {                                                
             const animP = CmulR(initTS.P, 1-sigmoid(step/steps))
-            CassignC(this.args.ui.transformation.state.P, animP)
+            CassignC(this.args.geometry.transformation.state.P, animP)
             
             this.updateTransformation()
 
