@@ -78,15 +78,6 @@ export interface HypertreeArgs
     }
 }
 
-export interface IHypertree
-{
-    args:                 any,
-    updateData:           (data)=> void,
-    updateLang:           (langmap)=> void,
-    updateSelection:      (selection)=> void,
-    updateTransformation: (T)=> void
-}
-
 var btn = (name, icon, classes='')=>
     `<button id="${name}" class="btn btn-small waves-effect waves-orange pn ${classes}">        
         <i class="material-icons">${icon}</i>
@@ -129,91 +120,162 @@ var hypertreehtml =
 * ajax -> weights -> layout -> transformation -> unitdisk / langmaps
 *
 * states: pipeline, interaction*
+*
+*    api: {
+*        setLangloader (loader)
+*        setLang (langmap)
+*        setDataloader (loader)
+*        setData (N*)
+*        setLayout (l)
+*        setWeigths (w)
+*
+*        toggleNav
+*        toggleLayers
+*
+*        toggleSelection (N, selId?)
+*
+*        addPath (p|[])
+*        removePath ([]|*)
+*
+*        gotoHome ()
+*        gotoT (TS)
+*
+*        beginAT (TS)
+*        AT (TS)
+*        endAT (TS)
+*    }
+*
+*    --> model (N, lang, layout, weights, nav, layers, pathes|selection, T)
+*
+*    update = {
+*        parent:         ()=> this.updateParent(),
+*        unitdiskView:   ()=> { this.updateUnitdiskView(); this.updateMetaView(); },
+*        metaView:       ()=> this.updateMetaView(),
+*
+*        data:           ()=> this.updateData(),
+*        lang:           ()=> this.updateLang(),        
+*        layout:         ()=> this.updateLayout(),
+*        transformation: ()=> this.updateTransformation(),
+*        pathes:         ()=> this.updatePath(null, null)
+*    }
 */
 export class Hypertree 
 {
-    args           : HypertreeArgs
-    unitdisk       : IUnitDisk
-    hypertreeMeta  : HypertreeMeta
-    data           : N
-    langMap        : {}
-    view           : HTMLElement
-    animation      : boolean = false    
-    magic          = 1/160
-    paths          : { 
-        isSelected?:N, 
-        isHovered?:N 
-    }              = {}    
+    args            : HypertreeArgs
     modelMeta
     langMeta
     layoutMeta
     noHypertreeMeta
 
+    view            : HTMLElement
+    unitdisk        : IUnitDisk
+    hypertreeMeta   : HypertreeMeta
+
+    magic           = 1/160
+    animation       : boolean = false    
+    data            : N
+    langMap         : {}    
+    paths           : { isSelected?:N, isHovered?:N } = {}    
+
     constructor(args : HypertreeArgs) {
         this.args = args        
-        this.update.parent()
+        this.update.view.parent()
     }
 
     /*
     * this functions modyfy model/view (this class internal state)
     * and call the according update function(s)
-    */
-    /*
-    api: {
+    */    
+    api = {        
+        setLangloader: ll=> { 
+            this.args.langloader = ll
+            this.update.langloader() 
+        },
+        setDataloader: dl=> { 
+            this.args.dataloader = dl
+            this.update.dataloader() 
+        },
+        setLoaders: (dl, ll)=> { 
+            this.args.dataloader = dl
+            this.args.langloader = ll
+            this.update.langloader() 
+        },
+        //setLang: (langmap)
+        //setData: (N*)        
+        //setLayout (l)
+        //setWeigths (w)
+        toggleNav: ()=> {
+            this.args.decorator = this.args.decorator === UnitDiskNav ? UnitDisk : UnitDiskNav
+            this.update.view.unitdisk()
+            this.unitdisk.update.data()
+            this.hypertreeMeta.update.model()
+            this.hypertreeMeta.update.layout()
+            this.hypertreeMeta.update.transformation()
+        },
+        toggleLayers: ()=> {
+            this.noHypertreeMeta = this.noHypertreeMeta ? undefined : new NoHypertreeMeta()
+            this.update.view.meta()
+            this.hypertreeMeta.update.model()
+            this.hypertreeMeta.update.layout()
+            this.hypertreeMeta.update.transformation()
+        },
+/*
+        toggleSelection (N, selId?)
+        addPath (p|[])
+        removePath ([]|*)
+*/
+        gotoHome: ()=> this.animateTo({ re:0, im:0 }, null),
+/*
+        gotoT (TS)
 
+        beginAT (TS)
+        AT (TS)
+        endAT (TS)*/
     }
-    */
 
     /*
     * this functions assume the model/view (this class internal state)
     * has changes, and call the according ui updates (animatin frames)
     */
-    update = {
-        parent:         ()=> this.updateParent(),
-        unitdiskView:   ()=> { this.updateUnitdiskView(); this.updateMetaView(); },
-        metaView:       ()=> this.updateMetaView(),
-
-        data:           ()=> this.updateData(),
-        lang:           ()=> this.updateLang(),        
+    update = {        
+        view: {
+            parent:     ()=> this.updateParent(),
+            unitdisk:   ()=> { this.updateUnitdiskView(); this.updateMetaView(); },
+            meta:       ()=> this.updateMetaView(),
+        },
+        dataloader:     ()=> this.updateDataloader(),
+        langloader:     ()=> this.updateLangloader(),
+        
         layout:         ()=> this.updateLayout(),
         transformation: ()=> this.updateTransformation(),
         pathes:         ()=> this.updatePath(null, null)
     }
 
-    // dann privates
+    //########################################################################################################
+    //##
+    //## View Updates
+    //##
+    //########################################################################################################
 
     private updateParent()
     {
-        this.view = HTML.parse<HTMLElement>(hypertreehtml)()        
-        this.args.parent.innerHTML = ''
+        this.args.parent.innerHTML = '' // actually just remove this.view if present ... do less
+        this.view = HTML.parse<HTMLElement>(hypertreehtml)()
         this.args.parent.appendChild(this.view)
         this.noHypertreeMeta = new NoHypertreeMeta()
         var btnMeta = <HTMLButtonElement>this.view.querySelector('#btnmeta')
         var btnNav = <HTMLButtonElement>this.view.querySelector('#btnnav')
         var btnHome = <HTMLButtonElement>this.view.querySelector('#btnhome')
         
-        btnHome.onclick = ()=> this.api.animateTo({ re:0, im:0 }, null)
-        btnMeta.onclick = ()=> {
-            this.noHypertreeMeta = this.noHypertreeMeta ? undefined : new NoHypertreeMeta()
-            this.update.metaView()
-            this.hypertreeMeta.update.model()
-            this.hypertreeMeta.update.layout()
-            this.hypertreeMeta.update.transformation()
-        }
-        btnNav.onclick = ()=> {
-            this.args.decorator = this.args.decorator === UnitDiskNav ? UnitDisk : UnitDiskNav
-            this.update.unitdiskView()
-            this.unitdisk.update.data()
-            this.hypertreeMeta.update.model()
-            this.hypertreeMeta.update.layout()
-            this.hypertreeMeta.update.transformation()
-        }
+        btnHome.onclick = ()=> this.api.gotoHome()
+        btnMeta.onclick = ()=> this.api.toggleLayers()
+        btnNav.onclick = ()=> this.api.toggleNav()
 
         this.updateUnitdiskView()
         this.updateMetaView()        
 
-        this.updateData()
-        this.updateLang()
+        this.update.dataloader()
+        this.update.langloader()
     }
 
     private updateUnitdiskView()
@@ -240,17 +302,19 @@ export class Hypertree
     {
         var p = this.view.querySelector('.unitdisk-nav > #meta')
         p.innerHTML = ''
-        this.hypertreeMeta = 
-            this.noHypertreeMeta ||
-            new this.unitdisk.HypertreeMetaType({ 
+        this.hypertreeMeta = this.noHypertreeMeta || new this.unitdisk.HypertreeMetaType({ 
                 view: { parent:p },
                 model: this
             })
     }
 
-// hmmm, async updates?
+    //########################################################################################################
+    //##
+    //## Async Stuff
+    //##
+    //########################################################################################################
 
-    private updateData() : void {
+    private updateDataloader() : void {
         var t0 = performance.now()
         this.view.querySelector('.preloader').innerHTML = htmlpreloader
         this.unitdisk.args.data = undefined
@@ -284,7 +348,7 @@ export class Hypertree
         })
     }
 
-    private updateLang() : void {
+    private updateLangloader() : void {
         this.args.langloader((langMap, t1, dl)=> {            
             this.langMap = langMap
             this.updateLang_(dl)
@@ -294,7 +358,11 @@ export class Hypertree
         })
     }
 
-// do this privates belong here?
+    //########################################################################################################
+    //##
+    //## internal functions, calles by ...?
+    //##
+    //########################################################################################################
 
     private updateLangData()
     {
@@ -321,14 +389,18 @@ export class Hypertree
     }
 
 
-// the following are requestng animation fames
+    //########################################################################################################
+    //##
+    //## Animation frames ans animations
+    //##
+    //########################################################################################################
 
     private updateWeights() : void {
-        this.data.sum(this.args.weight)
-        for (var n of dfsFlat(this.data, n=>true)) {
-            n.weightScale = (Math.log2(n.value) || 1)
-                / (Math.log2(this.data.value || this.data.children.length) || 1)
-        }
+        this.data.sum(this.args.weight) // äää besser...
+        for (var n of dfsFlat(this.data, n=>true)) 
+            // ...hier selber machen
+            n.weightScale = (Math.log2(n.value) || 1) / (Math.log2(this.data.value || this.data.children.length) || 1)
+        
         this.updateLayout()
     }
 
@@ -355,7 +427,7 @@ export class Hypertree
         })
     }
 
-    public updateTransformation() : void {
+    private updateTransformation() : void {
         requestAnimationFrame(()=> {
             this.unitdisk.update.transformation() 
             this.hypertreeMeta.update.transformation()
@@ -365,7 +437,7 @@ export class Hypertree
         })
     }
 
-    public updatePath(pathId:string, n:N)
+    private updatePath(pathId:string, n:N)
     {
         var old_ =  this.paths[pathId]
         this.paths[pathId] = n
@@ -448,30 +520,25 @@ export class Hypertree
         requestAnimationFrame(()=> frame())
     }
 
-    api = {
-        animateTo: (newP, newλ)=> 
-        {   
-            if (this.animation) return
-            else this.animation = true
+    private animateTo(newP, newλ) 
+    {   
+        if (this.animation) return
+        else this.animation = true
 
-            const initTS = clone(this.args.ui.transformation.state)            
-            const steps = 16
-            let step = 1
+        const initTS = clone(this.args.ui.transformation.state)            
+        const steps = 16
+        let step = 1
 
-            const frame = ()=> {                                                
-                const animP = CmulR(initTS.P, 1-sigmoid(step/steps))
-                CassignC(this.args.ui.transformation.state.P, animP)
-                
-                this.updateTransformation()
+        const frame = ()=> {                                                
+            const animP = CmulR(initTS.P, 1-sigmoid(step/steps))
+            CassignC(this.args.ui.transformation.state.P, animP)
+            
+            this.updateTransformation()
 
-                if (step++ > steps) this.animation = false                    
-                else requestAnimationFrame(()=> frame())                
-            }
-            requestAnimationFrame(()=> frame())
+            if (step++ > steps) this.animation = false                    
+            else requestAnimationFrame(()=> frame())                
         }
-        //toggleSelection (updatepath)
-        //setdata
-        //setlang        
+        requestAnimationFrame(()=> frame())
     }
 
     public isAnimationRunning() {
