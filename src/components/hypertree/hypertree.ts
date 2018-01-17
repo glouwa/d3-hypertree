@@ -130,7 +130,7 @@ var hypertreehtml =
 *        setWeigths (w)
 *
 *        toggleNav
-*        toggleLayers
+*        toggleMeta
 *
 *        toggleSelection (N, selId?)
 *
@@ -172,7 +172,7 @@ export class Hypertree
     hypertreeMeta   : HypertreeMeta
 
     magic           = 1/160
-    animation       : boolean = false    
+    animation       : boolean = false
     data            : N
     langMap         : {}    
     paths           : { isSelected?:N, isHovered?:N } = {}    
@@ -212,7 +212,7 @@ export class Hypertree
             this.hypertreeMeta.update.layout()
             this.hypertreeMeta.update.transformation()
         },
-        toggleLayers: ()=> {
+        toggleMeta: ()=> {
             this.noHypertreeMeta = this.noHypertreeMeta ? undefined : new NoHypertreeMeta()
             this.update.view.meta()
             this.hypertreeMeta.update.model()
@@ -268,11 +268,11 @@ export class Hypertree
         var btnHome = <HTMLButtonElement>this.view.querySelector('#btnhome')
         
         btnHome.onclick = ()=> this.api.gotoHome()
-        btnMeta.onclick = ()=> this.api.toggleLayers()
-        btnNav.onclick = ()=> this.api.toggleNav()
+        btnMeta.onclick = ()=> this.api.toggleMeta()
+        btnNav.onclick  = ()=> this.api.toggleNav()
 
         this.updateUnitdiskView()
-        this.updateMetaView()        
+        this.updateMetaView()    
 
         this.update.dataloader()
         this.update.langloader()
@@ -280,10 +280,10 @@ export class Hypertree
 
     private updateUnitdiskView()
     {
-        var p = this.view.querySelector('.unitdisk-nav > svg')
-        p.innerHTML = bubbleSvgDef
+        var udparent = this.view.querySelector('.unitdisk-nav > svg')
+        udparent.innerHTML = bubbleSvgDef
         this.unitdisk = new this.args.decorator({
-            parent:         p,
+            parent:         udparent,
             className:      'unitDisc',
             position:       'translate(520,500) scale(470)',
             hypertree:      this,
@@ -300,10 +300,10 @@ export class Hypertree
 
     private updateMetaView()
     {
-        var p = this.view.querySelector('.unitdisk-nav > #meta')
-        p.innerHTML = ''
+        var metaparent = this.view.querySelector('.unitdisk-nav > #meta')
+        metaparent.innerHTML = ''
         this.hypertreeMeta = this.noHypertreeMeta || new this.unitdisk.HypertreeMetaType({ 
-                view: { parent:p },
+                view: { parent:metaparent },
                 model: this
             })
     }
@@ -364,8 +364,7 @@ export class Hypertree
     //##
     //########################################################################################################
 
-    private updateLangData()
-    {
+    private updateLangData() {
         // das was von data und lang abhängt: wiki nodes in this file...
     }
 
@@ -387,7 +386,6 @@ export class Hypertree
         for (var n of dfsFlat(this.data, n=>true)) 
             n.imageHref = this.args.iconmap.fileName2IconUrl(n.data.name, n.data.type)                    
     }
-
 
     //########################################################################################################
     //##
@@ -437,8 +435,7 @@ export class Hypertree
         })
     }
 
-    private updatePath(pathId:string, n:N)
-    {
+    private updatePath(pathId:string, n:N) {
         var old_ =  this.paths[pathId]
         this.paths[pathId] = n
         var new_ =  this.paths[pathId]
@@ -471,8 +468,7 @@ export class Hypertree
         })
     }
 
-    private animateUp()
-    {
+    private animateUp() {
         this.args.ui.transformation.state.P.re = 0
         this.args.ui.transformation.state.P.im = 0
 
@@ -481,11 +477,10 @@ export class Hypertree
         var frame = ()=>
         {
             var p = step++/steps
-            if (step > steps)             
+            if (step > steps)
                 this.animation = false
             
-            else 
-            {
+            else {
                 // new P, λ values
                 var λ = .03 + p * .98
                 var animλ = CptoCk({ θ:2*π*λ, r:1 })
@@ -495,9 +490,8 @@ export class Hypertree
                 //app.toast('Layout')
                 this.args.layout(this.data, this.args.ui.transformation.state)
                 
-                if (this.data
-                    .leaves()
-                    .reduce((max, n)=> Math.max(max, CktoCp(n.z).r), 0) > .95)                     
+                if (this.data.leaves()
+                             .reduce((max, n)=> Math.max(max, CktoCp(n.z).r), 0) > .95)                     
                 {
                     // on abort
                     this.animation = false
@@ -520,8 +514,7 @@ export class Hypertree
         requestAnimationFrame(()=> frame())
     }
 
-    private animateTo(newP, newλ) 
-    {   
+    private animateTo(newP, newλ) {
         if (this.animation) return
         else this.animation = true
 
