@@ -205,6 +205,8 @@ export class UnitDiskNav implements IUnitDisk
                                                          .classed("selected-path-nav", d=> d.isSelected)
                                     }),            
                                     (v, ud:UnitDisk)=> new LabelLayer(v, {
+                                        invisible:  true,
+                                        hideOnDrag: true,
                                         name:       'emojis',   
                                         className:  'caption label-big',
                                         data:       ()=> ud.cache.emojis,
