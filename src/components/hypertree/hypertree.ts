@@ -100,14 +100,14 @@ export interface HypertreeArgs
     weight:       (n:N) => number,
     layout:       LayoutFunction,
 
-    caption:      (hypertree:Hypertree, n:N)=> string,       
+    caption:      (hypertree:Hypertree, n:N)=> string,
     onNodeSelect: (n:N)=> void,
     decorator:    { new(a: UnitDiskArgs) : IUnitDisk },
 
     objects: {
         pathes: {
             centerNode: N[],       // readonly
-            hover: N[],            // readonly
+            hover:      N[],            // readonly
             //['selection-*']: N[],
         },
         selections: N[],
@@ -129,14 +129,13 @@ export interface HypertreeArgs
 * states: pipeline, interaction*
 *
 * --> model (N, lang, layout, weights, nav, layers, pathes|selection, T)
-*
 */
 export class Hypertree 
 {
     args            : HypertreeArgs    
     view_: {
-        parent        : HTMLElement,
-        path?         : HTMLElement,
+        parent         : HTMLElement,
+        path?          : HTMLElement,
 
         html?          : HTMLElement,
         unitdisk?      : IUnitDisk,
@@ -256,8 +255,7 @@ export class Hypertree
         var btnHome = <HTMLButtonElement>this.view_.html.querySelector('#btnhome')
 
         this.view_.path = <HTMLElement>this.view_.html.querySelector('#path')
-        this.view_.path.innerText = 'fs › d3-hypertree ››› src › components'
-        
+                
         btnHome.onclick = ()=> this.api.gotoHome()
         btnMeta.onclick = ()=> this.api.toggleMeta()
         btnNav.onclick  = ()=> this.api.toggleNav()
@@ -309,6 +307,8 @@ export class Hypertree
         var t0 = performance.now()
         this.view_.html.querySelector('.preloader').innerHTML = htmlpreloader
         this.unitdisk.args.data = undefined
+
+        this.view_.path.innerText = ''
         this.args.objects.selections = []
         this.paths.isSelected = undefined
         this.paths.isHovered= undefined
