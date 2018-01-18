@@ -65,6 +65,7 @@ const btn = (name, icon, classes='')=>
 const hypertreehtml =
     `<div class="unitdisk-nav">        
         <div class=tool-bar>
+            <div id="path" class="absolute-center">...</div>
             <!--${btn('btnundo', 'undo')}
             ${btn('btncommit', 'check')}-->
             ${btn('btnnav', 'explore', 'tool-seperator')}
@@ -90,8 +91,8 @@ const hypertreehtml =
 export interface HypertreeArgs
 {
     parent:       HTMLElement,
-
     iconmap:      any,
+
     dataloader:   LoaderFunction,
     data:         N,
     langloader:   (lang)=> (ok)=> void,
@@ -237,6 +238,9 @@ export class Hypertree
         var btnMeta = <HTMLButtonElement>this.view.querySelector('#btnmeta')
         var btnNav = <HTMLButtonElement>this.view.querySelector('#btnnav')
         var btnHome = <HTMLButtonElement>this.view.querySelector('#btnhome')
+
+        this.view.path = <HTMLElement>this.view.querySelector('#path')
+        this.view.path.innerText = 'fs › d3-hypertree ››› src › components'
         
         btnHome.onclick = ()=> this.api.gotoHome()
         btnMeta.onclick = ()=> this.api.toggleMeta()

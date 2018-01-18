@@ -39,3 +39,16 @@
         }
     }
 }
+
+#path {    
+    color: white;
+    font-size: .75em;    
+    max-width: 50%;
+}
+
+.absolute-center {
+    margin: auto;
+    position: absolute;
+    left: 7em; bottom: .7em; right: 0;
+    text-align: center;
+}
