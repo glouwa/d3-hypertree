@@ -110,7 +110,7 @@ export interface HypertreeArgs
             hover: N[],            // readonly
             //['selection-*']: N[],
         },
-        selection: N[],
+        selections: N[],
     },   
 
     geometry: {
@@ -133,23 +133,39 @@ export interface HypertreeArgs
 */
 export class Hypertree 
 {
-    args            : HypertreeArgs
+    args            : HypertreeArgs    
+    view_: {
+        parent        : HTMLElement,
+        path?         : HTMLElement,
+
+        html?          : HTMLElement,
+        unitdisk?      : IUnitDisk,
+        hypertreeMeta? : HypertreeMeta,
+/*
+        modelMeta,
+        langMeta,
+        layoutMeta,
+        noHypertreeMeta,*/
+    }
     modelMeta
     langMeta
     layoutMeta
     noHypertreeMeta
 
-    view            : HTMLElement
-    unitdisk        : IUnitDisk
-    hypertreeMeta   : HypertreeMeta
+    //view           : HTMLElement
+    unitdisk       : IUnitDisk
+    hypertreeMeta  : HypertreeMeta
 
-    magic           = 1/160
-    animation       : boolean = false
-    data            : N
-    langMap         : {}    
-    paths           : { isSelected?:N, isHovered?:N } = {}    
+    // todo: move to args    
+    magic          = 1/160    
+    data           : N
+    langMap        : {}    
+    paths          : { isSelected?:N, isHovered?:N } = {}    
+    animation      : boolean = false
+    // end todo
 
-    constructor(args : HypertreeArgs) {
+    constructor(view:{ parent:HTMLElement }, args:HypertreeArgs) {
+        this.view_ = view
         this.args = args        
         this.update.view.parent()
     }
@@ -158,7 +174,7 @@ export class Hypertree
     * this functions modyfy model/view (this class internal state)
     * and call the according update function(s)
     */    
-    api = {        
+    public api = {        
         setLangloader: ll=> { 
             this.args.langloader = ll
             this.update.langloader() 
@@ -231,16 +247,16 @@ export class Hypertree
 
     private updateParent()
     {
-        this.args.parent.innerHTML = '' // actually just remove this.view if present ... do less
-        this.view = HTML.parse<HTMLElement>(hypertreehtml)()
-        this.args.parent.appendChild(this.view)
+        this.view_.parent.innerHTML = '' // actually just remove this.view if present ... do less
+        this.view_.html = HTML.parse<HTMLElement>(hypertreehtml)()
+        this.view_.parent.appendChild(this.view_.html)
         this.noHypertreeMeta = new NoHypertreeMeta()
-        var btnMeta = <HTMLButtonElement>this.view.querySelector('#btnmeta')
-        var btnNav = <HTMLButtonElement>this.view.querySelector('#btnnav')
-        var btnHome = <HTMLButtonElement>this.view.querySelector('#btnhome')
+        var btnMeta = <HTMLButtonElement>this.view_.html.querySelector('#btnmeta')
+        var btnNav = <HTMLButtonElement>this.view_.html.querySelector('#btnnav')
+        var btnHome = <HTMLButtonElement>this.view_.html.querySelector('#btnhome')
 
-        this.view.path = <HTMLElement>this.view.querySelector('#path')
-        this.view.path.innerText = 'fs › d3-hypertree ››› src › components'
+        this.view_.path = <HTMLElement>this.view_.html.querySelector('#path')
+        this.view_.path.innerText = 'fs › d3-hypertree ››› src › components'
         
         btnHome.onclick = ()=> this.api.gotoHome()
         btnMeta.onclick = ()=> this.api.toggleMeta()
@@ -255,7 +271,7 @@ export class Hypertree
 
     private updateUnitdiskView()
     {
-        var udparent = this.view.querySelector('.unitdisk-nav > svg')
+        var udparent = this.view_.html.querySelector('.unitdisk-nav > svg')
         udparent.innerHTML = bubbleSvgDef
         this.unitdisk = new this.args.decorator({
             parent:         udparent,
@@ -275,7 +291,7 @@ export class Hypertree
 
     private updateMetaView()
     {
-        var metaparent = this.view.querySelector('.unitdisk-nav > #meta')
+        var metaparent = this.view_.html.querySelector('.unitdisk-nav > #meta')
         metaparent.innerHTML = ''
         this.hypertreeMeta = this.noHypertreeMeta || new this.unitdisk.HypertreeMetaType({ 
                 view: { parent:metaparent },
@@ -291,9 +307,9 @@ export class Hypertree
 
     private updateDataloader() : void {
         var t0 = performance.now()
-        this.view.querySelector('.preloader').innerHTML = htmlpreloader
+        this.view_.html.querySelector('.preloader').innerHTML = htmlpreloader
         this.unitdisk.args.data = undefined
-        this.args.objects.selection = []
+        this.args.objects.selections = []
         this.paths.isSelected = undefined
         this.paths.isHovered= undefined
         this.unitdisk.update.data()
@@ -306,7 +322,7 @@ export class Hypertree
                 .each((n:any)=> n.mergeId = ncount++)
                 //.sum(this.args.weight) // this.updateWeights()
 
-            this.view.querySelector('.preloader').innerHTML = ''
+            this.view_.html.querySelector('.preloader').innerHTML = ''
             this.modelMeta = { Δ: [t1-t0, t2-t1, performance.now()-t2], filesize:dl }
             
             var t3 = performance.now()
@@ -417,7 +433,7 @@ export class Hypertree
         var new_ =  this.paths[pathId]
 
         if (pathId === 'isSelected')
-            this.args.objects.selection = [n]
+            this.args.objects.selections = [n]
 
         if (old_)
             if (old_.ancestors) 

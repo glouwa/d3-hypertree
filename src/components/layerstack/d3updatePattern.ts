@@ -49,6 +49,7 @@ export class D3UpdatePattern
             // -webkit-font-smoothing: antialiased;
 
         this.data = this.mayEval(this.args.data)
+        console.assert(this.data)
         this.elements =
             this.mainSvgGroup
                 .selectAll(this.args.elementType)

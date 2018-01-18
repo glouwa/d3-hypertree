@@ -218,7 +218,7 @@ export class UnitDiskNav implements IUnitDisk
                                     (v, ud:UnitDisk)=> new LabelLayer(v, {
                                         name:       'labels',
                                         className:  'caption label-big', 
-                                        data:       ()=> ud.args.hypertree.args.selection,
+                                        data:       ()=> ud.args.hypertree.args.objects.selections,
                                         text:       (d)=> d.txt,
                                         delta:      (d, i, v)=> CaddC(
                                                         nodeRadiusOffset(ud)(d),
