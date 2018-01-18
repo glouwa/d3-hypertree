@@ -99,6 +99,7 @@ export interface HypertreeArgs
     langmap:      {},
     weight:       (n:N) => number,
     layout:       LayoutFunction,
+    magic:        number,
 
     caption:      (hypertree:Hypertree, n:N)=> string,
     onNodeSelect: (n:N)=> void,
@@ -112,7 +113,7 @@ export interface HypertreeArgs
         },
         selections: N[],
     },   
-
+    
     geometry: {
         clipRadius:     number,
         nodeRadius:     number,
@@ -156,7 +157,6 @@ export class Hypertree
     hypertreeMeta  : HypertreeMeta
 
     // todo: move to args    
-    magic          = 1/160    
     data           : N
     langMap        : {}    
     paths          : { isSelected?:N, isHovered?:N } = {}    

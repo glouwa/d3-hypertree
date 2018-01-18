@@ -79,8 +79,8 @@ export class InteractionLayer implements ILayer
                     
                     const min = .1 * Math.PI
                     const max = .8 * Math.PI*2
-                    if (newλp.θ >= max) console.log('to big')
-                    if (newλp.θ <= min) console.log('to small')
+                    //if (newλp.θ >= max) console.log('to big')
+                    //if (newλp.θ <= min) console.log('to small')
 
                     if (newλp.θ < max && newλp.θ > min) 
                         this.onDragλ(null, CptoCk(newλp))
@@ -95,17 +95,17 @@ export class InteractionLayer implements ILayer
 
                         const newλp = { θ:πify(d3.event.transform.k+.5), r:1 }
                         
-                        console.log('touch zoom', newλp.θ)
+                        //console.log('touch zoom', newλp.θ)
                         const min = .1 * Math.PI
                         const max = .8 * Math.PI*2
-                        if (newλp.θ >= max) console.log('to big')
-                        if (newλp.θ <= min) console.log('to small')
+                        //if (newλp.θ >= max) console.log('to big')
+                        //if (newλp.θ <= min) console.log('to small')
 
                         if (newλp.θ < max && newλp.θ > min) 
                             this.onDragλ(null, CptoCk(newλp))                        
                     }
                     else {
-                        console.log('touch drag')
+                        //console.log('touch drag')
                         this.onDragByNode(
                             dragStartElement,
                             dragStartPoint,
@@ -123,13 +123,13 @@ export class InteractionLayer implements ILayer
                 }
             })
             .on("start", ()=> {
-                console.log('start')
+                //console.log('start')
                 this.onDragStart(
                     dragStartElement = this.findNodeByCell(),
                     dragStartPoint = this.currMousePosAsC()
             )})
             .on("end",   ()=> { 
-                console.log('end')
+                //console.log('end')
                 this.onDragEnd(
                     dragStartElement,
                     dragStartPoint,
