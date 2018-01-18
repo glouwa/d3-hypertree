@@ -147,20 +147,22 @@ export class Hypertree
         layoutMeta,
         noHypertreeMeta,*/
     }
+    animation      : boolean = false
+    
+    // todo: move to view
     modelMeta
     langMeta
     layoutMeta
     noHypertreeMeta
-
-    //view           : HTMLElement
+    
     unitdisk       : IUnitDisk
     hypertreeMeta  : HypertreeMeta
+    // end todo
 
     // todo: move to args    
     data           : N
     langMap        : {}    
     whateveritis          : { isSelected?:N, isHovered?:N } = {}    
-    animation      : boolean = false
     // end todo
 
     constructor(view:{ parent:HTMLElement }, args:HypertreeArgs) {
@@ -208,9 +210,10 @@ export class Hypertree
         },
 /*
         toggleSelection (N, selId?)
-        addPath (p|[])
-        removePath ([]|*)
-*/
+*/        
+        addPath: (pathid, node:N)=> this.addPath(pathid, node),
+        removePath: (pathid)=> this.removePath(pathid),
+
         gotoHome: ()=> this.animateTo({ re:0, im:0 }, null),
 /*
         gotoT (TS)
@@ -347,6 +350,13 @@ export class Hypertree
             this.hypertreeMeta.update.lang()
             this.updateTransformation()
         })
+    }
+
+    private addPath(pathId:string, n:N) {
+        
+    }
+    private removePath(pathId:string, n:N) {
+
     }
 
     private updatePath(pathId:string, n:N) {
