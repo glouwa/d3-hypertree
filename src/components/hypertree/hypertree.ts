@@ -159,7 +159,7 @@ export class Hypertree
     // todo: move to args    
     data           : N
     langMap        : {}    
-    paths          : { isSelected?:N, isHovered?:N } = {}    
+    whateveritis          : { isSelected?:N, isHovered?:N } = {}    
     animation      : boolean = false
     // end todo
 
@@ -235,7 +235,7 @@ export class Hypertree
         
         layout:         ()=> this.updateLayout(),
         transformation: ()=> this.updateTransformation(),
-        pathes:         ()=> this.updatePath(null, null)
+        pathes:         ()=> this.updatePathes()
     }
 
     //########################################################################################################
@@ -310,8 +310,8 @@ export class Hypertree
 
         this.view_.path.innerText = ''
         this.args.objects.selections = []
-        this.paths.isSelected = undefined
-        this.paths.isHovered= undefined
+        this.whateveritis.isSelected = undefined
+        this.whateveritis.isHovered= undefined
         this.unitdisk.update.data()
 
         this.args.dataloader((d3h, t1, dl)=> {
@@ -347,6 +347,31 @@ export class Hypertree
             this.hypertreeMeta.update.lang()
             this.updateTransformation()
         })
+    }
+
+    private updatePath(pathId:string, n:N) {
+        var old_ =  this.whateveritis[pathId]
+        this.whateveritis[pathId] = n
+        var new_ =  this.whateveritis[pathId]
+
+        if (pathId === 'isSelected')
+            this.args.objects.selections = [n]
+
+        if (old_)
+            if (old_.ancestors) 
+                for (var pn of old_.ancestors())
+                    pn[pathId] = undefined
+            else
+                old_[pathId] = undefined
+
+        if (new_)
+            if (new_.ancestors) 
+                for (var pn of new_.ancestors()) 
+                    pn[pathId] = true // könnte alles sein oder?
+            else
+                new_[pathId] = true // könnte alles sein oder?
+
+        this.update.pathes()
     }
 
     //########################################################################################################
@@ -427,28 +452,7 @@ export class Hypertree
         })
     }
 
-    private updatePath(pathId:string, n:N) {
-        var old_ =  this.paths[pathId]
-        this.paths[pathId] = n
-        var new_ =  this.paths[pathId]
-
-        if (pathId === 'isSelected')
-            this.args.objects.selections = [n]
-
-        if (old_)
-            if (old_.ancestors) 
-                for (var pn of old_.ancestors())
-                    pn[pathId] = undefined
-            else
-                old_[pathId] = undefined
-
-        if (new_)
-            if (new_.ancestors) 
-                for (var pn of new_.ancestors()) 
-                    pn[pathId] = true // könnte alles sein oder?
-            else
-                new_[pathId] = true // könnte alles sein oder?
-
+    private updatePathes() {
         //this.ui.updateSelection()
         //requestAnimationFrame(()=> this.unitdisk.updateTransformation())
         requestAnimationFrame(()=> {
@@ -459,7 +463,7 @@ export class Hypertree
             //this.layerStackMeta.update.data()            
         })
     }
-
+    
     private animateUp() {
         this.args.geometry.transformation.state.P.re = 0
         this.args.geometry.transformation.state.P.im = 0
