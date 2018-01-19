@@ -50,9 +50,9 @@ const bubbleSvgDef =
         </radialGradient>
     </defs>` 
 
-const btn = (name, icon, classes='')=>
+const btn = (name, icon, classes='', iconColor=undefined)=>
     `<button id="${name}" class="btn btn-small waves-effect waves-orange pn ${classes}">        
-        <i class="material-icons">${icon}</i>
+        <i class="material-icons" ${iconColor?'style="color:'+iconColor+';"':''}>${icon}</i>
     </button>`
 
 // explore | near_me | fingerprint
@@ -64,7 +64,7 @@ const btn = (name, icon, classes='')=>
 
 const hypertreehtml =
     `<div class="unitdisk-nav">        
-        <div class=tool-bar>
+        <div class="tool-bar">
             <div id="path" class="absolute-center">...</div>
             <!--${btn('btnundo', 'undo')}
             ${btn('btncommit', 'check')}-->
@@ -80,6 +80,13 @@ const hypertreehtml =
             ${btn('btnadd', 'add')}
             ${btn('btnedit', 'border_color')}
             ${btn('btndelte', 'delete')}-->
+        </div> 
+        <div class="tool-bar path-bar">
+            ${btn('btn-path-s0', 'trending_up', '', '#ff9800')}
+            ${btn('btn-path-s1', 'trending_up', '', '#2196F3')}
+            ${btn('btn-path-home', 'grade', 'tool-seperator')}            
+            ${btn('btn-path-center', 'add_circle_outline', 'disabled')}
+            ${btn('btn-path-hover', 'mouse', 'disabled')}
         </div> 
         <svg width="calc(100% - 3em)" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">
             ${bubbleSvgDef}
@@ -353,34 +360,40 @@ export class Hypertree
     }
 
     private addPath(pathId:string, n:N) {
-        
+        if (n.ancestors) 
+            for (var pn of n.ancestors()) 
+                pn[pathId] = true // könnte alles sein oder?
+        else
+            n[pathId] = true // könnte alles sein oder?
     }
     private removePath(pathId:string, n:N) {
+        if (n.ancestors) 
+            for (var pn of n.ancestors())
+                pn[pathId] = undefined
+        else
+            n[pathId] = undefined
+    }
 
+    private toggleSelection(pathId:string, n:N) {
+        // set selection
+        // reserve/free color
+        // add/remove path
     }
 
     private updatePath(pathId:string, n:N) {
-        var old_ =  this.whateveritis[pathId]
-        this.whateveritis[pathId] = n
-        var new_ =  this.whateveritis[pathId]
 
         if (pathId === 'isSelected')
             this.args.objects.selections = [n]
-
+        
+        var old_ = this.whateveritis[pathId]
         if (old_)
-            if (old_.ancestors) 
-                for (var pn of old_.ancestors())
-                    pn[pathId] = undefined
-            else
-                old_[pathId] = undefined
+            this.removePath(pathId, old_)
 
+        this.whateveritis[pathId] = n
+        var new_ = n
         if (new_)
-            if (new_.ancestors) 
-                for (var pn of new_.ancestors()) 
-                    pn[pathId] = true // könnte alles sein oder?
-            else
-                new_[pathId] = true // könnte alles sein oder?
-
+            this.addPath(pathId, new_)
+        
         this.update.pathes()
     }
 

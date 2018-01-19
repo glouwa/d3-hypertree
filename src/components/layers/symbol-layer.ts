@@ -16,6 +16,8 @@ export interface SymbolLayerArgs
 var symbol = d3.symbol().size(.004)
 var d_star = symbol.type(d3['symbolStar'])()
 
+const home = 'M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z'
+
 export class SymbolLayer implements ILayer
 {  
     view:            ILayerView  
@@ -53,7 +55,7 @@ export class SymbolLayer implements ILayer
             updateColor:       s=> s.classed("hovered",   d=> d.isHovered && d.parent)
                                     .classed("selected",  d=> d.isSelected && d.parent),
             updateTransform:   s=> s.attr("transform",    d=> this.args.transform(d))
-                                    .attr("d",            d=> d_star),
+                                    .attr("d",            d=> /*home*/d_star),
         })
     }
 }
