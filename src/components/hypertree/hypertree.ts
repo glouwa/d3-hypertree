@@ -215,9 +215,8 @@ export class Hypertree
             this.hypertreeMeta.update.layout()
             this.hypertreeMeta.update.transformation()
         },
-/*
-        toggleSelection (N, selId?)
-*/        
+
+        toggleSelection: (n:N)=> this.toggleSelection(n),        
         addPath: (pathid, node:N)=> this.addPath(pathid, node),
         removePath: (pathid)=> this.removePath(pathid),
 
@@ -374,7 +373,7 @@ export class Hypertree
             n[pathId] = undefined
     }
 
-    private toggleSelection(pathId:string, n:N) {
+    private toggleSelection(n:N) {
         // set selection
         // reserve/free color
         // add/remove path

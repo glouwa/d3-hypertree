@@ -69,6 +69,7 @@ export class HypertreeMetaNav
     private model      : Hypertree
     private udView     : UnitdiskMeta
     private udNav      : UnitdiskMeta
+    
     private lsView     : LayerStackMeta
     private lsNav      : LayerStackMeta
     private lsNavParam : LayerStackMeta
