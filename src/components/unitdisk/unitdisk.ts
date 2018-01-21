@@ -296,6 +296,7 @@ export class UnitDiskNav implements IUnitDisk
                                     }),
                                     (v, ud:UnitDisk)=> new InteractionLayer(v, {                                        
                                         unitdisk:    ud,
+                                        nohover:     true,
                                         mouseRadius: 1.5,
                                         onClick:     (n:N, m:C)=> {}
                                     })

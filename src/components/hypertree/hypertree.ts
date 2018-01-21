@@ -66,26 +66,30 @@ const hypertreehtml =
     `<div class="unitdisk-nav">        
         <div class="tool-bar">
             <div id="path" class="absolute-center">...</div>
-            <!--${btn('btnundo', 'undo')}
-            ${btn('btncommit', 'check')}-->
+            <!--
+            ${btn('btnundo', 'undo')}
+            ${btn('btncommit', 'check')}
+            -->
             ${btn('btnnav', 'explore', 'tool-seperator')}
             ${btn('btnmeta', 'layers')}
             ${btn('btnhome', 'home', 'tool-seperator')}
             ${btn('btnsearch', 'search', 'disabled')}
             ${btn('btndownload', 'file_download', 'disabled')}
-            <!--${btn('btncut', 'content_cut')}
+            <!--
+            ${btn('btncut', 'content_cut')}
             ${btn('btncopy', 'content_copy')}
             ${btn('btnpaste', 'content_paste')}
             ${btn('btnbrowse', 'open_with', 'tool-seperator tool-active')}
             ${btn('btnadd', 'add')}
             ${btn('btnedit', 'border_color')}
-            ${btn('btndelte', 'delete')}-->
+            ${btn('btndelte', 'delete')}
+            -->
         </div> 
         <div class="tool-bar path-bar">
             ${btn('btn-path-s0', 'trending_up', '', '#ff9800')}
             ${btn('btn-path-s1', 'trending_up', '', '#2196F3')}
-            ${btn('btn-path-home', 'grade', 'tool-seperator')}            
-            ${btn('btn-path-center', 'add_circle_outline', 'disabled')}
+            ${btn('btn-path-home', 'grade', 'tool-seperator')}
+            ${btn('btn-path-center', 'add_circle', 'disabled')}
             ${btn('btn-path-hover', 'mouse', 'disabled')}
         </div> 
         <svg width="calc(100% - 3em)" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">
@@ -144,6 +148,12 @@ export class Hypertree
     view_: {
         parent         : HTMLElement,
         path?          : HTMLElement,
+
+        btnHome?       : HTMLElement,
+        btnMeta?       : HTMLElement,
+        btnNav?        : HTMLElement,
+
+        btnPathHome?   : HTMLElement,
 
         html?          : HTMLElement,
         unitdisk?      : IUnitDisk,
@@ -258,16 +268,18 @@ export class Hypertree
         this.view_.parent.innerHTML = '' // actually just remove this.view if present ... do less
         this.view_.html = HTML.parse<HTMLElement>(hypertreehtml)()
         this.view_.parent.appendChild(this.view_.html)
-        this.noHypertreeMeta = new NoHypertreeMeta()
-        var btnMeta = <HTMLButtonElement>this.view_.html.querySelector('#btnmeta')
-        var btnNav = <HTMLButtonElement>this.view_.html.querySelector('#btnnav')
-        var btnHome = <HTMLButtonElement>this.view_.html.querySelector('#btnhome')
+        this.noHypertreeMeta   = new NoHypertreeMeta()
+        this.view_.btnMeta     = <HTMLButtonElement>this.view_.html.querySelector('#btnmeta')
+        this.view_.btnNav      = <HTMLButtonElement>this.view_.html.querySelector('#btnnav')
+        this.view_.btnHome     = <HTMLButtonElement>this.view_.html.querySelector('#btnhome')
+        this.view_.btnPathHome = <HTMLButtonElement>this.view_.html.querySelector('#btn-path-home')
+                
+        this.view_.btnHome.onclick     = ()=> this.api.gotoHome()
+        this.view_.btnPathHome.onclick = ()=> this.api.gotoHome()
+        this.view_.btnMeta.onclick     = ()=> this.api.toggleMeta()
+        this.view_.btnNav.onclick      = ()=> this.api.toggleNav()        
 
         this.view_.path = <HTMLElement>this.view_.html.querySelector('#path')
-                
-        btnHome.onclick = ()=> this.api.gotoHome()
-        btnMeta.onclick = ()=> this.api.toggleMeta()
-        btnNav.onclick  = ()=> this.api.toggleNav()
 
         this.updateUnitdiskView()
         this.updateMetaView()    
@@ -359,6 +371,7 @@ export class Hypertree
     }
 
     private addPath(pathId:string, n:N) {
+        console.assert(n.ancestors)
         if (n.ancestors) 
             for (var pn of n.ancestors()) 
                 pn[pathId] = true // könnte alles sein oder?
@@ -366,6 +379,7 @@ export class Hypertree
             n[pathId] = true // könnte alles sein oder?
     }
     private removePath(pathId:string, n:N) {
+        console.assert(n.ancestors)
         if (n.ancestors) 
             for (var pn of n.ancestors())
                 pn[pathId] = undefined
@@ -377,13 +391,13 @@ export class Hypertree
         // set selection
         // reserve/free color
         // add/remove path
+        this.args.objects.selections = [n]
+        this.updatePath('isSelected', n)
     }
 
+    // es kann nur einen pro id geben, gibt es bereits einen wird dieser entfernt 
+    // (praktisch für hover)
     private updatePath(pathId:string, n:N) {
-
-        if (pathId === 'isSelected')
-            this.args.objects.selections = [n]
-        
         var old_ = this.whateveritis[pathId]
         if (old_)
             this.removePath(pathId, old_)

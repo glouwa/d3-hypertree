@@ -13,6 +13,7 @@ import { C, CptoCk, CktoCp,
 export interface InteractionLayerArgs
 {
     unitdisk, 
+    nohover: boolean,
     mouseRadius,
     onClick
 }
@@ -139,17 +140,23 @@ export class InteractionLayer implements ILayer
         //var transform = d3.zoomTransform(selection.node());
         //var transform = d3.zoomTransform(this); in event sinks
 
-        this.view.parent.append('circle')
-            .attr("class", "mouse-circle")
-            .attr("r", this.args.mouseRadius)
-            .on("dblclick",  d=> this.onDblClick(this.findNodeByCell()))
-            //.on("click",     d=> this.onClick(findNodeByCell()))
-            .on("mousemove", d=> this.view.hypertree.updatePath('isHovered', this.findNodeByCell()))
-            .on("mouseout",  d=> this.view.hypertree.updatePath('isHovered', undefined))
-            //.call(drag)
-            .call(zoom)
-            .on("dblclick.zoom", null)
-
+        if (this.args.nohover) //.args.className === 'nav-parameter-disc')
+            this.view.parent.append('circle')
+                .attr("class", "mouse-circle")
+                .attr("r", this.args.mouseRadius)                
+                .call(zoom)
+                .on("dblclick.zoom", null)
+        else
+            this.view.parent.append('circle')
+                .attr("class", "mouse-circle")
+                .attr("r", this.args.mouseRadius)
+                .on("dblclick",  d=> this.onDblClick(this.findNodeByCell()))
+                //.on("click",     d=> this.onClick(findNodeByCell()))
+                .on("mousemove", d=> this.view.hypertree.updatePath('isHovered', this.findNodeByCell()))
+                .on("mouseout",  d=> this.view.hypertree.updatePath('isHovered', undefined))
+                //.call(drag)
+                .call(zoom)
+                .on("dblclick.zoom", null)
     }
 
     //-----------------------------------------------------------------------------------------
