@@ -391,8 +391,20 @@ export class Hypertree
         // set selection
         // reserve/free color
         // add/remove path
-        this.args.objects.selections = [n]
-        this.updatePath('isSelected', n)
+
+        if (this.args.objects.selections.includes(n)) {
+            //const nidx = this.args.objects.selections.indexOf(n)
+            //delete this.args.objects.selections[nidx]
+            this.args.objects.selections = this.args.objects.selections.filter(e=> e!=n)
+
+            this.updatePath('isSelected', undefined)
+        }
+        else
+        {
+            this.args.objects.selections.push(n)
+
+            this.updatePath('isSelected', n)            
+        }
     }
 
     // es kann nur einen pro id geben, gibt es bereits einen wird dieser entfernt 
