@@ -5,6 +5,7 @@ import { D3UpdatePattern } from '../layerstack/d3updatePattern'
 
 export interface FocusLayerArgs
 {
+    name: string,
     r: ()=> number
 }
 
@@ -13,7 +14,7 @@ export class FocusLayer implements ILayer
     view:             ILayerView
     args:             FocusLayerArgs
     d3updatePattern:  D3UpdatePattern
-    name =            'focus'
+    name:             string
    
     update = {
         parent:         ()=> this.attach(),      
@@ -25,6 +26,7 @@ export class FocusLayer implements ILayer
     constructor(view:ILayerView, args : FocusLayerArgs) {    
         this.view = view    
         this.args = args        
+        this.name = args.name
     }
 
     private attach() {

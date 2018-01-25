@@ -155,7 +155,9 @@ export function LayerInfo_({ parent, onCheckChange, className })
         ui.appendChild(layerViews.checkDrag)
         ui.appendChild(layerViews.bar)
         
+        if (name === 'λ') layerViews.label.style.textTransform = 'none'
         layerViews.label.innerHTML = name
+        
         layerViews.checkNormal.querySelector('input').onchange = function() {            
             function updateCheck(checkBox, layer:ILayer, layerViews) {        
                 // on change

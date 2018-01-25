@@ -50,6 +50,27 @@
             pointer-events:none;
         }
 
+        .center-node {
+            animation: centernodemove 750ms ease-out;// infinite;
+        }
+    
+        @keyframes centernodemove {
+            0% { 
+                transform: scale(0);                 
+                transform: rotate(1);
+            }
+            25% { 
+                transform: scale(0); 
+            }
+            50% { 
+                transform: scale(.1); 
+            }
+            80%, 100% {               
+                //transform: scale(.6);   
+                //transform: rotate(0);
+            }
+        }
+
         .nav-background-disc {
             .background-circle {
                 pointer-events:none;
