@@ -64,6 +64,7 @@ const btn = (name, icon, classes='', iconColor=undefined)=>
 
 const hypertreehtml =
     `<div class="unitdisk-nav">        
+        <div id="meta"></div>        
         <div class="tool-bar">
             <div id="path" class="absolute-center">...</div>
             <!--
@@ -92,11 +93,11 @@ const hypertreehtml =
             ${btn('btn-path-center', 'add_circle', 'disabled')}
             ${btn('btn-path-hover', 'mouse', 'disabled')}
         </div> 
+        
         <svg width="calc(100% - 3em)" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">
             ${bubbleSvgDef}
         </svg>        
-        <div class="preloader"></div>        
-        <div id="meta"></div>        
+        <div class="preloader"></div>                
     </div>`
 
 export interface HypertreeArgs

@@ -1,7 +1,8 @@
+import { HTML }           from 'ducd'
 import { UnitdiskMeta }   from '../unitdisk-meta/unitdisk-meta'
 import { LayerStackMeta } from '../layerstack-meta/layerstack-meta'
 import { Hypertree }      from '../../hypertree/hypertree'
-import { UnitDiskNav } from '../../../index';
+import { UnitDiskNav }    from '../../../index';
 
 export class NoHypertreeMeta
 {
@@ -109,27 +110,53 @@ export class HypertreeMetaNav
         }
     }
 
+    htmlCarUd = `
+        <div class="left carousel carousel-slider" data-indicators="true">
+            <div id="meta-ud-data" class="carousel-item"></div>
+            <div id="meta-ud-nav" class="carousel-item"></div>            
+        </div>`
+ 
+    htmlCarLs = `
+        <div class="right carousel carousel-slider" data-indicators="true">
+            <div id="meta-ls-data" class="carousel-item"></div>
+            <div id="meta-ls-bg" class="carousel-item"></div>
+            <div id="meta-ls-nav" class="carousel-item"></div>
+        </div>`
+
     private updateParent() {   
-        
+
+        //this.view_.parent.innerHTML = '' // actually just remove this.view if present ... do less
+        this.view.html = HTML.parse<HTMLElement>(this.htmlCarUd)()
+        this.view.parent.appendChild(this.view.html)
+
+        this.view.html2 = HTML.parse<HTMLElement>(this.htmlCarLs)()
+        this.view.parent.appendChild(this.view.html2)
+
+        $('.carousel').carousel({ 
+            fullWidth:true, 
+            noWrap:true
+         })
+
+        const navUnitDisk = <UnitDiskNav>this.model.unitdisk
         this.udView = new UnitdiskMeta({ 
-            view: { parent:this.view.parent, className:'data' },
-            model: (<UnitDiskNav>this.model.unitdisk).view
+            view: { parent:this.view.html.querySelector('#meta-ud-data'), className:'data' },
+            model: navUnitDisk.view
         })
         this.udNav = new UnitdiskMeta({ 
-            view: { parent:this.view.parent, className:'nav' },
-            model: (<UnitDiskNav>this.model.unitdisk).navParameter
+            view: { parent:this.view.html.querySelector('#meta-ud-nav'), className:'nav' },
+            model: navUnitDisk.navParameter
         })
         
         this.lsView = new LayerStackMeta({
-            view: { parent:this.view.parent, className: 'data' },
-            model: (<UnitDiskNav>this.model.unitdisk).view
+            view: { parent:this.view.html2.querySelector('#meta-ls-data'), className: 'data' },
+            model: navUnitDisk.view
         })        
         this.lsNav = new LayerStackMeta({
-            view: { parent:this.view.parent, className: 'navBg' },
-            model: (<UnitDiskNav>this.model.unitdisk).navBackground
+            view: { parent:this.view.html2.querySelector('#meta-ls-bg'), className: 'navBg' },
+            model: navUnitDisk.navBackground
         })
         this.lsNavParam = new LayerStackMeta({
-            view: { parent:this.view.parent, className: 'nav' },
+            view: { parent:this.view.html2.querySelector('#meta-ls-nav'), className: 'nav' },
             model: this.model.unitdisk.navParameter
         }) 
     }

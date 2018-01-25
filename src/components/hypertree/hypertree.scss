@@ -37,11 +37,45 @@
 
     > .preloader {
         width: 100%;
-        height: 100%;
+        height: 100%; 
         > .preloader-wrapper {
             position: absolute;
             left: calc(50% - 1em);
             top: calc(50% - 2.1em);
+        }
+    }
+
+    #meta {        
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        position: absolute;
+        
+        .carousel {            
+            width: 17em;
+            top: unset;
+            
+            bottom: .5em;
+            position: absolute;
+            z-index: 1000;
+
+            .indicators {
+                margin-right:1em;
+                line-height: .5em;
+                .indicator-item{
+                    margin: 0px 2px;
+                }
+            }
+        }
+
+        .left.carousel {
+            height: 18.5em !important;
+            left: 1em;
+        }
+        .right.carousel {
+            height: 45em !important;
+            left: calc(100% - 11em);
         }
     }
 }
