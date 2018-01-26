@@ -86,12 +86,9 @@ const hypertreehtml =
             ${btn('btndelte', 'delete')}
             -->
         </div> 
-        <div class="tool-bar path-bar">
-            ${btn('btn-path-s0', 'trending_up', '', '#ff9800')}
-            ${btn('btn-path-s1', 'trending_up', '', '#2196F3')}
-            ${btn('btn-path-home', 'grade', 'tool-seperator')}
-            ${btn('btn-path-center', 'add_circle', 'disabled')}
-            ${btn('btn-path-hover', 'mouse', 'disabled')}
+        <div id="path-toolbar" class="tool-bar path-bar">            
+            ${btn('btn-path-center', 'add_circle', 'tool-seperator'/*, '#b5b5b5'*/)}
+            ${btn('btn-path-home', 'grade', 'red-text'/*, '#ffee55'*/)}
         </div> 
         
         <svg width="calc(100% - 3em)" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">
@@ -154,6 +151,7 @@ export class Hypertree
         btnMeta?       : HTMLElement,
         btnNav?        : HTMLElement,
 
+        pathesToolbar? : HTMLElement,
         btnPathHome?   : HTMLElement,
 
         html?          : HTMLElement,
@@ -227,11 +225,12 @@ export class Hypertree
             this.hypertreeMeta.update.transformation()
         },
 
-        toggleSelection: (n:N)=> this.toggleSelection(n),        
-        addPath: (pathid, node:N)=> this.addPath(pathid, node),
-        removePath: (pathid)=> this.removePath(pathid),
+        toggleSelection: (n:N)=>            this.toggleSelection(n),        
+        addPath:         (pathid, node:N)=> this.addPath(pathid, node),
+        removePath:      (pathid)=>         this.removePath(pathid),
 
-        gotoHome: ()=> this.animateTo({ re:0, im:0 }, null),
+        gotoHome:        ()=>               this.animateTo({ re:0, im:0 }, null), 
+        gotoNode:        (n:N)=>            this.animateTo({ re:n.z.re, im:n.z.im }, null),
 /*
         gotoT (TS)
 
@@ -272,8 +271,10 @@ export class Hypertree
         this.noHypertreeMeta   = new NoHypertreeMeta()
         this.view_.btnMeta     = <HTMLButtonElement>this.view_.html.querySelector('#btnmeta')
         this.view_.btnNav      = <HTMLButtonElement>this.view_.html.querySelector('#btnnav')
-        this.view_.btnHome     = <HTMLButtonElement>this.view_.html.querySelector('#btnhome')
-        this.view_.btnPathHome = <HTMLButtonElement>this.view_.html.querySelector('#btn-path-home')
+        this.view_.btnHome     = <HTMLButtonElement>this.view_.html.querySelector('#btnhome')        
+
+        this.view_.pathesToolbar = <HTMLButtonElement>this.view_.html.querySelector('#path-toolbar')        
+        this.view_.btnPathHome   = <HTMLButtonElement>this.view_.html.querySelector('#btn-path-home')
                 
         this.view_.btnHome.onclick     = ()=> this.api.gotoHome()
         this.view_.btnPathHome.onclick = ()=> this.api.gotoHome()
@@ -371,40 +372,66 @@ export class Hypertree
         })
     }
 
+    private stringhash(s:string) : number {
+        let hash = 0, i, chr;
+        if (!s || s.length === 0) return hash;
+        for (i = 0; i < s.length; i++) {
+            chr   = s.charCodeAt(i);
+            hash  = ((hash << 5) - hash) + chr;
+            hash |= 0; // Convert to 32bit integer
+        }
+        return hash;
+    }
+    private palette = [
+        "#3366cc", "#dc3912", "#ff9900", "#109618",
+        "#990099", "#0099c6", "#dd4477", "#66aa00", 
+        "#b82e2e", "#316395", "#994499", "#22aa99", 
+        "#aaaa11", "#6633cc", "#e67300", "#8b0707", 
+        "#651067", "#329262", "#5574a6", "#3b3eac"
+    ]        
+    private btnPathId = (pathId:string, n:N)=> `btn-path-${pathId}` + (pathId === 'isSelected' ? `-${n.mergeId}` : '')
+ 
     private addPath(pathId:string, n:N) {
-        console.assert(n.ancestors)
-        if (n.ancestors) 
-            for (var pn of n.ancestors()) 
-                pn[pathId] = true // könnte alles sein oder?
-        else
-            n[pathId] = true // könnte alles sein oder?
+        const btnId = this.btnPathId(pathId, n)
+        const btnIcon = ({ 'isHovered':'mouse' })[pathId] || 'place'
+        const plidx = this.stringhash(n.txt) % this.palette.length
+        const btnColor = ({ 'isHovered':'#fff' })[pathId] || this.palette[plidx] || ' #ff9800' 
+        const btnElem = HTML.parse(btn(btnId, btnIcon, '', btnColor))()        
+        btnElem.onclick = ()=> this.api.gotoNode(n)
+        btnElem.title = `${n.txt} ${plidx}`
+        this.view_.pathesToolbar.insertBefore(btnElem, pathId==='isHovered' ? null : this.view_.pathesToolbar.firstChild)
+        
+        for (var pn of n.ancestors()) 
+            pn[pathId] = true                                    // könnte alles sein oder?        
     }
     private removePath(pathId:string, n:N) {
-        console.assert(n.ancestors)
-        if (n.ancestors) 
-            for (var pn of n.ancestors())
-                pn[pathId] = undefined
-        else
-            n[pathId] = undefined
+        const btnId = this.btnPathId(pathId, n)
+        const btnElem = this.view_.pathesToolbar.querySelector(`#${btnId}`)
+        this.view_.pathesToolbar.removeChild(btnElem)
+
+        for (var pn of n.ancestors())
+            pn[pathId] = undefined        
     }
 
     private toggleSelection(n:N) {
-        // set selection
-        // reserve/free color
-        // add/remove path
-
         if (this.args.objects.selections.includes(n)) {
             //const nidx = this.args.objects.selections.indexOf(n)
             //delete this.args.objects.selections[nidx]
             this.args.objects.selections = this.args.objects.selections.filter(e=> e!=n)
 
-            this.updatePath('isSelected', undefined)
+            //this.updatePath('isSelected', undefined)
+            this.removePath('isSelected', n)
+            this.whateveritis['isSelected'] = undefined
+            this.update.pathes()
         }
         else
         {
             this.args.objects.selections.push(n)
 
-            this.updatePath('isSelected', n)            
+            //this.updatePath('isSelected', n)            
+            this.whateveritis['isSelected'] = n
+            this.addPath('isSelected', n)
+            this.update.pathes()
         }
     }
 

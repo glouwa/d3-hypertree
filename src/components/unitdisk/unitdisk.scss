@@ -51,7 +51,7 @@
         }
 
         .center-node {
-            animation: centernodemove 750ms ease-out;// infinite;
+            animation: centernodemove 500ms ease-out;// infinite;
         }
     
         @keyframes centernodemove {
@@ -59,13 +59,13 @@
                 transform: scale(0);                 
                 transform: rotate(1);
             }
-            1% { 
+            10% { 
                 transform: scale(0); 
             }
-            50% { 
+            80% { 
                 transform: scale(.1); 
             }
-            80%, 100% {               
+            90%, 100% {               
                 //transform: scale(.6);   
                 //transform: rotate(0);
             }

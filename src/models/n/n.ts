@@ -26,6 +26,7 @@ export interface Species {
 */
 
 export interface N {    
+    mergeId:            number,
     id:                 string,        //
     name?:              string,
 
