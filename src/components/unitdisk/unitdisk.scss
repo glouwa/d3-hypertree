@@ -62,29 +62,12 @@
             10% { 
                 transform: scale(0); 
             }
-            80% { 
+            75% { 
                 transform: scale(.1); 
             }
-            90%, 100% {               
+            80%, 100% {               
                 //transform: scale(.6);   
                 //transform: rotate(0);
-            }
-        }
-
-        .nav-background-disc {
-            .background-circle {
-                pointer-events:none;
-            }
-            .caption {
-                font-size: .005em;
-            }
-            .label-big {
-                font-size: .0095em;
-                font-weight: 300; 
-                fill: #fff;               
-                paint-order:stroke;
-                stroke: rgba(#111, 1);
-                stroke-width: .04;
             }
         }
 
@@ -104,6 +87,21 @@
             .mouse-circle {            
                 pointer-events:visibleFill;
                 cursor: crosshair;
+            }
+        }
+
+        .nav-background-disc {
+            .background-circle {
+                pointer-events:none;
+            }
+            .caption {
+                font-size: .005em;
+            }
+            .label-big {
+                font-size: .0095em;
+                font-weight: 300;             
+                paint-order:stroke;            
+                stroke-width: .04;
             }
         }
     }

@@ -123,5 +123,12 @@ $nodeStroke:    #90caf9;
                 stroke: none; //$nodeStroke;                
             }
         }
+
+        .nav-background-disc {
+            .label-big {
+                fill: #fff;
+                stroke: rgba(#111, 1);
+            }
+        }
     }
 }

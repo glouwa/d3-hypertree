@@ -64,6 +64,10 @@ $nodeStroke:    #90caf9;
         .selected.cell  { stroke: rgba($selectedcolor, .2);          fill: rgba(lighten($selectedcolor, 0%), .1); }
         .selected.node  { stroke: darken($selectedcolor, 5%);                                                     }
 
+        .center-node {
+            fill: rgba(#000, .2);
+            stroke: none;
+        }
         .background-circle {
             fill-opacity: .5;
         }

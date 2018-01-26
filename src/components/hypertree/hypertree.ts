@@ -395,7 +395,7 @@ export class Hypertree
         const btnId = this.btnPathId(pathId, n)
         const btnIcon = ({ 'isHovered':'mouse' })[pathId] || 'place'
         const plidx = this.stringhash(n.txt) % this.palette.length
-        const btnColor = ({ 'isHovered':'#fff' })[pathId] || this.palette[plidx] || ' #ff9800' 
+        const btnColor = ({ 'isHovered':'none' })[pathId] || this.palette[plidx] || ' #ff9800' 
         const btnElem = HTML.parse(btn(btnId, btnIcon, '', btnColor))()        
         btnElem.onclick = ()=> this.api.gotoNode(n)
         btnElem.title = `${n.txt} ${plidx}`
