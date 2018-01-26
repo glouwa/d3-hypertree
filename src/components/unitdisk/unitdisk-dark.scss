@@ -128,6 +128,8 @@ $nodeStroke:    #90caf9;
             .label-big {
                 fill: #fff;
                 stroke: rgba(#111, 1);
+                stroke-width: .02;
+                font-weight: 300;    
             }
         }
     }

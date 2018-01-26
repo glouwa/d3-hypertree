@@ -68,7 +68,16 @@ export interface N {
     isSelected?:        N,
     isHovered?:         N,
 
-
+    /*
+    constants: {},       alles on load
+    layout: {},          ...  
+    transformation: {},
+    
+    pathes: {
+        isPartOfPath:  N[],
+        colors:        string[],
+    }
+    */
 }
 
 
