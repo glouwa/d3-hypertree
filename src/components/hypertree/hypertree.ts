@@ -333,6 +333,10 @@ export class Hypertree
 
         this.view_.path.innerText = ''
         this.args.objects.selections = []
+        this.args.objects.pathes = {}
+        this.view_.pathesToolbar.innerHTML = 
+            btn('btn-path-center', 'add_circle', 'tool-seperator'/*, '#b5b5b5'*/) 
+          + btn('btn-path-home', 'grade', 'red-text'/*, '#ffee55'*/)
         this.whateveritis.isSelected = undefined
         this.whateveritis.isHovered= undefined
         this.unitdisk.update.data()

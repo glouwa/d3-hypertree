@@ -25,7 +25,7 @@ import { HypertreeMetaNav }        from '../meta/hypertree-meta/hypertree-meta'
 import { bboxOffset }              from '../layerstack/d3updatePattern'
 
 //const navBackgroundLayers = []
-
+//const navParameterLayers = []
 export interface IUnitdiskView {    
     parent,
     hypertree
