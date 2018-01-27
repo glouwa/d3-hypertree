@@ -15,8 +15,8 @@ $nodeStroke:    #90caf9;
         //filter:drop-shadow(0px 1px 1.5px rgba(0,0,0,0.22));
 
         .cell {            
-            stroke: rgba($leafcolor, .25);             
-            fill: rgba(lighten($leafcolor, 0%), .3);
+            stroke: rgba($leafcolor, .25);            
+            fill: rgba($leafcolor, .2);
             stroke-width: 0.001;
         }
         .arc {
@@ -61,7 +61,7 @@ $nodeStroke:    #90caf9;
         //.hovered        { stroke: $hovercolor;                       fill: lighten($hovercolor, 25%);             }
         .hovered.arc    { stroke: $hovercolor;  fill:none;                                                          }
         .hovered-path.arc { stroke: rgba($hovercolor, .2);                                                          }
-        .hovered-path-nav.arc { stroke: rgba(red, .5);
+        .hovered-path-nav.arc { stroke: rgba($hovercolor, 1); }
         //.hovered.cell   { stroke: lighten($hovercolor, 27%);         fill: rgba(lighten($hovercolor, 0%), .15);   }
         .hovered.node   { stroke: darken($hovercolor, 10%);                                                       }
  
