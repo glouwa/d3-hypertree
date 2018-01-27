@@ -69,14 +69,23 @@ export interface N {
     isHovered?:         N,
 
     /*
-    constants: {},       alles on load
-    layout: {},          ...  
-    transformation: {},
-    
+    data: {           alles on load
+        weights, weightscale.        
+        labels, len, txt icon, img,
+
+    },  
+
     pathes: {
         isPartOfPath:  N[],
         colors:        string[],
     }
+
+    selection: {},
+        layout: {},          ...      
+        transformation: {},
+    
+        culling
+    
     */
 }
 

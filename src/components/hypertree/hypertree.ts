@@ -394,7 +394,7 @@ export class Hypertree
     private addPath(pathId:string, n:N) {
         const btnId = this.btnPathId(pathId, n)
         const btnIcon = ({ 'isHovered':'mouse' })[pathId] || 'place'
-        const plidx = this.stringhash(n.txt) % this.palette.length
+        const plidx = Math.abs(this.stringhash(n.txt)) % this.palette.length
         const btnColor = ({ 'isHovered':'none' })[pathId] || this.palette[plidx] || ' #ff9800' 
 
         const btnElem = HTML.parse(btn(btnId, btnIcon, '', btnColor))()        
@@ -402,17 +402,19 @@ export class Hypertree
         btnElem.title = `${n.txt} ${plidx}`
         this.view_.pathesToolbar.insertBefore(btnElem, pathId==='isHovered' ? null : this.view_.pathesToolbar.firstChild)
         
-        n.pathColor = btnColor
+        if (pathId!=='isHovered')
+            n.pathColor = btnColor
 
         for (var pn of n.ancestors()) 
             pn[pathId] = true                                    // könnte alles sein oder?        
     }
+
     private removePath(pathId:string, n:N) {
         const btnId = this.btnPathId(pathId, n)
         const btnElem = this.view_.pathesToolbar.querySelector(`#${btnId}`)
         this.view_.pathesToolbar.removeChild(btnElem)
 
-        n.pathColor = undefined
+        //n.pathColor = undefined
 
         for (var pn of n.ancestors())
             pn[pathId] = undefined        
@@ -426,8 +428,7 @@ export class Hypertree
 
             //this.updatePath('isSelected', undefined)
             this.removePath('isSelected', n)
-            this.whateveritis['isSelected'] = undefined
-            this.update.pathes()
+            this.whateveritis['isSelected'] = undefined            
         }
         else
         {
@@ -435,9 +436,9 @@ export class Hypertree
 
             //this.updatePath('isSelected', n)            
             this.whateveritis['isSelected'] = n
-            this.addPath('isSelected', n)
-            this.update.pathes()
+            this.addPath('isSelected', n)            
         }
+        this.update.pathes()
     }
 
     // es kann nur einen pro id geben, gibt es bereits einen wird dieser entfernt 

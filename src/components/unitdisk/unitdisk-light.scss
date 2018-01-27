@@ -16,12 +16,16 @@ $nodeStroke:    #90caf9;
 
         .cell {            
             stroke: rgba($leafcolor, .25);             
-            fill: rgba(lighten($leafcolor, 0%), .03);
+            fill: rgba(lighten($leafcolor, 0%), .3);
             stroke-width: 0.001;
         }
         .arc {
             stroke: #bf875f; // #b77d68; //#8d6e63;
             fill: none;            
+        }
+        .arc-focus {
+            stroke: $hovercolor; 
+            fill: none;
         }
         .node {
             fill: #a5d6a7;
@@ -47,7 +51,7 @@ $nodeStroke:    #90caf9;
         .root.node      { stroke: orange;                                                                       }
 
         .lazy           { stroke: darken($lazycolor, 15%);           fill: lighten($lazycolor, 5%);               }
-        .lazy.cell      { stroke: rgba(255, 204, 188, .5);         fill: rgba(255, 204, 188, 0.2);            }
+        .lazy.cell      { stroke: rgba(255, 204, 188, .9);         fill: rgba(255, 204, 188, 0.3);            }
         .lazy.node      { stroke: rgba(darken($lazycolor, 20%), .5);                                              }
 
         .exit           { stroke: darken($exitcolor, 15%);           fill: lighten($exitcolor, 5%);               }
@@ -56,11 +60,15 @@ $nodeStroke:    #90caf9;
  
         //.hovered        { stroke: $hovercolor;                       fill: lighten($hovercolor, 25%);             }
         .hovered.arc    { stroke: $hovercolor;  fill:none;                                                          }
+        .hovered-path.arc { stroke: rgba($hovercolor, .2);                                                          }
+        .hovered-path-nav.arc { stroke: rgba(red, .5);
         //.hovered.cell   { stroke: lighten($hovercolor, 27%);         fill: rgba(lighten($hovercolor, 0%), .15);   }
         .hovered.node   { stroke: darken($hovercolor, 10%);                                                       }
  
         //.selected       { stroke: $selectedcolor;                    fill: lighten($selectedcolor, 25%);          }
         .selected.arc     { stroke: $selectedcolor;     fill:none;      }
+        .selected-path.arc { stroke: rgba($selectedcolor, .2);                                                       }
+        .selected-path-nav.arc { stroke: rgba($selectedcolor, 1);                                                       }
         .selected.cell  { stroke: rgba($selectedcolor, .2);          fill: rgba(lighten($selectedcolor, 0%), .1); }
         .selected.node  { stroke: darken($selectedcolor, 5%);                                                     }
 

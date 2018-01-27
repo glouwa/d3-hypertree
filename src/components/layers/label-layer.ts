@@ -49,7 +49,7 @@ export class LabelLayer implements ILayer
                                     //.style("fill",           d=> d.pathColor)
                                     .style("stroke",          d=> d.pathColor)
                                     .text(                   this.args.text),
-            updateColor:       s=> {},
+            updateColor:       s=> s.style("stroke",          d=> d.pathColor),
             updateTransform:   s=> s.attr("transform", (d, i, v)=> this.args.transform(d, this.args.delta(d, i, v)))
                                     //.text(                   this.args.text)
         })
