@@ -68,8 +68,14 @@ export interface N {
     isSelected?:        N,
     isHovered?:         N,
 
+    pathes: {
+        headof:         N,
+        partof:         N[],
+        finalcolor:     string,
+    },
+
     /*
-    data: {           alles on load
+    constants: {           alles on load
         weights, weightscale.        
         labels, len, txt icon, img,
 

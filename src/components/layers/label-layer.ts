@@ -46,10 +46,10 @@ export class LabelLayer implements ILayer
             elementType:       'text',
             create:            s=> s.classed("P",            d=> d.name == 'P')
                                     .classed("caption-icon", d=> d.icon && navigator.platform.includes('inux'))
-                                    //.style("fill",           d=> d.pathColor)
-                                    .style("stroke",          d=> d.pathColor)
+                                    //.style("fill",           d=> d.pathes.finalcolor)
+                                    .style("stroke",          d=> d.pathes && d.pathes.finalcolor)
                                     .text(                   this.args.text),
-            updateColor:       s=> s.style("stroke",          d=> d.pathColor),
+            updateColor:       s=> s.style("stroke",          d=> d.pathes && d.pathes.finalcolor),
             updateTransform:   s=> s.attr("transform", (d, i, v)=> this.args.transform(d, this.args.delta(d, i, v)))
                                     //.text(                   this.args.text)
         })

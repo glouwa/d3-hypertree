@@ -4,7 +4,8 @@
 
 import * as d3                 from 'd3'
 import { HTML }                from 'ducd'
-import { clone }               from 'ducd'
+import { clone, stringhash }   from 'ducd'
+import { googlePalette }       from 'ducd'
 import { N }                   from '../../models/n/n'
 import { LoaderFunction }      from '../../models/n/n-loaders'
 import { LayoutFunction }      from '../../models/n/n-layouts'
@@ -63,8 +64,10 @@ const btn = (name, icon, classes='', iconColor=undefined)=>
 //${btn('btndownload', 'cloud_download')}                   
 
 const hypertreehtml =
-    `<div class="unitdisk-nav">        
+    `<div class="unitdisk-nav">      
+
         <div id="meta"></div>        
+
         <div class="tool-bar">
             <div id="path" class="absolute-center">...</div>
             <!--
@@ -86,6 +89,7 @@ const hypertreehtml =
             ${btn('btndelte', 'delete')}
             -->
         </div> 
+
         <div id="path-toolbar" class="tool-bar path-bar">            
             ${btn('btn-path-center', 'add_circle', 'tool-seperator'/*, '#b5b5b5'*/)}
             ${btn('btn-path-home', 'grade', 'red-text'/*, '#ffee55'*/)}
@@ -94,7 +98,9 @@ const hypertreehtml =
         <svg width="calc(100% - 3em)" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">
             ${bubbleSvgDef}
         </svg>        
+
         <div class="preloader"></div>                
+
     </div>`
 
 export interface HypertreeArgs
@@ -330,15 +336,15 @@ export class Hypertree
         var t0 = performance.now()
         this.view_.html.querySelector('.preloader').innerHTML = htmlpreloader
         this.unitdisk.args.data = undefined
-
-        this.view_.path.innerText = ''
-        this.args.objects.selections = []
-        this.args.objects.pathes = {}
-        this.view_.pathesToolbar.innerHTML = 
-            btn('btn-path-center', 'add_circle', 'tool-seperator'/*, '#b5b5b5'*/) 
-          + btn('btn-path-home', 'grade', 'red-text'/*, '#ffee55'*/)
+        
         this.whateveritis.isSelected = undefined
         this.whateveritis.isHovered= undefined
+        this.args.objects.selections = []
+        this.args.objects.pathes = {}
+        this.view_.path.innerText = ''
+        this.view_.pathesToolbar.innerHTML = 
+            btn('btn-path-center', 'add_circle', 'tool-seperator'/*, '#b5b5b5'*/) 
+          + btn('btn-path-home', 'grade', 'red-text'/*, '#ffee55'*/)        
         this.unitdisk.update.data()
 
         this.args.dataloader((d3h, t1, dl)=> {
@@ -346,7 +352,10 @@ export class Hypertree
             var ncount = 1
             this.data = <N & d3.HierarchyNode<N>>d3
                 .hierarchy(d3h)
-                .each((n:any)=> n.mergeId = ncount++)
+                .each((n:any)=> {
+                    n.mergeId = ncount++
+                    n.pathes = {}
+                })
                 //.sum(this.args.weight) // this.updateWeights()
 
             this.view_.html.querySelector('.preloader').innerHTML = ''
@@ -376,38 +385,28 @@ export class Hypertree
         })
     }
 
-    private stringhash(s:string) : number {
-        let hash = 0, i, chr;
-        if (!s || s.length === 0) return hash;
-        for (i = 0; i < s.length; i++) {
-            chr   = s.charCodeAt(i);
-            hash  = ((hash << 5) - hash) + chr;
-            hash |= 0; // Convert to 32bit integer
-        }
-        return hash;
-    }
-    private palette = [
-        "#3366cc", "#dc3912", "#ff9900", "#109618",
-        "#990099", "#0099c6", "#dd4477", "#66aa00", 
-        "#b82e2e", "#316395", "#994499", "#22aa99", 
-        "#aaaa11", "#6633cc", "#e67300", "#8b0707", 
-        "#651067", "#329262", "#5574a6", "#3b3eac"
-    ]        
+    // pathbtn mit d3update
+    // n groups
+    // api    
+           
     private btnPathId = (pathId:string, n:N)=> `btn-path-${pathId}` + (pathId === 'isSelected' ? `-${n.mergeId}` : '')
  
     private addPath(pathId:string, n:N) {
+        // path data
         const btnId = this.btnPathId(pathId, n)
         const btnIcon = ({ 'isHovered':'mouse' })[pathId] || 'place'
-        const plidx = Math.abs(this.stringhash(n.txt)) % this.palette.length
-        const btnColor = ({ 'isHovered':'none' })[pathId] || this.palette[plidx] || ' #ff9800' 
+        const plidx = Math.abs(stringhash(n.txt))
+        const btnColor = ({ 'isHovered':'none' })[pathId] || googlePalette(plidx) || ' #ff9800' 
 
+        // path btn
         const btnElem = HTML.parse(btn(btnId, btnIcon, '', btnColor))()        
         btnElem.onclick = ()=> this.api.gotoNode(n)
         btnElem.title = `${n.txt} ${plidx}`
         this.view_.pathesToolbar.insertBefore(btnElem, pathId==='isHovered' ? null : this.view_.pathesToolbar.firstChild)
         
+        // path down
         if (pathId!=='isHovered')
-            n.pathColor = btnColor
+            n.pathes.finalcolor = btnColor
 
         for (var pn of n.ancestors()) 
             pn[pathId] = true                                    // könnte alles sein oder?        
@@ -418,7 +417,7 @@ export class Hypertree
         const btnElem = this.view_.pathesToolbar.querySelector(`#${btnId}`)
         this.view_.pathesToolbar.removeChild(btnElem)
 
-        //n.pathColor = undefined
+        //n.pathes.finalcolor = undefined
 
         for (var pn of n.ancestors())
             pn[pathId] = undefined        

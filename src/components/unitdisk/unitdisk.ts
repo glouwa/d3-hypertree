@@ -24,8 +24,135 @@ import { HypertreeMeta }           from '../meta/hypertree-meta/hypertree-meta'
 import { HypertreeMetaNav }        from '../meta/hypertree-meta/hypertree-meta'
 import { bboxOffset }              from '../layerstack/d3updatePattern'
 
-//const navBackgroundLayers = []
-//const navParameterLayers = []
+var arcWidth = d=>
+            .022
+            * d.distScale
+            * d.weightScale
+var navBgNodeR = .012
+var nodeRadiusOffset = ls=> d=>
+    CptoCk({ θ:d.zRefp ? d.zRefp.θ : CktoCp(d.z).θ, r:navBgNodeR })
+
+const navBackgroundLayers = [
+    (v, ud:UnitDisk)=> new BackgroundLayer(v, {                                        
+    }),
+    (v, ud:UnitDisk)=> new CellLayer(v, {
+        invisible:  true,
+        hideOnDrag: true,                    
+        clip:       '#circle-clip' + ud.args.clipRadius,                            
+        data:       ()=> ud.cache.cells,      
+        // TODO: read d.z                      
+    }),
+    (v, ud:UnitDisk)=> new ArcLayer(v, {                                        
+        name:       'link-arcs',                            
+        className:  'arc',
+        curvature:  '-', // + - 0 l
+        data:       ()=> ud.cache.links,  
+        nodePos:    n=> n.zRef || n.z,
+        nodePosStr: n=> n.strCacheZref || n.strCacheZ,
+        width:      d=> arcWidth(d),
+        classed:    (s,w)=> {}
+    }),
+    (v, ud:UnitDisk)=> new ArcLayer(v, {                                        
+        name:       'link-arcs-focus',                            
+        className:  'arc-focus',
+        curvature:  '-', // + - 0 l
+        data:       ()=> ud.cache.links
+                        .filter(n=> n.parent.cachep.r < .6),  
+        nodePos:    n=> n.zRef || n.z,
+        nodePosStr: n=> n.strCacheZref || n.strCacheZ,
+        width:      d=> arcWidth(d) + (.005 * d.dampedDistScale),
+        classed:    (s,w)=> {}
+    }),
+    (v, ud:UnitDisk)=> new ArcLayer(v, {                                        
+        name:       'path-arcs',                
+        className:  'arc',
+        curvature:  '-', // + - 0 l
+        data:       ()=> ud.cache.paths,       
+        nodePos:    n=> n.zRef || n.z,
+        nodePosStr: n=> n.strCacheZref || n.strCacheZ,
+        width:      d=> arcWidth(d) + (.013 * d.dampedDistScale),
+        classed:    s=> s.classed("hovered-path-nav",  d=> d.isHovered)
+                         .classed("selected-path-nav", d=> d.isSelected)
+    }),            
+    (v, ud:UnitDisk)=> new LabelLayer(v, {
+        invisible:  true,
+        hideOnDrag: true,
+        name:       'emojis',   
+        className:  'caption label-big',
+        data:       ()=> ud.cache.emojis,
+        text:       (d)=> d.icon,
+        delta:      (d, i, v)=> CaddC(
+                        nodeRadiusOffset(ud)(d),
+                        bboxOffset(d, 'labellen-bg', d.zRefp || CktoCp(d.z))(v[i])),
+        transform:  (d, delta)=> 
+                        ` translate(${(d.zRef ? d.zRef.re : d.z.re) + delta.re} ${d.zRef ? d.zRef.im : d.z.im})`                                                         
+    }),
+    (v, ud:UnitDisk)=> new LabelLayer(v, {
+        name:       'labels',
+        className:  'caption label-big', 
+        data:       ()=> ud.args.hypertree.args.objects.selections,
+        text:       (d)=> d.txt,
+        delta:      (d, i, v)=> CaddC(
+                        nodeRadiusOffset(ud)(d),
+                        bboxOffset(d, 'labellen-bg', d.zRefp || CktoCp(d.z))(v[i])),
+        transform:  (d, delta)=> 
+                        ` translate(${(d.zRef ? d.zRef.re : d.z.re) + delta.re} ${d.zRef ? d.zRef.im : d.z.im})`                                                         
+    }),           
+    (v, ud:UnitDisk)=> new SymbolLayer(v, {
+        name:       'symbols',
+        data:       ()=> ud.cache.spezialNodes,                                        
+        r:          d=> .03,
+        transform:  d=>  ` translate(${d.strCacheZref || d.strCacheZ})`
+                        + ` scale(${d.dampedDistScale})`,
+    }),
+]
+
+var rotate = d=>
+            (d.name === 'λ' ? ' rotate(-25)' : ' rotate(0)')
+var deltaMap = {
+    P:{ re:.0025, im:.05 }, 
+    θ:{ re:.0025, im:.019 }, 
+    λ:{ re:.0025, im:.013 }
+}
+var Pscale =  ud=> d=>
+    lengthDilledation(d)
+    * (1 - πify(CktoCp(ud.args.transformation.state.λ).θ) / 2 / Math.PI)
+    / ud.args.nodeRadius
+
+const navParameterLayers = [
+    (v, ud:UnitDisk)=> new CellLayer(v, {
+        invisible:  true,
+        hideOnDrag: true,
+        clip:       '#circle-clip'+ud.args.clipRadius,
+        data:       ()=> ud.cache.cells,                                        
+    }), 
+    (v, ud:UnitDisk)=> new NodeLayer(v, {
+        name:        'nodes',
+        className:   'node',
+        data:        ()=> ud.cache.unculledNodes,
+        r:           d=> ud.args.nodeRadius * (d.name==='P' ? Pscale(ud)(d) : 1),
+        transform:   d=> d.transformStrCache,
+    }),
+    (v, ud:UnitDisk)=> new LabelLayer(v, {
+        invisible:  true,
+        hideOnDrag: true,   
+        name:        'labels',
+        className:   'caption',
+        data:        ()=> ud.cache.unculledNodes,
+        text:        d=> ({ P:'+', θ:'🠆', λ:'⚲' })[d.name],
+        delta:       d=> deltaMap[d.name],
+        transform:   (d, delta)=> 
+                        ` translate(${d.cache.re+delta.re} ${d.cache.im+delta.im})` 
+                        + rotate(d)
+    }),
+    (v, ud:UnitDisk)=> new InteractionLayer(v, {                                        
+        unitdisk:    ud,
+        nohover:     true,
+        mouseRadius: 1.5,
+        onClick:     (n:N, m:C)=> {}
+    })
+]
+
 export interface IUnitdiskView {    
     parent,
     hypertree
@@ -148,15 +275,6 @@ export class UnitDiskNav implements IUnitDisk
         this.cache = this.view.cache        
         this.layerStack = this.view.layerStack
         
-        var arcWidth = d=>
-            .022
-            * d.distScale
-            * d.weightScale
-
-        var navBgNodeR = .012
-        var nodeRadiusOffset = ls=> d=>
-            CptoCk({ θ:d.zRefp ? d.zRefp.θ : CktoCp(d.z).θ, r:navBgNodeR })
-
         this.navBackground = new UnitDisk({
             parent:             args.parent,
             className:          'nav-background-disc',
@@ -164,80 +282,7 @@ export class UnitDiskNav implements IUnitDisk
             hypertree:          args.hypertree,
             data:               args.data,
             //layers:             args.layers.filter((l, idx)=> usedLayers[idx]),
-            layers:             [
-                                    (v, ud:UnitDisk)=> new BackgroundLayer(v, {                                        
-                                    }),
-                                    (v, ud:UnitDisk)=> new CellLayer(v, {
-                                        invisible:  true,
-                                        hideOnDrag: true,                    
-                                        clip:       '#circle-clip' + ud.args.clipRadius,                            
-                                        data:       ()=> ud.cache.cells,      
-                                        // TODO: read d.z                      
-                                    }),
-                                    (v, ud:UnitDisk)=> new ArcLayer(v, {                                        
-                                        name:       'link-arcs',                            
-                                        className:  'arc',
-                                        curvature:  '-', // + - 0 l
-                                        data:       ()=> ud.cache.links,  
-                                        nodePos:    n=> n.zRef || n.z,
-                                        nodePosStr: n=> n.strCacheZref || n.strCacheZ,
-                                        width:      d=> arcWidth(d),
-                                        classed:    (s,w)=> {}
-                                    }),
-                                    (v, ud:UnitDisk)=> new ArcLayer(v, {                                        
-                                        name:       'link-arcs-focus',                            
-                                        className:  'arc-focus',
-                                        curvature:  '-', // + - 0 l
-                                        data:       ()=> ud.cache.links
-                                                        .filter(n=> n.parent.cachep.r < .6),  
-                                        nodePos:    n=> n.zRef || n.z,
-                                        nodePosStr: n=> n.strCacheZref || n.strCacheZ,
-                                        width:      d=> arcWidth(d) + (.005 * d.dampedDistScale),
-                                        classed:    (s,w)=> {}
-                                    }),
-                                    (v, ud:UnitDisk)=> new ArcLayer(v, {                                        
-                                        name:       'path-arcs',                
-                                        className:  'arc',
-                                        curvature:  '-', // + - 0 l
-                                        data:       ()=> ud.cache.paths,       
-                                        nodePos:    n=> n.zRef || n.z,
-                                        nodePosStr: n=> n.strCacheZref || n.strCacheZ,
-                                        width:      d=> arcWidth(d) + (.013 * d.dampedDistScale),
-                                        classed:    s=> s.classed("hovered-path-nav",  d=> d.isHovered)
-                                                         .classed("selected-path-nav", d=> d.isSelected)
-                                    }),            
-                                    (v, ud:UnitDisk)=> new LabelLayer(v, {
-                                        invisible:  true,
-                                        hideOnDrag: true,
-                                        name:       'emojis',   
-                                        className:  'caption label-big',
-                                        data:       ()=> ud.cache.emojis,
-                                        text:       (d)=> d.icon,
-                                        delta:      (d, i, v)=> CaddC(
-                                                        nodeRadiusOffset(ud)(d),
-                                                        bboxOffset(d, 'labellen-bg', d.zRefp || CktoCp(d.z))(v[i])),
-                                        transform:  (d, delta)=> 
-                                                        ` translate(${(d.zRef ? d.zRef.re : d.z.re) + delta.re} ${d.zRef ? d.zRef.im : d.z.im})`                                                         
-                                    }),
-                                    (v, ud:UnitDisk)=> new LabelLayer(v, {
-                                        name:       'labels',
-                                        className:  'caption label-big', 
-                                        data:       ()=> ud.args.hypertree.args.objects.selections,
-                                        text:       (d)=> d.txt,
-                                        delta:      (d, i, v)=> CaddC(
-                                                        nodeRadiusOffset(ud)(d),
-                                                        bboxOffset(d, 'labellen-bg', d.zRefp || CktoCp(d.z))(v[i])),
-                                        transform:  (d, delta)=> 
-                                                        ` translate(${(d.zRef ? d.zRef.re : d.z.re) + delta.re} ${d.zRef ? d.zRef.im : d.z.im})`                                                         
-                                    }),           
-                                    (v, ud:UnitDisk)=> new SymbolLayer(v, {
-                                        name:       'symbols',
-                                        data:       ()=> ud.cache.spezialNodes,                                        
-                                        r:          d=> .03,
-                                        transform:  d=>  ` translate(${d.strCacheZref || d.strCacheZ})`
-                                                        + ` scale(${d.dampedDistScale})`,
-                                    }),
-                                ],
+            layers:             navBackgroundLayers,
             cacheUpdate:        args.cacheUpdate,
             transformation:     args.transformation,
             transform:          (n:N)=> n.z,
@@ -250,57 +295,21 @@ export class UnitDiskNav implements IUnitDisk
         var navTransformation =
             new NegTransformation(
                 new PanTransformation(args.transformation.state))
-        var rotate = d=>
-            (d.name === 'λ' ? ' rotate(-25)' : ' rotate(0)')
-        var deltaMap = {
-            P:{ re:.0025, im:.05 }, 
-            θ:{ re:.0025, im:.019 }, 
-            λ:{ re:.0025, im:.013 }
-        }
-        var Pscale =  ud=> d=>
-            lengthDilledation(d)
-            * (1 - πify(CktoCp(ud.args.transformation.state.λ).θ) / 2 / Math.PI)
-            / ud.args.nodeRadius
-
+        
+        //var ncount = 1        
         this.navParameter = new UnitDisk({
             parent:             args.parent,
             className:          'nav-parameter-disc',
             position:           'translate(95,95) scale(70)',
             hypertree:          args.hypertree,
             data:               obj2data(args.transformation.state),
-            layers:             [
-                                    (v, ud:UnitDisk)=> new CellLayer(v, {
-                                        invisible:  true,
-                                        hideOnDrag: true,
-                                        clip:       '#circle-clip'+ud.args.clipRadius,
-                                        data:       ()=> ud.cache.cells,                                        
-                                    }), 
-                                    (v, ud:UnitDisk)=> new NodeLayer(v, {
-                                        name:        'nodes',
-                                        className:   'node',
-                                        data:        ()=> ud.cache.unculledNodes,
-                                        r:           d=> ud.args.nodeRadius * (d.name==='P' ? Pscale(ud)(d) : 1),
-                                        transform:   d=> d.transformStrCache,
-                                    }),
-                                    (v, ud:UnitDisk)=> new LabelLayer(v, {
-                                        invisible:  true,
-                                        hideOnDrag: true,   
-                                        name:        'labels',
-                                        className:   'caption',
-                                        data:        ()=> ud.cache.unculledNodes,
-                                        text:        d=> ({ P:'+', θ:'🠆', λ:'⚲' })[d.name],
-                                        delta:       d=> deltaMap[d.name],
-                                        transform:   (d, delta)=> 
-                                                        ` translate(${d.cache.re+delta.re} ${d.cache.im+delta.im})` 
-                                                        + rotate(d)
-                                    }),
-                                    (v, ud:UnitDisk)=> new InteractionLayer(v, {                                        
-                                        unitdisk:    ud,
-                                        nohover:     true,
-                                        mouseRadius: 1.5,
-                                        onClick:     (n:N, m:C)=> {}
-                                    })
-                                ],
+            /*data:               <N & d3.HierarchyNode<N>>d3
+                                    .hierarchy(obj2data(args.transformation.state))
+                                    .each((n:any)=> {
+                                        n.mergeId = ncount++
+                                        n.pathes = {}
+                                    }),*/
+            layers:             navParameterLayers,
             cacheUpdate:        (ud:UnitDisk, cache:TransformationCache)=> {
                                     var t0 = performance.now()
                                     cache.unculledNodes = dfsFlat(ud.args.data)
