@@ -404,12 +404,18 @@ export class Hypertree
         btnElem.title = `${n.txt} ${plidx}`
         this.view_.pathesToolbar.insertBefore(btnElem, pathId==='isHovered' ? null : this.view_.pathesToolbar.firstChild)
         
-        // path down
-        if (pathId!=='isHovered')
+        // path down 
+        if (pathId !== 'isHovered') {
             n.pathes.finalcolor = btnColor
+            n.pathes.labelcolor = btnColor
+        }
 
-        for (var pn of n.ancestors()) 
+        for (var pn of n.ancestors()) {
             pn[pathId] = true                                    // könnte alles sein oder?        
+
+            if (pathId !== 'isHovered')
+                pn.pathes.finalcolor = btnColor
+        }
     }
 
     private removePath(pathId:string, n:N) {

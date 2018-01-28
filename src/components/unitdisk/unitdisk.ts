@@ -73,6 +73,7 @@ const navBackgroundLayers = [
         width:      d=> arcWidth(d) + (.013 * d.dampedDistScale),
         classed:    s=> s.classed("hovered-path-nav",  d=> d.isHovered)
                          .classed("selected-path-nav", d=> d.isSelected)
+                         .style("stroke",              d=> d.pathes && d.pathes.finalcolor)
     }),            
     (v, ud:UnitDisk)=> new LabelLayer(v, {
         invisible:  true,
