@@ -52,6 +52,8 @@
 
         .center-node {
             animation: centernodemove 500ms ease-out;// infinite;
+            stroke: none;            
+            stroke-width: .006;
         }
     
         @keyframes centernodemove {

@@ -102,7 +102,7 @@ const hypertreehtml =
             ${bubbleSvgDef}
         </svg>        
 
-        <div class="preloader"></div>                
+        <div class="preloader"></div>
 
     </div>`
 

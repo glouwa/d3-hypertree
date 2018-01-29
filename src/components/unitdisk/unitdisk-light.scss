@@ -73,9 +73,8 @@ $nodeStroke:    #90caf9;
         .selected.node  { stroke: darken($selectedcolor, 5%);                                                     }
 
         .center-node {
-            fill: rgba(#000, 1);
-            opacity: .3;
-            stroke: none;
+            fill: rgba(#000, .25);
+            opacity: .5;
         }
         .background-circle {
             fill-opacity: .5;

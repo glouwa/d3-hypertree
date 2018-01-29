@@ -50,7 +50,7 @@ export class NodeLayer implements ILayer
                                                               && d.data && d.data.numLeafs),
             updateColor:       s=> s.classed("hovered",   d=> d.isHovered/* && d.parent removed wegen nav on hover*/)
                                     .classed("selected",  d=> d.isSelected/* && d.parent*/)
-                                    .style("fill",        d=> d.pathes && d.pathes.labelcolor),
+                                    .style("stroke",        d=> d.pathes && d.pathes.labelcolor),
 
             //updateColor:       s=> s.classed("hovered",   d=> d.isHovered && d.parent)
             //                        .classed("selected",  d=> d.isSelected && d.parent),
