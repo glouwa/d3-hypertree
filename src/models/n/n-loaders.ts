@@ -79,15 +79,15 @@ export var star_ =        n=> ok=> star(ok, n)
 export var fromFile =     f=> ok=> loadFromFile(ok, f)
 export var fromLangFile = f=> ok=> loadFromLangFile(ok, f)
 
-export function nTreeAtFirst(ok, max=10) {
+export function nTreeAtFirst(ok, max=75, deg=6) {
     oneNode(d=> {
         var cur = d
         for (var i=0; i < max; i++) {
-            for (var j=0; j<10; j++) {
+            for (var j=0; j<deg; j++) {
                 var newN = { parent:d, children:[] }
                 cur.children.push(newN)
             }
-            cur = newN
+            cur = cur.children[deg/2]
         }
         ok(d)
     })

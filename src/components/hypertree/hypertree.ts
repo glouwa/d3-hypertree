@@ -6,7 +6,7 @@ import * as d3                 from 'd3'
 import { HTML }                from 'ducd'
 import { clone, stringhash }   from 'ducd'
 import { googlePalette }       from 'ducd'
-import { N }                   from '../../models/n/n'
+import { N, Path }             from '../../models/n/n'
 import { LoaderFunction }      from '../../models/n/n-loaders'
 import { LayoutFunction }      from '../../models/n/n-layouts'
 import { dfsFlat }             from '../../hyperbolic-math'
@@ -76,10 +76,13 @@ const hypertreehtml =
             -->
             ${btn('btnnav', 'explore', 'tool-seperator')}
             ${btn('btnmeta', 'layers')}
+            ${btn('btnsize', 'all_out')}
+
             ${btn('btnhome', 'home', 'tool-seperator')}
             ${btn('btnsearch', 'search', 'disabled')}
             ${btn('btndownload', 'file_download', 'disabled')}
             <!--
+            ,530, 470
             ${btn('btncut', 'content_cut')}
             ${btn('btncopy', 'content_copy')}
             ${btn('btnpaste', 'content_paste')}
@@ -108,9 +111,9 @@ export interface HypertreeArgs
     parent:       HTMLElement,
     iconmap:      any,
 
-    dataloader:   LoaderFunction,
-    data:         N,
+    dataloader:   (ok: (root:N, t0:number, dl:number)=>void)=> void,    
     langloader:   (lang)=> (ok)=> void,
+    data:         N,
     langmap:      {},
     weight:       (n:N) => number,
     layout:       LayoutFunction,
@@ -121,11 +124,7 @@ export interface HypertreeArgs
     decorator:    { new(a: UnitDiskArgs) : IUnitDisk },
 
     objects: {
-        pathes: {
-            centerNode: N[],       // readonly
-            hover:      N[],            // readonly
-            //['selection-*']: N[],
-        },
+        pathes:     Path[],
         selections: N[],
     },   
     
@@ -184,7 +183,7 @@ export class Hypertree
     // todo: move to args    
     data           : N
     langMap        : {}    
-    whateveritis          : { isSelected?:N, isHovered?:N } = {}    
+    whateveritis   : { isSelected?:N, isHovered?:N } = {}    
     // end todo
 
     constructor(view:{ parent:HTMLElement }, args:HypertreeArgs) {
@@ -277,7 +276,8 @@ export class Hypertree
         this.noHypertreeMeta   = new NoHypertreeMeta()
         this.view_.btnMeta     = <HTMLButtonElement>this.view_.html.querySelector('#btnmeta')
         this.view_.btnNav      = <HTMLButtonElement>this.view_.html.querySelector('#btnnav')
-        this.view_.btnHome     = <HTMLButtonElement>this.view_.html.querySelector('#btnhome')        
+        this.view_.btnHome     = <HTMLButtonElement>this.view_.html.querySelector('#btnhome')
+        this.view_.btnSize     = <HTMLButtonElement>this.view_.html.querySelector('#btnsize')
 
         this.view_.pathesToolbar = <HTMLButtonElement>this.view_.html.querySelector('#path-toolbar')        
         this.view_.btnPathHome   = <HTMLButtonElement>this.view_.html.querySelector('#btn-path-home')
@@ -286,6 +286,27 @@ export class Hypertree
         this.view_.btnPathHome.onclick = ()=> this.api.gotoHome()
         this.view_.btnMeta.onclick     = ()=> this.api.toggleMeta()
         this.view_.btnNav.onclick      = ()=> this.api.toggleNav()        
+        this.view_.btnSize.onclick      = ()=> {            
+            const view = [
+                'translate(520,500) scale(470)', // small
+                'translate(520,500) scale(490)', // big
+                'translate(520,500) scale(720, 490)', // oval 
+                'translate(520,500) scale(720, 590)', // overlap
+                'translate(520,600) scale(680, 800)', // mobile (vertical)
+            ]
+            const nav = [
+                'translate(95,95) scale(70)',
+                'translate(95,95) scale(70)',
+                'translate(-150,105) scale(70)',
+                'translate(-160,95) scale(70)',
+                'translate(-150,105) scale(70)'
+            ]
+            sizeidx = ++sizeidx % 5
+            this.unitdisk.view.view.attr('transform', view[sizeidx])
+            this.unitdisk.navBackground.view.attr('transform', nav[sizeidx])
+            this.unitdisk.navParameter.view.attr('transform', nav[sizeidx])
+        }
+        let sizeidx = 0
 
         this.view_.path = <HTMLElement>this.view_.html.querySelector('#path')
 
@@ -340,7 +361,7 @@ export class Hypertree
         this.whateveritis.isSelected = undefined
         this.whateveritis.isHovered= undefined
         this.args.objects.selections = []
-        this.args.objects.pathes = {}
+        this.args.objects.pathes = []
         this.view_.path.innerText = ''
         this.view_.pathesToolbar.innerHTML = 
             btn('btn-path-center', 'add_circle', 'tool-seperator'/*, '#b5b5b5'*/) 
@@ -390,32 +411,45 @@ export class Hypertree
     // api    
            
     private btnPathId = (pathId:string, n:N)=> `btn-path-${pathId}` + (pathId === 'isSelected' ? `-${n.mergeId}` : '')
+
  
     private addPath(pathId:string, n:N) {
-        // path data
-        const btnId = this.btnPathId(pathId, n)
-        const btnIcon = ({ 'isHovered':'mouse' })[pathId] || 'place'
         const plidx = Math.abs(stringhash(n.txt))
-        const btnColor = ({ 'isHovered':'none' })[pathId] || googlePalette(plidx) || ' #ff9800' 
-
-        // path btn
-        const btnElem = HTML.parse(btn(btnId, btnIcon, '', btnColor))()        
-        btnElem.onclick = ()=> this.api.gotoNode(n)
-        btnElem.title = `${n.txt} ${plidx}`
-        this.view_.pathesToolbar.insertBefore(btnElem, pathId==='isHovered' ? null : this.view_.pathesToolbar.firstChild)
-        
-        // path down 
-        if (pathId !== 'isHovered') {
-            n.pathes.finalcolor = btnColor
-            n.pathes.labelcolor = btnColor
+        const newpath = {
+            head: n,
+            ancestors: n.ancestors(),
+            icon: ({ 'isHovered':'mouse' })[pathId] || 'place',
+            color: ({ 'isHovered':'none' })[pathId] || googlePalette(plidx) || ' #ff9800' ,
+            type: pathId,
+            id: this.btnPathId(pathId, n)
         }
+        this.args.objects.pathes.push(newpath)
 
+        // add loval (node) tstuff
+        for (var pn of n.ancestors()) 
+            if (pn.pathes.partof && !pn.pathes.partof.includes(newpath))
+                pn.pathes.partof.push(newpath)
+            else
+                pn.pathes.partof = [newpath]            
+        
+        n.pathes.headof = newpath        
+
+        // path down (currently in use?)
+        if (pathId !== 'isHovered') 
+            n.pathes.finalcolor = n.pathes.labelcolor = newpath.color
+                
         for (var pn of n.ancestors()) {
             pn[pathId] = true                                    // könnte alles sein oder?        
 
             if (pathId !== 'isHovered')
-                pn.pathes.finalcolor = btnColor
+                pn.pathes.finalcolor = newpath.color
         }
+
+        // btn        
+        const btnElem = HTML.parse(btn(newpath.id, newpath.icon, '', newpath.color))()        
+        btnElem.onclick = ()=> this.api.gotoNode(n)
+        btnElem.title = `${n.txt} ${plidx}`
+        this.view_.pathesToolbar.insertBefore(btnElem, pathId==='isHovered' ? null : this.view_.pathesToolbar.firstChild)        
     }
 
     private removePath(pathId:string, n:N) {
@@ -427,6 +461,11 @@ export class Hypertree
 
         for (var pn of n.ancestors())
             pn[pathId] = undefined        
+    }
+
+    private d3updatePath()
+    {
+        // this.args.objects.pathes --> Btn[]
     }
 
     private toggleSelection(n:N) {
