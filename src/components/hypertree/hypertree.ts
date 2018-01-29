@@ -286,7 +286,7 @@ export class Hypertree
         this.view_.btnPathHome.onclick = ()=> this.api.gotoHome()
         this.view_.btnMeta.onclick     = ()=> this.api.toggleMeta()
         this.view_.btnNav.onclick      = ()=> this.api.toggleNav()        
-        this.view_.btnSize.onclick      = ()=> {            
+        this.view_.btnSize.onclick     = ()=> {            
             const view = [
                 'translate(520,500) scale(470)', // small
                 'translate(520,500) scale(490)', // big
@@ -411,56 +411,69 @@ export class Hypertree
     // api    
            
     private btnPathId = (pathId:string, n:N)=> `btn-path-${pathId}` + (pathId === 'isSelected' ? `-${n.mergeId}` : '')
+    private addIfNotInSafe<ArrET>(arr:ArrET[], newE:ArrET) : ArrET[] {
+        if (!arr) return [newE]        
+        if (!arr.includes(newE)) arr.push(newE)
+        return arr
+    }
 
- 
-    private addPath(pathId:string, n:N) {
+    private addPath(pathType:string, n:N) {
         const plidx = Math.abs(stringhash(n.txt))
-        const newpath = {
+        const newpath:Path = {
+            type: pathType,
+            id: this.btnPathId(pathType, n),
+            icon: ({ 'isHovered':'mouse' })[pathType] || 'place',
             head: n,
-            ancestors: n.ancestors(),
-            icon: ({ 'isHovered':'mouse' })[pathId] || 'place',
-            color: ({ 'isHovered':'none' })[pathId] || googlePalette(plidx) || ' #ff9800' ,
-            type: pathId,
-            id: this.btnPathId(pathId, n)
+            headName: n.label,
+            ancestors: n.ancestors(),            
+            color: ({ 'isHovered':'none' })[pathType] || googlePalette(plidx) || 'red' ,            
         }
-        this.args.objects.pathes.push(newpath)
 
-        // add loval (node) tstuff
-        for (var pn of n.ancestors()) 
-            if (pn.pathes.partof && !pn.pathes.partof.includes(newpath))
-                pn.pathes.partof.push(newpath)
-            else
-                pn.pathes.partof = [newpath]            
-        
+        // model mod
+        this.args.objects.pathes.push(newpath)
+        // model mod: node context
         n.pathes.headof = newpath        
+        n.ancestors().forEach((pn:N)=> 
+            pn.pathes.partof = this.addIfNotInSafe(
+                pn.pathes.partof, 
+                newpath
+        ))
 
         // path down (currently in use?)
-        if (pathId !== 'isHovered') 
+        if (pathType !== 'isHovered') 
             n.pathes.finalcolor = n.pathes.labelcolor = newpath.color
                 
         for (var pn of n.ancestors()) {
-            pn[pathId] = true                                    // könnte alles sein oder?        
-
-            if (pathId !== 'isHovered')
+            pn[pathType] = true                                    // könnte alles sein oder?
+            if (pathType !== 'isHovered')
                 pn.pathes.finalcolor = newpath.color
         }
 
-        // btn        
+        // view: btn        
         const btnElem = HTML.parse(btn(newpath.id, newpath.icon, '', newpath.color))()        
         btnElem.onclick = ()=> this.api.gotoNode(n)
         btnElem.title = `${n.txt} ${plidx}`
-        this.view_.pathesToolbar.insertBefore(btnElem, pathId==='isHovered' ? null : this.view_.pathesToolbar.firstChild)        
+        this.view_.pathesToolbar.insertBefore(btnElem, pathType==='isHovered' ? null : this.view_.pathesToolbar.firstChild)        
     }
 
-    private removePath(pathId:string, n:N) {
-        const btnId = this.btnPathId(pathId, n)
-        const btnElem = this.view_.pathesToolbar.querySelector(`#${btnId}`)
-        this.view_.pathesToolbar.removeChild(btnElem)
-
+    private removePath(pathType:string, n:N) {
+        const pathId = this.btnPathId(pathType, n)
+        
+        // 
+        this.args.objects.pathes = this.args.objects.pathes.filter(e=> e.id !== pathId)
+        n.pathes.headof = undefined
+        n.ancestors().forEach((pn:N)=> 
+            pn.pathes.partof = pn.pathes.partof.filter(e=> e.id !== pathId)
+        )
         //n.pathes.finalcolor = undefined
 
+        // old~ path down (currently in use?)
         for (var pn of n.ancestors())
-            pn[pathId] = undefined        
+            pn[pathType] = undefined        
+
+        // btn
+        const btnElem = this.view_.pathesToolbar.querySelector(`#${pathId}`)
+        this.view_.pathesToolbar.removeChild(btnElem)
     }
 
     private d3updatePath()

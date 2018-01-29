@@ -74,7 +74,7 @@ export class InteractionLayer implements ILayer
                     d3.event.sourceEvent.type === 'wheel')
                 {
                     const mΔ = d3.event.sourceEvent.deltaY
-                    const λΔ = mΔ/53*2*Math.PI/16                
+                    const λΔ = mΔ/100*2*Math.PI/16                
                     const oldλp = CktoCp(this.view.unitdisk.args.transformation.state.λ)
                     const newλp = { θ:πify(oldλp.θ - λΔ), r:1 }
                     

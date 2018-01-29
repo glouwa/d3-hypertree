@@ -25,9 +25,12 @@ export interface Species {
 //HierarchyNode<Datum>
 */
 
-export interface Path {
-    name:      string,
+export interface Path {    
+    type:      string,
+    id:        string,
+    icon:      string,
     head:      N,
+    headName:  string,
     ancestors: N[],
     color:     string
 }
@@ -52,7 +55,9 @@ export interface N {
     sum,
 
 //  labels
-    label:              number,
+    label:              string,
+    txt:                string,
+    icon:               string,
     labellen:           number
 
 //layout
@@ -76,9 +81,10 @@ export interface N {
     isHovered?:         N,
 
     pathes: {
-        headof:         N,
-        partof:         N[],
+        headof:         Path,
+        partof:         Path[],
         finalcolor:     string,
+        labelcolor:     string
     },
 
     /*
