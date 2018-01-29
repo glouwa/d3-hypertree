@@ -205,7 +205,7 @@ export class UnitDisk implements IUnitDisk
     public HypertreeMetaType = HypertreeMeta
     public cacheMeta
 
-    private view          
+    private view // d3 select          
     
     constructor(args : UnitDiskArgs) {
         this.args = args
@@ -246,7 +246,10 @@ export class UnitDisk implements IUnitDisk
             .y(d=> d.cache.im)
             .extent([[-2,-2], [2,2]])
         
-        this.update.cache()
+        if (this.args.cacheUpdate)
+            this.update.cache()
+        else
+            console.log('this.args.cacheUpdate is null, and called')
 
         this.layerStack = new LayerStack({ 
             parent: this.view,
@@ -284,7 +287,8 @@ export class UnitDiskNav implements IUnitDisk
             data:               args.data,
             //layers:             args.layers.filter((l, idx)=> usedLayers[idx]),
             layers:             navBackgroundLayers,
-            cacheUpdate:        args.cacheUpdate,
+            //cacheUpdate:        args.cacheUpdate,
+            cacheUpdate:        null,
             transformation:     args.transformation,
             transform:          (n:N)=> n.z,
 

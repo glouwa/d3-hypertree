@@ -113,14 +113,14 @@ export interface HypertreeArgs
 
     dataloader:   (ok: (root:N, t0:number, dl:number)=>void)=> void,    
     langloader:   (lang)=> (ok)=> void,
-    data:         N,
-    langmap:      {},
     weight:       (n:N) => number,
-    layout:       LayoutFunction,
-    magic:        number,
-
     caption:      (hypertree:Hypertree, n:N)=> string,
     onNodeSelect: (n:N)=> void,
+    
+    data:         N,
+    langmap:      {},    
+    layout:       LayoutFunction,
+    magic:        number,
     decorator:    { new(a: UnitDiskArgs) : IUnitDisk },
 
     objects: {
@@ -155,6 +155,7 @@ export class Hypertree
         btnHome?       : HTMLElement,
         btnMeta?       : HTMLElement,
         btnNav?        : HTMLElement,
+        btnSize?       : HTMLElement,
 
         pathesToolbar? : HTMLElement,
         btnPathHome?   : HTMLElement,
@@ -230,10 +231,15 @@ export class Hypertree
             this.hypertreeMeta.update.transformation()
         },
 
-        toggleSelection: (n:N)=>            this.toggleSelection(n),        
-        addPath:         (pathid, node:N)=> this.addPath(pathid, node),
-        removePath:      (pathid)=>         this.removePath(pathid),
-
+        toggleSelection: (n:N)=> {
+            this.toggleSelection(n)
+        },
+        addPath: (pathid, node:N)=> {
+            this.addPath(pathid, node)
+        },
+        removePath: (pathid)=> {
+            this.removePath(pathid)
+        },
         gotoHome:        ()=>               this.animateTo({ re:0, im:0 }, null), 
         gotoNode:        (n:N)=>            this.animateTo({ re:n.z.re, im:n.z.im }, null),
 /*
@@ -242,6 +248,9 @@ export class Hypertree
         beginAT (TS)
         AT (TS)
         endAT (TS)*/
+    }
+
+    private actions = {    
     }
 
     /*
@@ -449,7 +458,7 @@ export class Hypertree
                 pn.pathes.finalcolor = newpath.color
         }
 
-        // view: btn        
+        // view: btn   ==> update.btntoolbar()    
         const btnElem = HTML.parse(btn(newpath.id, newpath.icon, '', newpath.color))()        
         btnElem.onclick = ()=> this.api.gotoNode(n)
         btnElem.title = `${n.txt} ${plidx}`
