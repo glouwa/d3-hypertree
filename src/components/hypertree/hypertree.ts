@@ -233,15 +233,16 @@ export class Hypertree
 
         toggleSelection: (n:N)=> {
             this.toggleSelection(n)
+            this.update.pathes()
         },
-        addPath: (pathid, node:N)=> {
-            this.addPath(pathid, node)
+        //addPath: (pathid, node:N)=> { this.addPath(pathid, node) },
+        //removePath: (pathid, node:N)=> { this.removePath(pathid, node) },
+        setPathHead: (pathType:string, n:N)=> {
+            this.setPathHead(pathType, n)
+            this.update.pathes()
         },
-        removePath: (pathid)=> {
-            this.removePath(pathid)
-        },
-        gotoHome:        ()=>               this.animateTo({ re:0, im:0 }, null), 
-        gotoNode:        (n:N)=>            this.animateTo({ re:n.z.re, im:n.z.im }, null),
+        gotoHome: ()=>    this.animateTo({ re:0, im:0 }, null), 
+        gotoNode: (n:N)=> this.animateTo({ re:n.z.re, im:n.z.im }, null),
 /*
         gotoT (TS)
 
@@ -507,13 +508,12 @@ export class Hypertree
             //this.updatePath('isSelected', n)            
             this.whateveritis['isSelected'] = n
             this.addPath('isSelected', n)            
-        }
-        this.update.pathes()
+        }        
     }
 
     // es kann nur einen pro id geben, gibt es bereits einen wird dieser entfernt 
     // (praktisch für hover)
-    private updatePath(pathId:string, n:N) {
+    private setPathHead(pathId:string, n:N) {
         var old_ = this.whateveritis[pathId]
         if (old_)
             this.removePath(pathId, old_)
@@ -522,8 +522,6 @@ export class Hypertree
         var new_ = n
         if (new_)
             this.addPath(pathId, new_)
-        
-        this.update.pathes()
     }
 
     //########################################################################################################
