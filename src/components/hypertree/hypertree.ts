@@ -6,6 +6,7 @@ import * as d3                 from 'd3'
 import { HTML }                from 'ducd'
 import { clone, stringhash }   from 'ducd'
 import { googlePalette }       from 'ducd'
+import { HypertreeArgs }       from '../../models/hypertree/model'
 import { N, Path }             from '../../models/n/n'
 import { LoaderFunction }      from '../../models/n/n-loaders'
 import { LayoutFunction }      from '../../models/n/n-layouts'
@@ -76,8 +77,8 @@ const hypertreehtml =
             ${btn('btncommit', 'check')}
             -->
             ${btn('btnnav', 'explore', 'tool-seperator')}
-            ${btn('btnmeta', 'layers')}
             ${btn('btnsize', 'all_out')}
+            ${btn('btnmeta', 'layers')}            
 
             ${btn('btnhome', 'home', 'tool-seperator')}
             ${btn('btnsearch', 'search', 'disabled')}
@@ -106,37 +107,6 @@ const hypertreehtml =
         <div class="preloader"></div>
 
     </div>`
-
-export interface HypertreeArgs
-{
-    parent:       HTMLElement,
-    iconmap:      any,
-
-    dataloader:   (ok: (root:N, t0:number, dl:number)=>void)=> void,    
-    langloader:   (lang)=> (ok)=> void,
-    weight:       (n:N) => number,
-    caption:      (hypertree:Hypertree, n:N)=> string,
-    onNodeSelect: (n:N)=> void,
-    
-    data:         N,
-    langmap:      {},    
-    layout:       LayoutFunction,
-    magic:        number,
-    decorator:    { new(a: UnitDiskArgs) : IUnitDisk },
-
-    objects: {
-        pathes:     Path[],
-        selections: N[],
-    },   
-    
-    geometry: {
-        clipRadius:     number,
-        nodeRadius:     number,
-        transformation: Transformation<N>,
-        cacheUpdate:    (cache:IUnitDisk)=> void,        
-        layers:         ((ls:IUnitDisk)=> ILayer)[],
-    }
-}
 
 /**
 * pipeline implementation:

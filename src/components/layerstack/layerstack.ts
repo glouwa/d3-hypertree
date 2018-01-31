@@ -15,6 +15,7 @@ export class LayerStack
     mainSvgGroup: any
     layers:       { [key:string]: ILayer }
     d3meta
+    
     public update = {
         parent:         ()=> this.updateLayers(),
         transformation: ()=> this.updateTransformation(),
