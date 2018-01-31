@@ -1,4 +1,5 @@
-export { Hypertree } from "./components/hypertree/hypertree"
+export { Hypertree }     from "./components/hypertree/hypertree"
+export { HypertreeArgs } from "./components/hypertree/hypertree"
 
 export * from './hyperbolic-math'
 export * from './hyperbolic-transformation'
@@ -9,6 +10,7 @@ export * from './models/n/n-layouts'
 
 export * from './components/layerstack/layerstack'
 export * from './components/layerstack/d3updatePattern'
+
 import * as cell from './components/layers/cell-layer'
 import * as arc  from './components/layers/link-layer'
 import * as node from './components/layers/node-layer'
@@ -39,6 +41,13 @@ export namespace layers
     export type InteractionLayerArgs = int.InteractionLayerArgs
     export var  ImageLayer           = img.ImageLayer
     export type ImageLayerArgs       = img.ImageLayerArgs
+}
+
+import * as presetbase from './models/hypertree/preset-base'
+
+export namespace presets 
+{
+    export var defaultModel        = presetbase.hypertreeModel
 }
 
 export * from './components/unitdisk/unitdisk'
