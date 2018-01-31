@@ -508,11 +508,10 @@ export class Hypertree
 
             if (pn.pathes.finalcolor === 'none') 
                 pn.pathes.finalcolor = undefined
+
+            const nodeFlagName = `isPartOfAny${pathType}`
+            pn[pathType] = pn.pathes.partof.some(e=> e.type === pathType)               
         })
-        
-        // old~ path down (currently in use?)
-        for (var pn of n.ancestors())
-            pn[pathType] = undefined        
 
         // btn
         const btnElem = this.view_.pathesToolbar.querySelector(`#${pathId}`)
