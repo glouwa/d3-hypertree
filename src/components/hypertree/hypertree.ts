@@ -425,6 +425,34 @@ export class Hypertree
         return arr
     }
 
+    private toggleSelection(n:N) {
+        if (this.args.objects.selections.includes(n)) {
+            //const nidx = this.args.objects.selections.indexOf(n)
+            //delete this.args.objects.selections[nidx]
+            this.args.objects.selections = this.args.objects.selections.filter(e=> e !== n)
+            this.removePath('isSelected', n)
+        }
+        else
+        {
+            this.args.objects.selections.push(n)
+            this.addPath('isSelected', n)            
+        }        
+    }
+
+    // es kann nur einen pro id geben, gibt es bereits einen wird dieser entfernt 
+    // (praktisch für hover)
+    private setPathHead(path:Path, n:N) {        
+        const pt = path ? path.type : 'isHovered'
+
+        const oldPathId = this.btnPathId(pt, n)
+        const oldPath = this.args.objects.pathes.find(e=> e.id === oldPathId)
+
+        if (oldPath)
+            this.removePath(pt, oldPath.head)
+        if (n)
+            this.addPath(pt, n)
+    }
+
     private addPath(pathType:string, n:N) {
         const plidx = Math.abs(stringhash(n.txt))
         const newpath:Path = {
@@ -494,35 +522,7 @@ export class Hypertree
     private d3updatePath()
     {
         // this.args.objects.pathes --> Btn[]
-    }
-
-    private toggleSelection(n:N) {
-        if (this.args.objects.selections.includes(n)) {
-            //const nidx = this.args.objects.selections.indexOf(n)
-            //delete this.args.objects.selections[nidx]
-            this.args.objects.selections = this.args.objects.selections.filter(e=> e !== n)
-            this.removePath('isSelected', n)
-        }
-        else
-        {
-            this.args.objects.selections.push(n)
-            this.addPath('isSelected', n)            
-        }        
-    }
-
-    // es kann nur einen pro id geben, gibt es bereits einen wird dieser entfernt 
-    // (praktisch für hover)
-    private setPathHead(path:Path, n:N) {        
-        const pt = path ? path.type : 'isHovered'
-
-        const oldPathId = this.btnPathId(pt, n)
-        const oldPath = this.args.objects.pathes.find(e=> e.id === oldPathId)
-
-        if (oldPath)
-            this.removePath(pt, oldPath.head)
-        if (n)
-            this.addPath(pt, n)
-    }
+    }    
 
     //########################################################################################################
     //##

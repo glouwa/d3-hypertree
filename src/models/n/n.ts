@@ -25,7 +25,17 @@ export interface Species {
 //HierarchyNode<Datum>
 */
 
-export class Path {    
+export interface Path {    
+    type:      string,
+    id:        string,
+    icon:      string,
+    head:      N,
+    headName:  string,
+    ancestors: N[],
+    color:     string
+}
+
+/*export class Path {    
     type:      string
     id:        string
     icon:      string
@@ -52,7 +62,7 @@ export class Path {
 
     remove()
     
-}
+}*/ 
 
 export interface N {    
     mergeId:            number,
