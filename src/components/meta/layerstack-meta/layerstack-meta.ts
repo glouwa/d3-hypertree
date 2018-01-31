@@ -32,8 +32,9 @@ export class LayerStackMeta
             onCheckChange: ()=> this.model.layerStack.update.transformation()
         })
 
-        for (var l in this.model.layerStack.layers)            
-            this.ui.addCheckboxes(this.model.layerStack.layers[l])    
+        Object.keys(this.model.layerStack.layers).reverse().forEach(e=> 
+            this.ui.addlayer(this.model.layerStack.layers[e])    
+        )
 
         this.ui.addSwitch()
     }
@@ -57,7 +58,7 @@ interface LayerStackMetaUi extends HTMLElement
     updateSwitch,
     updateCounts,
     addSwitch,
-    addCheckboxes
+    addlayer
 }
 
 function ping(v, cond=true) {                
@@ -102,7 +103,7 @@ export function LayerInfo_({ parent, onCheckChange, className })
 
     var  pos = 0
     var cc = 0
-    ui.addCheckboxes = function(layer) {
+    ui.addlayer = function(layer) {
 
         var ccidx = (colores.length+cc++)%colores.length
         var name = layer.name        
