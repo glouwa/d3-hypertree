@@ -24,6 +24,7 @@ import { UnitDiskNav }         from '../unitdisk/unitdisk'
 
 import { HypertreeMeta }       from '../meta/hypertree-meta/hypertree-meta'
 import { NoHypertreeMeta }     from '../meta/hypertree-meta/hypertree-meta'
+import { path } from 'd3';
 
 const π = Math.PI
 const htmlpreloader = `
@@ -438,8 +439,8 @@ export class Hypertree
 
         // model mod
         this.args.objects.pathes.push(newpath)
-        // model mod: node context
-        n.pathes.headof = newpath        
+        n.pathes.headof = newpath
+        // model mod: node context        
         n.ancestors().forEach((pn:N)=> 
             pn.pathes.partof = this.addIfNotInSafe(
                 pn.pathes.partof, 
@@ -464,20 +465,25 @@ export class Hypertree
     }
 
     private removePath(pathType:string, n:N) {
+        console.log(pathType, n.mergeId)
         const pathId = this.btnPathId(pathType, n)
         
-        // 
+        // model mod
         this.args.objects.pathes = this.args.objects.pathes.filter(e=> e.id !== pathId)
         n.pathes.headof = undefined
-        n.ancestors().forEach((pn:N)=> 
+        // model mod: node context        
+        n.ancestors().forEach((pn:N)=> {
             pn.pathes.partof = pn.pathes.partof.filter(e=> e.id !== pathId)
-        )
+            pn.pathes.finalcolor = pn.pathes.partof.length > 0            
+                ? pn.pathes.partof[0].color
+                : undefined
 
-        n.pathes.finalcolor = n.pathes.partof.length > 0
-                          //? this.args.objects.pathes.reverse()[0]
-                            ? n.pathes.partof[0].color
-                            : undefined
+            if (pn.pathes.finalcolor === 'none') 
+                pn.pathes.finalcolor = undefined
 
+            console.log(pn.pathes.finalcolor)
+        })
+        
         // old~ path down (currently in use?)
         for (var pn of n.ancestors())
             pn[pathType] = undefined        

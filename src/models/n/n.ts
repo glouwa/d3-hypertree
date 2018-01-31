@@ -25,14 +25,33 @@ export interface Species {
 //HierarchyNode<Datum>
 */
 
-export interface Path {    
-    type:      string,
-    id:        string,
-    icon:      string,
-    head:      N,
-    headName:  string,
-    ancestors: N[],
+export class Path {    
+    type:      string
+    id:        string
+    icon:      string
+    head_:     N
+    headName:  string
+    ancestors: N[]
     color:     string
+
+    constructor()
+    {
+
+    }
+
+    get head(){
+        return this.head
+    }
+
+    set head(h)
+    {
+        this.head_ = h
+        // remove old
+        // add new
+    }
+
+    remove()
+    
 }
 
 export interface N {    
