@@ -139,6 +139,9 @@ export class InteractionLayer implements ILayer
 
         //var transform = d3.zoomTransform(selection.node());
         //var transform = d3.zoomTransform(this); in event sinks
+        const htapi = this.view.hypertree.api
+        //const hoverpath = this.view.hypertree.args.objects.pathes.firstornull(e=> type==='isHovered')[0]
+        const hoverpath = this.view.hypertree.args.objects.pathes[0]
 
         if (this.args.nohover) //.args.className === 'nav-parameter-disc')
             this.view.parent.append('circle')
@@ -152,8 +155,8 @@ export class InteractionLayer implements ILayer
                 .attr("r", this.args.mouseRadius)
                 .on("dblclick",  d=> this.onDblClick(this.findNodeByCell()))
                 //.on("click",     d=> this.onClick(findNodeByCell()))
-                .on("mousemove", d=> this.view.hypertree.api.setPathHead('isHovered', this.findNodeByCell()))
-                .on("mouseout",  d=> this.view.hypertree.api.setPathHead('isHovered', undefined))
+                .on("mousemove", d=> htapi.setPathHead(hoverpath, this.findNodeByCell()))
+                .on("mouseout",  d=> htapi.setPathHead(hoverpath, undefined))
                 //.call(drag)
                 .call(zoom)
                 .on("dblclick.zoom", null)

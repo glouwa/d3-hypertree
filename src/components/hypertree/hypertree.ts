@@ -184,7 +184,6 @@ export class Hypertree
     // todo: move to args    
     data           : N
     langMap        : {}    
-    whateveritis   : { isSelected?:N, isHovered?:N } = {}    
     // end todo
 
     constructor(view:{ parent:HTMLElement }, args:HypertreeArgs) {
@@ -367,9 +366,7 @@ export class Hypertree
         var t0 = performance.now()
         this.view_.html.querySelector('.preloader').innerHTML = htmlpreloader
         this.unitdisk.args.data = undefined
-        
-        this.whateveritis.isSelected = undefined
-        this.whateveritis.isHovered= undefined
+     
         this.args.objects.selections = []
         this.args.objects.pathes = []
         this.view_.path.innerText = ''
@@ -420,7 +417,7 @@ export class Hypertree
     // n groups
     // api    
            
-    private btnPathId = (pathId:string, n:N)=> `btn-path-${pathId}` + (pathId === 'isSelected' ? `-${n.mergeId}` : '')
+    private btnPathId = (pathType:string, n:N)=> `btn-path-${pathType}` + (pathType === 'isSelected' ? `-${n.mergeId}` : '')
     private addIfNotInSafe<ArrET>(arr:ArrET[], newE:ArrET) : ArrET[] {
         if (!arr) return [newE]        
         if (!arr.includes(newE)) arr.push(newE)
@@ -475,7 +472,11 @@ export class Hypertree
         n.ancestors().forEach((pn:N)=> 
             pn.pathes.partof = pn.pathes.partof.filter(e=> e.id !== pathId)
         )
-        //n.pathes.finalcolor = undefined
+
+        n.pathes.finalcolor = n.pathes.partof.length > 0
+                          //? this.args.objects.pathes.reverse()[0]
+                            ? n.pathes.partof[0].color
+                            : undefined
 
         // old~ path down (currently in use?)
         for (var pn of n.ancestors())
@@ -495,33 +496,28 @@ export class Hypertree
         if (this.args.objects.selections.includes(n)) {
             //const nidx = this.args.objects.selections.indexOf(n)
             //delete this.args.objects.selections[nidx]
-            this.args.objects.selections = this.args.objects.selections.filter(e=> e!=n)
-
-            //this.updatePath('isSelected', undefined)
+            this.args.objects.selections = this.args.objects.selections.filter(e=> e !== n)
             this.removePath('isSelected', n)
-            this.whateveritis['isSelected'] = undefined            
         }
         else
         {
             this.args.objects.selections.push(n)
-
-            //this.updatePath('isSelected', n)            
-            this.whateveritis['isSelected'] = n
             this.addPath('isSelected', n)            
         }        
     }
 
     // es kann nur einen pro id geben, gibt es bereits einen wird dieser entfernt 
     // (praktisch für hover)
-    private setPathHead(pathId:string, n:N) {
-        var old_ = this.whateveritis[pathId]
-        if (old_)
-            this.removePath(pathId, old_)
+    private setPathHead(path:Path, n:N) {        
+        const pt = path ? path.type : 'isHovered'
 
-        this.whateveritis[pathId] = n
-        var new_ = n
-        if (new_)
-            this.addPath(pathId, new_)
+        const oldPathId = this.btnPathId(pt, n)
+        const oldPath = this.args.objects.pathes.find(e=> e.id === oldPathId)
+
+        if (oldPath)
+            this.removePath(pt, oldPath.head)
+        if (n)
+            this.addPath(pt, n)
     }
 
     //########################################################################################################
