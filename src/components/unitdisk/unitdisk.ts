@@ -71,8 +71,8 @@ const navBackgroundLayers = [
         nodePos:    n=> n.zRef || n.z,
         nodePosStr: n=> n.strCacheZref || n.strCacheZ,
         width:      d=> arcWidth(d) + (.013 * d.dampedDistScale),
-        classed:    s=> s.classed("hovered-path-nav",  d=> d.isHovered)
-                         .classed("selected-path-nav", d=> d.isSelected)
+        classed:    s=> s.classed("hovered-path-nav",  d=> d.pathes && d.pathes.isPartOfAnyHoverPath)
+                         .classed("selected-path-nav", d=> d.pathes && d.pathes.isPartOfAnySelectionPath)
                          .style("stroke",              d=> d.pathes && d.pathes.finalcolor)
     }),            
     (v, ud:UnitDisk)=> new LabelLayer(v, {

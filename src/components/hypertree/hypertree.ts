@@ -418,7 +418,7 @@ export class Hypertree
     // n groups
     // api    
            
-    private btnPathId = (pathType:string, n:N)=> `btn-path-${pathType}` + (pathType === 'isSelected' ? `-${n.mergeId}` : '')
+    private btnPathId = (pathType:string, n:N)=> `btn-path-${pathType}` + (pathType === 'SelectionPath' ? `-${n.mergeId}` : '')
     private addIfNotInSafe<ArrET>(arr:ArrET[], newE:ArrET, side='unshift') : ArrET[] {
         if (!arr) return [newE]        
         if (!arr.includes(newE)) arr[side](newE)
@@ -430,19 +430,19 @@ export class Hypertree
             //const nidx = this.args.objects.selections.indexOf(n)
             //delete this.args.objects.selections[nidx]
             this.args.objects.selections = this.args.objects.selections.filter(e=> e !== n)
-            this.removePath('isSelected', n)
+            this.removePath('SelectionPath', n)
         }
         else
         {
             this.args.objects.selections.push(n)
-            this.addPath('isSelected', n)            
+            this.addPath('SelectionPath', n)            
         }        
     }
 
     // es kann nur einen pro id geben, gibt es bereits einen wird dieser entfernt 
     // (praktisch für hover)
     private setPathHead(path:Path, n:N) {        
-        const pt = path ? path.type : 'isHovered'
+        const pt = path ? path.type : 'HoverPath'
 
         const oldPathId = this.btnPathId(pt, n)
         const oldPath = this.args.objects.pathes.find(e=> e.id === oldPathId)
@@ -458,39 +458,39 @@ export class Hypertree
         const newpath:Path = {
             type: pathType,
             id: this.btnPathId(pathType, n),
-            icon: ({ 'isHovered':'mouse' })[pathType] || 'place',
+            icon: ({ 'HoverPath':'mouse' })[pathType] || 'place',
             head: n,
             headName: n.label,
             ancestors: n.ancestors(),            
-            color: ({ 'isHovered':'none' })[pathType] || googlePalette(plidx) || 'red' ,            
+            color: ({ 'HoverPath':'none' })[pathType] || googlePalette(plidx) || 'red' ,            
         }
 
         // model mod
         this.args.objects.pathes.push(newpath)
         n.pathes.headof = newpath
         // model mod: node context        
-        n.ancestors().forEach((pn:N)=> 
+        n.ancestors().forEach((pn:N)=> {
             pn.pathes.partof = this.addIfNotInSafe(                
                 pn.pathes.partof, 
                 newpath,
-                pathType === 'isHovered' ? 'push' : 'unshift'
-        ))
+                pathType === 'HoverPath' ? 'push' : 'unshift'
+            )
+
+            if (pathType !== 'HoverPath')
+                pn.pathes.finalcolor = newpath.color
+
+            pn.pathes[`isPartOfAny${pathType}`] = true            
+        })
 
         // path down (currently in use?)
-        if (pathType !== 'isHovered') 
+        if (pathType !== 'HoverPath') 
             n.pathes.finalcolor = n.pathes.labelcolor = newpath.color
-                
-        for (var pn of n.ancestors()) {
-            pn[pathType] = true                                    // könnte alles sein oder?
-            if (pathType !== 'isHovered')
-                pn.pathes.finalcolor = newpath.color
-        }
-
+         
         // view: btn   ==> update.btntoolbar()    
         const btnElem = HTML.parse(btn(newpath.id, newpath.icon, '', newpath.color))()        
         btnElem.onclick = ()=> this.api.gotoNode(n)
         btnElem.title = `${n.txt} ${plidx}`
-        this.view_.pathesToolbar.insertBefore(btnElem, pathType==='isHovered' ? null : this.view_.pathesToolbar.firstChild)        
+        this.view_.pathesToolbar.insertBefore(btnElem, pathType==='HoverPath' ? null : this.view_.pathesToolbar.firstChild)        
     }
 
     private removePath(pathType:string, n:N) {        
@@ -509,8 +509,8 @@ export class Hypertree
             if (pn.pathes.finalcolor === 'none') 
                 pn.pathes.finalcolor = undefined
 
-            const nodeFlagName = `isPartOfAny${pathType}`
-            pn[pathType] = pn.pathes.partof.some(e=> e.type === pathType)               
+            const nodeFlagName = `isPartOfAny${pathType}`         
+            pn.pathes[nodeFlagName] = pn.pathes.partof.some(e=> e.type === pathType)
         })
 
         // btn

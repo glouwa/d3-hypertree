@@ -140,7 +140,7 @@ export class InteractionLayer implements ILayer
         //var transform = d3.zoomTransform(selection.node());
         //var transform = d3.zoomTransform(this); in event sinks
         const htapi = this.view.hypertree.api
-        //const hoverpath = this.view.hypertree.args.objects.pathes.firstornull(e=> type==='isHovered')[0]
+        //const hoverpath = this.view.hypertree.args.objects.pathes.firstornull(e=> type==='HoverPath')[0]
         const hoverpath = this.view.hypertree.args.objects.pathes[0]
 
         if (this.args.nohover) //.args.className === 'nav-parameter-disc')

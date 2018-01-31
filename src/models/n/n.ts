@@ -106,29 +106,25 @@ export interface N {
     hasOutChildren:     boolean,
 
 // selection
-    isSelected?:        N,
-    isHovered?:         N,
-
+    
     pathes: {
         headof:         Path,
         partof:         Path[],
         finalcolor:     string,
-        labelcolor:     string
+        labelcolor:     string,
+
+        isPartOfAnySelectionPath?: boolean,
+        isPartOfAnyHoverPath?:     boolean,
     },
 
     /*
-    constants: {           alles on load
+    virtuals (calaulated): {           alles on load
         weights, weightscale.        
         labels, len, txt icon, img,
 
     },  
 
-    pathes: {
-        isPartOfPath:  N[],
-        colors:        string[],
-    }
-
-    selection: {},
+    filter (selection): {},
         layout: {},          ...      
         transformation: {},
     

@@ -52,8 +52,8 @@ export class SymbolLayer implements ILayer
                                     .classed("leaf",      d=> d.parent)
                                     .classed("exit",      d=> (!d.children || !d.children.length)
                                                               && d.data && d.data.numLeafs),
-            updateColor:       s=> s.classed("hovered",   d=> d.isHovered && d.parent)
-                                    .classed("selected",  d=> d.isSelected && d.parent),
+            updateColor:       s=> s.classed("hovered",   d=> d.pathes && d.pathes.isPartOfAnyHoverPath && d.parent)
+                                    .classed("selected",  d=> d.pathes && d.pathes.isPartOfAnySelectionPath && d.parent),
             updateTransform:   s=> s.attr("transform",    d=> this.args.transform(d))
                                     .attr("d",            d=> /*home*/d_star),
         })
