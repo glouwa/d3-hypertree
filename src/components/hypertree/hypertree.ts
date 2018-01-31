@@ -419,9 +419,9 @@ export class Hypertree
     // api    
            
     private btnPathId = (pathType:string, n:N)=> `btn-path-${pathType}` + (pathType === 'isSelected' ? `-${n.mergeId}` : '')
-    private addIfNotInSafe<ArrET>(arr:ArrET[], newE:ArrET) : ArrET[] {
+    private addIfNotInSafe<ArrET>(arr:ArrET[], newE:ArrET, side='unshift') : ArrET[] {
         if (!arr) return [newE]        
-        if (!arr.includes(newE)) arr.push(newE)
+        if (!arr.includes(newE)) arr[side](newE)
         return arr
     }
 
@@ -442,9 +442,10 @@ export class Hypertree
         n.pathes.headof = newpath
         // model mod: node context        
         n.ancestors().forEach((pn:N)=> 
-            pn.pathes.partof = this.addIfNotInSafe(
+            pn.pathes.partof = this.addIfNotInSafe(                
                 pn.pathes.partof, 
-                newpath
+                newpath,
+                pathType === 'isHovered' ? 'push' : 'unshift'
         ))
 
         // path down (currently in use?)
@@ -464,8 +465,7 @@ export class Hypertree
         this.view_.pathesToolbar.insertBefore(btnElem, pathType==='isHovered' ? null : this.view_.pathesToolbar.firstChild)        
     }
 
-    private removePath(pathType:string, n:N) {
-        console.log(pathType, n.mergeId)
+    private removePath(pathType:string, n:N) {        
         const pathId = this.btnPathId(pathType, n)
         
         // model mod
@@ -480,8 +480,6 @@ export class Hypertree
 
             if (pn.pathes.finalcolor === 'none') 
                 pn.pathes.finalcolor = undefined
-
-            console.log(pn.pathes.finalcolor)
         })
         
         // old~ path down (currently in use?)
