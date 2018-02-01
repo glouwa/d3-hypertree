@@ -195,7 +195,9 @@ function UnitdiskMeta_({ parent, ud, className })
     function sliderInit(sliderHtml, binding) {        
         var slider = sliderHtml.querySelector('input')        
         binding.toView(slider)
-        slider.oninput = ()=> binding.fromView(slider)
+        slider.oninput = e=> binding.fromView(slider)
+        slider.onmousedown = e=> e.stopPropagation()
+        slider.onmouseup = e=> e.stopPropagation()
     }
 
     const λsliderInit = (sliderHtml)=> sliderInit(sliderHtml, sliderBindingλ)

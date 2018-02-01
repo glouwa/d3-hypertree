@@ -459,7 +459,6 @@ export class Hypertree
             pn.pathes[`isPartOfAny${pathType}`] = true            
         })        
         
-         
         // view: btn   ==> update.btntoolbar()    
         const btnElem = HTML.parse(btn(newpath.id, newpath.icon, '', newpath.color))()        
         btnElem.onclick = ()=> this.api.gotoNode(n)
