@@ -443,6 +443,8 @@ export class Hypertree
         // model mod
         this.args.objects.pathes.push(newpath)
         n.pathes.headof = newpath
+        if (pathType !== 'HoverPath') 
+            n.pathes.finalcolor = n.pathes.labelcolor = newpath.color            
         // model mod: node context        
         n.ancestors().forEach((pn:N)=> {
             pn.pathes.partof = this.addIfNotInSafe(                
@@ -455,11 +457,8 @@ export class Hypertree
                 pn.pathes.finalcolor = newpath.color
 
             pn.pathes[`isPartOfAny${pathType}`] = true            
-        })
-
-        // path down (currently in use?)
-        if (pathType !== 'HoverPath') 
-            n.pathes.finalcolor = n.pathes.labelcolor = newpath.color
+        })        
+        
          
         // view: btn   ==> update.btntoolbar()    
         const btnElem = HTML.parse(btn(newpath.id, newpath.icon, '', newpath.color))()        
@@ -474,6 +473,8 @@ export class Hypertree
         // model mod
         this.args.objects.pathes = this.args.objects.pathes.filter(e=> e.id !== pathId)
         n.pathes.headof = undefined
+        if (pathType !== 'HoverPath') 
+            n.pathes.labelcolor = undefined
         // model mod: node context        
         n.ancestors().forEach((pn:N)=> {
             pn.pathes.partof = pn.pathes.partof.filter(e=> e.id !== pathId)

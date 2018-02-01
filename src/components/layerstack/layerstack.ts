@@ -34,10 +34,10 @@ export class LayerStack
         this.layers = {}
         for (var layerfactoryfunc of this.args.unitdisk.args.layers) {
             const view = {
-                parent:this.mainSvgGroup,
-                layerstack:this,
-                unitdisk:this.args.unitdisk,
-                hypertree:this.args.unitdisk.args.hypertree
+                parent:     this.mainSvgGroup,
+                layerstack: this,
+                unitdisk:   this.args.unitdisk,
+                hypertree:  this.args.unitdisk.args.hypertree
             }
             const layer = layerfactoryfunc(view, this.args.unitdisk)            
             this.layers[layer.name] = layer

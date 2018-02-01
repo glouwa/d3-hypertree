@@ -11,8 +11,7 @@ import { C, CptoCk, CktoCp,
     sigmoid }               from '../../hyperbolic-math'
 
 export interface InteractionLayerArgs extends ILayerArgs
-{
-    unitdisk, 
+{    
     nohover: boolean,
     mouseRadius,
     onClick

@@ -16,11 +16,12 @@ import { HyperbolicTransformation } from '../../index'
 import { PanTransformation }        from '../../index'
 import { TransformationCache }      from '../../index'
 
-import { HypertreeArgs }            from '../../index'
+import { HypertreeArgs }            from '../../models/hypertree/model'
 import { UnitDisk }                 from '../../components/unitdisk/unitdisk'
 import { UnitDiskNav }              from '../../components/unitdisk/unitdisk'
 import { layers }                   from '../../index'
 import { bboxOffset }               from '../../index'
+import { Hypertree }                from '../../components/hypertree/hypertree'
 
 var cullingRadius =   0.98
 var labelλExtension = 1.2
@@ -197,6 +198,7 @@ const layerSrc = [
     }),
     (v, ud:UnitDisk)=> new layers.InteractionLayer(v, {                            
         mouseRadius: .95,
+        nohover:     false,
         onClick:     (n:N, m:C)=> {
                         var s = n.ancestors().find(e=> true)          // obsolete
                         //ud.args.hypertree.updatePath('SelectionPath', s) // toggle selection 
@@ -478,7 +480,7 @@ var emojimap = {
     //'ducd-templates':'♻', isr:'🍀'    
 }
 
-export const hypertreeModel:HypertreeArgs = 
+export const hypertreeModel: HypertreeArgs = 
 {
     // must have
     iconmap:      'will be set by navigation or user',
@@ -498,11 +500,11 @@ export const hypertreeModel:HypertreeArgs =
         selections: [],
         pathes: [],        
     },
-    caption: (ud:UnitDisk, n:N)=> {
+    caption: (ht:Hypertree, n:N)=> {
         // better: set of initial node actions [label, imghref, scalef, ...]
         var w  = (!n.value || n.value==1) ? '' : n.value + ' '
         var id = ( n.data && n.data.name) ? n.data.name : ''
-        var l  = ud.langMap ? ud.langMap[id] : ''
+        var l  = ht.langMap ? ht.langMap[id] : ''
         //var i  = ud.args.hypertree.args.iconmap[id]
         var i  = emojimap[id]
         n.icon = i                        
