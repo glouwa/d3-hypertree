@@ -40,8 +40,8 @@
         height: 100%; 
         > .preloader-wrapper {
             position: absolute;
-            left: calc(50% - 1em);
-            top: calc(50% - 2.1em);
+            left: calc(50% + .8em);
+            top: calc(50% - 2.7em);
         }
     }
 

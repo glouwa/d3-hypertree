@@ -176,7 +176,7 @@ export namespace generators
     export var star120 = deepStar
     export var star501 = star_(500)
 //    export var path50 = path_(50)
-//    export var path500 = path_(500)
+    export var path500 = path_(500)
 //    export var path5000 = path_(5000)
     export var nT1 = nTree
     export var nT2 = nTreeAtFirst
