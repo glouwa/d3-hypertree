@@ -43,16 +43,11 @@ export namespace layers
     export type ImageLayerArgs       = img.ImageLayerArgs
 }
 
-import * as presetbase from './models/hypertree/preset-base'
-
-export namespace presets 
-{
-    export var defaultModel        = presetbase.hypertreeModel
-}
-
 export * from './components/unitdisk/unitdisk'
 
 import * as loaders_ from './models/n/n-loaders'
 import * as layouts_ from './models/n/n-layouts'
 export var loaders = loaders_
 export var layouts = layouts_
+
+export { presets } from './models/hypertree/preset-base'

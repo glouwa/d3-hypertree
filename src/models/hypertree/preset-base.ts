@@ -480,52 +480,143 @@ var emojimap = {
     //'ducd-templates':'♻', isr:'🍀'    
 }
 
-export const hypertreeModel: HypertreeArgs = 
-{
-    // must have
-    iconmap:      'will be set by navigation or user',
-    onNodeSelect: 'will be set by navigation or user',    
-    dataloader:   'will be set by navigation or user',    
-    langloader:   'will be set by navigation or user',   
-
-    data:         'will be set by dataloader',
-    langmap:      'will be set by langloader',
-
-    // infovis stuff
-    weight:       (n:N)=> ((!n.children || !n.children.length)?1:0),
-    layout:       layoutBergé, // [0, π/2]
-    magic:        1/160,
+export const presets = {
+    otolModel:
+    {
+        // must have
+        iconmap:      'will be set by navigation or user',
+        onNodeSelect: 'will be set by navigation or user',    
+        dataloader:   'will be set by navigation or user',    
+        langloader:   'will be set by navigation or user',   
         
-    objects: {                      // oder indizes?
-        selections: [],
-        pathes: [],        
+        data:         'will be set by dataloader',
+        langmap:      'will be set by langloader',
+        
+        // infovis stuff
+        weight:       (n:N)=> ((!n.children || !n.children.length)?1:0),
+        layout:       layoutBergé, // [0, π/2]
+        magic:        1/160,
+            
+        objects: {                      // oder indizes?
+            selections: [],
+            pathes: [],        
+        },
+        caption: (ht:Hypertree, n:N)=> {
+            // better: set of initial node actions [label, imghref, scalef, ...]
+            var w  = (!n.value || n.value==1) ? '' : n.value + ' '
+            var id = ( n.data && n.data.name) ? n.data.name : ''
+            var l  = ht.langMap ? ht.langMap[id] : ''
+            //var i  = ud.args.hypertree.args.iconmap[id]
+            var i  = emojimap[id]
+            n.icon = i                        
+                if (i)  n.txt = i /*+ (l || id)*/
+            else if (l)  n.txt = '𝐖 ' + l
+            else if (id) n.txt = id
+            if (n.txt) return n.txt + tosub(w) 
+            return undefined
+        },
+        
+        // most important    
+        decorator: UnitDiskNav,
+        geometry: {
+            clipRadius:     1,
+            nodeRadius:     .01,        
+            transformation: new HyperbolicTransformation({
+                P:{ re: 0, im:0 },
+                θ:{ re: 1, im:0 },
+                λ:CptoCk({ θ:.1*2*Math.PI, r:1 })
+            }),        
+            cacheUpdate:    cacheUpdate,
+            layers:         layerSrc        
+        }
     },
-    caption: (ht:Hypertree, n:N)=> {
-        // better: set of initial node actions [label, imghref, scalef, ...]
-        var w  = (!n.value || n.value==1) ? '' : n.value + ' '
-        var id = ( n.data && n.data.name) ? n.data.name : ''
-        var l  = ht.langMap ? ht.langMap[id] : ''
-        //var i  = ud.args.hypertree.args.iconmap[id]
-        var i  = emojimap[id]
-        n.icon = i                        
-             if (i)  n.txt = i /*+ (l || id)*/
-        else if (l)  n.txt = '𝐖 ' + l
-        else if (id) n.txt = id
-        if (n.txt) return n.txt + tosub(w) 
-        return undefined
+    generatorModel: 
+    {
+        // must have
+        iconmap:      'will be set by navigation or user',
+        onNodeSelect: 'will be set by navigation or user',    
+        dataloader:   'will be set by navigation or user',    
+        langloader:   'will be set by navigation or user',   
+
+        data:         'will be set by dataloader',
+        langmap:      'will be set by langloader',
+
+        // infovis stuff
+        weight:       (n:N)=> ((!n.children || !n.children.length)?1:0),
+        layout:       layoutBergé, // [0, π/2]
+        magic:        1/160,
+            
+        objects: {                      // oder indizes?
+            selections: [],
+            pathes: [],        
+        },
+        caption: (ht:Hypertree, n:N)=> {
+            // better: set of initial node actions [label, imghref, scalef, ...]
+            var w  = (!n.value || n.value==1) ? '' : n.value + ' '
+            var id = ( n.data && n.data.name) ? n.data.name : ''
+            var l  = ht.langMap ? ht.langMap[id] : ''
+            //var i  = ud.args.hypertree.args.iconmap[id]
+            var i  = emojimap[id]
+            n.icon = i                        
+                if (i)  n.txt = i /*+ (l || id)*/
+            else if (l)  n.txt = '𝐖 ' + l
+            else if (id) n.txt = id
+            if (n.txt) return n.txt + tosub(w) 
+            return undefined
+        },
+        
+        // most important    
+        decorator: UnitDiskNav,
+        geometry: {
+            clipRadius:     1,
+            nodeRadius:     .01,        
+            transformation: new HyperbolicTransformation({
+                P:{ re: 0, im:0 },
+                θ:{ re: 1, im:0 },
+                λ:CptoCk({ θ:.1*2*Math.PI, r:1 })
+            }),        
+            cacheUpdate:    cacheUpdate,
+            layers:         layerSrc        
+        }
     },
-    
-    // most important    
-    decorator: UnitDiskNav,
-    geometry: {
-        clipRadius:     1,
-        nodeRadius:     .01,        
-        transformation: new HyperbolicTransformation({
-            P:{ re: 0, im:0 },
-            θ:{ re: 1, im:0 },
-            λ:CptoCk({ θ:.1*2*Math.PI, r:1 })
-        }),        
-        cacheUpdate:    cacheUpdate,
-        layers:         layerSrc        
+    fsModel: 
+    {
+        // must have
+        iconmap:      'will be set by navigation or user',
+        onNodeSelect: 'will be set by navigation or user',    
+        dataloader:   'will be set by navigation or user',    
+        langloader:   'will be set by navigation or user',   
+
+        data:         'will be set by dataloader',
+        langmap:      'will be set by langloader',
+
+        // infovis stuff
+        weight:       (n:N)=> ((!n.children || !n.children.length)?1:0),
+        layout:       layoutBergé, // [0, π/2]
+        magic:        1/160,
+            
+        objects: {                      // oder indizes?
+            selections: [],
+            pathes: [],        
+        },
+        caption: (ht:Hypertree, n:N)=> {            
+            const w  = (!n.value || n.value==1) ? '' : n.value + ' '
+            const id = ( n.data && n.data.name) ? n.data.name : ''            
+            return id + tosub(w) 
+        },
+        
+        // most important    
+        decorator: UnitDiskNav,
+        geometry: {
+            clipRadius:     1,
+            nodeRadius:     .001,        
+            transformation: new HyperbolicTransformation({
+                P:{ re: 0, im:0 },
+                θ:{ re: 1, im:0 },
+                λ:CptoCk({ θ:.1*2*Math.PI, r:1 })
+            }),        
+            cacheUpdate:    cacheUpdate,
+            layers:         layerSrc        
+        }
     }
 }

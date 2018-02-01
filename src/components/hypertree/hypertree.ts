@@ -167,7 +167,11 @@ export class Hypertree
     * this functions modyfy model/view (this class internal state)
     * and call the according update function(s)
     */    
-    public api = {        
+    public api = {
+        setModel: (model: HypertreeArgs)=> {
+            this.args = model        
+            this.update.view.parent()
+        },  
         setLangloader: ll=> { 
             this.args.langloader = ll
             this.update.langloader() 
