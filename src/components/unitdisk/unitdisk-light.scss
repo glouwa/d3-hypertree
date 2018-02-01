@@ -15,9 +15,9 @@ $nodeStroke:    #90caf9;
         //filter:drop-shadow(0px 1px 1.5px rgba(0,0,0,0.22));
 
         .cell {            
-            stroke: rgba($leafcolor, .22);            
+            stroke: rgba(#fff, .75);            
             fill: rgba($leafcolor, .2);
-            stroke-width: 0.001;
+            stroke-width: 0.0013;
         }
         .arc {
             stroke: #bf875f; // #b77d68; //#8d6e63;
@@ -51,7 +51,7 @@ $nodeStroke:    #90caf9;
         .root.node      { stroke: orange;                                                                       }
 
         .lazy           { stroke: darken($lazycolor, 15%);           fill: lighten($lazycolor, 5%);               }
-        .lazy.cell      { stroke: rgba(255, 204, 188, .9);         fill: rgba(255, 204, 188, 0.3);            }
+        .lazy.cell      { stroke: rgba(255, 255, 255, .75);         fill: rgba(255, 204, 188, 0.3);            }
         .lazy.node      { stroke: rgba(darken($lazycolor, 20%), .5);                                              }
 
         .exit           { stroke: darken($exitcolor, 15%);           fill: lighten($exitcolor, 5%);               }
