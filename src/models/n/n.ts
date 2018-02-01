@@ -88,6 +88,7 @@ export interface N {
     txt:                string,
     icon:               string,
     labellen:           number
+    imageHref:          string,
 
 //layout
     z?:                 C,
@@ -96,9 +97,18 @@ export interface N {
     cache?:             C,
     cachep?:            Cp,
     strCache?:          string,
+    strCacheZ?:          string,
+
     isOutλ,
     isOut99,
+    isOutWeight,
+    isOut,
+    hasOutPeriChildren,
+    hasOutWeightChildren,
+
     transformStrCache?: string,
+    transformStrCacheZ?: string,
+
     scaleStrText?:      string,
     distScale?:         number,
     dampedDistScale?:   number,

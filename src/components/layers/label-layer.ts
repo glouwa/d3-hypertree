@@ -3,7 +3,7 @@ import { ILayerView }      from '../layerstack/layer'
 import { ILayerArgs }      from '../layerstack/layer'
 import { D3UpdatePattern } from '../layerstack/d3updatePattern'
 
-export interface LabelLayerArgs
+export interface LabelLayerArgs extends ILayerArgs
 {
     name:        string,
     className:   string,

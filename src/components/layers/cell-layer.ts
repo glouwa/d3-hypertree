@@ -3,10 +3,8 @@ import { ILayerView }      from '../layerstack/layer'
 import { ILayerArgs }      from '../layerstack/layer'
 import { D3UpdatePattern } from '../layerstack/d3updatePattern'
 
-export interface CellLayerArgs
+export interface CellLayerArgs extends ILayerArgs
 {    
-    invisible?:  boolean,
-    hideOnDrag?: boolean,    
     clip?:       string,
     data:        ()=> any,
 } 

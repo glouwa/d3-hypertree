@@ -4,7 +4,7 @@ import { ILayerView }      from '../layerstack/layer'
 import { ILayerArgs }      from '../layerstack/layer'
 import { D3UpdatePattern } from '../layerstack/d3updatePattern'
 
-export interface ImageLayerArgs
+export interface ImageLayerArgs extends ILayerArgs
 {
     name:      string,
     data:      ()=> any,    

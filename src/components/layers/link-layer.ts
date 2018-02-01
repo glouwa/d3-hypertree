@@ -8,7 +8,7 @@ import { ILayerArgs }      from '../layerstack/layer'
 import { D3UpdatePattern }from '../layerstack/d3updatePattern'
 
 export type ArcCurvature = '+' | '0' | '-' | 'l'
-export interface ArcLayerArgs
+export interface ArcLayerArgs extends ILayerArgs
 {
     data:       ()=> any,
     name:       string,

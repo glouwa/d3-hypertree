@@ -3,7 +3,7 @@ import { ILayerView }      from '../layerstack/layer'
 import { ILayerArgs }      from '../layerstack/layer'
 import { D3UpdatePattern } from '../layerstack/d3updatePattern'
 
-export interface FocusLayerArgs
+export interface FocusLayerArgs extends ILayerArgs
 {
     name: string,
     r: ()=> number

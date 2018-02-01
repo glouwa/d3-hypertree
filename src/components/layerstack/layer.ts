@@ -10,8 +10,10 @@ export interface ILayerView
     hypertree:Hypertree
 }
 
-export interface ILayerArgs 
+export interface ILayerArgs
 {
+    invisible?: boolean,
+    hideOnDrag?: boolean,
 }
 
 export interface ILayer

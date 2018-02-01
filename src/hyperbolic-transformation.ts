@@ -110,6 +110,6 @@ export class TransformationCache
     
     voronoiDiagram: d3.VoronoiDiagram<N>
     
-    cells:          N[]
+    cells:          d3.VoronoiPolygon<N>[]
 }
 

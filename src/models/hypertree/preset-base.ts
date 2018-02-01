@@ -318,10 +318,10 @@ function findStartNode(interaction:UnitDisk, cache:TransformationCache) {
     return startNode
 }
 function pathToLastVisible(ud:UnitDisk, cache:TransformationCache) {
-    var startNode = null
+    var startNode : N = null
     var path = []
     if (ud.args.data) {
-        var startNode = cache.centerNode || ud.args.data        
+        startNode = cache.centerNode || ud.args.data        
         path.push(startNode)
 
         while (true) {

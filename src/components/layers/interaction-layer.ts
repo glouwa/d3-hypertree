@@ -10,7 +10,7 @@ import { C, CptoCk, CktoCp,
     arcCenter, πify,
     sigmoid }               from '../../hyperbolic-math'
 
-export interface InteractionLayerArgs
+export interface InteractionLayerArgs extends ILayerArgs
 {
     unitdisk, 
     nohover: boolean,

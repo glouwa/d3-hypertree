@@ -207,7 +207,7 @@ export class Hypertree
         },
         //addPath: (pathid, node:N)=> { this.addPath(pathid, node) },
         //removePath: (pathid, node:N)=> { this.removePath(pathid, node) },
-        setPathHead: (pathType:string, n:N)=> {
+        setPathHead: (pathType:Path, n:N)=> {
             this.setPathHead(pathType, n)
             this.update.pathes()
         },
@@ -282,9 +282,14 @@ export class Hypertree
                 'translate(-150,105) scale(70)'
             ]
             sizeidx = ++sizeidx % 5
-            this.unitdisk.view.view.attr('transform', view[sizeidx])
-            this.unitdisk.navBackground.view.attr('transform', nav[sizeidx])
-            this.unitdisk.navParameter.view.attr('transform', nav[sizeidx])
+            if (true) {
+                const navUnitDisk = <UnitDiskNav>this.unitdisk
+                navUnitDisk.view.view.attr('transform', view[sizeidx])
+                navUnitDisk.navBackground.view.attr('transform', nav[sizeidx])
+                navUnitDisk.navParameter.view.attr('transform', nav[sizeidx])
+            }
+            else
+                this.unitdisk.view.attr('transform', view[sizeidx])
         }
         let sizeidx = 0
 
