@@ -197,6 +197,7 @@ function UnitdiskMeta_({ parent, ud, className })
         binding.toView(slider)
         slider.oninput = e=> binding.fromView(slider)
         slider.onmousedown = e=> e.stopPropagation()
+        slider.onmousemove = e=> e.stopPropagation()
         slider.onmouseup = e=> e.stopPropagation()
     }
 
