@@ -515,6 +515,7 @@ export class Hypertree
     private updateLang_(dl=0) {
         const t0 = performance.now()
         for (var n of dfsFlat(this.data, n=>true)) {
+            n.txt = null            
             n.label = this.args.caption(this, n)
             n.labellen = undefined
         }

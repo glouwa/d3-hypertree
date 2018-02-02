@@ -249,10 +249,10 @@ function cacheUpdate(ud:UnitDisk, cache:TransformationCache) {
     }
 
     // select visible nodes
-    const path =      pathToLastVisible(ud, cache)
-    const startNode = path[0]
+    const path =          pathToLastVisible(ud, cache)
+    const startNode =     path[0]
     cache.unculledNodes = []
-    cache.spezialNodes = [ud.args.data, startNode].filter(e=> e)
+    cache.spezialNodes =  [ud.args.data, startNode].filter(e=> e)
         
     const tr = hwe=> hwe * ud.args.hypertree.args.magic
 
