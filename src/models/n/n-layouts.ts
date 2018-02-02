@@ -100,37 +100,38 @@ export function layoutLamping(n, wedge = { p:{ re:0, im:0 }, m:{ re:0, im:1 }, �
 
 export function layoutBergé(n, t)
 {
-    var π = Math.PI    
+    const π = Math.PI    
 
     function wedgeTranslate(w, P)
     {
-        var t = makeT(P, one)
+        const t = makeT(P, one)
 
-        var pα = { re:Math.cos(w.α), im:Math.sin(w.α) }
+        const pα = { re:Math.cos(w.α), im:Math.sin(w.α) }
         w.α = CktoCp(h2e(t, pα)).θ
 
-        var pΩ = { re:Math.cos(w.Ω), im:Math.sin(w.Ω) }
+        const pΩ = { re:Math.cos(w.Ω), im:Math.sin(w.Ω) }
         w.Ω = CktoCp(h2e(t, pΩ)).θ
     }
 
-    function layoutNode(n:N, wedge:{α,Ω}, length)
+    function layoutNode(n:N, wedge:{α,Ω}, length:number)
     {
         if (n.parent)
         {
-            var angleWidth = πify(wedge.Ω - wedge.α )
-            var bisectionAngle = wedge.α + (angleWidth / 2.0)
-
-            n.z = CptoCk({ θ:bisectionAngle, r:length })
-            n.z = h2e(makeT(n.parent.z, one), n.z)
+            const angleWidth = πify(wedge.Ω - wedge.α )
+            const bisectionAngle = wedge.α + (angleWidth / 2.0)
+            
+            n.layout.z = n.z = CptoCk({ θ:bisectionAngle, r:length })
+            n.layout.z = n.z = h2e(makeT(n.parent.z, one), n.z)
+            n.layout.zStrCache = `${n.z.re} ${n.z.im}`
 
             wedgeTranslate(wedge, n.parent.z)
             wedgeTranslate(wedge, Cneg(n.z))
         }
 
-        var angleWidth = πify(wedge.Ω - wedge.α )
+        let angleWidth = πify(wedge.Ω - wedge.α )
         if (angleWidth > 2*π)
         {
-            var anglediff = angleWidth - 2*π
+            const anglediff = angleWidth - 2*π
 
             wedge.α += anglediff / 2.0
             wedge.α = πify(wedge.α)
@@ -141,27 +142,33 @@ export function layoutBergé(n, t)
             angleWidth = 2*π
         }
 
-        var currentAngle = wedge.α
-        for (var c of n.children||[])
+        let currentAngle = wedge.α
+        for (let cn of n.children||[])
         {
-            var α = currentAngle             //   +.5
-            currentAngle += angleWidth * ((c.value||1) / (n.value||n.children.length||1))
-            var Ω = πify(currentAngle)
+            const α = currentAngle             //   +.5
+            currentAngle += angleWidth * ((cn.value||1) / (n.value||n.children.length||1))
+            const Ω = πify(currentAngle)
 
-            layoutNode(c, { α:α, Ω:Ω }, length)
+            cn.layout = { wedge: { α:α, Ω:Ω } }
+            layoutNode(cn, cn.layout.wedge, length)
         }
         return n
     }
 
-    var startAngle    = 3 * π / 2
-    var defAngleWidth = π * 1.999999999999
-    var sad = 2.0
-    var wedge = {
-        α: πify(startAngle - defAngleWidth/sad),
-        Ω: πify(startAngle + defAngleWidth/sad)
-    }
-    n.z = { re:0, im:0 }
+    const startAngle    = 3 * π / 2
+    const defAngleWidth = π * 1.999999999999
+    const sad = 2.0
 
-    var λrNorm = πify(CktoCp(t.λ).θ) / 2 / Math.PI
-    return layoutNode(n, wedge, λrNorm)
+    n.z = { re:0, im:0 }     // todo: remove
+    
+    n.layout = {
+        wedge: {
+            α: πify(startAngle - defAngleWidth/sad),
+            Ω: πify(startAngle + defAngleWidth/sad)
+        },
+        z: { re:0, im:0 },
+        zStrCache: `0 0`
+    }
+    const λrNorm = πify(CktoCp(t.λ).θ) / 2 / π
+    return layoutNode(n, n.layout.wedge, λrNorm)
 }

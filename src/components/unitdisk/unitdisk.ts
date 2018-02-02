@@ -24,17 +24,16 @@ import { HypertreeMeta }           from '../meta/hypertree-meta/hypertree-meta'
 import { HypertreeMetaNav }        from '../meta/hypertree-meta/hypertree-meta'
 import { bboxOffset }              from '../layerstack/d3updatePattern'
 
-var arcWidth = d=>
-            .022
-            * d.distScale
-            * d.weightScale
-var navBgNodeR = .012
-var nodeRadiusOffset = ls=> d=>
-    CptoCk({ θ:d.zRefp ? d.zRefp.θ : CktoCp(d.z).θ, r:navBgNodeR })
+const navBgNodeR = .012
+const arcWidth = (d:N)=>
+    .022
+    * d.distScale
+    * d.weightScale
+const nodeRadiusOffset = ls=> (d:N)=>
+    CptoCk({ θ:d.layoutReference.zp ? d.layoutReference.zp.θ : CktoCp(d.z).θ, r:navBgNodeR })
 
 const navBackgroundLayers = [
-    (v, ud:UnitDisk)=> new BackgroundLayer(v, {                                        
-    }),
+    (v, ud:UnitDisk)=> new BackgroundLayer(v, {}),
     (v, ud:UnitDisk)=> new CellLayer(v, {
         invisible:  true,
         hideOnDrag: true,                    
@@ -47,9 +46,9 @@ const navBackgroundLayers = [
         className:  'arc',
         curvature:  '-', // + - 0 l
         data:       ()=> ud.cache.links,  
-        nodePos:    n=> n.zRef || n.z,
-        nodePosStr: n=> n.strCacheZref || n.strCacheZ,
-        width:      d=> arcWidth(d),
+        nodePos:    (n:N)=> (n.layoutReference || n.layout).z,
+        nodePosStr: (n:N)=> (n.layoutReference || n.layout).zStrCache,
+        width:      (n:N)=> arcWidth(n),
         classed:    (s,w)=> {}
     }),
     (v, ud:UnitDisk)=> new ArcLayer(v, {                                        
@@ -57,10 +56,10 @@ const navBackgroundLayers = [
         className:  'arc-focus',
         curvature:  '-', // + - 0 l
         data:       ()=> ud.cache.links
-                        .filter(n=> n.parent.cachep.r < .6),  
-        nodePos:    n=> n.zRef || n.z,
-        nodePosStr: n=> n.strCacheZref || n.strCacheZ,
-        width:      d=> arcWidth(d) + (.005 * d.dampedDistScale),
+                        .filter(n=> n.parent.cachep.r < .6),        
+        nodePos:    (n:N)=> (n.layoutReference || n.layout).z,
+        nodePosStr: (n:N)=> (n.layoutReference || n.layout).zStrCache,
+        width:      (d:N)=> arcWidth(d) + (.005 * d.dampedDistScale),
         classed:    (s,w)=> {}
     }),
     (v, ud:UnitDisk)=> new ArcLayer(v, {                                        
@@ -68,8 +67,8 @@ const navBackgroundLayers = [
         className:  'arc',
         curvature:  '-', // + - 0 l
         data:       ()=> ud.cache.paths,       
-        nodePos:    n=> n.zRef || n.z,
-        nodePosStr: n=> n.strCacheZref || n.strCacheZ,
+        nodePos:    (n:N)=> (n.layoutReference || n.layout).z,
+        nodePosStr: (n:N)=> (n.layoutReference || n.layout).zStrCache,        
         width:      d=> arcWidth(d) + (.013 * d.dampedDistScale),
         classed:    s=> s.classed("hovered-path-nav",  d=> d.pathes && d.pathes.isPartOfAnyHoverPath)
                          .classed("selected-path-nav", d=> d.pathes && d.pathes.isPartOfAnySelectionPath)
@@ -86,7 +85,9 @@ const navBackgroundLayers = [
                         nodeRadiusOffset(ud)(d),
                         bboxOffset(d, 'labellen-bg', d.zRefp || CktoCp(d.z))(v[i])),
         transform:  (d, delta)=> 
-                        ` translate(${(d.zRef ? d.zRef.re : d.z.re) + delta.re} ${d.zRef ? d.zRef.im : d.z.im})`                                                         
+                        ` translate(
+                            ${(d.zRef ? d.zRef.re : d.z.re) + delta.re} 
+                            ${(d.zRef ? d.zRef.im : d.z.im) + delta.im})`                                                         
     }),
     (v, ud:UnitDisk)=> new LabelLayer(v, {
         name:       'labels',
@@ -97,13 +98,15 @@ const navBackgroundLayers = [
                         nodeRadiusOffset(ud)(d),
                         bboxOffset(d, 'labellen-bg', d.zRefp || CktoCp(d.z))(v[i])),
         transform:  (d, delta)=> 
-                        ` translate(${(d.zRef ? d.zRef.re : d.z.re) + delta.re} ${d.zRef ? d.zRef.im : d.z.im})`                                                         
+                        ` translate(
+                            ${(d.zRef ? d.zRef.re : d.z.re) + delta.re} 
+                            ${(d.zRef ? d.zRef.im : d.z.im) + delta.im})`
     }),           
     (v, ud:UnitDisk)=> new SymbolLayer(v, {
         name:       'symbols',
         data:       ()=> ud.cache.spezialNodes,                                        
         r:          d=> .03,
-        transform:  d=>  ` translate(${d.strCacheZref || d.strCacheZ})`
+        transform:  d=>  ` translate(${d.strCacheZref || d.layout.zStrCache})`
                         + ` scale(${d.dampedDistScale})`,
     }),
 ]
@@ -143,7 +146,7 @@ const navParameterLayers = [
         text:        d=> ({ P:'+', θ:'🠆', λ:'⚲' })[d.name],
         delta:       d=> deltaMap[d.name],
         transform:   (d, delta)=> 
-                        ` translate(${d.cache.re+delta.re} ${d.cache.im+delta.im})` 
+                        ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` 
                         + rotate(d)
     }),
     (v, ud:UnitDisk)=> new InteractionLayer(v, {        

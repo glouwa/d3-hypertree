@@ -352,10 +352,9 @@ function peocessNodeTransformation(ud:UnitDisk, cache:TransformationCache, n:N) 
 }
 
 function peocessNode(ud:UnitDisk, cache:TransformationCache, n:N, maxLabelR, minWeight) {    
-    n.strCache =                   `${n.cache.re} ${n.cache.im}`
-    n.strCacheZ =                  `${n.z.re} ${n.z.im}`
+    n.strCache =                   `${n.cache.re} ${n.cache.im}`    
     n.transformStrCache =          ` translate(${n.strCache})`
-    n.transformStrCacheZ =         ` translate(${n.strCacheZ})`
+    n.transformStrCacheZ =         ` translate(${n.layout.zStrCache})`
     
     n.isOutλ =                     n.cachep.r >= maxLabelR
     n.isOut99 =                    n.cachep.r >= cullingRadius
@@ -378,7 +377,7 @@ function doVoronoiStuff(ud:UnitDisk, cache:TransformationCache) {
     catch(e) { console.log('voronoi exception') }
 
     cache.cells = cache.voronoiDiagram
-        .polygons()            
+        .polygons()
         .filter(e=> hasCircle(e.data)
                 /*|| e.data.isPartOfAnyHoverPath 
                 || e.data.isPartOfAnySelectionPath*/)
@@ -499,17 +498,16 @@ export const presets =
         weight:       (n:N)=> ((!n.children || !n.children.length)?1:0),
         caption: (ht:Hypertree, n:N)=> {
             // better: set of initial node actions [label, imghref, scalef, ...]
-            var w  = (!n.value || n.value==1) ? '' : n.value + ' '
-            var id = ( n.data && n.data.name) ? n.data.name : ''
-            var l  = ht.langMap ? ht.langMap[id] : ''
-            //var i  = ud.args.hypertree.args.iconmap[id]
-            var i  = emojimap[id]
+            const w  = (!n.value || n.value==1) ? '' : n.value + ' '
+            const id = ( n.data && n.data.name) ? n.data.name : ''
+            const l  = ht.langMap && ht.langMap[id] ? '𝐖 ' + ht.langMap[id] : ''
+            
+            const i  = emojimap[id]
             n.icon = i                        
-                if (i)  n.txt = i /*+ (l || id)*/
-            else if (l)  n.txt = '𝐖 ' + l
-            else if (id) n.txt = id
+            n.txt = i || l || id
+
             if (n.txt) return n.txt + tosub(w) 
-            return undefined
+            else return undefined
         },        
         layout:       layoutBergé, // [0, π/2]
         magic:        1/160,

@@ -620,10 +620,12 @@ export class Hypertree
                 {
                     // on abort
                     this.animation = false
-                    this.data.each((n:any)=> { 
-                        n.zRef = n.z
-                        n.zRefp = CktoCp(n.z)
-                        n.strCacheZref = `${n.z.re} ${n.z.im}`
+                    this.data.each((n:N)=> { 
+                        n.layoutReference = clone(n.layout)
+
+                        n.layout.zRef = n.zRef = n.z                        
+                        n.layout.zRefp = n.zRefp = CktoCp(n.z)
+                        n.layout.zRefStrCache = n.strCacheZref = `${n.z.re} ${n.z.im}`
                     })
                     // on abort - ui.update(s)
                     this.hypertreeMeta.update.transformation()

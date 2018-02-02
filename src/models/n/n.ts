@@ -1,4 +1,4 @@
-import { C, Cp }         from '../../hyperbolic-math'
+import { C, Cp, Ck }     from '../../hyperbolic-math'
 import { HierarchyNode } from 'd3'
 
 /*
@@ -92,12 +92,30 @@ export interface N {
 
 //layout
     z?:                 C,
+    
+    layout: {
+        wedge: {
+            α:          number,
+            Ω:          number,
+        },
+        z?:             Ck,
+        zStrCache?:     string,
+        zp?:            Cp,
+    }
+    layoutReference: {
+        wedge: {
+            α:          number,            
+            Ω:          number,
+        },
+        z?:             Ck,
+        zStrCache?:     string,
+        zp?:            Cp,
+    }
 
 //cahce
     cache?:             C,
     cachep?:            Cp,
-    strCache?:          string,
-    strCacheZ?:          string,
+    strCache?:          string,    
 
     isOutλ,
     isOut99,
