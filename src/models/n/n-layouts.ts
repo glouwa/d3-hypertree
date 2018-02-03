@@ -11,12 +11,21 @@ export type LayoutFunction = (root:N, t?:T) => N
 
 var unitVectors = [{ re:1, im:0 }, { re:0, im:1 }, { re:-1, im:0 }, { re:0, im:-1 }]
 
+function setZ(container, z) {
+    container.z = z
+    container.layout = container.layout || {}
+    container.layoutReference = container.layout || {}
+    container.layout.z = z
+    container.layout.zStrCache = `${z.re} ${z.im}`
+    container.layout.zp = CktoCp(z)
+}
+
 export function layoutUnitVectors(root) {
     var some = [{ re:0, im:0 }].concat(unitVectors)
     var i=0
     dfs(root, n=> {
         var a = i%some.length
-        n.z = { re:some[a].re*.99, im:some[a].im*.99 }
+        setZ(n, { re:some[a].re*.99, im:some[a].im*.99 })
         i++
     })
     return root
@@ -34,7 +43,7 @@ export function layoutUnitLines(root) {
         var rt = r=> pa + r * (1-pa)
         dfs(pathBegin, n=> {
             var r = i/depth
-            n.z = { re:rt(r) * target.re, im:rt(r) * target.im }
+            setZ(n, { re:rt(r) * target.re, im:rt(r) * target.im })
             i++
         })
     }
@@ -48,7 +57,7 @@ export function layoutSpiral(root) {
     for (var i=0; i < nrN; i++) {
         var a = i/nrN * 2*Math.PI * (nrRounds+1)
         var r = Math.pow(2, i/nrN)-1
-        flatNodes[i].z = { re:r*Math.cos(a), im:r*Math.sin(a) }
+        setZ(flatNodes[i], { re:r*Math.cos(a), im:r*Math.sin(a) })
     }
     return root
 }
@@ -57,7 +66,7 @@ export function layoutBuchheim(root) {
     root = tree().size([2 * Math.PI, 0.9])(root)
     dfs(root, n=> {
         var a = n.x - Math.PI/2
-        n.z = { re:n.y * Math.cos(a), im:n.y * Math.sin(a) }
+        setZ(n, { re:n.y * Math.cos(a), im:n.y * Math.sin(a) })
     })
     return root
 }
@@ -67,7 +76,7 @@ export function layoutLamping(n, wedge = { p:{ re:0, im:0 }, m:{ re:0, im:1 }, �
     console.log('--------------------------------------------------------', n.depth)
     console.log(wedge.p, wedge.m, wedge.α)
 
-    n.z = wedge.p
+    setZ(n, wedge.p)
 
     if (n.children) {
         for (var i=0; i < n.children.length; i++) {
@@ -120,10 +129,8 @@ export function layoutBergé(n, t)
             const angleWidth = πify(wedge.Ω - wedge.α )
             const bisectionAngle = wedge.α + (angleWidth / 2.0)
             
-            n.layout.z = n.z = CptoCk({ θ:bisectionAngle, r:length })
-            n.layout.z = n.z = h2e(makeT(n.parent.z, one), n.z)
-            n.layout.zStrCache = `${n.z.re} ${n.z.im}`
-            n.layout.zp = CktoCp(n.layout.z)
+            const nz1 = CptoCk({ θ:bisectionAngle, r:length })
+            setZ(n, h2e(makeT(n.parent.z, one), nz1))
 
             wedgeTranslate(wedge, n.parent.z)
             wedgeTranslate(wedge, Cneg(n.z))
@@ -160,17 +167,14 @@ export function layoutBergé(n, t)
     const defAngleWidth = π * 1.999999999999
     const sad = 2.0
 
-    n.z = { re:0, im:0 }     // todo: remove
-    
     n.layout = {
         wedge: {
             α: πify(startAngle - defAngleWidth/sad),
             Ω: πify(startAngle + defAngleWidth/sad)
-        },
-        z: { re:0, im:0 },
-        zStrCache: `0 0`,
-        zp: CktoCp({ re:0, im:0 })
+        }        
     }
+    setZ(n, { re:0, im:0 })
+
     const λrNorm = πify(CktoCp(t.λ).θ) / 2 / π
     return layoutNode(n, n.layout.wedge, λrNorm)
 }
