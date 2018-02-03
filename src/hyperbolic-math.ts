@@ -244,3 +244,6 @@ export function ArrAddR(p:[number, number], s:number) : [number,number] { return
             else
                 return { r:0, θ:0 }
         }
+
+
+export var CtoStr = (c:C)=> `${c.re} ${c.im}`

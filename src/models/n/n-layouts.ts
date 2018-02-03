@@ -123,6 +123,7 @@ export function layoutBergé(n, t)
             n.layout.z = n.z = CptoCk({ θ:bisectionAngle, r:length })
             n.layout.z = n.z = h2e(makeT(n.parent.z, one), n.z)
             n.layout.zStrCache = `${n.z.re} ${n.z.im}`
+            n.layout.zp = CktoCp(n.layout.z)
 
             wedgeTranslate(wedge, n.parent.z)
             wedgeTranslate(wedge, Cneg(n.z))
@@ -167,7 +168,8 @@ export function layoutBergé(n, t)
             Ω: πify(startAngle + defAngleWidth/sad)
         },
         z: { re:0, im:0 },
-        zStrCache: `0 0`
+        zStrCache: `0 0`,
+        zp: CktoCp({ re:0, im:0 })
     }
     const λrNorm = πify(CktoCp(t.λ).θ) / 2 / π
     return layoutNode(n, n.layout.wedge, λrNorm)

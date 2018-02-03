@@ -14,8 +14,8 @@ export interface ArcLayerArgs extends ILayerArgs
     name:       string,
     className:  string,
     curvature:  ArcCurvature,
-    nodePos:    (n)=> C,
-    nodePosStr: (n)=> string,
+    nodePos:    (n:N)=> C,
+    nodePosStr: (n:N)=> string,
     classed:    (s,w)=> void,
     width,
     clip?:      string,
@@ -72,7 +72,7 @@ export class ArcLayer implements ILayer
         return this.args.curvature
     }
 
-    private width(d) {
+    private width(d:N) {
         return this.arcOptions[this.args.curvature](d)
     }
 
@@ -87,6 +87,8 @@ export class ArcLayer implements ILayer
         return function(d) : string {
             var arcP1 = $this.args.nodePos(d)
             var arcP2 = $this.args.nodePos(d.parent)
+            console.assert(arcP1)
+            console.assert(arcP2)
             var arcC = arcCenter(arcP1, arcP2)
 
             var r = CktoCp(CsubC(arcP2, arcC.c)).r; if (isNaN(r)) r = 0;            
@@ -97,7 +99,7 @@ export class ArcLayer implements ILayer
         }
     }
 
-    private svgArcLine(d) {
+    private svgArcLine(d:N) {
         var s = this.args.nodePosStr(d)
         var e = this.args.nodePosStr(d.parent)
         return `M ${s} L ${e}`

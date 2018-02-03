@@ -6,6 +6,7 @@ import { C, CktoCp, CptoCk }       from '../../hyperbolic-math'
 import { CmulR, CsubC, CaddC }     from '../../hyperbolic-math'
 import { dfsFlat, πify, CassignC } from '../../hyperbolic-math'
 import { ArrAddR }                 from '../../hyperbolic-math'
+import { CtoStr }                  from '../../hyperbolic-math'
 import { lengthDilledation }       from '../../hyperbolic-math'
 import { Transformation }          from '../../hyperbolic-transformation'
 import { PanTransformation }       from '../../hyperbolic-transformation'
@@ -30,7 +31,7 @@ const arcWidth = (d:N)=>
     * d.distScale
     * d.weightScale
 const nodeRadiusOffset = ls=> (d:N)=>
-    CptoCk({ θ:d.layoutReference.zp ? d.layoutReference.zp.θ : CktoCp(d.z).θ, r:navBgNodeR })
+    CptoCk({ θ:(d.layoutReference||d.layout).zp.θ, r:navBgNodeR }) 
 
 const navBackgroundLayers = [
     (v, ud:UnitDisk)=> new BackgroundLayer(v, {}),
@@ -69,7 +70,7 @@ const navBackgroundLayers = [
         data:       ()=> ud.cache.paths,       
         nodePos:    (n:N)=> (n.layoutReference || n.layout).z,
         nodePosStr: (n:N)=> (n.layoutReference || n.layout).zStrCache,        
-        width:      d=> arcWidth(d) + (.013 * d.dampedDistScale),
+        width:      (d:N)=> arcWidth(d) + (.013 * d.dampedDistScale),
         classed:    s=> s.classed("hovered-path-nav",  d=> d.pathes && d.pathes.isPartOfAnyHoverPath)
                          .classed("selected-path-nav", d=> d.pathes && d.pathes.isPartOfAnySelectionPath)
                          .style("stroke",              d=> d.pathes && d.pathes.finalcolor)
@@ -80,45 +81,39 @@ const navBackgroundLayers = [
         name:       'emojis',   
         className:  'caption label-big',
         data:       ()=> ud.cache.emojis,
-        text:       (d)=> d.icon,
-        delta:      (d, i, v)=> CaddC(
+        text:       (d:N)=> d.icon,
+        delta:      (d:N, i:number, v:N[])=> CaddC(
                         nodeRadiusOffset(ud)(d),
-                        bboxOffset(d, 'labellen-bg', d.zRefp || CktoCp(d.z))(v[i])),
-        transform:  (d, delta)=> 
-                        ` translate(
-                            ${(d.zRef ? d.zRef.re : d.z.re) + delta.re} 
-                            ${(d.zRef ? d.zRef.im : d.z.im) + delta.im})`                                                         
+                        bboxOffset(d, 'labellen-bg', d.layoutReference.zp || CktoCp(d.z))(v[i])),        
+        transform:  (d:N, delta:C)=> ` translate(${CtoStr(CaddC((d.layout||d.layoutReference).z, delta))})`
     }),
     (v, ud:UnitDisk)=> new LabelLayer(v, {
         name:       'labels',
         className:  'caption label-big', 
         data:       ()=> ud.args.hypertree.args.objects.selections,
-        text:       (d)=> d.txt,
-        delta:      (d, i, v)=> CaddC(
+        text:       (d:N)=> d.txt,
+        delta:      (d:N, i:number, v:N[])=> CaddC(
                         nodeRadiusOffset(ud)(d),
-                        bboxOffset(d, 'labellen-bg', d.zRefp || CktoCp(d.z))(v[i])),
-        transform:  (d, delta)=> 
-                        ` translate(
-                            ${(d.zRef ? d.zRef.re : d.z.re) + delta.re} 
-                            ${(d.zRef ? d.zRef.im : d.z.im) + delta.im})`
+                        bboxOffset(d, 'labellen-bg', d.layoutReference.zp || CktoCp(d.z))(v[i])),
+        transform:  (d:N, delta:C)=> ` translate(${CtoStr(CaddC((d.layout||d.layoutReference).z, delta))})`
     }),           
     (v, ud:UnitDisk)=> new SymbolLayer(v, {
         name:       'symbols',
         data:       ()=> ud.cache.spezialNodes,                                        
-        r:          d=> .03,
-        transform:  d=>  ` translate(${d.strCacheZref || d.layout.zStrCache})`
-                        + ` scale(${d.dampedDistScale})`,
+        r:          (d:N)=> .03,
+        transform:  (d:N)=> ` translate(${(d.layoutReference || d.layout).zStrCache})`
+                          + ` scale(${d.dampedDistScale})`,
     }),
 ]
 
-var rotate = d=>
-            (d.name === 'λ' ? ' rotate(-25)' : ' rotate(0)')
+var rotate = (d:N)=>
+    (d.name === 'λ' ? ' rotate(-25)' : ' rotate(0)')
 var deltaMap = {
     P:{ re:.0025, im:.05 }, 
     θ:{ re:.0025, im:.019 }, 
     λ:{ re:.0025, im:.013 }
 }
-var Pscale =  ud=> d=>
+var Pscale =  (ud:UnitDisk)=> (d:N)=>
     lengthDilledation(d)
     * (1 - πify(CktoCp(ud.args.transformation.state.λ).θ) / 2 / Math.PI)
     / ud.args.nodeRadius

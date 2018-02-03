@@ -362,6 +362,8 @@ export class Hypertree
                 .hierarchy(d3h)
                 .each((n:any)=> {
                     n.mergeId = ncount++
+                    n.layout = null
+                    n.layoutReference = null
                     n.pathes = {}
                 })
                 //.sum(this.args.weight) // this.updateWeights()
@@ -620,13 +622,7 @@ export class Hypertree
                 {
                     // on abort
                     this.animation = false
-                    this.data.each((n:N)=> { 
-                        n.layoutReference = clone(n.layout)
-
-                        n.layout.zRef = n.zRef = n.z                        
-                        n.layout.zRefp = n.zRefp = CktoCp(n.z)
-                        n.layout.zRefStrCache = n.strCacheZref = `${n.z.re} ${n.z.im}`
-                    })
+                    this.data.each((n:N)=> n.layoutReference = clone(n.layout))
                     // on abort - ui.update(s)
                     this.hypertreeMeta.update.transformation()
                     this.hypertreeMeta.update.layout()
