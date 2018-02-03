@@ -10,11 +10,11 @@ import { HypertreeArgs }       from '../../models/hypertree/model'
 import { N, Path }             from '../../models/n/n'
 import { LoaderFunction }      from '../../models/n/n-loaders'
 import { LayoutFunction }      from '../../models/n/n-layouts'
-import { dfsFlat }             from '../../hyperbolic-math'
-import { C, CktoCp, CptoCk }   from '../../hyperbolic-math'
-import { CassignC, CmulR }     from '../../hyperbolic-math'
-import { sigmoid }             from '../../hyperbolic-math'
-import { Transformation }      from '../../hyperbolic-transformation'
+import { dfsFlat }             from '../../models/transformation/hyperbolic-math'
+import { C, CktoCp, CptoCk }   from '../../models/transformation/hyperbolic-math'
+import { CassignC, CmulR }     from '../../models/transformation/hyperbolic-math'
+import { sigmoid }             from '../../models/transformation/hyperbolic-math'
+import { Transformation }      from '../../models/transformation/hyperbolic-transformation'
 
 import { ILayer }              from '../layerstack/layer'
 import { D3UpdatePatternArgs } from '../layerstack/d3updatePattern'
@@ -544,7 +544,8 @@ export class Hypertree
         this.data.sum(this.args.weight) // äää besser...
         for (var n of dfsFlat(this.data, n=>true)) 
             // ...hier selber machen
-            n.weightScale = (Math.log2(n.value) || 1) / (Math.log2(this.data.value || this.data.children.length) || 1)
+            n.weightScale = (Math.log2(n.value) || 1) 
+                          / (Math.log2(this.data.value || this.data.children.length) || 1)
         
         this.updateLayout()
     }

@@ -1,15 +1,15 @@
 import { tree }                from 'd3-hierarchy'
 import { N }                   from './n'
-import {
-    T, makeT, one,
-    C, CktoCp, CptoCk,
-    Cneg, CmulR, Clog, Cpow,
-    h2e,
-    πify, dfs, dfsFlat }       from '../../hyperbolic-math'
-
+import { T, makeT, one }       from '../../models/transformation/hyperbolic-math'
+import { C, CktoCp, CptoCk }   from '../../models/transformation/hyperbolic-math'
+import { Cneg, CmulR }         from '../../models/transformation/hyperbolic-math'
+import { Clog, Cpow }          from '../../models/transformation/hyperbolic-math'
+import { h2e }                 from '../../models/transformation/hyperbolic-math'
+import { πify, dfs, dfsFlat}   from '../../models/transformation/hyperbolic-math' 
+    
 export type LayoutFunction = (root:N, t?:T) => N
 
-var unitVectors = [{ re:1, im:0 }, { re:0, im:1 }, { re:-1, im:0 }, { re:0, im:-1 }]
+const unitVectors = [{ re:1, im:0 }, { re:0, im:1 }, { re:-1, im:0 }, { re:0, im:-1 }]
 
 function setZ(container, z) {
     container.z = z
@@ -17,14 +17,14 @@ function setZ(container, z) {
     container.layoutReference = container.layout || {}
     container.layout.z = z
     container.layout.zStrCache = `${z.re} ${z.im}`
-    container.layout.zp = CktoCp(z)
+    container.layout.zp = CktoCp(z)    
 }
 
 export function layoutUnitVectors(root) {
-    var some = [{ re:0, im:0 }].concat(unitVectors)
-    var i=0
+    const some = [{ re:0, im:0 }].concat(unitVectors)
+    let i=0
     dfs(root, n=> {
-        var a = i%some.length
+        const a = i%some.length
         setZ(n, { re:some[a].re*.99, im:some[a].im*.99 })
         i++
     })
@@ -33,16 +33,16 @@ export function layoutUnitVectors(root) {
 
 export function layoutUnitLines(root) {
     root.z = { re:0, im:0 }
-    for (var i=0; i<4; i++)
+    for (let i=0; i<4; i++)
         layoutPath(root.children[i], unitVectors[i], root.children[i].height)
 
     function layoutPath(pathBegin, target, depth=30)
     {
-        var i = 0
-        var pa = 1/depth
-        var rt = r=> pa + r * (1-pa)
+        let i = 0
+        const pa = 1/depth
+        const rt = r=> pa + r * (1-pa)
         dfs(pathBegin, n=> {
-            var r = i/depth
+            const r = i/depth
             setZ(n, { re:rt(r) * target.re, im:rt(r) * target.im })
             i++
         })
@@ -51,12 +51,12 @@ export function layoutUnitLines(root) {
 }
 
 export function layoutSpiral(root) {
-    var flatNodes = dfsFlat(root)
-    var nrN = flatNodes.length
-    var nrRounds = Math.floor(nrN/24)
-    for (var i=0; i < nrN; i++) {
-        var a = i/nrN * 2*Math.PI * (nrRounds+1)
-        var r = Math.pow(2, i/nrN)-1
+    const flatNodes = dfsFlat(root)
+    const nrN = flatNodes.length
+    const nrRounds = Math.floor(nrN/24)
+    for (let i=0; i < nrN; i++) {
+        const a = i/nrN * 2*Math.PI * (nrRounds+1)
+        const r = Math.pow(2, i/nrN)-1
         setZ(flatNodes[i], { re:r*Math.cos(a), im:r*Math.sin(a) })
     }
     return root
@@ -65,7 +65,7 @@ export function layoutSpiral(root) {
 export function layoutBuchheim(root) {
     root = tree().size([2 * Math.PI, 0.9])(root)
     dfs(root, n=> {
-        var a = n.x - Math.PI/2
+        const a = n.x - Math.PI/2
         setZ(n, { re:n.y * Math.cos(a), im:n.y * Math.sin(a) })
     })
     return root
@@ -79,27 +79,26 @@ export function layoutLamping(n, wedge = { p:{ re:0, im:0 }, m:{ re:0, im:1 }, �
     setZ(n, wedge.p)
 
     if (n.children) {
-        for (var i=0; i < n.children.length; i++) {
+        for (let i=0; i < n.children.length; i++) {
 
-            var cα = wedge.α / n.children.length * (i+1)
+            const cα = wedge.α / n.children.length * (i+1)
             console.assert(isFinite(cα))
             console.log('cα', cα)
 
-            var s = .1
-            var it = ((1-s*s) * Math.sin(cα)) / (2*s);              console.log('it',it)
-            var d = Math.sqrt(Math.pow(it,2)+1) - it
-            d = d * .5
-
+            const s = .1
+            const it = ((1-s*s) * Math.sin(cα)) / (2*s);              console.log('it',it)
+            const d = (Math.sqrt(Math.pow(it,2)+1) - it) * .5
+            
             console.assert(isFinite(d))
             console.log('d',d)
 
-            var p1 = makeT(wedge.p, one)
-            var np = h2e(p1, CmulR(wedge.m, d));                    console.log('np',np)
+            const p1 = makeT(wedge.p, one)
+            const np = h2e(p1, CmulR(wedge.m, d));                    console.log('np',np)
 
-            var npp1 = makeT(Cneg(np), one)
-            var nd1 = makeT({ re:-d, im:0 }, one)
-            var nm = h2e(npp1, h2e(p1, wedge.m));                   console.log('nm',nm)
-            var nα = Clog(h2e(nd1, Cpow(cα))).im;                   console.assert(isFinite(nα))
+            const npp1 = makeT(Cneg(np), one)
+            const nd1 = makeT({ re:-d, im:0 }, one)
+            const nm = h2e(npp1, h2e(p1, wedge.m));                   console.log('nm',nm)
+            const nα = Clog(h2e(nd1, Cpow(cα))).im;                   console.assert(isFinite(nα))
 
             layoutLamping(n.children[i], { p:np, m:nm, α:nα })
         }

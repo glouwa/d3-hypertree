@@ -1,7 +1,7 @@
 import { N, Path }        from '../n/n'
 import { LoaderFunction } from '../n/n-loaders'
 import { LayoutFunction } from '../n/n-layouts'
-import { Transformation } from '../../hyperbolic-transformation'
+import { Transformation } from '../../models/transformation/hyperbolic-transformation'
 
 import { Hypertree }      from '../../components/hypertree/hypertree'
 import { IUnitDisk }      from '../../components/unitdisk/unitdisk'

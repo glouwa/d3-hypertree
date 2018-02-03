@@ -2,8 +2,8 @@ import * as d3            from 'd3'
 import { HTML }           from 'ducd'
 import { t }              from 'ducd'
 import { IUnitDisk }      from '../../unitdisk/unitdisk'
-import { CptoCk, CktoCp } from '../../../hyperbolic-math'
-import { πify }           from '../../../hyperbolic-math'
+import { CptoCk, CktoCp } from '../../../models/transformation/hyperbolic-math'
+import { πify }           from '../../../models/transformation/hyperbolic-math'
 
 export class UnitdiskMeta 
 {

@@ -1,11 +1,11 @@
-import { N }              from '../../models/n/n'
-import { CsubC, CktoCp }  from '../../hyperbolic-math'
-import { C }              from '../../hyperbolic-math'
-import { arcCenter }      from '../../hyperbolic-math'
+import { N }               from '../../models/n/n'
+import { CsubC, CktoCp }   from '../../models/transformation/hyperbolic-math'
+import { C }               from '../../models/transformation/hyperbolic-math'
+import { arcCenter }       from '../../models/transformation/hyperbolic-math'
 import { ILayer }          from '../layerstack/layer'
 import { ILayerView }      from '../layerstack/layer'
 import { ILayerArgs }      from '../layerstack/layer'
-import { D3UpdatePattern }from '../layerstack/d3updatePattern'
+import { D3UpdatePattern } from '../layerstack/d3updatePattern'
 
 export type ArcCurvature = '+' | '0' | '-' | 'l'
 export interface ArcLayerArgs extends ILayerArgs

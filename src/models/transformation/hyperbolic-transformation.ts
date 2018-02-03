@@ -1,12 +1,9 @@
-import {
-    T,
-    C, CassignC, CktoCp, CptoCk,
-    CaddC, CsubC, CmulR, CdivR,
-    h2e, compose, shift, lengthDilledation,
-    dfs, clone, πify, setR, maxR
-}
-from './hyperbolic-math'
-import { N } from './models/n/n'
+import { N }                                     from '../../models/n/n'
+import { T }                                     from './hyperbolic-math'
+import {C, CassignC, CktoCp, CptoCk }            from './hyperbolic-math'
+import {CaddC, CsubC, CmulR, CdivR }             from './hyperbolic-math'
+import {h2e, compose, shift, lengthDilledation } from './hyperbolic-math'
+import {dfs, clone, πify, setR, maxR }           from './hyperbolic-math'
 
 export interface Transformation<OT>
 {    

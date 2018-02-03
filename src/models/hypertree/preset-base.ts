@@ -2,13 +2,13 @@ import * as d3 from 'd3'
 
 import { tosub }                    from 'ducd'
 import { N }                        from '../n/n'
-import { dfs2, dfsFlat2, dfsFlat }  from '../../hyperbolic-math'
+import { dfs2, dfsFlat2, dfsFlat }  from '../../models/transformation/hyperbolic-math'
 
-import { C, CptoCk, CktoCp, πify }  from '../../hyperbolic-math'
-import { CaddC, CsubC, CmulR }      from '../../hyperbolic-math'
-import { CassignC }                 from '../../hyperbolic-math'
+import { C, CptoCk, CktoCp, πify }  from '../../models/transformation/hyperbolic-math'
+import { CaddC, CsubC, CmulR }      from '../../models/transformation/hyperbolic-math'
+import { CassignC }                 from '../../models/transformation/hyperbolic-math'
 
-import { lengthDilledation }        from '../../hyperbolic-math'
+import { lengthDilledation }        from '../../models/transformation/hyperbolic-math'
 import { loaders }                  from '../../index'
 import { layoutBergé }              from '../n/n-layouts'
 import { layoutBuchheim }           from '../n/n-layouts'

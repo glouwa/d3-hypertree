@@ -1,8 +1,8 @@
 export { Hypertree }     from "./components/hypertree/hypertree"
 export { HypertreeArgs } from "./models/hypertree/model"
 
-export * from './hyperbolic-math'
-export * from './hyperbolic-transformation'
+export * from './models/transformation/hyperbolic-math'
+export * from './models/transformation/hyperbolic-transformation'
 
 export * from './models/n/n'
 export * from './models/n/n-loaders'
