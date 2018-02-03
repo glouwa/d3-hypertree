@@ -14,7 +14,7 @@ export interface HypertreeArgs
 
     dataloader:   (ok: (root:N, t0:number, dl:number)=>void)=> void,    
     langloader:   (lang)=> (ok)=> void,
-    weight:       (n:N) => number,
+    weight:       (n:N)=> number,
     caption:      (hypertree:Hypertree, n:N)=> string,
     onNodeSelect: (n:N)=> void,
     

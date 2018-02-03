@@ -3,6 +3,7 @@
 //import { interpolateHcl, rgb }      from 'd3-color'
 
 import * as d3                 from 'd3'
+import { path }                from 'd3'
 import { HTML }                from 'ducd'
 import { clone, stringhash }   from 'ducd'
 import { googlePalette }       from 'ducd'
@@ -25,7 +26,7 @@ import { UnitDiskNav }         from '../unitdisk/unitdisk'
 
 import { HypertreeMeta }       from '../meta/hypertree-meta/hypertree-meta'
 import { NoHypertreeMeta }     from '../meta/hypertree-meta/hypertree-meta'
-import { path } from 'd3';
+
 
 const π = Math.PI
 const htmlpreloader = `
@@ -46,10 +47,10 @@ const htmlpreloader = `
 const bubbleSvgDef =
     `<defs>
         <radialGradient id="exampleGradient">            
-            <stop offset="58%"   stop-color="rgba(255,255,255, .08)"/>            
-            <stop offset="92%"   stop-color="rgba( 96, 96, 96, .08)"/>
-            <stop offset="98%"   stop-color="rgba( 36, 36, 36, .08)"/>
-            <stop offset="100%"  stop-color="rgba( 0, 0, 0, .08)"/>
+            <stop offset="58%"  stop-color="rgba(255,255,255, .08)"/>            
+            <stop offset="92%"  stop-color="rgba( 96, 96, 96, .08)"/>
+            <stop offset="98%"  stop-color="rgba( 36, 36, 36, .08)"/>
+            <stop offset="100%" stop-color="rgba( 0, 0, 0, .08)"   />
         </radialGradient>
     </defs>` 
 
@@ -417,7 +418,7 @@ export class Hypertree
         {
             this.args.objects.selections.push(n)
             this.addPath('SelectionPath', n)            
-        }        
+        }    
     }
 
     // es kann nur einen pro id geben, gibt es bereits einen wird dieser entfernt 
@@ -437,13 +438,13 @@ export class Hypertree
     private addPath(pathType:string, n:N) {
         const plidx = Math.abs(stringhash(n.txt))
         const newpath:Path = {
-            type: pathType,
-            id: this.btnPathId(pathType, n),
-            icon: ({ 'HoverPath':'mouse' })[pathType] || 'place',
-            head: n,
-            headName: n.label,
+            type:      pathType,
+            id:        this.btnPathId(pathType, n),
+            icon:      ({ 'HoverPath':'mouse' })[pathType] || 'place',
+            head:      n,
+            headName:  n.label,
             ancestors: n.ancestors(),            
-            color: ({ 'HoverPath':'none' })[pathType] || googlePalette(plidx) || 'red' ,            
+            color:     ({ 'HoverPath':'none' })[pathType] || googlePalette(plidx) || 'red' ,            
         }
 
         // model mod

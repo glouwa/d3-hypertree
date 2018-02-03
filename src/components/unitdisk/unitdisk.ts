@@ -31,7 +31,10 @@ const arcWidth = (d:N)=>
     * d.distScale
     * d.weightScale
 const nodeRadiusOffset = ls=> (d:N)=>
-    CptoCk({ θ:(d.layoutReference||d.layout).zp.θ, r:navBgNodeR }) 
+    CptoCk({ 
+        θ:(d.layoutReference||d.layout).zp.θ, 
+        r:navBgNodeR 
+    }) 
 
 const navBackgroundLayers = [
     (v, ud:UnitDisk)=> new BackgroundLayer(v, {}),
@@ -129,8 +132,8 @@ const navParameterLayers = [
         name:        'nodes',
         className:   'node',
         data:        ()=> ud.cache.unculledNodes,
-        r:           d=> ud.args.nodeRadius * (d.name==='P' ? Pscale(ud)(d) : 1),
-        transform:   d=> d.transformStrCache,
+        r:           (d:N)=> ud.args.nodeRadius * (d.name==='P' ? Pscale(ud)(d) : 1),
+        transform:   (d:N)=> d.transformStrCache,
     }),
     (v, ud:UnitDisk)=> new LabelLayer(v, {
         invisible:  true,
@@ -138,9 +141,9 @@ const navParameterLayers = [
         name:        'labels',
         className:   'caption',
         data:        ()=> ud.cache.unculledNodes,
-        text:        d=> ({ P:'+', θ:'🠆', λ:'⚲' })[d.name],
-        delta:       d=> deltaMap[d.name],
-        transform:   (d, delta)=> 
+        text:        (d:N)=> ({ P:'+', θ:'🠆', λ:'⚲' })[d.name],
+        delta:       (d:N)=> deltaMap[d.name],
+        transform:   (d:N, delta:C)=> 
                         ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` 
                         + rotate(d)
     }),
