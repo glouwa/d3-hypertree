@@ -55,7 +55,7 @@ const navBackgroundLayers = [
         data:       ()=> ud.cache.cells        
     }),
     (v, ud:UnitDisk)=> new ArcLayer(v, {                                        
-        name:       'link-arcs',                            
+        name:       'link-arcs',
         className:  'arc',
         curvature:  '-',
         data:       ()=> ud.cache.links,  

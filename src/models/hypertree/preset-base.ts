@@ -618,8 +618,9 @@ export const presets =
         weight:       (n:N)=> ((!n.children || !n.children.length)?1:0),
         caption: (ht:Hypertree, n:N)=> {            
             const w  = (!n.value || n.value==1) ? '' : n.value + ' '
-            const id = ( n.data && n.data.name) ? n.data.name : ''            
-            return id + tosub(w) 
+            n.txt = ( n.data && n.data.name) ? n.data.name : ''            
+
+            return n.txt + tosub(w) 
         },
         layout:       layoutBergé, // [0, π/2]
         magic:        1/160,

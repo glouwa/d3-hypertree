@@ -6,7 +6,7 @@ import { Cneg, CmulR }         from '../../models/transformation/hyperbolic-math
 import { Clog, Cpow }          from '../../models/transformation/hyperbolic-math'
 import { h2e }                 from '../../models/transformation/hyperbolic-math'
 import { πify, dfs, dfsFlat}   from '../../models/transformation/hyperbolic-math' 
-    
+
 export type LayoutFunction = (root:N, t?:T) => N
 
 const unitVectors = [{ re:1, im:0 }, { re:0, im:1 }, { re:-1, im:0 }, { re:0, im:-1 }]
