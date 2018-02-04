@@ -89,9 +89,6 @@ export interface N {
     icon:               string,
     labellen:           number
     imageHref:          string,
-
-//layout
-    z?:                 C,
     
     layout: {
         wedge: {

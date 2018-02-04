@@ -12,7 +12,6 @@ export type LayoutFunction = (root:N, t?:T) => N
 const unitVectors = [{ re:1, im:0 }, { re:0, im:1 }, { re:-1, im:0 }, { re:0, im:-1 }]
 
 function setZ(container, z) {
-    container.z = z
     container.layout = container.layout || {}    
     container.layout.z = z
     container.layout.zStrCache = `${z.re} ${z.im}`
@@ -139,10 +138,10 @@ export function layoutBergé(n, t)
             const bisectionAngle = wedge.α + (angleWidth / 2.0)
             
             const nz1 = CptoCk({ θ:bisectionAngle, r:length })
-            setZ(n, h2e(makeT(n.parent.z, one), nz1))
+            setZ(n, h2e(makeT(n.parent.layout.z, one), nz1))
 
-            wedgeTranslate(wedge, n.parent.z)
-            wedgeTranslate(wedge, Cneg(n.z))
+            wedgeTranslate(wedge, n.parent.layout.z)
+            wedgeTranslate(wedge, Cneg(n.layout.z))
         }
 
         let angleWidth = πify(wedge.Ω - wedge.α )

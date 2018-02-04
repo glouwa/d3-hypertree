@@ -30,11 +30,21 @@ const arcWidth = (d:N)=>
     .022
     * d.distScale
     * d.weightScale
-const nodeRadiusOffset = ls=> (d:N)=>
+const nodeRadiusOffset = (ud:UnitDisk)=> (d:N)=>
     CptoCk({ 
         θ:(d.layoutReference||d.layout).zp.θ, 
         r:navBgNodeR 
     }) 
+
+const labelDelta = (ud:UnitDisk)=> (d:N, i:number, v:N[])=> 
+    CaddC(
+        nodeRadiusOffset(ud)(d),
+        bboxOffset(
+            d, 
+            'labellen-bg', 
+            d.layoutReference.zp || CktoCp(d.layout.z)
+        )(v[i])
+    )
 
 const navBackgroundLayers = [
     (v, ud:UnitDisk)=> new BackgroundLayer(v, {}),
@@ -42,13 +52,12 @@ const navBackgroundLayers = [
         invisible:  true,
         hideOnDrag: true,                    
         clip:       '#circle-clip' + ud.args.clipRadius,                            
-        data:       ()=> ud.cache.cells,      
-        // TODO: read d.z                      
+        data:       ()=> ud.cache.cells        
     }),
     (v, ud:UnitDisk)=> new ArcLayer(v, {                                        
         name:       'link-arcs',                            
         className:  'arc',
-        curvature:  '-', // + - 0 l
+        curvature:  '-',
         data:       ()=> ud.cache.links,  
         nodePos:    (n:N)=> (n.layoutReference || n.layout).z,
         nodePosStr: (n:N)=> (n.layoutReference || n.layout).zStrCache,
@@ -58,9 +67,8 @@ const navBackgroundLayers = [
     (v, ud:UnitDisk)=> new ArcLayer(v, {                                        
         name:       'link-arcs-focus',                            
         className:  'arc-focus',
-        curvature:  '-', // + - 0 l
-        data:       ()=> ud.cache.links
-                        .filter(n=> n.parent.cachep.r < .6),        
+        curvature:  '-',
+        data:       ()=> ud.cache.links.filter(n=> n.parent.cachep.r < .6),        
         nodePos:    (n:N)=> (n.layoutReference || n.layout).z,
         nodePosStr: (n:N)=> (n.layoutReference || n.layout).zStrCache,
         width:      (d:N)=> arcWidth(d) + (.005 * d.dampedDistScale),
@@ -69,14 +77,15 @@ const navBackgroundLayers = [
     (v, ud:UnitDisk)=> new ArcLayer(v, {                                        
         name:       'path-arcs',                
         className:  'arc',
-        curvature:  '-', // + - 0 l
+        curvature:  '-',
         data:       ()=> ud.cache.paths,       
         nodePos:    (n:N)=> (n.layoutReference || n.layout).z,
         nodePosStr: (n:N)=> (n.layoutReference || n.layout).zStrCache,        
         width:      (d:N)=> arcWidth(d) + (.013 * d.dampedDistScale),
-        classed:    s=> s.classed("hovered-path-nav",  d=> d.pathes && d.pathes.isPartOfAnyHoverPath)
-                         .classed("selected-path-nav", d=> d.pathes && d.pathes.isPartOfAnySelectionPath)
-                         .style("stroke",              d=> d.pathes && d.pathes.finalcolor)
+        classed:    s=> s
+            .classed("hovered-path-nav",  d=> d.pathes && d.pathes.isPartOfAnyHoverPath)
+            .classed("selected-path-nav", d=> d.pathes && d.pathes.isPartOfAnySelectionPath)
+            .style("stroke",              d=> d.pathes && d.pathes.finalcolor)
     }),            
     (v, ud:UnitDisk)=> new LabelLayer(v, {
         invisible:  true,
@@ -85,27 +94,26 @@ const navBackgroundLayers = [
         className:  'caption label-big',
         data:       ()=> ud.cache.emojis,
         text:       (d:N)=> d.icon,
-        delta:      (d:N, i:number, v:N[])=> CaddC(
-                        nodeRadiusOffset(ud)(d),
-                        bboxOffset(d, 'labellen-bg', d.layoutReference.zp || CktoCp(d.z))(v[i])),        
-        transform:  (d:N, delta:C)=> ` translate(${CtoStr(CaddC((d.layout||d.layoutReference).z, delta))})`
+        delta:      labelDelta(ud),
+        transform:  (d:N, delta:C)=> 
+            ` translate(${CtoStr(CaddC((d.layout||d.layoutReference).z, delta))})`
     }),
     (v, ud:UnitDisk)=> new LabelLayer(v, {
         name:       'labels',
         className:  'caption label-big', 
         data:       ()=> ud.args.hypertree.args.objects.selections,
         text:       (d:N)=> d.txt,
-        delta:      (d:N, i:number, v:N[])=> CaddC(
-                        nodeRadiusOffset(ud)(d),
-                        bboxOffset(d, 'labellen-bg', d.layoutReference.zp || CktoCp(d.z))(v[i])),
-        transform:  (d:N, delta:C)=> ` translate(${CtoStr(CaddC((d.layout||d.layoutReference).z, delta))})`
+        delta:      labelDelta(ud),
+        transform:  (d:N, delta:C)=> 
+            ` translate(${CtoStr(CaddC((d.layout||d.layoutReference).z, delta))})`
     }),           
     (v, ud:UnitDisk)=> new SymbolLayer(v, {
         name:       'symbols',
         data:       ()=> ud.cache.spezialNodes,                                        
         r:          (d:N)=> .03,
-        transform:  (d:N)=> ` translate(${(d.layoutReference || d.layout).zStrCache})`
-                          + ` scale(${d.dampedDistScale})`,
+        transform:  (d:N)=> 
+            ` translate(${(d.layoutReference || d.layout).zStrCache})`
+          + ` scale(${d.dampedDistScale})`,
     }),
 ]
 
@@ -123,10 +131,10 @@ var Pscale =  (ud:UnitDisk)=> (d:N)=>
 
 const navParameterLayers = [
     (v, ud:UnitDisk)=> new CellLayer(v, {
-        invisible:  true,
-        hideOnDrag: true,
-        clip:       '#circle-clip'+ud.args.clipRadius,
-        data:       ()=> ud.cache.cells,                                        
+        invisible:   true,
+        hideOnDrag:  true,
+        clip:        '#circle-clip' + ud.args.clipRadius,
+        data:        ()=> ud.cache.cells,                                        
     }), 
     (v, ud:UnitDisk)=> new NodeLayer(v, {
         name:        'nodes',
@@ -136,16 +144,16 @@ const navParameterLayers = [
         transform:   (d:N)=> d.transformStrCache,
     }),
     (v, ud:UnitDisk)=> new LabelLayer(v, {
-        invisible:  true,
-        hideOnDrag: true,   
+        invisible:   true,
+        hideOnDrag:  true,   
         name:        'labels',
         className:   'caption',
         data:        ()=> ud.cache.unculledNodes,
         text:        (d:N)=> ({ P:'+', θ:'🠆', λ:'⚲' })[d.name],
         delta:       (d:N)=> deltaMap[d.name],
         transform:   (d:N, delta:C)=> 
-                        ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` 
-                        + rotate(d)
+            ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` 
+            + rotate(d)
     }),
     (v, ud:UnitDisk)=> new InteractionLayer(v, {        
         nohover:     true,
@@ -290,8 +298,7 @@ export class UnitDiskNav implements IUnitDisk
             //cacheUpdate:        args.cacheUpdate,
             cacheUpdate:        null,
             transformation:     args.transformation,
-            transform:          (n:N)=> n.z,
-
+            transform:          (n:N)=> n.layout.z,
             caption:            (n:N)=> undefined,
             nodeRadius:         navBgNodeR,
             clipRadius:         1
@@ -307,38 +314,29 @@ export class UnitDiskNav implements IUnitDisk
             className:          'nav-parameter-disc',
             position:           'translate(95,95) scale(70)',
             hypertree:          args.hypertree,
-            data:               obj2data(args.transformation.state),
-            /*data:               <N & d3.HierarchyNode<N>>d3
-                                    .hierarchy(obj2data(args.transformation.state))
-                                    .each((n:any)=> {
-                                        n.mergeId = ncount++
-                                        n.pathes = {}
-                                    }),*/
+            data:               obj2data(args.transformation.state),            
             layers:             navParameterLayers,
             cacheUpdate:        (ud:UnitDisk, cache:TransformationCache)=> {
-                                    var t0 = performance.now()
-                                    cache.unculledNodes = dfsFlat(ud.args.data)
-                                    for (var n of cache.unculledNodes) {
-                                        n.cache = n.cache || { re:0, im:0 }
-                                        var np = ud.args.transform(n)
-                                        if (n.name == 'θ' || n.name == 'λ')
-                                            np = CmulR(np, 1.08)
-                                        CassignC(n.cache, np)
+                var t0 = performance.now()
+                cache.unculledNodes = dfsFlat(ud.args.data)
+                for (var n of cache.unculledNodes) {
+                    n.cache = n.cache || { re:0, im:0 }
+                    var np = ud.args.transform(n)
+                    if (n.name == 'θ' || n.name == 'λ')
+                        np = CmulR(np, 1.08)
+                    CassignC(n.cache, np)
 
-                                        n.cachep            = CktoCp(n.cache)
-                                        n.strCache          = n.cache.re + ' ' + n.cache.im
-                                        n.scaleStrText      = ` scale(1)`
-                                        n.transformStrCache = ` translate(${n.strCache})`
-                                    }
-                                    cache.voronoiDiagram = ud.voronoiLayout(cache.unculledNodes)
-                                    cache.cells = <any>cache.voronoiDiagram.polygons()            
-
-                                    ud.cacheMeta = { minWeight:[0], Δ:[performance.now()-t0] }
-                                    //try { cache.voronoiDiagram = ud.voronoiLayout(cache.unculledNodes) } catch(e) {}
-                                },
+                    n.cachep            = CktoCp(n.cache)
+                    n.strCache          = n.cache.re + ' ' + n.cache.im
+                    n.scaleStrText      = ` scale(1)`
+                    n.transformStrCache = ` translate(${n.strCache})`
+                }
+                cache.voronoiDiagram = ud.voronoiLayout(cache.unculledNodes)
+                cache.cells = <any>cache.voronoiDiagram.polygons()
+                ud.cacheMeta = { minWeight:[0], Δ:[performance.now()-t0] }              
+            },
             transformation:     navTransformation,
             transform:          (n:any)=> CmulR(n, -1),
-
             caption:            (n:N)=> undefined,
             nodeRadius:         .16,
             clipRadius:         1.7

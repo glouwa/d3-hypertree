@@ -217,7 +217,7 @@ export class Hypertree
             this.update.pathes()
         },
         gotoHome: ()=>    this.animateTo({ re:0, im:0 }, null), 
-        gotoNode: (n:N)=> this.animateTo({ re:n.z.re, im:n.z.im }, null),
+        gotoNode: (n:N)=> this.animateTo({ re:n.layout.z.re, im:n.layout.z.im }, null),
 /*
         gotoT (TS)
 
@@ -318,7 +318,7 @@ export class Hypertree
             hypertree:      this,
             data:           this.data,            
             transformation: this.args.geometry.transformation,
-            transform:      (n:N)=> this.unitdisk.args.transformation.transformPoint(n.z),
+            transform:      (n:N)=> this.unitdisk.args.transformation.transformPoint(n.layout.z),
             layers:         this.args.geometry.layers,
             cacheUpdate:    this.args.geometry.cacheUpdate,
             caption:        (n:N)=> this.args.caption(this, n),
@@ -560,8 +560,8 @@ export class Hypertree
         
         const t = this.args.geometry.transformation
         if (t.cache.centerNode) {
-            t.state.P.re = -t.cache.centerNode.z.re
-            t.state.P.im = -t.cache.centerNode.z.im
+            t.state.P.re = -t.cache.centerNode.layout.z.re
+            t.state.P.im = -t.cache.centerNode.layout.z.im
         }
 
         requestAnimationFrame(()=> {
@@ -619,8 +619,9 @@ export class Hypertree
                 //app.toast('Layout')
                 this.args.layout(this.data, this.args.geometry.transformation.state)
                 
-                if (this.data.leaves()
-                             .reduce((max, n)=> Math.max(max, CktoCp(n.z).r), 0) > .95)                     
+                if (this.data
+                    .leaves()
+                    .reduce((max, n)=> Math.max(max, CktoCp(n.layout.z).r), 0) > .95)                     
                 {
                     // on abort
                     this.animation = false
