@@ -1,30 +1,6 @@
 import { C, Cp, Ck }     from '../../models/transformation/hyperbolic-math'
 import { HierarchyNode } from 'd3'
 
-/*
-export interface NavObject {
-}
-
-export interface File {    
-    io {
-        read,
-        write,
-    }
-}
-
-export interface TreeFile   extends File {} // folderstructure, skos...
-export interface StringFile extends File {}
-
-export interface Species {
-    name:string,
-    numLeafs:number,
-    ottId:string,
-    hasWiki:boolean,
-}
-
-//HierarchyNode<Datum>
-*/
-
 export interface Path {    
     type:      string,
     id:        string,
@@ -34,35 +10,6 @@ export interface Path {
     ancestors: N[],
     color:     string
 }
-
-/*export class Path {    
-    type:      string
-    id:        string
-    icon:      string
-    head_:     N
-    headName:  string
-    ancestors: N[]
-    color:     string
-
-    constructor()
-    {
-
-    }
-
-    get head(){
-        return this.head
-    }
-
-    set head(h)
-    {
-        this.head_ = h
-        // remove old
-        // add new
-    }
-
-    remove()
-    
-}*/ 
 
 export interface N {    
     mergeId:            number,
@@ -80,33 +27,36 @@ export interface N {
     descendants,
     leaves,
     each,
-
     sum,
 
 //  labels
-    label:              string,
-    txt:                string,
-    icon:               string,
-    labellen:           number
-    imageHref:          string,
+    precalc: {
+        weight:             number
+        weightScale:        number
+        icon:               string
+        txt:                string
+        label:              string
+        labellen:           number
+        imageHref:          string
+    }
     
     layout: {
         wedge: {
-            α:          number,
-            Ω:          number,
+            α:              number,
+            Ω:              number,
         },
-        z?:             Ck,
-        zStrCache?:     string,
-        zp?:            Cp,
+        z?:                 Ck,
+        zStrCache?:         string,
+        zp?:                Cp,
     }
     layoutReference: {
         wedge: {
-            α:          number,            
-            Ω:          number,
+            α:              number,            
+            Ω:              number,
         },
-        z?:             Ck,
-        zStrCache?:     string,
-        zp?:            Cp,
+        z?:                 Ck,
+        zStrCache?:         string,
+        zp?:                Cp,
     }
 
 //cahce
@@ -127,10 +77,7 @@ export interface N {
     scaleStrText?:      string,
     distScale?:         number,
     dampedDistScale?:   number,
-    weightScale?:       number,
     hasOutChildren:     boolean,
-
-// selection
     
     pathes: {
         headof:         Path,
@@ -142,13 +89,7 @@ export interface N {
         isPartOfAnyHoverPath?:     boolean,
     },
 
-    /*
-    virtuals (calaulated): {           alles on load
-        weights, weightscale.        
-        labels, len, txt icon, img,
-
-    },  
-
+/*
     filter (selection): {},
         layout: {},          ...      
         transformation: {},

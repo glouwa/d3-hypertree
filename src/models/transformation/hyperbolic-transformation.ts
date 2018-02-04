@@ -9,7 +9,7 @@ export interface Transformation<OT>
 {    
     state:          T, // state: T,
     isMoving:       ()=> boolean,
-    cache: TransformationCache,
+    cache:          TransformationCache,
 
     transformPoint: (n:C)=> C,
     transformDist:  (p:C)=> number,
@@ -26,9 +26,10 @@ export interface Transformation<OT>
 export class HyperbolicTransformation implements Transformation<N>
 {
     cache: TransformationCache = new TransformationCache()
-    state:  T
+    state: T
     dST: T    
     maxMouseR = .98
+    
     constructor(tp)  { this.state = tp }
 
     transformPoint = (p:C)=> h2e(this.state, p)
@@ -45,9 +46,10 @@ export class HyperbolicTransformation implements Transformation<N>
 export class PanTransformation implements Transformation<N>
 {
     cache: TransformationCache = new TransformationCache()
-    state:  T
+    state: T
     dST: T
     maxMouseR = 1000
+
     constructor(tp)  { this.state = tp }
 
     transformPoint = (p:C)=> {
@@ -73,7 +75,8 @@ export class NegTransformation implements Transformation<N>
     state:  T
     decorated: Transformation<N>
     maxMouseR = 0
-    constructor(d: Transformation<N>)  {
+
+    constructor(d: Transformation<N>) {
         this.decorated = d
         this.state = d.state
         this.maxMouseR = d.maxMouseR

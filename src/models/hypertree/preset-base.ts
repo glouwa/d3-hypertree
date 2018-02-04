@@ -322,8 +322,8 @@ function findStartNode(interaction:UnitDisk, cache:TransformationCache) {
     return startNode
 }
 function pathToLastVisible(ud:UnitDisk, cache:TransformationCache) {
-    var startNode : N = null
-    var path = []
+    let startNode : N = null
+    let path = []
     if (ud.args.data) {
         startNode = cache.centerNode || ud.args.data        
         path.push(startNode)
@@ -587,7 +587,7 @@ export const presets =
         objects: {                      // oder indizes?
             selections: [],
             pathes: [],        
-        },        
+        },
         
         // most important    
         decorator: UnitDiskNav,

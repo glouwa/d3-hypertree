@@ -363,6 +363,8 @@ export class Hypertree
                 .hierarchy(d3h)
                 .each((n:any)=> {
                     n.mergeId = ncount++
+                    n.value = null
+                    n.precalc = {}
                     n.layout = null
                     n.layoutReference = null
                     n.pathes = {}
