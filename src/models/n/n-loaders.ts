@@ -139,6 +139,7 @@ export function obj2data(o)
     for (var name in o) {
         var newN = o[name]
         newN.mergeId = mergeId++
+        newN.precalc = {}
         newN.name = name
         //newN.parent = cur
         newN.children = []

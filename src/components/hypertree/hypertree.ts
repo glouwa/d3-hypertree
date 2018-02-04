@@ -438,13 +438,13 @@ export class Hypertree
     }
 
     private addPath(pathType:string, n:N) {
-        const plidx = Math.abs(stringhash(n.txt))
+        const plidx = Math.abs(stringhash(n.precalc.txt))
         const newpath:Path = {
             type:      pathType,
             id:        this.btnPathId(pathType, n),
             icon:      ({ 'HoverPath':'mouse' })[pathType] || 'place',
             head:      n,
-            headName:  n.label,
+            headName:  n.precalc.label,
             ancestors: n.ancestors(),            
             color:     ({ 'HoverPath':'none' })[pathType] || googlePalette(plidx) || 'red' ,            
         }
@@ -471,7 +471,7 @@ export class Hypertree
         // view: btn   ==> update.btntoolbar()    
         const btnElem = HTML.parse(btn(newpath.id, newpath.icon, '', newpath.color))()        
         btnElem.onclick = ()=> this.api.gotoNode(n)
-        btnElem.title = `${n.txt} ${plidx}`
+        btnElem.title = `${n.precalc.txt} ${plidx}`
         this.view_.pathesToolbar.insertBefore(btnElem, pathType==='HoverPath' ? null : this.view_.pathesToolbar.firstChild)        
     }
 
@@ -520,9 +520,9 @@ export class Hypertree
     private updateLang_(dl=0) {
         const t0 = performance.now()
         for (var n of dfsFlat(this.data, n=>true)) {
-            n.txt = null            
-            n.label = this.args.caption(this, n)
-            n.labellen = undefined
+            n.precalc.txt = null            
+            n.precalc.label = this.args.caption(this, n)
+            n.precalc.labellen = undefined
         }
         if (dl || !this.langMeta)
             this.langMeta = {
@@ -534,7 +534,7 @@ export class Hypertree
 
     private updateImgHref_() {
         for (var n of dfsFlat(this.data, n=>true)) 
-            n.imageHref = this.args.iconmap.fileName2IconUrl(n.data.name, n.data.type)                    
+            n.precalc.imageHref = this.args.iconmap.fileName2IconUrl(n.data.name, n.data.type)                    
     }
 
     //########################################################################################################
@@ -547,7 +547,7 @@ export class Hypertree
         this.data.sum(this.args.weight) // äää besser...
         for (var n of dfsFlat(this.data, n=>true)) 
             // ...hier selber machen
-            n.weightScale = (Math.log2(n.value) || 1) 
+            n.precalc.weightScale = (Math.log2(n.value) || 1) 
                           / (Math.log2(this.data.value || this.data.children.length) || 1)
         
         this.updateLayout()

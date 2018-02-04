@@ -167,7 +167,7 @@ const layerSrc = [
     (v, ud:UnitDisk)=> new layers.ImageLayer(v, {
         name:       'images',
         data:       ()=> ud.cache.images,
-        imagehref:  (d)=> d.imageHref,
+        imagehref:  (d)=> d.precalc.imageHref,
         delta:      (d)=> CmulR({ re:-.025, im:-.025 }, d.distScale),
         transform:  (d, delta)=> 
                         ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` 
@@ -178,7 +178,7 @@ const layerSrc = [
         name:       'labels',
         className:  'caption',
         data:       ()=> ud.cache.labels,
-        text:       (d)=> d.label,
+        text:       (d)=> d.precalc.label,
         delta:      (d, i, v)=> CaddC(
                         nodeRadiusOffset(ud)(d),
                         bboxOffset(d)(v[i])), 
@@ -190,7 +190,7 @@ const layerSrc = [
         name:       'emojis',  
         className:  'caption',                          
         data:       ()=> ud.cache.emojis,
-        text:       (d)=> d.label,
+        text:       (d)=> d.precalc.label,
         delta:      (d, i, v)=> CaddC(
                         nodeRadiusOffset(ud)(d),
                         bboxOffset(d)(v[i])),
@@ -385,7 +385,9 @@ function doVoronoiStuff(ud:UnitDisk, cache:TransformationCache) {
     const centerCell = cache.voronoiDiagram.find(0, 0)
     if (centerCell) {
         cache.centerNode = centerCell.data
-        const pathStr = cache.centerNode.ancestors().reduce((a, e)=> `${e.txt?("  "+e.txt+"  "):''}${a?"›":""}${a}`, '') 
+        const pathStr = cache.centerNode
+            .ancestors()
+            .reduce((a, e)=> `${e.precalc.txt?("  "+e.precalc.txt+"  "):''}${a?"›":""}${a}`, '') 
         const hypertree = ud.args.hypertree
         hypertree.view_.path.innerText = pathStr // todo: html m frame?
 
@@ -416,23 +418,23 @@ function doLabelStuff(ud:UnitDisk, cache:TransformationCache) {
     }
     var wikiR = λmap(undefined)
     var labels = cache.unculledNodes
-        .filter((e:N)=> e.label)
+        .filter((e:N)=> e.precalc.label)
 
     var pathLabels = labels
         .filter((e:N)=> e.pathes.partof && e.pathes.partof.length)
 
     var stdlabels = labels
         .filter(e=> pathLabels.indexOf(e) === -1)
-        .filter(e=> !e.icon)
+        .filter(e=> !e.precalc.icon)
         .filter((e:N)=>         
                    !e.parent                
                 || !e.isOutλ
-                || (e.cachep.r <= wikiR  && e.label.startsWith('𝐖')))
+                || (e.cachep.r <= wikiR  && e.precalc.label.startsWith('𝐖')))
         //.sort((a, b)=> a.label.length - b.label.length)
         //.slice(0, 15)        
     
     var emojis = labels
-        .filter((e:N)=> e.icon)
+        .filter((e:N)=> e.precalc.icon)
 
     cache.labels = stdlabels.concat(pathLabels)
     cache.emojis = emojis
@@ -440,7 +442,7 @@ function doLabelStuff(ud:UnitDisk, cache:TransformationCache) {
 
 function doImageStuff(ud:UnitDisk, cache:TransformationCache) {
     cache.images = cache.unculledNodes
-        .filter((e:N)=> e.imageHref)
+        .filter((e:N)=> e.precalc.imageHref)
 }
 
 var nodeInitR = ls=> d=>
@@ -455,10 +457,10 @@ var nodeScale = d=>
 var arcWidth = d=>
     .022
     * d.distScale
-    * d.weightScale
+    * d.precalc.weightScale
 
 var innerNodeScale = d=>
-    d.weightScale
+    d.precalc.weightScale
 
 var nodeRadiusOffset = ls=> d=>
     CptoCk({ θ:d.cachep.θ, r:nodeInitR(ls)(d)*2 })
@@ -503,10 +505,10 @@ export const presets =
             const l  = ht.langMap && ht.langMap[id] ? '𝐖 ' + ht.langMap[id] : ''
             
             const i  = emojimap[id]
-            n.icon = i                        
-            n.txt = i || l || id
+            n.precalc.icon = i                        
+            n.precalc.txt = i || l || id
 
-            if (n.txt) return n.txt + tosub(w) 
+            if (n.precalc.txt) return n.precalc.txt + tosub(w) 
             else return undefined
         },        
         layout:       layoutBergé, // [0, π/2]
@@ -618,9 +620,9 @@ export const presets =
         weight:       (n:N)=> ((!n.children || !n.children.length)?1:0),
         caption: (ht:Hypertree, n:N)=> {            
             const w  = (!n.value || n.value==1) ? '' : n.value + ' '
-            n.txt = ( n.data && n.data.name) ? n.data.name : ''            
+            n.precalc.txt = ( n.data && n.data.name) ? n.data.name : ''            
 
-            return n.txt + tosub(w) 
+            return n.precalc.txt + tosub(w) 
         },
         layout:       layoutBergé, // [0, π/2]
         magic:        1/160,

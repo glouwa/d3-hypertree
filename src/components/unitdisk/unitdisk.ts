@@ -29,7 +29,7 @@ const navBgNodeR = .012
 const arcWidth = (d:N)=>
     .022
     * d.distScale
-    * d.weightScale
+    * d.precalc.weightScale
 const nodeRadiusOffset = (ud:UnitDisk)=> (d:N)=>
     CptoCk({ 
         θ:(d.layoutReference||d.layout).zp.θ, 
@@ -93,7 +93,7 @@ const navBackgroundLayers = [
         name:       'emojis',   
         className:  'caption label-big',
         data:       ()=> ud.cache.emojis,
-        text:       (d:N)=> d.icon,
+        text:       (d:N)=> d.precalc.icon,
         delta:      labelDelta(ud),
         transform:  (d:N, delta:C)=> 
             ` translate(${CtoStr(CaddC((d.layout||d.layoutReference).z, delta))})`
@@ -102,7 +102,7 @@ const navBackgroundLayers = [
         name:       'labels',
         className:  'caption label-big', 
         data:       ()=> ud.args.hypertree.args.objects.selections,
-        text:       (d:N)=> d.txt,
+        text:       (d:N)=> d.precalc.txt,
         delta:      labelDelta(ud),
         transform:  (d:N, delta:C)=> 
             ` translate(${CtoStr(CaddC((d.layout||d.layoutReference).z, delta))})`

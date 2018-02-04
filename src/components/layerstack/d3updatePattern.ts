@@ -102,7 +102,7 @@ export class D3UpdatePattern
                     /*|| d.cachep.r < 0.6*/)
                 {
                     var view:any = v[i]
-                    var w = d.labellen = d.labellen || view.getComputedTextLength()
+                    var w = d.precalc.labellen = d.precalc.labellen || view.getComputedTextLength()
                     var h = 0.04
                     var paddingLeftRight = .08
                     var paddingTopBottom = .02
@@ -123,7 +123,7 @@ export class D3UpdatePattern
 }
 
 export var bboxOffset = (d, cacheId='labellen', θn=undefined)=> v=> {
-    var w = d[cacheId] = d[cacheId] || v.getComputedTextLength()  //var bb = v.getBBox() war schlechter
+    var w = d.precalc[cacheId] = d.precalc[cacheId] || v.getComputedTextLength()  //var bb = v.getBBox() war schlechter
     var h = .045
     var paddingLeftRight = .08
     var paddingTopBottom = .02
