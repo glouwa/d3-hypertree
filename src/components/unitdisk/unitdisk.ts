@@ -117,14 +117,14 @@ const navBackgroundLayers = [
     }),
 ]
 
-var rotate = (d:N)=>
+var rotate = (d:N)=> // label rotation (font correction)
     (d.name === 'λ' ? ' rotate(-25)' : ' rotate(0)')
-var deltaMap = {
+var deltaMap = { // label offsets (font correction)
     P:{ re:.0025, im:.05 }, 
     θ:{ re:.0025, im:.019 }, 
     λ:{ re:.0025, im:.013 }
 }
-var Pscale =  (ud:UnitDisk)=> (d:N)=>
+var Pscale =  (ud:UnitDisk)=> (d:any)=>
     lengthDilledation(d)
     * (1 - πify(CktoCp(ud.args.transformation.state.λ).θ) / 2 / Math.PI)
     / ud.args.nodeRadius
@@ -193,6 +193,10 @@ export interface IUnitDisk
     HypertreeMetaType
     navParameter?:      UnitDisk,
 
+    api: {
+        setTransform: (t:string, tn:string)=> void
+    }
+
     update: {
         data:           ()=> void,
         layout:         ()=> void,
@@ -221,6 +225,10 @@ export class UnitDisk implements IUnitDisk
         this.update.parent()
     }
     
+    public api = {
+        setTransform: (t:string, tn:string)=> this.view.attr('transform', t)        
+    }
+
     public update = {
         parent: ()=> this.updateParent(),
         cache: ()=> this.args.cacheUpdate(this, this.cache),
@@ -343,6 +351,14 @@ export class UnitDiskNav implements IUnitDisk
         })
     }
     
+    public api = {
+        setTransform: (t:string, tn:string)=> {
+            this.view.api.setTransform(t, null)
+            this.navBackground.api.setTransform(tn, null)
+            this.navParameter.api.setTransform(tn, null)
+        }
+    }
+
     update = {
         data: ()=> { 
             this.navBackground.args.data = this.args.data

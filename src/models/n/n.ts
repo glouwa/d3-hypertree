@@ -59,7 +59,20 @@ export interface N {
         zp?:                Cp,
     }
 
-//cahce
+    navigation: {
+        layout: {
+        },
+        transformation: {
+        }
+    }
+
+    view: {
+        layout: {
+        },
+        transformation: {
+        }
+    }
+
     cache?:             C,
     cachep?:            Cp,
     strCache?:          string,    

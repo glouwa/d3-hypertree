@@ -287,14 +287,7 @@ export class Hypertree
                 'translate(-150,105) scale(70)'
             ]
             sizeidx = ++sizeidx % 5
-            if (true) {
-                const navUnitDisk = <UnitDiskNav>this.unitdisk
-                navUnitDisk.view.view.attr('transform', view[sizeidx])
-                navUnitDisk.navBackground.view.attr('transform', nav[sizeidx])
-                navUnitDisk.navParameter.view.attr('transform', nav[sizeidx])
-            }
-            else
-                this.unitdisk.view.attr('transform', view[sizeidx])
+            this.unitdisk.api.setTransform(view[sizeidx], nav[sizeidx])
         }
         let sizeidx = 0
 

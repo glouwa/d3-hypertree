@@ -21,9 +21,20 @@ import { TransformationCache }      from '../../index'
 import { HypertreeArgs }            from '../../models/hypertree/model'
 import { UnitDisk }                 from '../../components/unitdisk/unitdisk'
 import { UnitDiskNav }              from '../../components/unitdisk/unitdisk'
-import { layers }                   from '../../index'
+
 import { bboxOffset }               from '../../index'
 import { Hypertree }                from '../../components/hypertree/hypertree'
+
+import { NodeLayer }               from '../../components/layers/node-layer'
+import { CellLayer }               from '../../components/layers/cell-layer'
+import { BackgroundLayer }         from '../../components/layers/background-layer'
+import { SymbolLayer }             from '../../components/layers/symbol-layer'
+import { ArcLayer }                from '../../components/layers/link-layer'
+import { LabelLayer }              from '../../components/layers/label-layer'
+import { InteractionLayer }        from '../../components/layers/interaction-layer'
+import { ImageLayer }              from '../../components/layers/image-layer';
+import { FocusLayer }              from '../../components/layers/focus-layer';
+
 
 var cullingRadius =   0.98
 var labelλExtension = 1.2
@@ -44,34 +55,34 @@ const layerSrc = [
     // interaction-trace
     // interaction-d3
     // interaction-hammer
-    (v, ud:UnitDisk)=> new layers.BackgroundLayer(v, {}),
-    (v, ud:UnitDisk)=> new layers.FocusLayer(v, {
+    (v, ud:UnitDisk)=> new BackgroundLayer(v, {}),
+    (v, ud:UnitDisk)=> new FocusLayer(v, {
         invisible:  true,
         name:       'λ',
         r:          ()=> πify(CktoCp(ud.args.transformation.state.λ).θ) / 2 / Math.PI                            
     }),
-    (v, ud:UnitDisk)=> new layers.FocusLayer(v, {        
+    (v, ud:UnitDisk)=> new FocusLayer(v, {        
         invisible:  true,
         name:       'labels-focus',
         r:          ()=> 1.2 * πify(CktoCp(ud.args.transformation.state.λ).θ) / 2 / Math.PI                            
     }),
-    (v, ud:UnitDisk)=> new layers.FocusLayer(v, {        
+    (v, ud:UnitDisk)=> new FocusLayer(v, {        
         invisible:  true,
         hideOnDrag: true,
         name:       'culling-r',
         r:          ()=> cullingRadius
     }),
-    (v, ud:UnitDisk)=> new layers.FocusLayer(v, {        
+    (v, ud:UnitDisk)=> new FocusLayer(v, {        
         invisible:  false,
         name:       '(0,0)',
         r:          ()=> .004
     }),
-    (v, ud:UnitDisk)=> new layers.CellLayer(v, {
+    (v, ud:UnitDisk)=> new CellLayer(v, {
         invisible:  false,
         clip:       '#circle-clip' + ud.args.clipRadius,
         data:       ()=> ud.cache.cells,                            
     }),
-    (v, ud:UnitDisk)=> new layers.NodeLayer(v, {
+    (v, ud:UnitDisk)=> new NodeLayer(v, {
         invisible:  true,
         hideOnDrag: true,
         name:       'weigths',
@@ -81,7 +92,7 @@ const layerSrc = [
         transform:  d=> d.transformStrCache 
                         + ` scale(${nodeScale(d)})`,
     }),
-    (v, ud:UnitDisk)=> new layers.NodeLayer(v, {                            
+    (v, ud:UnitDisk)=> new NodeLayer(v, {                            
         name:       'center-node',
         className:  'center-node', 
         //clip:       '#node-32-clip', centernode.id
@@ -90,7 +101,7 @@ const layerSrc = [
         transform:  d=> d.transformStrCache                            
                         + ` scale(${nodeScale(d)})`,
     }),
-    (v, ud:UnitDisk)=> new layers.ArcLayer(v, {
+    (v, ud:UnitDisk)=> new ArcLayer(v, {
         invisible:  false,
         hideOnDrag: false,
         name:       'path-arcs',
@@ -104,7 +115,7 @@ const layerSrc = [
                          .classed("selected-path", d=> d.pathes && d.pathes.isPartOfAnySelectionPath)
                          .style("stroke",          d=> d.pathes && d.pathes.finalcolor)
     }),
-    (v, ud:UnitDisk)=> new layers.ArcLayer(v, {
+    (v, ud:UnitDisk)=> new ArcLayer(v, {
         invisible:  true,
         hideOnDrag: true,
         name:       'path-lines',                            
@@ -118,7 +129,7 @@ const layerSrc = [
                          .classed("selected-path", d=> d.pathes && d.pathes.isPartOfAnySelectionPath)
                          .style("stroke",          d=> d.pathes && d.pathes.finalcolor)
     }),
-    (v, ud:UnitDisk)=> new layers.ArcLayer(v, {
+    (v, ud:UnitDisk)=> new ArcLayer(v, {
         invisible:  false,
         hideOnDrag: false,
         name:       'link-arcs',                            
@@ -134,7 +145,7 @@ const layerSrc = [
                          .style("stroke",      d=> d.pathes && d.pathes.finalcolor)
                          .attr("stroke-width", d=> w(d))
     }),
-    (v, ud:UnitDisk)=> new layers.ArcLayer(v, {
+    (v, ud:UnitDisk)=> new ArcLayer(v, {
         invisible:  true,
         hideOnDrag: true,
         name:       'link-lines',                            
@@ -149,7 +160,7 @@ const layerSrc = [
                          .style("stroke",      d=> d.pathes && d.pathes.finalcolor)
 
     }),                        
-    (v, ud:UnitDisk)=> new layers.NodeLayer(v, {
+    (v, ud:UnitDisk)=> new NodeLayer(v, {
         name:       'nodes',
         className:  'node',
         data:       ()=> ud.cache.leafOrLazy,
@@ -157,14 +168,14 @@ const layerSrc = [
         transform:  d=> d.transformStrCache                            
                         + ` scale(${nodeScale(d)})`,
     }),                        
-    (v, ud:UnitDisk)=> new layers.SymbolLayer(v, {
+    (v, ud:UnitDisk)=> new SymbolLayer(v, {
         name:       'symbols',
         data:       ()=> ud.cache.spezialNodes,
         r:          d=> .03,
         transform:  d=> d.transformStrCache 
                         + ` scale(${d.dampedDistScale})`,
     }),
-    (v, ud:UnitDisk)=> new layers.ImageLayer(v, {
+    (v, ud:UnitDisk)=> new ImageLayer(v, {
         name:       'images',
         data:       ()=> ud.cache.images,
         imagehref:  (d)=> d.precalc.imageHref,
@@ -173,7 +184,7 @@ const layerSrc = [
                         ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` 
                         + ` scale(${d.distScale})`
     }),
-    (v, ud:UnitDisk)=> new layers.LabelLayer(v, {                            
+    (v, ud:UnitDisk)=> new LabelLayer(v, {                            
         hideOnDrag: false,                            
         name:       'labels',
         className:  'caption',
@@ -186,7 +197,7 @@ const layerSrc = [
                         ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` 
                         + d.scaleStrText                            
     }),
-    (v, ud:UnitDisk)=> new layers.LabelLayer(v, {
+    (v, ud:UnitDisk)=> new LabelLayer(v, {
         name:       'emojis',  
         className:  'caption',                          
         data:       ()=> ud.cache.emojis,
@@ -198,7 +209,7 @@ const layerSrc = [
                         ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` 
                         + d.scaleStrText                            
     }),
-    (v, ud:UnitDisk)=> new layers.InteractionLayer(v, {                            
+    (v, ud:UnitDisk)=> new InteractionLayer(v, {                            
         mouseRadius: .95,
         nohover:     false,
         onClick:     (n:N, m:C)=> {
