@@ -24,6 +24,7 @@ import { LayerStack }              from '../layerstack/layerstack'
 import { HypertreeMeta }           from '../meta/hypertree-meta/hypertree-meta'
 import { HypertreeMetaNav }        from '../meta/hypertree-meta/hypertree-meta'
 import { bboxOffset }              from '../layerstack/d3updatePattern'
+import { Hypertree }               from '../hypertree/hypertree';
 
 const navBgNodeR = .012
 const arcWidth = (d:N)=>
@@ -172,7 +173,7 @@ export interface UnitDiskArgs
     parent:            any,
     position:          string,
     className:         string,
-    hypertree,
+    hypertree:         Hypertree,
     data:              N,
     layers:            ((v, ls:IUnitDisk)=> ILayer)[],
 
