@@ -13,7 +13,8 @@ import { LoaderFunction }      from '../../models/n/n-loaders'
 import { LayoutFunction }      from '../../models/n/n-layouts'
 import { dfsFlat }             from '../../models/transformation/hyperbolic-math'
 import { C, CktoCp, CptoCk }   from '../../models/transformation/hyperbolic-math'
-import { CassignC, CmulR }     from '../../models/transformation/hyperbolic-math'
+import { CassignC }            from '../../models/transformation/hyperbolic-math'
+import { CaddC, CsubC, CmulR } from '../../models/transformation/hyperbolic-math'
 import { sigmoid }             from '../../models/transformation/hyperbolic-math'
 import { Transformation }      from '../../models/transformation/hyperbolic-transformation'
 
@@ -463,7 +464,7 @@ export class Hypertree
         
         // view: btn   ==> update.btntoolbar()    
         const btnElem = HTML.parse(btn(newpath.id, newpath.icon, '', newpath.color))()        
-        btnElem.onclick = ()=> this.api.gotoNode(n)
+        btnElem.onclick = ()=> this.animateToNode(n, n.cache)
         btnElem.title = `${n.precalc.txt} ${plidx}`
         this.view_.pathesToolbar.insertBefore(btnElem, pathType==='HoverPath' ? null : this.view_.pathesToolbar.firstChild)        
     }
@@ -660,6 +661,73 @@ export class Hypertree
         var nav = this.unitdisk.navParameter 
                && this.unitdisk.navParameter.args.transformation.isMoving()
         return view || nav || this.animation
+    }
+
+    //########################################################################################################
+    //##
+    //## from interaction
+    //##
+    //########################################################################################################
+
+    private onDragStart = (n:N, m:C)=> {
+        if (!this.animationTimer)
+            this.args.geometry.transformation.onDragStart(m)
+    }
+
+    private onDragλ = (s:C, e:C)=> {
+        this.args.geometry.transformation.onDragλ(s, e)
+        this.updateLayout()
+    }
+
+    private onDragByNode = (n:N, s:C, e:C)=> {
+        if (n && n.name == 'θ') {
+            this.args.geometry.transformation.onDragθ(s, e)
+            this.updateTransformation()
+        }
+        else if (n && n.name == 'λ') {
+            this.onDragλ(s, e)
+        }
+        else {
+            this.args.geometry.transformation.onDragP(s, e)
+            this.updateTransformation()
+        }
+    }
+
+    private onDragEnd = (n:N, s:C, e:C)=> {
+        var dc = CsubC(s, e)        
+        var dist = Math.sqrt(dc.re*dc.re + dc.im*dc.im)
+        
+        //nothing done event
+        //if (dist < .006)
+        //    this.onClick(n, e) // sollte on click sein und auch timer berücksichtigen oder?        
+
+        // immer?
+        this.args.geometry.transformation.onDragEnd(e)
+        this.updateTransformation()
+    }
+
+    private animationTimer = null
+    private cancelAnimationTimer = ()=> { 
+        this.animationTimer.stop(); this.animationTimer = null 
+    }
+
+    private animateToNode(n:N, m:C) : void
+    {
+        if (this.animationTimer)
+            return
+
+        this.onDragStart(n, m)
+
+        var md = CktoCp(m), initR = md.r, step = 0, steps = 20
+        this.animationTimer = d3.timer(()=> {            
+            md.r = initR * (1 - sigmoid(step++/steps))
+            if (step > steps) {
+                this.cancelAnimationTimer()    
+                this.onDragEnd(n, m, CptoCk(md))
+            }
+            else  
+                this.onDragByNode(n, m, CptoCk(md))
+        },1)
     }
 }
 

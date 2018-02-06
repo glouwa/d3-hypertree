@@ -210,7 +210,7 @@ export class InteractionLayer implements ILayer
 
         this.onDragStart(n, m)
 
-        var md = CktoCp(m), initR = md.r, step = 0, steps = 20
+        var md = CktoCp(m), initR = md.r, step = 1, steps = 20
         this.animationTimer = d3.timer(()=> {            
             md.r = initR * (1 - sigmoid(step++/steps))
             if (step > steps) {
@@ -256,5 +256,15 @@ export class InteractionLayer implements ILayer
         //this.animateTo(n, ArrtoC(d3.mouse(this.args.parent)))
         this.args.onClick(n, m)
     }
+
+    // DEFINE EVENTS!!!
+    /*
+
+        pan (drag)
+        click
+        dblclick
+
+
+     */
 }
 
