@@ -98,8 +98,8 @@ const hypertreehtml =
         </div> 
 
         <div id="path-toolbar" class="tool-bar path-bar">            
-            ${btn('btn-path-center', 'add_circle', 'tool-seperator'/*, '#b5b5b5'*/)}
-            ${btn('btn-path-home', 'grade', 'red-text'/*, '#ffee55'*/)}
+            ${btn('btn-path-home', 'grade', 'tool-seperator'/*, '#ffee55'*/)}
+            ${btn('btn-path-center', 'add_circle', /*, '#b5b5b5'*/)}
         </div> 
         
         <svg width="calc(100% - 3em)" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">
@@ -346,8 +346,12 @@ export class Hypertree
         this.args.objects.pathes = []
         this.view_.path.innerText = ''
         this.view_.pathesToolbar.innerHTML = 
-            btn('btn-path-center', 'add_circle', 'tool-seperator'/*, '#b5b5b5'*/) 
-          + btn('btn-path-home', 'grade', 'red-text'/*, '#ffee55'*/)        
+            btn('btn-path-home', 'grade', 'tool-seperator', '#e2d773') //'#ffee55'
+          + btn('btn-path-center', 'add_circle', 'disabled'/*, '#b5b5b5'*/)
+        this.view_.pathesToolbar
+            .querySelector<HTMLButtonElement>('#btn-path-home')
+            .onclick = ()=> this.api.gotoHome()
+
         this.unitdisk.update.data()
 
         this.args.dataloader((d3h, t1, dl)=> {
@@ -463,7 +467,11 @@ export class Hypertree
         })        
         
         // view: btn   ==> update.btntoolbar()    
-        const btnElem = HTML.parse(btn(newpath.id, newpath.icon, '', newpath.color))()        
+        const btnElem = HTML.parse(btn(
+            newpath.id, 
+            newpath.icon, 
+            pathType === 'HoverPath' ? 'disabled' : '', 
+            newpath.color))()        
         btnElem.onclick = ()=> this.api.gotoNode(n)
         btnElem.title = `${n.precalc.txt} ${plidx}`
         this.view_.pathesToolbar.insertBefore(btnElem, pathType==='HoverPath' ? null : this.view_.pathesToolbar.firstChild)        

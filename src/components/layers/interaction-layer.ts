@@ -188,7 +188,8 @@ export class InteractionLayer implements ILayer
     private ping(p:C, c, s=true) {
         /*addping
         shift
-        pattern*/                
+        pattern*/    
+        /*           
         if (this.lastpingpos)
             this.view.parent.append('line')
                 .attr("class", "ping-line")
@@ -204,6 +205,7 @@ export class InteractionLayer implements ILayer
             .attr("fill", c)
 
         this.lastpingpos = p
+        */
         //this...addCircle().addAAnimation().noFertig(removecircle)
     }
 
