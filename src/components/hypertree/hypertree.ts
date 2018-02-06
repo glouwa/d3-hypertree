@@ -218,7 +218,7 @@ export class Hypertree
             this.update.pathes()
         },
         gotoHome: ()=>    this.animateTo({ re:0, im:0 }, null), 
-        gotoNode: (n:N)=> this.animateTo({ re:n.layout.z.re, im:n.layout.z.im }, null),
+        gotoNode: (n:N)=> this.animateTo(CmulR({ re:n.layout.z.re, im:n.layout.z.im }, -1), null),
 /*
         gotoT (TS)
 
@@ -464,7 +464,7 @@ export class Hypertree
         
         // view: btn   ==> update.btntoolbar()    
         const btnElem = HTML.parse(btn(newpath.id, newpath.icon, '', newpath.color))()        
-        btnElem.onclick = ()=> this.animateToNode(n, n.cache)
+        btnElem.onclick = ()=> this.api.gotoNode(n)
         btnElem.title = `${n.precalc.txt} ${plidx}`
         this.view_.pathesToolbar.insertBefore(btnElem, pathType==='HoverPath' ? null : this.view_.pathesToolbar.firstChild)        
     }
@@ -636,16 +636,18 @@ export class Hypertree
         requestAnimationFrame(()=> frame())
     }
 
-    private animateTo(newP, newλ) {
+    private animateTo(newP:C, newλ) {
         if (this.animation) return
         else this.animation = true
 
-        const initTS = clone(this.args.geometry.transformation.state)            
+        const initTS = clone(this.args.geometry.transformation.state)
+        const way = CsubC(newP, initTS.P)
+
         const steps = 16
         let step = 1
 
         const frame = ()=> {                                                
-            const animP = CmulR(initTS.P, 1-sigmoid(step/steps))
+            const animP = CaddC(initTS.P, CmulR(way, sigmoid(step/steps)))
             CassignC(this.args.geometry.transformation.state.P, animP)
             
             this.updateTransformation()
