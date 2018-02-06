@@ -9,6 +9,7 @@ import { C, CptoCk, CktoCp,
     dfsFlat, CsubC,
     arcCenter, πify,
     sigmoid }               from '../../models/transformation/hyperbolic-math'
+import { shift } from '../../index';
 
 export interface InteractionLayerArgs extends ILayerArgs
 {    
@@ -163,7 +164,52 @@ export class InteractionLayer implements ILayer
 
     //-----------------------------------------------------------------------------------------
 
+    private lastpingNodepos = null
+    private pingNode(n:N, c, s=true) {        
+        const p = n.cache
+        this.view.parent.append('circle')
+            .attr("class", "ping-circle")
+            .attr("r", s?.01:.05)
+            .attr("transform", ` translate(${p.re} ${p.im})`)
+            .attr("fill", c)
+        
+        if (this.lastpingNodepos)
+            this.view.parent.append('line')
+                .attr("class", "ping-line")
+                .attr('x1',             p.re)
+                .attr('y1',             p.im)
+                .attr('x2',             this.lastpingNodepos.re)
+                .attr('y2',             this.lastpingNodepos.im)                
+
+        this.lastpingNodepos = p
+    }
+
+    private lastpingpos = null
+    private ping(p:C, c, s=true) {
+        /*addping
+        shift
+        pattern*/                
+        if (this.lastpingpos)
+            this.view.parent.append('line')
+                .attr("class", "ping-line")
+                .attr('x1',             p.re)
+                .attr('y1',             p.im)
+                .attr('x2',             this.lastpingpos.re)
+                .attr('y2',             this.lastpingpos.im)                
+
+        this.view.parent.append('circle')
+            .attr("class", "ping-circle")
+            .attr("r", s?.01:.05)
+            .attr("transform", ` translate(${p.re} ${p.im})`)
+            .attr("fill", c)
+
+        this.lastpingpos = p
+        //this...addCircle().addAAnimation().noFertig(removecircle)
+    }
+
     private onDragStart = (n:N, m:C)=> {
+        this.ping(m, 'green', false)
+        //this.pingNode(n, 'green', false)
         if (!this.animationTimer)
             this.view.unitdisk.args.transformation.onDragStart(m)
     }
@@ -173,7 +219,7 @@ export class InteractionLayer implements ILayer
         this.view.hypertree.updateLayout()
     }
 
-    private onDragByNode = (n:N, s:C, e:C)=> {
+    private onDragByNode = (n:N, s:C, e:C)=> {  
         if (n && n.name == 'θ') {
             this.view.unitdisk.args.transformation.onDragθ(s, e)
             this.view.hypertree.updateTransformation()
@@ -183,11 +229,24 @@ export class InteractionLayer implements ILayer
         }
         else {
             this.view.unitdisk.args.transformation.onDragP(s, e)
+            this.ping(e, 'black')
+            //this.pingNode(n, 'orange')
             this.view.hypertree.updateTransformation()
         }
     }
 
-    private onDragEnd = (n:N, s:C, e:C)=> {
+    private onDragEnd = (n:N, s:C, e:C)=> {  
+        
+        const ti3 = d3.timer(()=> {
+            this.lastpingpos = null
+            this.lastpingNodepos = null
+            ti3.stop()
+            this.view.parent.selectAll('.ping-circle').remove()
+            this.view.parent.selectAll('.ping-line').remove()            
+        }, 2000)
+
+        this.ping(e, 'blue', false)
+        //this.pingNode(n, 'blue', false)
         var dc = CsubC(s, e)        
         var dist = Math.sqrt(dc.re*dc.re + dc.im*dc.im)
         
@@ -233,6 +292,7 @@ export class InteractionLayer implements ILayer
             d3.event.preventDefault()
             
         m = m || this.currMousePosAsC()
+        //m = n.cache
 
         if (!this.dblClickTimer) 
             this.dblClickTimer = setTimeout(() => {
