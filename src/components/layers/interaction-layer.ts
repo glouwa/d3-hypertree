@@ -184,12 +184,19 @@ export class InteractionLayer implements ILayer
         this.lastpingNodepos = p
     }
 
+    private traceColors = {
+        begin: '#ff5722',
+        mouse: '#2196f3',
+        frame: 'red',
+        end: '#4caf50',
+    }
     private lastpingpos = null
     private ping(p:C, c, s=true) {
         /*addping
         shift
-        pattern*/    
-        /*           
+        pattern*/  
+        return  
+                   
         if (this.lastpingpos)
             this.view.parent.append('line')
                 .attr("class", "ping-line")
@@ -205,12 +212,12 @@ export class InteractionLayer implements ILayer
             .attr("fill", c)
 
         this.lastpingpos = p
-        */
+        
         //this...addCircle().addAAnimation().noFertig(removecircle)
     }
 
     private onDragStart = (n:N, m:C)=> {
-        this.ping(m, 'green', false)
+        this.ping(m, this.traceColors.begin, false)
         //this.pingNode(n, 'green', false)
         if (!this.animationTimer)
             this.view.unitdisk.args.transformation.onDragStart(m)
@@ -231,7 +238,7 @@ export class InteractionLayer implements ILayer
         }
         else {
             this.view.unitdisk.args.transformation.onDragP(s, e)
-            this.ping(e, 'black')
+            this.ping(e, this.traceColors.mouse)
             //this.pingNode(n, 'orange')
             this.view.hypertree.updateTransformation()
         }
@@ -247,7 +254,7 @@ export class InteractionLayer implements ILayer
             this.view.parent.selectAll('.ping-line').remove()            
         }, 2000)
 
-        this.ping(e, 'blue', false)
+        this.ping(e, this.traceColors.end, false)
         //this.pingNode(n, 'blue', false)
         var dc = CsubC(s, e)        
         var dist = Math.sqrt(dc.re*dc.re + dc.im*dc.im)

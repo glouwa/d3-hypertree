@@ -97,7 +97,7 @@ const navBackgroundLayers = [
         text:       (d:N)=> d.precalc.icon,
         delta:      labelDelta(ud),
         transform:  (d:N, delta:C)=> 
-            ` translate(${CtoStr(CaddC((d.layout||d.layoutReference).z, delta))})`
+            ` translate(${CtoStr(CaddC((d.layoutReference||d.layout).z, delta))})`
     }),
     (v, ud:UnitDisk)=> new LabelLayer(v, {
         name:       'labels',
@@ -106,7 +106,7 @@ const navBackgroundLayers = [
         text:       (d:N)=> d.precalc.txt,
         delta:      labelDelta(ud),
         transform:  (d:N, delta:C)=> 
-            ` translate(${CtoStr(CaddC((d.layout||d.layoutReference).z, delta))})`
+            ` translate(${CtoStr(CaddC((d.layoutReference||d.layout).z, delta))})`
     }),           
     (v, ud:UnitDisk)=> new SymbolLayer(v, {
         name:       'symbols',
