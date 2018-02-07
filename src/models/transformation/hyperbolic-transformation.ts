@@ -28,7 +28,7 @@ export class HyperbolicTransformation implements Transformation<N>
     cache: TransformationCache = new TransformationCache()
     state: T
     dST:   T    
-    maxMouseR = .98
+    maxMouseR = .99
     
     constructor(tp)  { this.state = tp }
 

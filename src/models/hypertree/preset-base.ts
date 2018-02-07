@@ -55,22 +55,33 @@ const layerSrc = [
     // interaction-trace
     // interaction-d3
     // interaction-hammer
-    (v, ud:UnitDisk)=> new BackgroundLayer(v, {}),
-    (v, ud:UnitDisk)=> new FocusLayer(v, {
-        invisible:  true,
-        name:       'λ',
-        r:          ()=> πify(CktoCp(ud.args.transformation.state.λ).θ) / 2 / Math.PI                            
-    }),
-    (v, ud:UnitDisk)=> new FocusLayer(v, {        
-        invisible:  true,
-        name:       'labels-focus',
-        r:          ()=> 1.2 * πify(CktoCp(ud.args.transformation.state.λ).θ) / 2 / Math.PI                            
-    }),
+    (v, ud:UnitDisk)=> new BackgroundLayer(v, {}),    
     (v, ud:UnitDisk)=> new FocusLayer(v, {        
         invisible:  true,
         hideOnDrag: true,
         name:       'culling-r',
         r:          ()=> cullingRadius
+    }),
+    (v, ud:UnitDisk)=> new FocusLayer(v, {        
+        invisible:  true,
+        hideOnDrag: true,
+        name:       'mouse-r',
+        r:          ()=> .98
+    }),
+    (v, ud:UnitDisk)=> new FocusLayer(v, {        
+        invisible:  true,
+        name:       'labels-r',
+        r:          ()=> 1.2 * πify(CktoCp(ud.args.transformation.state.λ).θ) / 2 / Math.PI                            
+    }),    
+    (v, ud:UnitDisk)=> new FocusLayer(v, {        
+        invisible:  true,
+        name:       'labels-𝐖-r',
+        r:          ()=> ud.cache.wikiR
+    }),    
+    (v, ud:UnitDisk)=> new FocusLayer(v, {
+        invisible:  true,
+        name:       'λ',
+        r:          ()=> πify(CktoCp(ud.args.transformation.state.λ).θ) / 2 / Math.PI                            
     }),
     (v, ud:UnitDisk)=> new FocusLayer(v, {        
         invisible:  false,
@@ -87,6 +98,16 @@ const layerSrc = [
         hideOnDrag: true,
         name:       'weigths',
         className:  'weigths',
+        data:       ()=> ud.cache.weights,
+        r:          d=> nodeInitR(ud)(d),
+        transform:  d=> d.transformStrCache 
+                        + ` scale(${nodeScale(d)})`,
+    }),
+    (v, ud:UnitDisk)=> new NodeLayer(v, {
+        invisible:  true,
+        hideOnDrag: true,
+        name:       'wedges',
+        className:  'wedges',
         data:       ()=> ud.cache.weights,
         r:          d=> nodeInitR(ud)(d),
         transform:  d=> d.transformStrCache 
@@ -427,7 +448,8 @@ function doLabelStuff(ud:UnitDisk, cache:TransformationCache) {
         if (λ > 1/8) return  .6
         else         return  .5
     }
-    var wikiR = λmap(undefined)
+    
+    var wikiR = ud.cache.wikiR = λmap(undefined)
     var labels = cache.unculledNodes
         .filter((e:N)=> e.precalc.label)
 

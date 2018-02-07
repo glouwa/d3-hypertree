@@ -7,7 +7,7 @@
 }
 .render-info {
     z-index: 1000;   
-    width:21.5em;
+    width:21.2em;
     padding-left:.3em;
     padding-bottom:.1em;    
     font-size: .8em;
@@ -16,7 +16,7 @@
     grid-row-gap: 4px;
     //grid-column-gap: 3px;
     //grid-template-rows: repeat(8, auto);
-    grid-template-columns: 4.5em 1em auto 3em 1.15em .5em auto;
+    grid-template-columns: 4.5em 1em auto 3em 1.15em .5em .16em;
 
     .slider {
         position: relative; 
@@ -77,7 +77,7 @@
         width: 2px;        
         height: 100%;
         grid-row: auto / span 2;
-        margin-left: 2px;
+        margin-left: 1px;
         opacity: 0;
     }
 
