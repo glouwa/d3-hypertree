@@ -1,6 +1,8 @@
 import * as d3            from 'd3'
 import { HTML }           from 'ducd'
 import { t }              from 'ducd'
+import { stringhash }     from 'ducd'
+import { googlePalette }  from 'ducd'
 import { IUnitDisk }      from '../../unitdisk/unitdisk'
 import { CptoCk, CktoCp } from '../../../models/transformation/hyperbolic-math'
 import { πify }           from '../../../models/transformation/hyperbolic-math'
@@ -199,6 +201,10 @@ function UnitdiskMeta_({ parent, ud, className })
         slider.onmousedown = e=> e.stopPropagation()
         slider.onmousemove = e=> e.stopPropagation()
         slider.onmouseup = e=> e.stopPropagation()
+        slider.ontouchstart = e=> e.stopPropagation()
+        slider.ontouchmove = e=> e.stopPropagation()
+        slider.ontouchend = e=> e.stopPropagation()
+        slider.ontouchcanel = e=> e.stopPropagation()
     }
 
     const λsliderInit = (sliderHtml)=> sliderInit(sliderHtml, sliderBindingλ)
@@ -229,18 +235,20 @@ function UnitdiskMeta_({ parent, ud, className })
     ui.updateSvgInfo = ()=> {
         const layerStack = ud.layerStack
         const Δ = []
+        const colors = []
         if (layerStack)
             for (var l in layerStack.layers) {            
                 const d3updatePattern = layerStack.layers[l].d3updatePattern                
                 const elemCount = d3updatePattern ? d3updatePattern.data.length : 1
                 Δ.push(elemCount)
+                colors.push(googlePalette(stringhash(layerStack.layers[l].name)))
             }
             const a = Δ.reduce((a,e)=> a+e, 0).toFixed(0)
                 
         const v = rows.rendering
         v.q.innerHTML = `${a}` 
         
-        updateBar(v.bar, Δ.map(e=> e*mag_svg), typeColors)                
+        updateBar(v.bar, Δ.map(e=> e*mag_svg), colors)                
         ping(v.useIndic)
         ping(v.overuseIndic, parseFloat(a) > maxSvg)        
     }
@@ -251,6 +259,7 @@ function UnitdiskMeta_({ parent, ud, className })
         const layerlist = ud.layerStack.d3meta.names
 
         const t = Δ.reduce((a,e)=> a+e).toFixed(0)
+        const colors = layerlist.map(e=> googlePalette(stringhash(e)))
 
         const v = rows.d3
         
@@ -258,7 +267,7 @@ function UnitdiskMeta_({ parent, ud, className })
         v.info.title     = Δ.map((e, i)=> `${layerlist[i]}: ${e.toFixed(1)}ms`).join('\n')
         v.q.innerHTML    = `${t}`
 
-        updateBar(v.bar, Δ.map(e=> e*mag_time), typeColors)
+        updateBar(v.bar, Δ.map(e=> e*mag_time), colors)
         ping(v.useIndic)
         if (parseFloat(t) > maxTime) ping(v.overuseIndic)
     }
@@ -448,9 +457,6 @@ class BoxplotRow {
         this.label.innerText = 'hallo'
     }
 }
-
-const colors         = ["#3366cc", "#dc3912", "#ff9900", "#109618", "#990099", "#0099c6", "#dd4477", "#66aa00", "#b82e2e", "#316395", "#994499", "#22aa99", "#aaaa11", "#6633cc", "#e67300", "#8b0707", "#651067", "#329262", "#5574a6", "#3b3eac"];
-const typeColors     = colors
 
 const maxTime        = 25     // 25ms
 const maxSvg         = 1000

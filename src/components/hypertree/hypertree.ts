@@ -436,7 +436,7 @@ export class Hypertree
     }
 
     private addPath(pathType:string, n:N) {
-        const plidx = Math.abs(stringhash(n.precalc.txt))
+        const plidx = stringhash(n.precalc.txt)
         const newpath:Path = {
             type:      pathType,
             id:        this.btnPathId(pathType, n),

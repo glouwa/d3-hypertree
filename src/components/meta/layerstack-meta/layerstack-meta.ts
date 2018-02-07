@@ -1,7 +1,9 @@
-import * as d3  from 'd3'
-import { HTML } from 'ducd'
-import { ILayer } from '../../layerstack/layer'
-import { IUnitDisk } from '../../unitdisk/unitdisk'
+import * as d3              from 'd3'
+import { HTML }             from 'ducd'
+import { stringhash }       from 'ducd'
+import { googlePalette }    from 'ducd'
+import { ILayer }           from '../../layerstack/layer'
+import { IUnitDisk }        from '../../unitdisk/unitdisk'
 
 export class LayerStackMeta
 {
@@ -82,10 +84,7 @@ export function LayerInfo_({ parent, onCheckChange, className })
     
     var rows = []
     var cols = ['name', 'type', 'count', 'time', 'enabled']
- 
-    var colores = d3.schemeCategory10
-    var colores = ["#3366cc", "#dc3912", "#ff9900", "#109618", "#990099", "#0099c6", "#dd4477", "#66aa00", "#b82e2e", "#316395", "#994499", "#22aa99", "#aaaa11", "#6633cc", "#e67300", "#8b0707", "#651067", "#329262", "#5574a6", "#3b3eac"];
-    
+     
     const maxElementCount = 300        
     const maxElementCountGlobal = 1000        
     const maxTimeLayer = 10
@@ -100,13 +99,13 @@ export function LayerInfo_({ parent, onCheckChange, className })
     var sum = 0
     var sumtime = 0
     
-
-    var  pos = 0
+    var pos = 0
     var cc = 0
     ui.addlayer = function(layer) {
 
-        var ccidx = (colores.length+cc++)%colores.length
         var name = layer.name        
+        var color = googlePalette(stringhash(name))
+        
         var checked =  ()=> !layer.args.invisible
         var checked2 = ()=> !layer.args.hideOnDrag
         var count =    ()=> (layer.d3updatePattern && layer.d3updatePattern.data ? layer.d3updatePattern.data.length : 1)        
@@ -140,7 +139,7 @@ export function LayerInfo_({ parent, onCheckChange, className })
                 layerViews.time.innerHTML = checker ? timeStr : ``
 
                 layerViews.bar.children[0].style.width = (time/maxTimeLayer*100*1000)+'%'
-                layerViews.bar.children[0].style.backgroundColor = colores[ccidx]
+                layerViews.bar.children[0].style.backgroundColor = color
                 ping(layerViews.ping1, checker && !isIrrelevant(time))
                 ping(layerViews.ping2, checker && !isIrrelevant(time) && time*1000 > maxTimeLayer)
             }
@@ -200,7 +199,7 @@ export function LayerInfo_({ parent, onCheckChange, className })
                 stateViews.time.innerHTML = timeStr
 
                 stateViews.bar.children[0].style.width = (sumtime/maxTimeLayerstack*100*1000)+'%'
-                stateViews.bar.children[0].style.backgroundColor = colores[0]
+                stateViews.bar.children[0].style.backgroundColor = googlePalette(0)
             }
         }
         switchRow = stateViews
