@@ -357,7 +357,7 @@ function UnitdiskMeta_({ parent, ud, className })
 
         const v = rows.data
 
-        v.info.innerHTML  = `${mysi(n)}<sub>N</sub>${sep}${kb}<sub>kB</sub>` 
+        v.info.innerHTML  = `${kb}<sub>kB</sub>${sep}${mysi(n)}<sub>N</sub>` 
         v.info.title      = `download: ${Δ[0].toFixed(0)}ms\n`
         v.info.title     += `parse: ${Δ[1].toFixed(0)}ms\n`
         v.info.title     += `hierarchy and weights: ${Δ[2].toFixed(0)}ms\n`

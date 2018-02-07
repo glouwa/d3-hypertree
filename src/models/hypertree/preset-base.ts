@@ -442,11 +442,8 @@ function doVoronoiStuff(ud:UnitDisk, cache:TransformationCache) {
 function doLabelStuff(ud:UnitDisk, cache:TransformationCache) {    
     var λmap = λ=> {
         λ = ud.args.transformation.state.λ
-        λ = πify(CktoCp(λ).θ) / 2 / Math.PI        
-        if (λ > 1/2) return 1.0
-        if (λ > 1/4) return  .75
-        if (λ > 1/8) return  .6
-        else         return  .5
+        λ = πify(CktoCp(λ).θ) / 2 / Math.PI
+        return λ + .3 * lengthDilledation(CptoCk({ θ:0, r:λ}))
     }
     
     var wikiR = ud.cache.wikiR = λmap(undefined)
