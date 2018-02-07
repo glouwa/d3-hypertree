@@ -1,7 +1,7 @@
 @import "unitdisk";
 
 $leafcolor:     #a5d6a7; //"#e3f2fd" "#ffe082
-$hovercolor:    #666;
+$hovercolor:    #65f;
 $selectedcolor: orange;
 $rootcolor:     #ffeb3b; //#e53935; //#e53935; //"#e3f2fd" "#ffe082
 $exitcolor:     #ce93d8; //"#e3f2fd" "#ffe082
@@ -24,7 +24,7 @@ $nodeStroke:    #90caf9;
             fill: none;            
         }
         .arc-focus {
-            stroke: $hovercolor; 
+            stroke: rgba($hovercolor, .45); 
             fill: none;
         }
         .node {
@@ -62,7 +62,7 @@ $nodeStroke:    #90caf9;
         //.hovered        { stroke: $hovercolor;                       fill: lighten($hovercolor, 25%);             }
         .hovered.arc    { stroke: $hovercolor;  fill:none;                                                          }
         .hovered-path.arc { stroke: rgba($hovercolor, .2);                                        }
-        .hovered-path-nav.arc { stroke: rgba($hovercolor, 1); }
+        .hovered-path-nav.arc { stroke: rgba(red, .65); }
         //.hovered.cell   { stroke: lighten($hovercolor, 27%);         fill: rgba(lighten($hovercolor, 0%), .15);   }
         .hovered.node   { stroke: darken($hovercolor, 10%);                                                       }
  
@@ -136,3 +136,4 @@ $nodeStroke:    #90caf9;
         }
     }
 }
+

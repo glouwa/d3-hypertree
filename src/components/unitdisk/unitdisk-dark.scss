@@ -70,7 +70,7 @@ $nodeStroke:    #90caf9;
         .hovered.node     { stroke: darken($hovercolor, 10%);                                                         }
 
         //.selected       { stroke: $selectedcolor;                      fill: lighten($selectedcolor, 25%);          }
-        .selected.arc      { stroke: rgba($selectedcolor, 1);                                     }
+        .selected.arc      { stroke: rgba($selectedcolor, 1);                                                          }
         .selected-path.arc { stroke: rgba($selectedcolor, .2);           stroke-opacity: .3;                             }
         .selected-path-nav.arc { stroke: rgba($selectedcolor, 1);                                                       }
         .selected.cell     { stroke: rgba($selectedcolor, .2);           fill: rgba(lighten($selectedcolor, 0%), .1); }
