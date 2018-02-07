@@ -214,7 +214,7 @@ function UnitdiskMeta_({ parent, ud, className })
     var e = 0
     var re = 7 
     var rows = {                
-        rendering: new BarRow   (ui, e+=0,  'SVG',                 '<sub>#</sub>'),
+        rendering: new BarRow   (ui, e+=0,  'Σ',                   '<sub>ms</sub>'),
         d3:        new BarRow   (ui, e+=re, 'D<sub>3</sub>',       '<sub>ms</sub>'),
         transform: new BarRow   (ui, e+=re, '∀<sub>visible</sub>', '<sub>ms</sub>'),     
         cullmaxw:  new SliderRow(ui, e+=re, 'ω<sub>cull</sub>',    '<sub>.5k</sub>', ωsliderInit, v=> `<sub>${v}</sub>`),

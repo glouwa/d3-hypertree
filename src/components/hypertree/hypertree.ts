@@ -28,7 +28,6 @@ import { UnitDiskNav }         from '../unitdisk/unitdisk'
 import { HypertreeMeta }       from '../meta/hypertree-meta/hypertree-meta'
 import { NoHypertreeMeta }     from '../meta/hypertree-meta/hypertree-meta'
 
-
 const π = Math.PI
 const htmlpreloader = `
     <div class="preloader-wrapper big active">

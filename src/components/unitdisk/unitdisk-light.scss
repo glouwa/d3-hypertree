@@ -24,7 +24,7 @@ $nodeStroke:    #90caf9;
             fill: none;            
         }
         .arc-focus {
-            stroke: rgba($hovercolor, .45); 
+            stroke: rgba($hovercolor, .35); 
             fill: none;
         }
         .node {
@@ -62,7 +62,7 @@ $nodeStroke:    #90caf9;
         //.hovered        { stroke: $hovercolor;                       fill: lighten($hovercolor, 25%);             }
         .hovered.arc    { stroke: $hovercolor;  fill:none;                                                          }
         .hovered-path.arc { stroke: rgba($hovercolor, .2);                                        }
-        .hovered-path-nav.arc { stroke: rgba(red, .65); }
+        .hovered-path-nav.arc { stroke: rgba(red, 1); }
         //.hovered.cell   { stroke: lighten($hovercolor, 27%);         fill: rgba(lighten($hovercolor, 0%), .15);   }
         .hovered.node   { stroke: darken($hovercolor, 10%);                                                       }
  
