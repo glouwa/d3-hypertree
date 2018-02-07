@@ -1,7 +1,7 @@
 @import "unitdisk";
 
 $leafcolor:     #a5d6a7; //"#e3f2fd" "#ffe082
-$hovercolor:    #65f;
+$hovercolor:    #64b5f6; //#65f;
 $selectedcolor: orange;
 $rootcolor:     #ffeb3b; //#e53935; //#e53935; //"#e3f2fd" "#ffe082
 $exitcolor:     #ce93d8; //"#e3f2fd" "#ffe082
@@ -60,16 +60,16 @@ $nodeStroke:    #90caf9;
         .exit.node      { stroke: rgba(darken($exitcolor, 50%), .5);                                              }
  
         //.hovered        { stroke: $hovercolor;                       fill: lighten($hovercolor, 25%);             }
-        .hovered.arc    { stroke: $hovercolor;  fill:none;                                                          }
+        .hovered.arc    { stroke: $hovercolor;                                                           }
         .hovered-path.arc { stroke: rgba($hovercolor, .2);                                        }
         .hovered-path-nav.arc { stroke: rgba(red, 1); }
         //.hovered.cell   { stroke: lighten($hovercolor, 27%);         fill: rgba(lighten($hovercolor, 0%), .15);   }
         .hovered.node   { stroke: darken($hovercolor, 10%);                                                       }
  
         //.selected       { stroke: $selectedcolor;                    fill: lighten($selectedcolor, 25%);          }
-        .selected.arc     { stroke: $selectedcolor;     fill:none;      }
+        .selected.arc     { stroke: $selectedcolor;                                                                }      
         .selected-path.arc { stroke: rgba($selectedcolor, .2);       stroke-opacity: .3;                           }
-        .selected-path-nav.arc { stroke: rgba($selectedcolor, 1);                                                       }
+        //.selected-path-nav.arc { stroke: rgba($selectedcolor, 1);                                                       }
         .selected.cell  { stroke: rgba($selectedcolor, .2);          fill: rgba(lighten($selectedcolor, 0%), .1); }
         .selected.node  { stroke: darken($selectedcolor, 5%);                                                     }
 
@@ -129,9 +129,11 @@ $nodeStroke:    #90caf9;
                 font-weight: 100;
                 fill: rgba(#000, 1)
             }
+            .hovered-path-nav.arc {
+                stroke: red; 
+            }
             .arc {
-                stroke: #aaa; // #b77d68; //#8d6e63;
-                fill: none;            
+                stroke: #aaa; // #b77d68; //#8d6e63;                
             }
         }
     }

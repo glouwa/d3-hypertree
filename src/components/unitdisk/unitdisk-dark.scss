@@ -72,7 +72,7 @@ $nodeStroke:    #90caf9;
         //.selected       { stroke: $selectedcolor;                      fill: lighten($selectedcolor, 25%);          }
         .selected.arc      { stroke: rgba($selectedcolor, 1);                                                          }
         .selected-path.arc { stroke: rgba($selectedcolor, .2);           stroke-opacity: .3;                             }
-        .selected-path-nav.arc { stroke: rgba($selectedcolor, 1);                                                       }
+        //.selected-path-nav.arc { stroke: rgba($selectedcolor, 1);                                                       }
         .selected.cell     { stroke: rgba($selectedcolor, .2);           fill: rgba(lighten($selectedcolor, 0%), .1); }
         .selected.node     { stroke: darken($selectedcolor, 5%);                                                       }
         
