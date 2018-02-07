@@ -1,7 +1,7 @@
 @import "unitdisk";
 
 $leafcolor:     #a5d6a7; //"#e3f2fd" "#ffe082
-$hovercolor:    #42a5f5;
+$hovercolor:    #666;
 $selectedcolor: orange;
 $rootcolor:     #ffeb3b; //#e53935; //#e53935; //"#e3f2fd" "#ffe082
 $exitcolor:     #ce93d8; //"#e3f2fd" "#ffe082
@@ -128,6 +128,10 @@ $nodeStroke:    #90caf9;
                 stroke-width: .015;
                 font-weight: 100;
                 fill: rgba(#000, 1)
+            }
+            .arc {
+                stroke: #aaa; // #b77d68; //#8d6e63;
+                fill: none;            
             }
         }
     }

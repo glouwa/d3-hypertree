@@ -259,7 +259,7 @@ export class Hypertree
         this.view_.parent.innerHTML = '' // actually just remove this.view if present ... do less
         this.view_.html = HTML.parse<HTMLElement>(hypertreehtml)()
         this.view_.parent.appendChild(this.view_.html)
-        this.noHypertreeMeta   = new NoHypertreeMeta()
+        this.noHypertreeMeta   = null // new NoHypertreeMeta()
         this.view_.btnMeta     = <HTMLButtonElement>this.view_.html.querySelector('#btnmeta')
         this.view_.btnNav      = <HTMLButtonElement>this.view_.html.querySelector('#btnnav')
         this.view_.btnHome     = <HTMLButtonElement>this.view_.html.querySelector('#btnhome')
@@ -555,7 +555,7 @@ export class Hypertree
         this.updateLayout()
     }
 
-    private updateLayout() : void {        
+    private updateLayout() : void {
         //app.toast('Layout')
         var t0 = performance.now()
         this.args.layout(this.data, this.args.geometry.transformation.state)        
@@ -589,9 +589,7 @@ export class Hypertree
         })
     }
 
-    private updatePathes() {
-        //this.ui.updateSelection()
-        //requestAnimationFrame(()=> this.unitdisk.updateTransformation())
+    private updatePathes() {      
         requestAnimationFrame(()=> {
             this.unitdisk.update.pathes()
             this.hypertreeMeta.update.transformation()
@@ -678,7 +676,7 @@ export class Hypertree
     //## from interaction
     //##
     //########################################################################################################
-
+/*
     private onDragStart = (n:N, m:C)=> {
         if (!this.animationTimer)
             this.args.geometry.transformation.onDragStart(m)
@@ -738,6 +736,6 @@ export class Hypertree
             else  
                 this.onDragByNode(n, m, CptoCk(md))
         },1)
-    }
+    }*/
 }
 

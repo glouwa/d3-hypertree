@@ -1,7 +1,7 @@
 @import 'unitdisk-meta'; 
 
 .render-info {
-    color: rgba(darken(#a5d6a7, 30%), .6);
+    color: #444; //rgba(darken(#a5d6a7, 30%), .6);
 
     div {
         
@@ -20,7 +20,11 @@
                 color: #fff; 
                 font-weight: 500; 
             }
-        }
+        }        
+    }
+
+    .info {
+        background-color:#ccc;
     }
 
     .bar-bg {
