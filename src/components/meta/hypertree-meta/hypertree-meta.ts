@@ -131,11 +131,11 @@ export class HypertreeMetaNav
 
         this.view.html2 = HTML.parse<HTMLElement>(this.htmlCarLs)()
         this.view.parent.appendChild(this.view.html2)
-
+        
         $('.carousel').carousel({ 
             fullWidth:true, 
             noWrap:true
-         })
+        })
 
         const navUnitDisk = <UnitDiskNav>this.model.unitdisk
         this.udView = new UnitdiskMeta({ 

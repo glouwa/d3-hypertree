@@ -16,14 +16,17 @@
         .tool-seperator {
             margin-top: .6em;
         }
+        .tool-seperator:first-child {
+            margin-top: .32em;
+        }
         .tool-active {
             background-color: #333;
         }
     }
 
     .path-bar {
-        top:.8em;        
-        right:-3.3em;
+        top:.6em;        
+        right:1.5em;
         position: absolute;       
     }
 
@@ -75,7 +78,7 @@
         }
         .right.carousel {
             height: 44em !important;
-            left: calc(100% - 11em);
+            left: calc(100% - 15.5em);
         }
     }
 }
