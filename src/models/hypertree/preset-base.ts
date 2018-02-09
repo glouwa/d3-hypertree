@@ -515,8 +515,8 @@ var emojimap = {
 
 export const presets = 
 {
-    otolModel:
-    {
+    otolModel: ()=>
+    ({
         // must have
         iconmap:      'will be set by navigation or user',
         onNodeSelect: 'will be set by navigation or user',    
@@ -562,9 +562,9 @@ export const presets =
             cacheUpdate:    cacheUpdate,
             layers:         layerSrc        
         }
-    },
-    generatorModel: 
-    {
+    }),
+    generatorModel: ()=>
+    ({
         // must have
         iconmap:      'will be set by navigation or user',
         onNodeSelect: 'will be set by navigation or user',    
@@ -598,9 +598,9 @@ export const presets =
             cacheUpdate:    cacheUpdate,
             layers:         layerSrc        
         }
-    },
-    generatorSpiralModel: 
-    {
+    }),
+    generatorSpiralModel: ()=>
+    ({
         // must have
         iconmap:      'will be set by navigation or user',
         onNodeSelect: 'will be set by navigation or user',    
@@ -634,9 +634,9 @@ export const presets =
             cacheUpdate:    cacheUpdate,
             layers:         layerSrc        
         }
-    },
-    fsModel: 
-    {
+    }),
+    fsModel: ()=>
+    ({
         // must have
         iconmap:      'will be set by navigation or user',
         onNodeSelect: 'will be set by navigation or user',    
@@ -675,5 +675,5 @@ export const presets =
             cacheUpdate:    cacheUpdate,
             layers:         layerSrc        
         }
-    }
+    })
 }

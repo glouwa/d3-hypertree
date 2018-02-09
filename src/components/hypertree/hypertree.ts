@@ -258,7 +258,7 @@ export class Hypertree
         this.view_.parent.innerHTML = '' // actually just remove this.view if present ... do less
         this.view_.html = HTML.parse<HTMLElement>(hypertreehtml)()
         this.view_.parent.appendChild(this.view_.html)
-        this.noHypertreeMeta   = null // new NoHypertreeMeta()
+        this.noHypertreeMeta   = new NoHypertreeMeta()
         this.view_.btnMeta     = <HTMLButtonElement>this.view_.html.querySelector('#btnmeta')
         this.view_.btnNav      = <HTMLButtonElement>this.view_.html.querySelector('#btnnav')
         this.view_.btnHome     = <HTMLButtonElement>this.view_.html.querySelector('#btnhome')
