@@ -86,7 +86,7 @@ $nodeStroke:    #90caf9;
             fill: none;
         }
         .focus-circle {        
-            fill:rgba(255, 255, 255, .0);
+            fill:none;
             stroke: darken($nodeStroke, 25%);
             stroke-width: .0008;            
         }
