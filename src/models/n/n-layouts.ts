@@ -33,7 +33,8 @@ export function layoutUnitVectors(root) {
 }
 
 export function layoutUnitLines(root) {
-    root.z = { re:0, im:0 }
+    //root.z = { re:0, im:0 }
+    setZ(root, { re:0, im:0 })
     for (let i=0; i<4; i++)
         layoutPath(root.children[i], unitVectors[i], root.children[i].height)
 
