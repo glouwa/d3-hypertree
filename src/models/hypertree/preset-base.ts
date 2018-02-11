@@ -405,9 +405,7 @@ function peocessNode(ud:UnitDisk, cache:TransformationCache, n:N, maxLabelR, min
 
 function doVoronoiStuff(ud:UnitDisk, cache:TransformationCache) {
     
-    try { cache.voronoiDiagram = ud.voronoiLayout(cache.unculledNodes) }
-    catch(e) { console.log('voronoi exception') }
-
+    cache.voronoiDiagram = ud.voronoiLayout(cache.unculledNodes)
     cache.cells = cache.voronoiDiagram
         .polygons()
         .filter(e=> hasCircle(e.data)
@@ -422,7 +420,6 @@ function doVoronoiStuff(ud:UnitDisk, cache:TransformationCache) {
             .reduce((a, e)=> `${e.precalc.txt?("  "+e.precalc.txt+"  "):''}${a?"›":""}${a}`, '') 
         const hypertree = ud.args.hypertree
         hypertree.view_.path.innerText = pathStr // todo: html m frame?
-
 
         if (cache.centerNode === hypertree.data && !hypertree.view_.btnHome.classList.contains('disabled')) {
             hypertree.view_.btnHome.classList.add('disabled')
@@ -513,22 +510,37 @@ var emojimap = {
     //'ducd-templates':'♻', isr:'🍀'    
 }
 
+const modelBase = ()=>
+({
+    weight:       (n:N)=> ((!n.children || !n.children.length)?1:0),
+    caption:      (ht:Hypertree, n:N)=> undefined,
+    onNodeSelect: ()=> {},
+    layout:       layoutBergé, // [0, π/2]
+    magic:        1/160,        
+    objects: {                      // oder indizes?
+        selections: [],
+        pathes: [],        
+    },    
+    decorator: UnitDiskNav,
+    geometry: {
+        clipRadius:     1,
+        nodeRadius:     .01,        
+        transformation: new HyperbolicTransformation({
+            P:{ re: 0, im:0 },
+            θ:{ re: 1, im:0 },
+            λ:CptoCk({ θ:.1*2*Math.PI, r:1 })
+        }),
+        cacheUpdate:    cacheUpdate,
+        layers:         layerSrc        
+    }
+})
+
 export const presets = 
 {
-    otolModel: ()=>
-    ({
-        // must have
-        iconmap:      'will be set by navigation or user',
-        onNodeSelect: 'will be set by navigation or user',    
-        dataloader:   'will be set by navigation or user',    
-        langloader:   'will be set by navigation or user',   
-        
-        data:         'will be set by dataloader',
-        langmap:      'will be set by langloader',
-        
-        // infovis stuff
-        weight:       (n:N)=> ((!n.children || !n.children.length)?1:0),
-        caption: (ht:Hypertree, n:N)=> {
+    otolModel: ()=> 
+    {
+        const model = modelBase()
+        model.caption = (ht:Hypertree, n:N)=> {
             // better: set of initial node actions [label, imghref, scalef, ...]
             const w  = (!n.value || n.value==1) ? '' : n.value + ' '
             const id = ( n.data && n.data.name) ? n.data.name : ''
@@ -540,140 +552,29 @@ export const presets =
 
             if (n.precalc.txt) return n.precalc.txt + tosub(w) 
             else return undefined
-        },        
-        layout:       layoutBergé, // [0, π/2]
-        magic:        1/160,
-            
-        objects: {                      // oder indizes?
-            selections: [],
-            pathes: [],        
-        },
-        
-        // most important    
-        decorator: UnitDiskNav,
-        geometry: {
-            clipRadius:     1,
-            nodeRadius:     .01,        
-            transformation: new HyperbolicTransformation({
-                P:{ re: 0, im:0 },
-                θ:{ re: 1, im:0 },
-                λ:CptoCk({ θ:.1*2*Math.PI, r:1 })
-            }),        
-            cacheUpdate:    cacheUpdate,
-            layers:         layerSrc        
-        }
-    }),
-    generatorModel: ()=>
-    ({
-        // must have
-        iconmap:      'will be set by navigation or user',
-        onNodeSelect: 'will be set by navigation or user',    
-        dataloader:   'will be set by navigation or user',    
-        langloader:   'will be set by navigation or user',   
-
-        data:         'will be set by dataloader',
-        langmap:      'will be set by langloader',
-
-        // infovis stuff
-        caption:      (ht:Hypertree, n:N)=> undefined,
-        weight:       (n:N)=> ((!n.children || !n.children.length)?1:0),
-        layout:       layoutBergé, // [0, π/2]
-        magic:        1/160,
-            
-        objects: {                      // oder indizes?
-            selections: [],
-            pathes: [],        
-        },        
-        
-        // most important    
-        decorator: UnitDiskNav,
-        geometry: {
-            clipRadius:     1,
-            nodeRadius:     .01,        
-            transformation: new HyperbolicTransformation({
-                P:{ re: 0, im:0 },
-                θ:{ re: 1, im:0 },
-                λ:CptoCk({ θ:.1*2*Math.PI, r:1 })
-            }),        
-            cacheUpdate:    cacheUpdate,
-            layers:         layerSrc        
-        }
-    }),
-    generatorSpiralModel: ()=>
-    ({
-        // must have
-        iconmap:      'will be set by navigation or user',
-        onNodeSelect: 'will be set by navigation or user',    
-        dataloader:   'will be set by navigation or user',    
-        langloader:   'will be set by navigation or user',   
-
-        data:         'will be set by dataloader',
-        langmap:      'will be set by langloader',
-
-        // infovis stuff
-        caption:      (ht:Hypertree, n:N)=> undefined,
-        weight:       (n:N)=> ((!n.children || !n.children.length)?1:0),
-        layout:       layoutSpiral, // [0, π/2]
-        magic:        1/160,
-            
-        objects: {                      // oder indizes?
-            selections: [],
-            pathes: [],        
-        },
-        
-        // most important    
-        decorator: UnitDiskNav,
-        geometry: {
-            clipRadius:     1,
-            nodeRadius:     .01,        
-            transformation: new HyperbolicTransformation({
-                P:{ re: 0, im:0 },
-                θ:{ re: 1, im:0 },
-                λ:CptoCk({ θ:.1*2*Math.PI, r:1 })
-            }),        
-            cacheUpdate:    cacheUpdate,
-            layers:         layerSrc        
-        }
-    }),
-    fsModel: ()=>
-    ({
-        // must have
-        iconmap:      'will be set by navigation or user',
-        onNodeSelect: 'will be set by navigation or user',    
-        dataloader:   'will be set by navigation or user',    
-        langloader:   'will be set by navigation or user',   
-
-        data:         'will be set by dataloader',
-        langmap:      'will be set by langloader',
-
-        // infovis stuff
-        weight:       (n:N)=> ((!n.children || !n.children.length)?1:0),
-        caption: (ht:Hypertree, n:N)=> {            
+        }        
+        return model
+    },
+    generatorModel: ()=> 
+    {
+        const model = modelBase()        
+        return model
+    },    
+    generatorSpiralModel: ()=> 
+    {
+        const model = modelBase()     
+        model.layout = layoutSpiral  
+        return model
+    },
+    fsModel: ()=> 
+    {
+        const model = modelBase()   
+        model.geometry.nodeRadius = .035
+        model.caption = (ht:Hypertree, n:N)=> {            
             const w  = (!n.value || n.value==1) ? '' : n.value + ' '
-            n.precalc.txt = ( n.data && n.data.name) ? n.data.name : ''            
-
+            n.precalc.txt = ( n.data && n.data.name) ? n.data.name : ''
             return n.precalc.txt + tosub(w) 
-        },
-        layout:       layoutBergé, // [0, π/2]
-        magic:        1/160,
-            
-        objects: {                      // oder indizes?
-            selections: [],
-            pathes: [],        
-        },
-        
-        // most important    
-        decorator: UnitDiskNav,
-        geometry: {
-            clipRadius:     1,
-            nodeRadius:     .001,        
-            transformation: new HyperbolicTransformation({
-                P:{ re: 0, im:0 },
-                θ:{ re: 1, im:0 },
-                λ:CptoCk({ θ:.1*2*Math.PI, r:1 })
-            }),        
-            cacheUpdate:    cacheUpdate,
-            layers:         layerSrc        
-        }
-    })
+        }        
+        return model
+    }    
 }

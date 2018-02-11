@@ -113,6 +113,8 @@ export class TransformationCache
     emojis:         N[]
     images:         N[]
     
+    wikiR:          number
+    
     voronoiDiagram: d3.VoronoiDiagram<N>
     
     cells:          d3.VoronoiPolygon<N>[]
