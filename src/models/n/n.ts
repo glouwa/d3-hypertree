@@ -1,78 +1,28 @@
 import { C, Cp, Ck }     from '../../models/transformation/hyperbolic-math'
 import { HierarchyNode } from 'd3'
+import { Path } from '../path/path';
 
-export interface Path {    
-    type:      string,
-    id:        string,
-    icon:      string,
-    head:      N,
-    headName:  string,
-    ancestors: N[],
-    color:     string
+export interface NodePrecalulations {
+    weight:             number
+    weightScale:        number
+    icon:               string
+    txt:                string
+    label:              string
+    labellen:           number
+    imageHref:          string
 }
 
-export interface N {    
-    mergeId:            number,
-    id:                 string,        //
-    name?:              string,
+export interface NodeLayout {
+    wedge: {
+        α:              number,
+        Ω:              number,
+    },
+    z?:                 Ck,
+    zStrCache?:         string,
+    zp?:                Cp,
+}
 
-    data:               any,           //
-    parent:             N,             //?
-    children:           Array<N>,      //?
-    depth:              number,        //
-    height:             number,
-    value?:             number,        //
-
-    ancestors,
-    descendants,
-    leaves,
-    each,
-    sum,
-
-//  labels
-    precalc: {
-        weight:             number
-        weightScale:        number
-        icon:               string
-        txt:                string
-        label:              string
-        labellen:           number
-        imageHref:          string
-    }
-    
-    layout: {
-        wedge: {
-            α:              number,
-            Ω:              number,
-        },
-        z?:                 Ck,
-        zStrCache?:         string,
-        zp?:                Cp,
-    }
-    layoutReference: {
-        wedge: {
-            α:              number,            
-            Ω:              number,
-        },
-        z?:                 Ck,
-        zStrCache?:         string,
-        zp?:                Cp,
-    }
-
-    navigation: {
-        layout: {
-        },
-        transformation: {
-        }
-    }
-
-    view: {
-        layout: {
-        },
-        transformation: {
-        }
-    }
-
+export interface NodeTransformation {
     cache?:             C,
     cachep?:            Cp,
     strCache?:          string,    
@@ -90,26 +40,50 @@ export interface N {
     scaleStrText?:      string,
     distScale?:         number,
     dampedDistScale?:   number,
-    hasOutChildren:     boolean,
-    
-    pathes: {
-        headof:         Path,
-        partof:         Path[],
-        finalcolor:     string,
-        labelcolor:     string,
+    hasOutChildren:     boolean,    
+}
 
-        isPartOfAnySelectionPath?: boolean,
-        isPartOfAnyHoverPath?:     boolean,
-    },
+export interface NodePath {
+    headof:         Path,
+    partof:         Path[],
+    finalcolor:     string,
+    labelcolor:     string,
 
-/*
-    filter (selection): {},
-        layout: {},          ...      
-        transformation: {},
-    
-        culling
-    
-    */
+    isPartOfAnySelectionPath?: boolean,
+    isPartOfAnyHoverPath?:     boolean,
+}
+
+export interface N extends NodeTransformation {    
+    mergeId:            number,
+    id:                 string,        // mess
+    name?:              string,
+
+    data:               any,           // d3
+    parent:             N,             
+    children:           Array<N>,      
+    depth:              number,        
+    height:             number,
+    value?:             number,        
+
+    ancestors,
+    descendants,
+    leaves,
+    each,
+    sum,
+
+    precalc:            NodePrecalulations
+    pathes:             NodePath    
+
+    unitdisk: {
+        layout:         NodeLayout,
+        transformation: NodeTransformation
+    }
+    navigationUnitdisk: {
+        layout:         NodeLayout,
+        transformation: NodeTransformation
+    }    
+    layout:             NodeLayout
+    layoutReference:    NodeLayout
 }
 
 

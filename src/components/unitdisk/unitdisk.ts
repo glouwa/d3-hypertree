@@ -24,7 +24,7 @@ import { LayerStack }              from '../layerstack/layerstack'
 import { HypertreeMeta }           from '../meta/hypertree-meta/hypertree-meta'
 import { HypertreeMetaNav }        from '../meta/hypertree-meta/hypertree-meta'
 import { bboxOffset }              from '../layerstack/d3updatePattern'
-import { Hypertree }               from '../hypertree/hypertree';
+import { UnitDiskArgs }            from '../../models/unitdisk/unitdisk-model'
 
 const navBgNodeR = .012
 const arcWidth = (d:N)=>
@@ -166,24 +166,6 @@ const navParameterLayers = [
 export interface IUnitdiskView {    
     parent,
     hypertree
-}
-
-export interface UnitDiskArgs
-{
-    parent:            any,
-    position:          string,
-    className:         string,
-    hypertree:         Hypertree,
-    data:              N,
-    layers:            ((v, ls:IUnitDisk)=> ILayer)[],
-
-    transformation:    Transformation<N>,
-    cacheUpdate:       (ud:IUnitDisk, cache:TransformationCache)=> void,    
-    transform:         (n:N)=> C,
-
-    caption:           (n:N)=> string,
-    nodeRadius:        number,
-    clipRadius?:       number
 }
 
 export interface IUnitDisk
