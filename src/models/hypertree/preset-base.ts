@@ -45,8 +45,7 @@ var isLeaf =          n=> !n.children || !n.children.length
 var isRoot =          n=> !n.parent 
 var hasCircle =       n=> hasLazy(n) || isRoot(n) || isLeaf(n)
 
-const layerSrc = [
-    // wedges                        
+const layerSrc = [    
     // nodes
     // nodes-leafs
     // nodes-lazy                        

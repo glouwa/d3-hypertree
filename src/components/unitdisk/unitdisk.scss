@@ -8,6 +8,11 @@
         }
         .node {            
             pointer-events:none;
+            //animation: nodefadein 1250ms ease-in-out;// infinite;
+        }
+        @keyframes nodefadein {
+            0%   { opacity: 0; }            
+            100% { opacity: 1; }
         }
         .caption-icon {
             font-family: 'NotoColorEmoji', Roboto;

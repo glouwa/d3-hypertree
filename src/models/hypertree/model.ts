@@ -22,18 +22,21 @@ export interface HypertreeArgs
     langmap:      {},    
     layout:       LayoutFunction,
     magic:        number,
-    decorator:    { new(a: UnitDiskArgs) : IUnitDisk },
+    decorator:    { new(a: UnitDiskArgs) : IUnitDisk }, // replace by navigation
 
     objects: {
         pathes:     Path[],
         selections: N[],
     },   
     
-    geometry: {
+    geometry: { // unitdisk
         clipRadius:     number,
         nodeRadius:     number,
         transformation: Transformation<N>,
         cacheUpdate:    (cache:IUnitDisk)=> void,        
         layers:         ((ls:IUnitDisk)=> ILayer)[],
     }
+    //navigation?: {},
+    //meta?: {},
+
 }

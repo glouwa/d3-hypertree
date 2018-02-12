@@ -601,7 +601,7 @@ export class Hypertree
     private animateUp() {
         this.args.geometry.transformation.state.P.re = 0
         this.args.geometry.transformation.state.P.im = 0
-
+        
         this.animation = true
         var step = 0, steps = 16
         var frame = ()=>
