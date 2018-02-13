@@ -23,9 +23,15 @@ export interface NodeLayout {
 }
 
 export interface NodeTransformation {
-    cache?:             C,
-    cachep?:            Cp,
-    strCache?:          string,    
+    cache?:               C,
+    cachep?:              Cp,
+    strCache?:            string,    
+    transformStrCache?:   string,
+    transformStrCacheZ?:  string,
+
+    scaleStrText?:        string,
+    distScale?:           number,
+    dampedDistScale?:     number,
 
     isOutλ,
     isOut99,
@@ -33,21 +39,14 @@ export interface NodeTransformation {
     isOut,
     hasOutPeriChildren,
     hasOutWeightChildren,
-
-    transformStrCache?: string,
-    transformStrCacheZ?: string,
-
-    scaleStrText?:      string,
-    distScale?:         number,
-    dampedDistScale?:   number,
-    hasOutChildren:     boolean,    
+    hasOutChildren:       boolean,            
 }
 
 export interface NodePath {
-    headof:         Path,
-    partof:         Path[],
-    finalcolor:     string,
-    labelcolor:     string,
+    headof:                    Path,
+    partof:                    Path[],
+    finalcolor:                string,
+    labelcolor:                string,
 
     isPartOfAnySelectionPath?: boolean,
     isPartOfAnyHoverPath?:     boolean,
@@ -74,11 +73,13 @@ export interface N extends NodeTransformation {
     precalc:            NodePrecalulations
     pathes:             NodePath    
 
-    unitdisk: {
+    unitdisk: 
+    {
         layout:         NodeLayout,
         transformation: NodeTransformation
     }
-    navigationUnitdisk: {
+    navigationUnitdisk: 
+    {
         layout:         NodeLayout,
         transformation: NodeTransformation
     }    

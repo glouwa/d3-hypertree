@@ -162,11 +162,12 @@ const navParameterLayers = [
         onClick:     (n:N, m:C)=> {}
     })
 ]
-
+/*
 export interface IUnitdiskView {    
     parent,
     hypertree
 }
+*/
 
 export interface IUnitDisk
 {
@@ -214,7 +215,7 @@ export class UnitDisk implements IUnitDisk
 
     public update = {
         parent: ()=> this.updateParent(),
-        cache: ()=> this.args.cacheUpdate(this, this.cache),
+        cache: ()=> this.args.cacheUpdate(this, this.cache), // gehört nicht hier her
         data: ()=> this.update.layout(),
         layout: ()=> { 
             this.args.cacheUpdate(this, this.cache)

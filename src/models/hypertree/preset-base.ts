@@ -35,7 +35,6 @@ import { InteractionLayer }        from '../../components/layers/interaction-lay
 import { ImageLayer }              from '../../components/layers/image-layer';
 import { FocusLayer }              from '../../components/layers/focus-layer';
 
-
 var cullingRadius =   0.98
 var labelλExtension = 1.2
 var minLabelR =       0.85 
