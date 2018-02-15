@@ -21,6 +21,7 @@ export interface UnitDiskArgs
     transform:         (n:N)=> C,
 
     caption:           (n:N)=> string,
-    nodeRadius:        number,
+    nodeRadius:        (ud:IUnitDisk, n:N)=> number,
+    nodeScale,
     clipRadius?:       number
 }

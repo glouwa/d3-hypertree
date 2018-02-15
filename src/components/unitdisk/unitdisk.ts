@@ -128,7 +128,7 @@ var deltaMap = { // label offsets (font correction)
 var Pscale =  (ud:UnitDisk)=> (d:any)=>
     lengthDilledation(d)
     * (1 - πify(CktoCp(ud.args.transformation.state.λ).θ) / 2 / Math.PI)
-    / ud.args.nodeRadius
+    / ud.args.nodeRadius(ud, d)
 
 const navParameterLayers = [
     (v, ud:UnitDisk)=> new CellLayer(v, {
@@ -141,7 +141,8 @@ const navParameterLayers = [
         name:        'nodes',
         className:   'node',
         data:        ()=> ud.cache.unculledNodes,
-        r:           (d:N)=> ud.args.nodeRadius * (d.name==='P' ? Pscale(ud)(d) : 1),
+        r:           (d:N)=> ud.args.nodeRadius(ud, d) 
+                           * (d.name==='P' ? Pscale(ud)(d) : 1),
         transform:   (d:N)=> d.transformStrCache,
     }),
     (v, ud:UnitDisk)=> new LabelLayer(v, {
@@ -292,7 +293,8 @@ export class UnitDiskNav implements IUnitDisk
             transformation:     args.transformation,
             transform:          (n:N)=> n.layout.z,
             caption:            (n:N)=> undefined,
-            nodeRadius:         navBgNodeR,
+            nodeRadius:         ()=> navBgNodeR,
+            nodeScale:          args.nodeScale,        
             clipRadius:         1
         })
 
@@ -330,7 +332,8 @@ export class UnitDiskNav implements IUnitDisk
             transformation:     navTransformation,
             transform:          (n:any)=> CmulR(n, -1),
             caption:            (n:N)=> undefined,
-            nodeRadius:         .16,
+            nodeRadius:         ()=> .16,
+            nodeScale:          ()=> 1,
             clipRadius:         1.7
         })
     }

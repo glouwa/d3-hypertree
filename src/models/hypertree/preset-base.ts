@@ -42,7 +42,8 @@ var animateUpR =      0.99
 var hasLazy =         n=> (n.hasOutChildren && n.isOutλ /*&& n.parent.isOutλ*/)
 var isLeaf =          n=> !n.children || !n.children.length
 var isRoot =          n=> !n.parent 
-var hasCircle =       n=> hasLazy(n) || isRoot(n) || isLeaf(n)
+//var hasCircle =       n=> hasLazy(n) || isRoot(n) || isLeaf(n)
+var hasCircle =       n=> true
 
 const layerSrc = [    
     // nodes
@@ -97,9 +98,9 @@ const layerSrc = [
         name:       'weigths',
         className:  'weigths',
         data:       ()=> ud.cache.weights,
-        r:          d=> nodeInitR(ud)(d),
+        r:          d=> ud.args.nodeRadius(ud, d),
         transform:  d=> d.transformStrCache 
-                        + ` scale(${nodeScale(d)})`,
+                        + ` scale(${ud.args.nodeScale(d)})`,
     }),
     (v, ud:UnitDisk)=> new NodeLayer(v, {
         invisible:  true,
@@ -107,9 +108,9 @@ const layerSrc = [
         name:       'wedges',
         className:  'wedges',
         data:       ()=> ud.cache.weights,
-        r:          d=> nodeInitR(ud)(d),
+        r:          d=> ud.args.nodeRadius(ud, d),
         transform:  d=> d.transformStrCache 
-                        + ` scale(${nodeScale(d)})`,
+                        + ` scale(${ud.args.nodeScale(d)})`,
     }),
     (v, ud:UnitDisk)=> new NodeLayer(v, {                            
         name:       'center-node',
@@ -118,7 +119,7 @@ const layerSrc = [
         data:       ()=> ud.cache.centerNode?[ud.cache.centerNode]:[],
         r:          d=> .1,
         transform:  d=> d.transformStrCache                            
-                        + ` scale(${nodeScale(d)})`,
+                        + ` scale(${ud.args.nodeScale(d)})`,
     }),
     (v, ud:UnitDisk)=> new ArcLayer(v, {
         invisible:  false,
@@ -183,9 +184,9 @@ const layerSrc = [
         name:       'nodes',
         className:  'node',
         data:       ()=> ud.cache.leafOrLazy,
-        r:          d=> nodeInitR(ud)(d),
+        r:          d=> ud.args.nodeRadius(ud, d),
         transform:  d=> d.transformStrCache                            
-                        + ` scale(${nodeScale(d)})`,
+                        + ` scale(${ud.args.nodeScale(d)})`,
     }),                        
     (v, ud:UnitDisk)=> new SymbolLayer(v, {
         name:       'symbols',
@@ -438,7 +439,7 @@ function doLabelStuff(ud:UnitDisk, cache:TransformationCache) {
     var λmap = λ=> {
         λ = ud.args.transformation.state.λ
         λ = πify(CktoCp(λ).θ) / 2 / Math.PI
-        return λ + .3 * lengthDilledation(CptoCk({ θ:0, r:λ}))
+        return λ + .3 * lengthDilledation(CptoCk({ θ:0, r:λ }))
     }
     
     var wikiR = ud.cache.wikiR = λmap(undefined)
@@ -470,25 +471,31 @@ function doImageStuff(ud:UnitDisk, cache:TransformationCache) {
         .filter((e:N)=> e.precalc.imageHref)
 }
 
-var nodeInitR = ls=> d=>
-    ls.args.nodeRadius
+var nodeInitR = (c:number)=> (ud:UnitDisk, d:N)=>
+    c
     //* 3.5
     * ((d.children && d.parent) ? innerNodeScale(d) : 1)
+     
+var nodeInitRNoInner = (c:number)=> (ud:UnitDisk, d:N)=>
+    c
 
 var nodeScale = d=>
     d.distScale
     * (hasLazy(d) ? 1.8 : 1)    
 
+var nodeScaleNoInner = d=>
+    d.distScale
+    
+var innerNodeScale = d=>
+    d.precalc.weightScale
+
+var nodeRadiusOffset = (ls:UnitDisk)=> (d:N)=>
+    CptoCk({ θ:d.cachep.θ, r:ls.args.nodeRadius(ls, d)*2 })
+
 var arcWidth = d=>
     .022
     * d.distScale
     * d.precalc.weightScale
-
-var innerNodeScale = d=>
-    d.precalc.weightScale
-
-var nodeRadiusOffset = ls=> d=>
-    CptoCk({ θ:d.cachep.θ, r:nodeInitR(ls)(d)*2 })
 
 var emojimap = {    
     Delphinidae:'🐬', Mysticeti:'🐋',    
@@ -522,7 +529,8 @@ const modelBase = ()=>
     decorator: UnitDiskNav,
     geometry: {
         clipRadius:     1,
-        nodeRadius:     .01,        
+        nodeRadius:     nodeInitR(.01),   
+        nodeScale:      nodeScale,
         transformation: new HyperbolicTransformation({
             P:{ re: 0, im:0 },
             θ:{ re: 1, im:0 },
@@ -567,7 +575,8 @@ export const presets =
     fsModel: ()=> 
     {
         const model = modelBase()   
-        model.geometry.nodeRadius = .035
+        model.geometry.nodeRadius = nodeInitRNoInner(.035)
+        model.geometry.nodeScale = nodeScaleNoInner
         model.caption = (ht:Hypertree, n:N)=> {            
             const w  = (!n.value || n.value==1) ? '' : n.value + ' '
             n.precalc.txt = ( n.data && n.data.name) ? n.data.name : ''

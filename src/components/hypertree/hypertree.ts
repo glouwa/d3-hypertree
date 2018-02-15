@@ -317,7 +317,8 @@ export class Hypertree
             cacheUpdate:    this.args.geometry.cacheUpdate,
             caption:        (n:N)=> this.args.caption(this, n),
             clipRadius:     this.args.geometry.clipRadius,
-            nodeRadius:     this.args.geometry.nodeRadius            
+            nodeRadius:     this.args.geometry.nodeRadius,
+            nodeScale:      this.args.geometry.nodeScale,            
         })
     }
 

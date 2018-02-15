@@ -33,7 +33,8 @@ export interface HypertreeArgs
     
     geometry: { // unitdisk
         clipRadius:     number,
-        nodeRadius:     number,
+        nodeRadius:     (ud:IUnitDisk, n:N)=> number,
+        nodeScale:      any,
         transformation: Transformation<N>,
         cacheUpdate:    (cache:IUnitDisk)=> void,        
         layers:         ((ls:IUnitDisk)=> ILayer)[],
