@@ -32,8 +32,8 @@ import { SymbolLayer }             from '../../components/layers/symbol-layer'
 import { ArcLayer }                from '../../components/layers/link-layer'
 import { LabelLayer }              from '../../components/layers/label-layer'
 import { InteractionLayer }        from '../../components/layers/interaction-layer'
-import { ImageLayer }              from '../../components/layers/image-layer';
-import { FocusLayer }              from '../../components/layers/focus-layer';
+import { ImageLayer }              from '../../components/layers/image-layer'
+import { FocusLayer }              from '../../components/layers/focus-layer'
 
 var cullingRadius =   0.98
 var labelλExtension = 1.2
@@ -69,16 +69,19 @@ const layerSrc = [
     }),
     (v, ud:UnitDisk)=> new FocusLayer(v, {        
         invisible:  true,
+        hideOnDrag: true,
         name:       'labels-r',
         r:          ()=> 1.2 * πify(CktoCp(ud.args.transformation.state.λ).θ) / 2 / Math.PI                            
     }),    
     (v, ud:UnitDisk)=> new FocusLayer(v, {        
         invisible:  true,
+        hideOnDrag: true,
         name:       'labels-𝐖-r',
         r:          ()=> ud.cache.wikiR
     }),    
     (v, ud:UnitDisk)=> new FocusLayer(v, {
         invisible:  true,
+        hideOnDrag: true,
         name:       'λ',
         r:          ()=> πify(CktoCp(ud.args.transformation.state.λ).θ) / 2 / Math.PI                            
     }),

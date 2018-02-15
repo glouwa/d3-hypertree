@@ -353,7 +353,7 @@ export class UnitDiskNav implements IUnitDisk
 
             this.update.layout()
         },
-        layout: ()=> { 
+        layout: ()=> {
             this.view.update.cache()
             this.navParameter.update.cache()
 

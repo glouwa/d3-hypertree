@@ -30,7 +30,8 @@ $nodeStroke:    #90caf9;
         .node {
             fill: #f4f8f4;
             stroke: #555;
-            stroke-width: .001;
+            //stroke-width: .001;
+            stroke-width: 0;
         }        
         .caption {     
             font-weight:400;       
@@ -56,7 +57,7 @@ $nodeStroke:    #90caf9;
 
         .lazy           { stroke: darken($lazycolor, 15%);             fill: lighten($lazycolor, 5%);               }
         .lazy.cell      { stroke: rgba(0, 0, 0, 0.15);          fill: rgba(255, 204, 188, 0.03);           }
-        .lazy.node      { stroke: #c5c5c5;      stroke-width:.0023                                                }
+        .lazy.node      { stroke: #c5c5c5;                    stroke-width:0                                      }
 
         .exit           { stroke: darken($exitcolor, 15%);             fill: lighten($exitcolor, 5%);               }
         .exit.cell      { stroke: rgba(darken($exitcolor, 95%), .9);   fill: rgba(lighten($exitcolor, 0%), .05);    }
