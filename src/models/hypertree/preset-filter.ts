@@ -1,5 +1,5 @@
 import { N }                        from '../n/n'
-import { UnitDisk }                 from "../../components/unitdisk/unitdisk"
+import { IUnitDisk }                 from "../../components/unitdisk/unitdisk"
 import { dfs2, dfsFlat2, dfsFlat }  from '../../models/transformation/hyperbolic-math'
 import { TransformationCache }      from "../../models/transformation/hyperbolic-transformation"
 import { C, CptoCk, CktoCp, πify }  from '../../models/transformation/hyperbolic-math'
@@ -14,7 +14,7 @@ var cullingRadius =   0.98
 var labelλExtension = 1.2
 var minLabelR =       0.85 
 
-export function cacheUpdate(ud:UnitDisk, cache:TransformationCache) {
+export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
     // constants 
     const t0 =        performance.now()
     const normλ =     πify(CktoCp(ud.args.transformation.state.λ).θ) / 2 / Math.PI
@@ -105,7 +105,7 @@ export function cacheUpdate(ud:UnitDisk, cache:TransformationCache) {
     }
 }
 
-function findStartNode(interaction:UnitDisk, cache:TransformationCache) {
+function findStartNode(interaction:IUnitDisk, cache:TransformationCache) {
     let startNode = null
     let prev_startNode = null
     if (interaction.args.data) {
@@ -129,7 +129,7 @@ function findStartNode(interaction:UnitDisk, cache:TransformationCache) {
     return startNode
 }
 
-function pathToLastVisible(ud:UnitDisk, cache:TransformationCache) {
+function pathToLastVisible(ud:IUnitDisk, cache:TransformationCache) {
     let startNode : N = null
     let path = []
     if (ud.args.data) {
@@ -153,13 +153,13 @@ function pathToLastVisible(ud:UnitDisk, cache:TransformationCache) {
     return path.reverse()
 }
 
-function peocessNodeTransformation(ud:UnitDisk, cache:TransformationCache, n:N) {
+function peocessNodeTransformation(ud:IUnitDisk, cache:TransformationCache, n:N) {
     n.cache = n.cache || { re:0, im:0 }
     CassignC(n.cache, ud.args.transform(n)) 
     n.cachep = CktoCp(n.cache)   
 }
 
-function peocessNode(ud:UnitDisk, cache:TransformationCache, n:N, maxLabelR, minWeight) {    
+function peocessNode(ud:IUnitDisk, cache:TransformationCache, n:N, maxLabelR, minWeight) {    
     n.strCache =                   `${n.cache.re} ${n.cache.im}`    
     n.transformStrCache =          ` translate(${n.strCache})`
     n.transformStrCacheZ =         ` translate(${n.layout.zStrCache})`

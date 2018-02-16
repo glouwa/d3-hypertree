@@ -59,8 +59,13 @@ var arcWidth = d=>
     * d.distScale
     * d.precalc.weightScale
 
-const modelBase = ()=>
+const modelBase : ()=> HypertreeArgs = ()=>
 ({
+    iconmap:      null,
+    dataloader:   null,
+    langloader:   null,
+    data:         null,
+    langmap:      null,
     weight:       (n:N)=> ((!n.children || !n.children.length)?1:0),
     caption:      (ht:Hypertree, n:N)=> undefined,
     onNodeSelect: ()=> {},
@@ -87,7 +92,7 @@ const modelBase = ()=>
     }
 })
 
-export const presets = 
+export const presets : { [key: string]:()=> HypertreeArgs } = 
 {
     otolModel: ()=> 
     {

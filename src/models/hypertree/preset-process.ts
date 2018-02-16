@@ -1,18 +1,19 @@
 import { N }                        from '../n/n'
-import { UnitDisk }                 from "../../components/unitdisk/unitdisk"
+import { IUnitDisk }                 from "../../components/unitdisk/unitdisk"
 import { dfs2, dfsFlat2, dfsFlat }  from '../../models/transformation/hyperbolic-math'
 import { C, CptoCk, CktoCp, πify }  from '../../models/transformation/hyperbolic-math'
 import { lengthDilledation }        from '../../models/transformation/hyperbolic-math'
 import { TransformationCache }      from "../../models/transformation/hyperbolic-transformation"
 
-export function doVoronoiStuff(ud:UnitDisk, cache:TransformationCache) {
+export function doVoronoiStuff(ud:IUnitDisk, cache:TransformationCache) {
     
     cache.voronoiDiagram = ud.voronoiLayout(cache.unculledNodes)
     cache.cells = cache.voronoiDiagram
         .polygons()
         .filter(e=> ud.args.nodeFilter(e.data)
                 /*|| e.data.isPartOfAnyHoverPath 
-                || e.data.isPartOfAnySelectionPath*/)
+                || e.data.isPartOfAnySelectionPath*/
+            )
 
     const centerCell = cache.voronoiDiagram.find(0, 0)
     if (centerCell) {
@@ -38,7 +39,7 @@ export function doVoronoiStuff(ud:UnitDisk, cache:TransformationCache) {
     }
 }
 
-export function doLabelStuff(ud:UnitDisk, cache:TransformationCache) {    
+export function doLabelStuff(ud:IUnitDisk, cache:TransformationCache) {    
     var λmap = λ=> {
         λ = ud.args.transformation.state.λ
         λ = πify(CktoCp(λ).θ) / 2 / Math.PI
@@ -69,7 +70,7 @@ export function doLabelStuff(ud:UnitDisk, cache:TransformationCache) {
     cache.emojis = emojis
 }
 
-export function doImageStuff(ud:UnitDisk, cache:TransformationCache) {
+export function doImageStuff(ud:IUnitDisk, cache:TransformationCache) {
     cache.images = cache.unculledNodes
         .filter((e:N)=> e.precalc.imageHref)
 }

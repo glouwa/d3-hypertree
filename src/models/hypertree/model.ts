@@ -3,6 +3,7 @@ import { Path }           from '../path/path'
 import { LoaderFunction } from '../n/n-loaders'
 import { LayoutFunction } from '../n/n-layouts'
 import { Transformation } from '../../models/transformation/hyperbolic-transformation'
+import { TransformationCache } from '../../models/transformation/hyperbolic-transformation'
 import { UnitDiskArgs }   from '../../models/unitdisk/unitdisk-model'
 
 
@@ -32,14 +33,14 @@ export interface HypertreeArgs
         selections: N[],
     },   
     
-    geometry: { // unitdiskModel
+    geometry: {         // unitdiskModel
         clipRadius:     number,
         nodeRadius:     (ud:IUnitDisk, n:N)=> number,
         nodeScale:      any,
         nodeFilter:     (n:N)=> boolean,
-        linkWidth:      (n:N)=> number,
+        linkWidth:      (n:N)=> number, 
         transformation: Transformation<N>,
-        cacheUpdate:    (cache:IUnitDisk)=> void,        
+        cacheUpdate:    (ud:IUnitDisk, cache:TransformationCache)=> void,        
         layers:         ((ls:IUnitDisk)=> ILayer)[],
     }
     //navigation?: {},
