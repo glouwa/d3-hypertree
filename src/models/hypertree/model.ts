@@ -16,6 +16,7 @@ export interface HypertreeArgs
 
     dataloader:   (ok: (root:N, t0:number, dl:number)=>void)=> void,    
     langloader:   (lang)=> (ok)=> void,
+    
     weight:       (n:N)=> number,
     caption:      (hypertree:Hypertree, n:N)=> string,
     onNodeSelect: (n:N)=> void,
@@ -31,7 +32,7 @@ export interface HypertreeArgs
         selections: N[],
     },   
     
-    geometry: { // unitdisk
+    geometry: { // unitdiskModel
         clipRadius:     number,
         nodeRadius:     (ud:IUnitDisk, n:N)=> number,
         nodeScale:      any,
@@ -42,5 +43,4 @@ export interface HypertreeArgs
     }
     //navigation?: {},
     //meta?: {},
-
 }

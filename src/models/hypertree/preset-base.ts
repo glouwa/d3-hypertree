@@ -310,6 +310,21 @@ function cacheUpdate(ud:UnitDisk, cache:TransformationCache) {
         highway:     path
     })
     
+    /*    
+    auto measured functions
+
+    [
+        (ud:UnitDisk, cache:TransformationCache)=> void
+    ]
+
+    [
+        filteredSets,
+        doVoronoiStuff,
+        doLabelStuff,
+        doImageStuff
+    ]
+    */
+
     // groups of nodes
     const t1 = performance.now()
     cache.links =      cache.unculledNodes.slice(1)     
