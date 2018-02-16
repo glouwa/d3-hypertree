@@ -1,27 +1,29 @@
-import { N }                       from '../../models/n/n'
-import { C, CktoCp, CptoCk }       from '../../models/transformation/hyperbolic-math'
-import { CmulR, CsubC, CaddC }     from '../../models/transformation/hyperbolic-math'
-import { πify }                    from '../../models/transformation/hyperbolic-math'
-import { CtoStr }                  from '../../models/transformation/hyperbolic-math'
-import { lengthDilledation }       from '../../models/transformation/hyperbolic-math'
-import { bboxOffset }              from '../layerstack/d3updatePattern'
-import { ILayer }                  from '../layerstack/layer'
-import { NodeLayer }               from '../layers/node-layer'
-import { CellLayer }               from '../layers/cell-layer'
-import { BackgroundLayer }         from '../layers/background-layer'
-import { SymbolLayer }             from '../layers/symbol-layer'
-import { ArcLayer }                from '../layers/link-layer'
-import { LabelLayer }              from '../layers/label-layer'
-import { InteractionLayer }        from '../layers/interaction-layer'
-import { UnitDisk }                from './unitdisk'
+import { N }                   from '../../models/n/n'
+import { C, CktoCp, CptoCk }   from '../../models/transformation/hyperbolic-math'
+import { CmulR, CsubC, CaddC } from '../../models/transformation/hyperbolic-math'
+import { πify }                from '../../models/transformation/hyperbolic-math'
+import { CtoStr }              from '../../models/transformation/hyperbolic-math'
+import { lengthDilledation }   from '../../models/transformation/hyperbolic-math'
+import { bboxOffset }          from '../layerstack/d3updatePattern'
+import { ILayer }              from '../layerstack/layer'
+import { NodeLayer }           from '../layers/node-layer'
+import { CellLayer }           from '../layers/cell-layer'
+import { BackgroundLayer }     from '../layers/background-layer'
+import { SymbolLayer }         from '../layers/symbol-layer'
+import { ArcLayer }            from '../layers/link-layer'
+import { LabelLayer }          from '../layers/label-layer'
+import { InteractionLayer }    from '../layers/interaction-layer'
+import { UnitDisk }            from './unitdisk'
 
 var rotate = (d:N)=> // label rotation (font correction)
     (d.name === 'λ' ? ' rotate(-25)' : ' rotate(0)')
+
 var deltaMap = { // label offsets (font correction)
     P:{ re:.0025, im:.05 }, 
     θ:{ re:.0025, im:.019 }, 
     λ:{ re:.0025, im:.013 }
 }
+
 var Pscale =  (ud:UnitDisk)=> (d:any)=>
     lengthDilledation(d)
     * (1 - πify(CktoCp(ud.args.transformation.state.λ).θ) / 2 / Math.PI)

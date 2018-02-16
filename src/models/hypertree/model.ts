@@ -37,6 +37,7 @@ export interface HypertreeArgs
         nodeRadius:     (ud:IUnitDisk, n:N)=> number,
         nodeScale:      any,
         nodeFilter:     (n:N)=> boolean,
+        linkWidth:      (n:N)=> number,
         transformation: Transformation<N>,
         cacheUpdate:    (cache:IUnitDisk)=> void,        
         layers:         ((ls:IUnitDisk)=> ILayer)[],

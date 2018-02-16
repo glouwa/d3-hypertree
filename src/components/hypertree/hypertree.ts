@@ -320,6 +320,7 @@ export class Hypertree
             nodeRadius:     this.args.geometry.nodeRadius,
             nodeScale:      this.args.geometry.nodeScale,            
             nodeFilter:     this.args.geometry.nodeFilter,
+            linkWidth:      this.args.geometry.linkWidth
         })
     }
 

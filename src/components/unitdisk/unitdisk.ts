@@ -6,29 +6,20 @@ import { C, CktoCp, CptoCk }       from '../../models/transformation/hyperbolic-
 import { CmulR, CsubC, CaddC }     from '../../models/transformation/hyperbolic-math'
 import { dfsFlat, πify, CassignC } from '../../models/transformation/hyperbolic-math'
 import { ArrAddR }                 from '../../models/transformation/hyperbolic-math'
-import { CtoStr }                  from '../../models/transformation/hyperbolic-math'
-import { lengthDilledation }       from '../../models/transformation/hyperbolic-math'
 import { Transformation }          from '../../models/transformation/hyperbolic-transformation'
 import { PanTransformation }       from '../../models/transformation/hyperbolic-transformation'
 import { NegTransformation }       from '../../models/transformation/hyperbolic-transformation'
 import { TransformationCache }     from '../../models/transformation/hyperbolic-transformation'
-import { ILayer }                  from '../layerstack/layer'
-import { NodeLayer }               from '../layers/node-layer'
-import { CellLayer }               from '../layers/cell-layer'
-import { BackgroundLayer }         from '../layers/background-layer'
-import { SymbolLayer }             from '../layers/symbol-layer'
-import { ArcLayer }                from '../layers/link-layer'
-import { LabelLayer }              from '../layers/label-layer'
-import { InteractionLayer }        from '../layers/interaction-layer'
 import { LayerStack }              from '../layerstack/layerstack'
 import { HypertreeMeta }           from '../meta/hypertree-meta/hypertree-meta'
 import { HypertreeMetaNav }        from '../meta/hypertree-meta/hypertree-meta'
-import { bboxOffset }              from '../layerstack/d3updatePattern'
 import { UnitDiskArgs }            from '../../models/unitdisk/unitdisk-model'
 
 import { navBackgroundLayers }     from './layers-background'
 import { navBgNodeR }              from './layers-background'
 import { navParameterLayers }      from './layers-parameter'
+
+//----------------------------------------------------------------------------------------
 
 export interface IUnitDisk
 {
@@ -56,7 +47,7 @@ export class UnitDisk implements IUnitDisk
 {
     public args          : UnitDiskArgs        
     public cache         : TransformationCache // zeigt auf transformation.cache
-    public voronoiLayout : d3.VoronoiLayout<N>    
+    public voronoiLayout : d3.VoronoiLayout<N>
     
     public layerStack    : LayerStack
     public HypertreeMetaType = HypertreeMeta
@@ -155,7 +146,8 @@ export class UnitDiskNav implements IUnitDisk
             caption:            (n:N)=> undefined,
             nodeRadius:         ()=> navBgNodeR,
             nodeScale:          args.nodeScale,
-            nodeFilter:         args.nodeFilter,        
+            nodeFilter:         args.nodeFilter,
+            linkWidth:          args.linkWidth,
             clipRadius:         1
         })
 
@@ -196,6 +188,7 @@ export class UnitDiskNav implements IUnitDisk
             nodeRadius:         ()=> .16,
             nodeScale:          ()=> 1,
             nodeFilter:         ()=> true,
+            linkWidth:          args.linkWidth,
             clipRadius:         1.7
         })
     }

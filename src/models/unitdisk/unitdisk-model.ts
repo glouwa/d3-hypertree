@@ -24,5 +24,6 @@ export interface UnitDiskArgs
     nodeRadius:        (ud:IUnitDisk, n:N)=> number,
     nodeScale,
     nodeFilter:        (n:N)=> boolean,
+    linkWidth:         (n:N)=> number,
     clipRadius?:       number
 }
