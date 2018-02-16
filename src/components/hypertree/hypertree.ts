@@ -319,6 +319,7 @@ export class Hypertree
             clipRadius:     this.args.geometry.clipRadius,
             nodeRadius:     this.args.geometry.nodeRadius,
             nodeScale:      this.args.geometry.nodeScale,            
+            nodeFilter:     this.args.geometry.nodeFilter,
         })
     }
 

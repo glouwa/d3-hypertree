@@ -294,7 +294,8 @@ export class UnitDiskNav implements IUnitDisk
             transform:          (n:N)=> n.layout.z,
             caption:            (n:N)=> undefined,
             nodeRadius:         ()=> navBgNodeR,
-            nodeScale:          args.nodeScale,        
+            nodeScale:          args.nodeScale,
+            nodeFilter:         args.nodeFilter,        
             clipRadius:         1
         })
 
@@ -334,6 +335,7 @@ export class UnitDiskNav implements IUnitDisk
             caption:            (n:N)=> undefined,
             nodeRadius:         ()=> .16,
             nodeScale:          ()=> 1,
+            nodeFilter:         ()=> true,
             clipRadius:         1.7
         })
     }

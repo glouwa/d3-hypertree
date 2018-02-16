@@ -42,8 +42,7 @@ var animateUpR =      0.99
 var hasLazy =         n=> (n.hasOutChildren && n.isOutλ /*&& n.parent.isOutλ*/)
 var isLeaf =          n=> !n.children || !n.children.length
 var isRoot =          n=> !n.parent 
-//var hasCircle =       n=> hasLazy(n) || isRoot(n) || isLeaf(n)
-var hasCircle =       n=> true
+var hasCircle =       n=> hasLazy(n) || isRoot(n) || isLeaf(n)
 
 const layerSrc = [    
     // nodes
@@ -314,7 +313,7 @@ function cacheUpdate(ud:UnitDisk, cache:TransformationCache) {
     // groups of nodes
     const t1 = performance.now()
     cache.links =      cache.unculledNodes.slice(1)     
-    cache.leafOrLazy = cache.unculledNodes.filter(hasCircle) 
+    cache.leafOrLazy = cache.unculledNodes.filter(ud.args.nodeFilter) 
     cache.paths =      cache.links.filter((n:N)=> n.pathes.partof && n.pathes.partof.length)
     cache.weights =    []
     
@@ -410,7 +409,7 @@ function doVoronoiStuff(ud:UnitDisk, cache:TransformationCache) {
     cache.voronoiDiagram = ud.voronoiLayout(cache.unculledNodes)
     cache.cells = cache.voronoiDiagram
         .polygons()
-        .filter(e=> hasCircle(e.data)
+        .filter(e=> ud.args.nodeFilter(e.data)
                 /*|| e.data.isPartOfAnyHoverPath 
                 || e.data.isPartOfAnySelectionPath*/)
 
@@ -534,6 +533,7 @@ const modelBase = ()=>
         clipRadius:     1,
         nodeRadius:     nodeInitR(.01),   
         nodeScale:      nodeScale,
+        nodeFilter:     hasCircle,
         transformation: new HyperbolicTransformation({
             P:{ re: 0, im:0 },
             θ:{ re: 1, im:0 },
@@ -580,6 +580,7 @@ export const presets =
         const model = modelBase()   
         model.geometry.nodeRadius = nodeInitRNoInner(.035)
         model.geometry.nodeScale = nodeScaleNoInner
+        model.geometry.nodeFilter = n=> true
         model.caption = (ht:Hypertree, n:N)=> {            
             const w  = (!n.value || n.value==1) ? '' : n.value + ' '
             n.precalc.txt = ( n.data && n.data.name) ? n.data.name : ''
