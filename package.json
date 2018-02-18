@@ -2,7 +2,7 @@
   "name": "d3-hypertree",
   "main": "dist/js/index.js",
   "types": "dist/d/index.js.map",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Hyperbolictree",
   "author": "Michael Glatzhofer",
   "license": "???",
@@ -38,8 +38,8 @@
     "gulp-util": "^3.0.8",
     "merge2": "^1.1.0",
     "typescript": "^2.6.2",
-    "webpack": "^3.7.1",
-    "webpack-stream": "^4.0.0",
+    "webpack": "^3.11.0",
+    "webpack-stream": "^4.0.1",
     "yargs": "^8.0.2"
   }
 }
