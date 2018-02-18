@@ -1,15 +1,13 @@
-import { N }              from '../n/n'
-import { Path }           from '../path/path'
-import { LoaderFunction } from '../n/n-loaders'
-import { LayoutFunction } from '../n/n-layouts'
-import { Transformation } from '../../models/transformation/hyperbolic-transformation'
+import { N }                   from '../n/n'
+import { Path }                from '../path/path'
+import { LoaderFunction }      from '../n/n-loaders'
+import { LayoutFunction }      from '../n/n-layouts'
+import { Transformation }      from '../../models/transformation/hyperbolic-transformation'
 import { TransformationCache } from '../../models/transformation/hyperbolic-transformation'
-import { UnitDiskArgs }   from '../../models/unitdisk/unitdisk-model'
-
-
-import { Hypertree }      from '../../components/hypertree/hypertree'
-import { IUnitDisk }      from '../../components/unitdisk/unitdisk'
-import { ILayer }         from '../../components/layerstack/layer'
+import { UnitDiskArgs }        from '../../models/unitdisk/unitdisk-model'
+import { Hypertree }           from '../../components/hypertree/hypertree'
+import { IUnitDisk }           from '../../components/unitdisk/unitdisk'
+import { ILayer }              from '../../components/layerstack/layer'
 
 export interface HypertreeArgs
 {    
@@ -41,7 +39,7 @@ export interface HypertreeArgs
         linkWidth:      (n:N)=> number, 
         transformation: Transformation<N>,
         cacheUpdate:    (ud:IUnitDisk, cache:TransformationCache)=> void,        
-        layers:         ((ls:IUnitDisk)=> ILayer)[],
+        layers:         ((v, ls:IUnitDisk)=> ILayer)[],
     }
     //navigation?: {},
     //meta?: {},

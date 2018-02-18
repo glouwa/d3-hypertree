@@ -32,10 +32,10 @@ import { FocusLayer }               from '../../components/layers/focus-layer'
 import { layerSrc }                 from './preset-layers'
 import { cacheUpdate }              from './preset-filter'
 
-var hasLazy =         n=> (n.hasOutChildren && n.isOutλ)
-var isLeaf =          n=> !n.children || !n.children.length
-var isRoot =          n=> !n.parent 
-var hasCircle =       n=> hasLazy(n) || isRoot(n) || isLeaf(n)
+var hasLazy =   n=> (n.hasOutChildren && n.isOutλ)
+var isLeaf =    n=> !n.children || !n.children.length
+var isRoot =    n=> !n.parent 
+var hasCircle = n=> hasLazy(n) || isRoot(n) || isLeaf(n)
 
 var nodeInitR = (c:number)=> (ud:UnitDisk, d:N)=>
     c
