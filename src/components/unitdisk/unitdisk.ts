@@ -14,7 +14,9 @@ import { LayerStack }              from '../layerstack/layerstack'
 import { HypertreeMeta }           from '../meta/hypertree-meta/hypertree-meta'
 import { HypertreeMetaNav }        from '../meta/hypertree-meta/hypertree-meta'
 import { UnitDiskArgs }            from '../../models/unitdisk/unitdisk-model'
+import { UnitDiskView }            from '../../models/unitdisk/unitdisk-model'
 
+import { Hypertree }               from '../hypertree/hypertree'
 import { navBackgroundLayers }     from './layers-background'
 import { navBgNodeR }              from './layers-background'
 import { navParameterLayers }      from './layers-parameter'
@@ -22,8 +24,10 @@ import { navParameterLayers }      from './layers-parameter'
 //----------------------------------------------------------------------------------------
 
 export interface IUnitDisk
-{
+{  
+    view:               UnitDiskView
     args:               UnitDiskArgs
+
     cache    
     layerStack:         LayerStack
     HypertreeMetaType
@@ -45,6 +49,7 @@ export interface IUnitDisk
 
 export class UnitDisk implements IUnitDisk
 {
+    public view          : UnitDiskView
     public args          : UnitDiskArgs        
     public cache         : TransformationCache // zeigt auf transformation.cache
     public voronoiLayout : d3.VoronoiLayout<N>
@@ -53,16 +58,17 @@ export class UnitDisk implements IUnitDisk
     public HypertreeMetaType = HypertreeMeta
     public cacheMeta
 
-    private view // d3 select          
+    private mainsvg // d3 select          
     
-    constructor(args : UnitDiskArgs) {
+    constructor(view:UnitDiskView, args : UnitDiskArgs) {
+        this.view = view
         this.args = args
         this.cache = args.transformation.cache                        
         this.update.parent()
     }
     
     public api = {
-        setTransform: (t:string, tn:string)=> this.view.attr('transform', t)        
+        setTransform: (t:string, tn:string)=> this.mainsvg.attr('transform', t)        
     }
 
     public update = {
@@ -84,11 +90,11 @@ export class UnitDisk implements IUnitDisk
     }
 
     private updateParent() {        
-        this.view = d3.select(this.args.parent).append('g')
-            .attr('class', this.args.className)
-            .attr('transform', this.args.position)
+        this.mainsvg = d3.select(this.view.parent).append('g')
+            .attr('class', this.view.className)
+            .attr('transform', this.view.position)
         
-        this.view.append('clipPath')
+        this.mainsvg.append('clipPath')
             .attr('id', 'circle-clip' + this.args.clipRadius)
             .append('circle')
                 .attr('r', this.args.clipRadius)       
@@ -104,7 +110,7 @@ export class UnitDisk implements IUnitDisk
             console.log('this.args.cacheUpdate is null, and called')
 
         this.layerStack = new LayerStack({ 
-            parent: this.view,
+            parent: this.mainsvg,
             unitdisk: this
         })
     }
@@ -114,28 +120,32 @@ export class UnitDisk implements IUnitDisk
 
 export class UnitDiskNav implements IUnitDisk
 {
+    public view          : UnitDiskView
     public args          : UnitDiskArgs
     public cache         // redircteds NOT xD to view.cache    
     public layerStack
       
-    public view          : UnitDisk // public wegen hypertreemeta
+    public mainView      : UnitDisk // public wegen hypertreemeta
     public navBackground : UnitDisk // public wegen hypertreemeta
     public navParameter  : UnitDisk // public wegen hypertreemeta
 
     public HypertreeMetaType = HypertreeMetaNav
 
-    constructor(args:UnitDiskArgs) {
+    constructor(view:UnitDiskView, args:UnitDiskArgs) {
+        this.view = view
         this.args = args
 
-        this.view = new UnitDisk(args)
-        this.cache = this.view.cache        
-        this.layerStack = this.view.layerStack
+        this.mainView = new UnitDisk(view, args)
+        this.cache = this.mainView.cache        
+        this.layerStack = this.mainView.layerStack
         
         this.navBackground = new UnitDisk({
-            parent:             args.parent,
+            parent:             view.parent,
             className:          'nav-background-disc',
             position:           'translate(95,95) scale(70)',
-            hypertree:          args.hypertree,
+            hypertree:          view.hypertree
+        },
+        {
             data:               args.data,
             
             cacheUpdate:        null,
@@ -156,11 +166,12 @@ export class UnitDiskNav implements IUnitDisk
         
         //var ncount = 1        
         this.navParameter = new UnitDisk({
-            parent:             args.parent,
+            parent:             view.parent,
             className:          'nav-parameter-disc',
             position:           'translate(95,95) scale(70)',
-            hypertree:          args.hypertree,
-
+            hypertree:          view.hypertree
+        },
+        {            
             data:               obj2data(args.transformation.state),
 
             layers:             navParameterLayers,
@@ -196,7 +207,7 @@ export class UnitDiskNav implements IUnitDisk
     
     public api = {
         setTransform: (t:string, tn:string)=> {
-            this.view.api.setTransform(t, null)
+            this.mainView.api.setTransform(t, null)
             this.navBackground.api.setTransform(tn, null)
             this.navParameter.api.setTransform(tn, null)
         }
@@ -205,30 +216,30 @@ export class UnitDiskNav implements IUnitDisk
     update = {
         data: ()=> { 
             this.navBackground.args.data = this.args.data
-            this.view.args.data = this.args.data
+            this.mainView.args.data = this.args.data
 
             this.update.layout()
         },
         layout: ()=> {
-            this.view.update.cache()
+            this.mainView.update.cache()
             this.navParameter.update.cache()
 
             this.navBackground.layerStack.update.transformation() 
-            this.view.layerStack.update.transformation()
+            this.mainView.layerStack.update.transformation()
             this.navParameter.layerStack.update.transformation()        
         },
         transformation: ()=> {
-            this.view.update.cache()
+            this.mainView.update.cache()
             this.navParameter.update.cache()
 
-            this.view.layerStack.update.transformation()        
+            this.mainView.layerStack.update.transformation()        
             this.navParameter.layerStack.update.transformation()        
             this.navBackground.layerStack.update.pathes()
         },
         pathes: ()=> {
-            this.view.update.cache()            
+            this.mainView.update.cache()            
 
-            this.view.layerStack.update.transformation()
+            this.mainView.layerStack.update.transformation()
             this.navBackground.layerStack.update.pathes()
             this.navParameter.layerStack.update.transformation() // wegen node hover
         }

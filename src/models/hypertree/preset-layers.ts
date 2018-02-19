@@ -214,8 +214,8 @@ export const layerSrc = [
         onClick:     (n:N, m:C)=> {
                         var s = n.ancestors().find(e=> true)          // obsolete
                         //ud.args.hypertree.updatePath('SelectionPath', s) // toggle selection 
-                        ud.args.hypertree.api.toggleSelection(s)          // toggle selection 
-                        ud.args.hypertree.args.onNodeSelect(s)        // focus splitter
+                        ud.view.hypertree.api.toggleSelection(s)          // toggle selection 
+                        ud.view.hypertree.args.onNodeSelect(s)        // focus splitter
         }
     })
 ]

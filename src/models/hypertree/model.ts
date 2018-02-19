@@ -5,6 +5,7 @@ import { LayoutFunction }      from '../n/n-layouts'
 import { Transformation }      from '../../models/transformation/hyperbolic-transformation'
 import { TransformationCache } from '../../models/transformation/hyperbolic-transformation'
 import { UnitDiskArgs }        from '../../models/unitdisk/unitdisk-model'
+import { UnitDiskView }        from '../../models/unitdisk/unitdisk-model'
 import { Hypertree }           from '../../components/hypertree/hypertree'
 import { IUnitDisk }           from '../../components/unitdisk/unitdisk'
 import { ILayer }              from '../../components/layerstack/layer'
@@ -24,7 +25,7 @@ export interface HypertreeArgs
     langmap:      {},
     layout:       LayoutFunction,
     magic:        number,
-    decorator:    { new(a: UnitDiskArgs) : IUnitDisk }, // replace by navigation
+    decorator:    { new(view:UnitDiskView, args:UnitDiskArgs) : IUnitDisk }, // replace by navigation
 
     objects: {
         pathes:     Path[],

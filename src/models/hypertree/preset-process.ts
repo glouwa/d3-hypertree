@@ -21,7 +21,7 @@ export function doVoronoiStuff(ud:IUnitDisk, cache:TransformationCache) {
         const pathStr = cache.centerNode
             .ancestors()
             .reduce((a, e)=> `${e.precalc.txt?("  "+e.precalc.txt+"  "):''}${a?"›":""}${a}`, '') 
-        const hypertree = ud.args.hypertree
+        const hypertree = ud.view.hypertree
         hypertree.view_.path.innerText = pathStr // todo: html m frame?
 
         if (cache.centerNode === hypertree.data && !hypertree.view_.btnHome.classList.contains('disabled')) {

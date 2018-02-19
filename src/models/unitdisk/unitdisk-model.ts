@@ -7,13 +7,16 @@ import { C }                       from '../../models/transformation/hyperbolic-
 import { Transformation }          from '../../models/transformation/hyperbolic-transformation'
 import { TransformationCache }     from '../../models/transformation/hyperbolic-transformation'
 
-export interface UnitDiskArgs
+export interface UnitDiskView
 {
     parent:            any,
     position:          string,
     className:         string,
     hypertree:         Hypertree,
+}
 
+export interface UnitDiskArgs
+{
     data:              N,
 
     transformation:    Transformation<N>,

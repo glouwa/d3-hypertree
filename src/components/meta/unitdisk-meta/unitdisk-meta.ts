@@ -196,17 +196,17 @@ function UnitdiskMeta_({ parent, ud, className })
             const λk = CptoCk({ θ:(1-slider.value)*π*2, r:1})
             ud.args.transformation.state.λ.re = λk.re
             ud.args.transformation.state.λ.im = λk.im
-            ud.args.hypertree.updateLayout()
+            ud.view.hypertree.updateLayout()
         }
     }
 
     const sliderBindingω = {
         toView: (slider)=> {
-            slider.value = 1 / ud.args.hypertree.args.magic            
+            slider.value = 1 / ud.view.hypertree.args.magic            
         },
         fromView: (slider)=> {
-            ud.args.hypertree.args.magic = 1 / slider.value
-            ud.args.hypertree.updateTransformation()
+            ud.view.hypertree.args.magic = 1 / slider.value
+            ud.view.hypertree.updateTransformation()
         }
     }
 
@@ -242,7 +242,7 @@ function UnitdiskMeta_({ parent, ud, className })
         data:      new BarRow   (ui, e+=7,  'Load',                '<sub>s</sub>'),
         lang:      new BarRow   (ui, e+=re, 'Lang',                '<sub>s</sub>'),
     }*/
-    var rows = {                
+    var rows = {
         lang:      new BarRow   (ui, e+=0,  'Lang',                '<sub>s</sub>'),        
         heights:   new HistRow  (ui, e+=7,  'τ',                   '<sub>79</sub>'),
         weights:   new HistRow  (ui, e+=7,  'ω',                   '<sub>34k</sub>'),
@@ -259,7 +259,7 @@ function UnitdiskMeta_({ parent, ud, className })
     ui.updateλω = ()=> {
         var π = Math.PI
         rows.lambda.slider.querySelector('input').value = 1 - πify(CktoCp(ud.args.transformation.state.λ).θ) / 2 / π        
-        rows.cullmaxw.slider.querySelector('input').value = 1 / ud.args.hypertree.args.magic
+        rows.cullmaxw.slider.querySelector('input').value = 1 / ud.view.hypertree.args.magic
     }
 
     ui.updateSvgInfo = ()=> {
@@ -327,7 +327,7 @@ function UnitdiskMeta_({ parent, ud, className })
 
     const sep = '&nbsp; •&ensp;'
     ui.updateLayout = ()=> {        
-        const Δ = ud.args.hypertree.layoutMeta.Δ
+        const Δ = ud.view.hypertree.layoutMeta.Δ
         
         const v = rows.layout
 
@@ -341,9 +341,9 @@ function UnitdiskMeta_({ parent, ud, className })
 
     const d3format = d3.format('.3s')
     ui.updateModel = ()=> {        
-        const Δ = ud.args.hypertree.modelMeta.Δ
-        const kb = (ud.args.hypertree.modelMeta.filesize/1024).toFixed(0)
-        const model = ud.args.hypertree.data
+        const Δ = ud.view.hypertree.modelMeta.Δ
+        const kb = (ud.view.hypertree.modelMeta.filesize/1024).toFixed(0)
+        const model = ud.view.hypertree.data
 
         // do the hole DSIT STUFF!
 
@@ -391,11 +391,11 @@ function UnitdiskMeta_({ parent, ud, className })
     }
     
     ui.updateLang = ()=> {        
-        const Δ  = ud.args.hypertree.langMeta.Δ 
-        const kb = ud.args.hypertree.langMeta.filesize
-                 ? (ud.args.hypertree.langMeta.filesize/1024).toFixed(0)
+        const Δ  = ud.view.hypertree.langMeta.Δ 
+        const kb = ud.view.hypertree.langMeta.filesize
+                 ? (ud.view.hypertree.langMeta.filesize/1024).toFixed(0)
                  : '-'
-        const model = ud.args.hypertree.data
+        const model = ud.view.hypertree.data
         const Δs = Δ/1000
 
         // do the hole DSIT STUFF!

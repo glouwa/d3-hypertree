@@ -53,12 +53,12 @@ export class HypertreeMeta
     private updateParent() {   
         
         this.udView = new UnitdiskMeta({ 
-            view: { parent:this.view.parent, className:'data' },
+            view: { parent:this.view.parent, className:'data', hypertree:this.model },
             model: this.model.unitdisk
         })
         
         this.lsView = new LayerStackMeta({
-            view: { parent:this.view.parent, className: 'data' },
+            view: { parent:this.view.parent, className: 'data', hypertree:this.model },
             model: this.model.unitdisk
         })
     }
@@ -139,24 +139,24 @@ export class HypertreeMetaNav
 
         const navUnitDisk = <UnitDiskNav>this.model.unitdisk
         this.udView = new UnitdiskMeta({ 
-            view: { parent:this.view.html.querySelector('#meta-ud-data'), className:'data' },
-            model: navUnitDisk.view
+            view: { parent:this.view.html.querySelector('#meta-ud-data'), className:'data', hypertree:this.model },
+            model: navUnitDisk.mainView
         })
         this.udNav = new UnitdiskMeta({ 
-            view: { parent:this.view.html.querySelector('#meta-ud-nav'), className:'nav' },
+            view: { parent:this.view.html.querySelector('#meta-ud-nav'), className:'nav', hypertree:this.model },
             model: navUnitDisk.navParameter
         })
         
         this.lsView = new LayerStackMeta({
-            view: { parent:this.view.html2.querySelector('#meta-ls-data'), className: 'data' },
-            model: navUnitDisk.view
+            view: { parent:this.view.html2.querySelector('#meta-ls-data'), className: 'data', hypertree:this.model },
+            model: navUnitDisk.mainView
         })        
         this.lsNav = new LayerStackMeta({
-            view: { parent:this.view.html2.querySelector('#meta-ls-bg'), className: 'navBg' },
+            view: { parent:this.view.html2.querySelector('#meta-ls-bg'), className: 'navBg', hypertree:this.model },
             model: navUnitDisk.navBackground
         })
         this.lsNavParam = new LayerStackMeta({
-            view: { parent:this.view.html2.querySelector('#meta-ls-nav'), className: 'nav' },
+            view: { parent:this.view.html2.querySelector('#meta-ls-nav'), className: 'nav', hypertree:this.model },
             model: this.model.unitdisk.navParameter
         }) 
     }

@@ -136,11 +136,12 @@ export class Hypertree
         html?          : HTMLElement,
         unitdisk?      : IUnitDisk,
         hypertreeMeta? : HypertreeMeta,
-/*
+        /*
         modelMeta,
         langMeta,
         layoutMeta,
-        noHypertreeMeta,*/
+        noHypertreeMeta,
+        */
     }
     animation      : boolean = false
     
@@ -310,6 +311,8 @@ export class Hypertree
             className:      'unitDisc',
             position:       'translate(520,500) scale(470)',
             hypertree:      this,
+        },
+        {            
             data:           this.data,            
             transformation: this.args.geometry.transformation,
             transform:      (n:N)=> this.unitdisk.args.transformation.transformPoint(n.layout.z),

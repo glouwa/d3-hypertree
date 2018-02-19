@@ -89,7 +89,7 @@ export const navBackgroundLayers = [
     (v, ud:UnitDisk)=> new LabelLayer(v, {
         name:       'labels',
         className:  'caption label-big', 
-        data:       ()=> ud.args.hypertree.args.objects.selections,
+        data:       ()=> ud.view.hypertree.args.objects.selections,
         text:       (d:N)=> d.precalc.txt,
         delta:      labelDelta(ud),
         transform:  (d:N, delta:C)=> 

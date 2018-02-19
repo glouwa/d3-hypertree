@@ -20,8 +20,8 @@ export class LayerStackMeta
     update = {
         parent: ()=> this.updateParent(),
         data: ()=> {             
-            this.ui.updateSwitch(this.model.args.hypertree.isAnimationRunning())
-            this.ui.updateCounts(this.model.args.hypertree.isAnimationRunning())
+            this.ui.updateSwitch(this.view.hypertree.isAnimationRunning())
+            this.ui.updateCounts(this.view.hypertree.isAnimationRunning())
         }
     }
 

@@ -27,14 +27,14 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
     //stopDown
     if (cache.unculledNodes) {
         if (cache.unculledNodes.length > range.max) {
-            if (1/ud.args.hypertree.args.magic > 2) { // ???
-                ud.args.hypertree.args.magic *= alpha
+            if (1/ud.view.hypertree.args.magic > 2) { // ???
+                ud.view.hypertree.args.magic *= alpha
                 //console.log('to big', (1/ud.args.hypertree.args.magic).toFixed(0))
             }
         }
         if (cache.unculledNodes.length < range.min) {
-            if (1/ud.args.hypertree.args.magic < 500) { // ???
-                ud.args.hypertree.args.magic /= alpha
+            if (1/ud.view.hypertree.args.magic < 500) { // ???
+                ud.view.hypertree.args.magic /= alpha
                 //console.log('to small', (1/ud.args.hypertree.args.magic).toFixed(0))
             }
         }
@@ -46,7 +46,7 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
     cache.unculledNodes = []
     cache.spezialNodes =  [ud.args.data, startNode].filter(e=> e)
         
-    const tr = hwe=> hwe * ud.args.hypertree.args.magic
+    const tr = hwe=> hwe * ud.view.hypertree.args.magic
 
     function abortfilter(n, idx, highway) { // return false to abort
         const minWeight = tr(highway[0].value)
