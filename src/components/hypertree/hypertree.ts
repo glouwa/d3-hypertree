@@ -174,20 +174,29 @@ export class Hypertree
         setModel: (model: HypertreeArgs)=> {
             this.args = model        
             this.update.view.parent()
-        },  
+        },
         setLangloader: ll=> { 
-            this.args.langloader = ll
-            this.update.langloader() 
+            this.args.langloader = ll            
+            this.args.langloader((langMap, t1, dl)=> {            
+                this.langMap = langMap
+                this.updateLang_(dl)
+                this.update.langloader() 
+            })
         },
         setDataloader: dl=> { 
             this.args.dataloader = dl
-            this.update.dataloader() 
+            const t0 = performance.now()
+            this.resetData()
+            this.args.dataloader((d3h, t1, dl)=> 
+                this.initData(d3h, t0, t1, dl)
+            )
         },
+        /*
         setLoaders: (dl, ll)=> { 
             this.args.dataloader = dl
             this.args.langloader = ll
             this.update.langloader() 
-        },
+        },*/
         //setLang: (langmap)
         //setData: (N*)        
         onDragλ: ()=> {
@@ -202,7 +211,7 @@ export class Hypertree
         toggleNav: ()=> {
             this.args.decorator = this.args.decorator === UnitDiskNav ? UnitDisk : UnitDiskNav
             this.update.view.unitdisk()
-            this.unitdisk.update.data()
+            this.update.data()
             this.hypertreeMeta.update.model()
             this.hypertreeMeta.update.layout()
             this.hypertreeMeta.update.transformation()
@@ -246,10 +255,14 @@ export class Hypertree
             parent:         ()=> this.updateParent(),
             unitdisk:       ()=> { this.updateUnitdiskView(); this.updateMetaView(); },
             meta:           ()=> this.updateMetaView(),
-        },
-        dataloader:     ()=> this.updateDataloader(),
-        langloader:     ()=> this.updateLangloader(),
-        
+        },        
+        data:          ()=> requestAnimationFrame(()=> {                            
+                            this.unitdisk.update.data()
+                        }),        
+        langloader:     ()=> requestAnimationFrame(()=> {                            
+                            this.hypertreeMeta.update.lang()
+                            this.update.transformation()
+                        }),        
         layout:         ()=> requestAnimationFrame(()=> {
                             this.unitdisk.update.transformation() 
                             this.hypertreeMeta.update.layout()
@@ -314,8 +327,8 @@ export class Hypertree
         this.updateUnitdiskView()
         this.updateMetaView()    
 
-        this.update.dataloader()
-        this.update.langloader()
+        this.api.setDataloader(this.args.dataloader)        
+        this.api.setLangloader(this.args.langloader)
     }
 
     private updateUnitdiskView()
@@ -359,8 +372,7 @@ export class Hypertree
     //##
     //########################################################################################################
 
-    private updateDataloader() : void {
-        var t0 = performance.now()
+    private resetData() {        
         this.view_.html.querySelector('.preloader').innerHTML = htmlpreloader
         this.unitdisk.args.data = undefined
      
@@ -374,53 +386,45 @@ export class Hypertree
             .querySelector<HTMLButtonElement>('#btn-path-home')
             .onclick = ()=> this.api.gotoHome()
 
-        this.unitdisk.update.data()
-
-        this.args.dataloader((d3h, t1, dl)=> {
-            var t2 = performance.now()
-            var ncount = 1
-            this.data = <N & d3.HierarchyNode<N>>d3
-                .hierarchy(d3h)
-                .each((n:any)=> {
-                    n.mergeId = ncount++
-                    n.value = null
-                    n.precalc = {}
-                    n.layout = null
-                    n.layoutReference = null
-                    n.pathes = {}
-                })
-                //.sum(this.args.weight) // this.updateWeights()
-
-            this.view_.html.querySelector('.preloader').innerHTML = ''
-            this.modelMeta = { Δ: [t1-t0, t2-t1, performance.now()-t2], filesize:dl }
-            
-            var t3 = performance.now()
-            this.data = this.args.layout(this.data, this.args.geometry.transformation.state)
-            this.unitdisk.args.data = this.data
-            this.args.geometry.transformation.cache.N = this.data.descendants().length
-            this.updateWeights_()
-            this.updateLang_()
-            this.updateImgHref_()            
-            this.layoutMeta = { Δ: performance.now()-t3 }
-            
-            this.hypertreeMeta.update.model()
-            this.animateUp()
-        })
+        this.update.data()   
     }
 
-    private updateLangloader() : void {
-        this.args.langloader((langMap, t1, dl)=> {            
-            this.langMap = langMap
-            this.updateLang_(dl)
+    private initData(d3h, t0, t1, dl) {
+        var t2 = performance.now()
+        var ncount = 1
+        this.data = <N & d3.HierarchyNode<N>>d3
+            .hierarchy(d3h)
+            .each((n:any)=> {
+                n.mergeId = ncount++
+                n.value = null
+                n.precalc = {}
+                n.layout = null
+                n.layoutReference = null
+                n.pathes = {}
+            })
+            //.sum(this.args.weight) // this.updateWeights()
 
-            this.hypertreeMeta.update.lang()
-            this.update.transformation()
-        })
+        this.view_.html.querySelector('.preloader').innerHTML = ''
+        this.modelMeta = { Δ: [t1-t0, t2-t1, performance.now()-t2], filesize:dl }
+        
+        var t3 = performance.now()
+        this.data = this.args.layout(this.data, this.args.geometry.transformation.state)
+        this.unitdisk.args.data = this.data
+        this.args.geometry.transformation.cache.N = this.data.descendants().length
+        this.updateWeights_()
+        this.updateLang_()
+        this.updateImgHref_()            
+        this.layoutMeta = { Δ: performance.now()-t3 }
+        
+        this.hypertreeMeta.update.model()
+        this.animateUp()
     }
 
-    // pathbtn mit d3update
-    // n groups
-    // api    
+    //########################################################################################################
+    //##
+    //## Path
+    //##
+    //########################################################################################################
            
     private btnPathId = (pathType:string, n:N)=> `btn-path-${pathType}` + (pathType === 'SelectionPath' ? `-${n.mergeId}` : '')
     private addIfNotInSafe<ArrET>(arr:ArrET[], newE:ArrET, side='unshift') : ArrET[] {
@@ -445,7 +449,7 @@ export class Hypertree
 
     // es kann nur einen pro id geben, gibt es bereits einen wird dieser entfernt 
     // (praktisch für hover)
-    private setPathHead(path:Path, n:N) {        
+    private setPathHead(path:Path, n:N) {
         const pt = path ? path.type : 'HoverPath'
 
         const oldPathId = this.btnPathId(pt, n)
@@ -499,7 +503,7 @@ export class Hypertree
         this.view_.pathesToolbar.insertBefore(btnElem, pathType==='HoverPath' ? null : this.view_.pathesToolbar.firstChild)        
     }
 
-    private removePath(pathType:string, n:N) {        
+    private removePath(pathType:string, n:N) {
         const pathId = this.btnPathId(pathType, n)
         
         // model mod
@@ -536,10 +540,6 @@ export class Hypertree
     //## internal functions, calles by ...?
     //##
     //########################################################################################################
-
-    private updateLangData() {
-        // das was von data und lang abhängt: wiki nodes in this file...
-    }
 
     private updateLang_(dl=0) {
         const t0 = performance.now()
@@ -626,7 +626,7 @@ export class Hypertree
                     requestAnimationFrame(()=> frame())
 
                 // ui.update(s)
-                this.unitdisk.update.data()
+                this.update.data()
             }
         }
         requestAnimationFrame(()=> frame())
