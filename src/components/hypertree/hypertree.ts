@@ -577,31 +577,21 @@ export class Hypertree
         requestAnimationFrame(()=> {
             this.unitdisk.update.transformation() 
             this.hypertreeMeta.update.layout()
-            this.hypertreeMeta.update.transformation()
-            //this.unitdiskMeta.update.layout()
-            //this.unitdiskMeta.update.transformation()
-            //this.layerStackMeta2.update.data()
-            //this.layerStackMeta.update.data()            
+            this.hypertreeMeta.update.transformation()           
         })
     }
 
     private updateTransformation() : void {
         requestAnimationFrame(()=> {
             this.unitdisk.update.transformation() 
-            this.hypertreeMeta.update.transformation()
-            //this.unitdiskMeta.update.transformation()
-            //this.layerStackMeta2.update.data()
-            //this.layerStackMeta.update.data()            
+            this.hypertreeMeta.update.transformation()     
         })
     }
 
     private updatePathes() {      
         requestAnimationFrame(()=> {
             this.unitdisk.update.pathes()
-            this.hypertreeMeta.update.transformation()
-            //this.unitdiskMeta.update.transformation()
-            //this.layerStackMeta2.update.data()
-            //this.layerStackMeta.update.data()            
+            this.hypertreeMeta.update.transformation()     
         })
     }
     

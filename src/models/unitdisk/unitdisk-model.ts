@@ -17,11 +17,11 @@ export interface UnitDiskView
 
 export interface UnitDiskArgs
 {
-    data:              N,
+    data?:             N,
 
     transformation:    Transformation<N>,
     cacheUpdate:       (ud:IUnitDisk, cache:TransformationCache)=> void,    
-    transform:         (n:N)=> C,
+    transform?:        (n:N)=> C,
 
     nodeRadius:        (ud:IUnitDisk, n:N)=> number,
     nodeScale,

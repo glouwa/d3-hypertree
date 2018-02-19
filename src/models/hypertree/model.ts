@@ -12,37 +12,27 @@ import { ILayer }              from '../../components/layerstack/layer'
 
 export interface HypertreeArgs
 {    
-    iconmap:      any,
+    iconmap:       any,
 
-    dataloader:   (ok: (root:N, t0:number, dl:number)=>void)=> void,    
-    langloader:   (lang)=> (ok)=> void,
+    dataloader:    (ok: (root:N, t0:number, dl:number)=>void)=> void,    
+    langloader:    (lang)=> (ok)=> void,
     
-    weight:       (n:N)=> number,
-    caption:      (hypertree:Hypertree, n:N)=> string,
-    onNodeSelect: (n:N)=> void,
+    weight:        (n:N)=> number,
+    caption:       (hypertree:Hypertree, n:N)=> string,
+    onNodeSelect:  (n:N)=> void,
     
-    data:         N,
-    langmap:      {},
-    layout:       LayoutFunction,
-    magic:        number,
-    decorator:    { new(view:UnitDiskView, args:UnitDiskArgs) : IUnitDisk }, // replace by navigation
+    data:          N,
+    langmap:       {},
+    layout:        LayoutFunction,
+    magic:         number,
+    decorator:     { new(view:UnitDiskView, args:UnitDiskArgs) : IUnitDisk }, // replace by navigation
 
     objects: {
-        pathes:     Path[],
-        selections: N[],
+        pathes:      Path[],
+        selections:  N[],
     },
     
-    geometry: {         // unitdiskModel
-        transformation: Transformation<N>,
-        cacheUpdate:    (ud:IUnitDisk, cache:TransformationCache)=> void,        
-        
-        nodeRadius:     (ud:IUnitDisk, n:N)=> number,
-        nodeScale:      any,
-        nodeFilter:     (n:N)=> boolean,
-        linkWidth:      (n:N)=> number,         
-        layers:         ((v, ls:IUnitDisk)=> ILayer)[],
-        clipRadius:     number,
-    }
-    //navigation?: {},
-    //meta?: {},
+    geometry:      UnitDiskArgs
+    //navigation?: UnitDiskArgs | null,
+    //meta?:       boolean,
 }
