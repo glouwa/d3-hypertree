@@ -225,22 +225,23 @@ export class InteractionLayer implements ILayer
 
     private onDragλ = (s:C, e:C)=> {
         this.view.unitdisk.args.transformation.onDragλ(s, e)
-        this.view.hypertree.updateLayout()
+        this.view.hypertree.updateLayout_()
+        this.view.hypertree.update.layout()
     }
 
     private onDragByNode = (n:N, s:C, e:C)=> {  
         if (n && n.name == 'θ') {
             this.view.unitdisk.args.transformation.onDragθ(s, e)
-            this.view.hypertree.updateTransformation()
+            this.view.hypertree.update.transformation()
         }
         else if (n && n.name == 'λ') {
             this.onDragλ(s, e)
         }
         else {
             this.view.unitdisk.args.transformation.onDragP(s, e)
+            this.view.hypertree.update.transformation()
             this.ping(e, this.traceColors.mouse)
-            //this.pingNode(n, 'orange')
-            this.view.hypertree.updateTransformation()
+            //this.pingNode(n, 'orange')            
         }
     }
 
@@ -264,7 +265,7 @@ export class InteractionLayer implements ILayer
 
         // immer?
         this.view.unitdisk.args.transformation.onDragEnd(e)
-        this.view.hypertree.updateTransformation()
+        this.view.hypertree.update.transformation()
     }
 
     private animationTimer = null

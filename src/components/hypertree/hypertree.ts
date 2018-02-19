@@ -190,7 +190,14 @@ export class Hypertree
         },
         //setLang: (langmap)
         //setData: (N*)        
-        //setLayout (l)
+        onDragλ: ()=> {
+            this.updateLayout_()
+            this.update.layout()
+        },
+        onDragP: ()=> {
+            this.updateLayout_()
+            this.update.layout()
+        },
         //setWeigths (w)
         toggleNav: ()=> {
             this.args.decorator = this.args.decorator === UnitDiskNav ? UnitDisk : UnitDiskNav
@@ -228,8 +235,7 @@ export class Hypertree
         endAT (TS)*/
     }
 
-    private actions = {    
-    }
+    // private actions = {} todo: alles mit *_
 
     /*
     * this functions assume the model/view (this class internal state)
@@ -237,16 +243,26 @@ export class Hypertree
     */
     private update = {        
         view: {
-            parent:     ()=> this.updateParent(),
-            unitdisk:   ()=> { this.updateUnitdiskView(); this.updateMetaView(); },
-            meta:       ()=> this.updateMetaView(),
+            parent:         ()=> this.updateParent(),
+            unitdisk:       ()=> { this.updateUnitdiskView(); this.updateMetaView(); },
+            meta:           ()=> this.updateMetaView(),
         },
         dataloader:     ()=> this.updateDataloader(),
         langloader:     ()=> this.updateLangloader(),
         
-        layout:         ()=> this.updateLayout(),
-        transformation: ()=> this.updateTransformation(),
-        pathes:         ()=> this.updatePathes()
+        layout:         ()=> requestAnimationFrame(()=> {
+                            this.unitdisk.update.transformation() 
+                            this.hypertreeMeta.update.layout()
+                            this.hypertreeMeta.update.transformation()           
+                        }),
+        transformation: ()=> requestAnimationFrame(()=> {
+                            this.unitdisk.update.transformation() 
+                            this.hypertreeMeta.update.transformation()     
+                        }),
+        pathes:         ()=> requestAnimationFrame(()=> {
+                            this.unitdisk.update.pathes()
+                            this.hypertreeMeta.update.transformation()     
+                        })
     }
 
     //########################################################################################################
@@ -382,7 +398,7 @@ export class Hypertree
             this.data = this.args.layout(this.data, this.args.geometry.transformation.state)
             this.unitdisk.args.data = this.data
             this.args.geometry.transformation.cache.N = this.data.descendants().length
-            this.updateWeights()
+            this.updateWeights_()
             this.updateLang_()
             this.updateImgHref_()            
             this.layoutMeta = { Δ: performance.now()-t3 }
@@ -398,7 +414,7 @@ export class Hypertree
             this.updateLang_(dl)
 
             this.hypertreeMeta.update.lang()
-            this.updateTransformation()
+            this.update.transformation()
         })
     }
 
@@ -545,27 +561,18 @@ export class Hypertree
             n.precalc.imageHref = this.args.iconmap.fileName2IconUrl(n.data.name, n.data.type)                    
     }
 
-    //########################################################################################################
-    //##
-    //## Animation frames ans animations
-    //##
-    //########################################################################################################
-
-    private updateWeights() : void {
+    private updateWeights_() {
         this.data.sum(this.args.weight) // äää besser...
         for (var n of dfsFlat(this.data, n=>true)) 
             // ...hier selber machen
             n.precalc.weightScale = (Math.log2(n.value) || 1) 
-                          / (Math.log2(this.data.value || this.data.children.length) || 1)
-        
-        this.updateLayout()
+                          / (Math.log2(this.data.value || this.data.children.length) || 1)        
     }
 
-    private updateLayout() : void {
+    private updateLayout_() : void {
         //app.toast('Layout')
         var t0 = performance.now()
-        this.args.layout(this.data, this.args.geometry.transformation.state)        
-        this.layoutMeta = { Δ: performance.now()-t0 }
+        this.args.layout(this.data, this.args.geometry.transformation.state)                
         //this.unitdiskMeta.update.layout(this.args.geometry.transformation.cache, performance.now() - t0)
         
         const t = this.args.geometry.transformation
@@ -573,28 +580,15 @@ export class Hypertree
             t.state.P.re = -t.cache.centerNode.layout.z.re
             t.state.P.im = -t.cache.centerNode.layout.z.im
         }
-
-        requestAnimationFrame(()=> {
-            this.unitdisk.update.transformation() 
-            this.hypertreeMeta.update.layout()
-            this.hypertreeMeta.update.transformation()           
-        })
+        this.layoutMeta = { Δ: performance.now()-t0 }
     }
 
-    private updateTransformation() : void {
-        requestAnimationFrame(()=> {
-            this.unitdisk.update.transformation() 
-            this.hypertreeMeta.update.transformation()     
-        })
-    }
+    //########################################################################################################
+    //##
+    //## Animation frames ans animations
+    //##
+    //########################################################################################################
 
-    private updatePathes() {      
-        requestAnimationFrame(()=> {
-            this.unitdisk.update.pathes()
-            this.hypertreeMeta.update.transformation()     
-        })
-    }
-    
     private animateUp() {
         this.args.geometry.transformation.state.P.re = 0
         this.args.geometry.transformation.state.P.im = 0
@@ -652,7 +646,7 @@ export class Hypertree
             const animP = CaddC(initTS.P, CmulR(way, sigmoid(step/steps)))
             CassignC(this.args.geometry.transformation.state.P, animP)
             
-            this.updateTransformation()
+            this.update.transformation()
 
             if (step++ > steps) this.animation = false                    
             else requestAnimationFrame(()=> frame())                
