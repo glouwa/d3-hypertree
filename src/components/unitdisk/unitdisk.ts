@@ -137,17 +137,16 @@ export class UnitDiskNav implements IUnitDisk
             position:           'translate(95,95) scale(70)',
             hypertree:          args.hypertree,
             data:               args.data,
-            //layers:             args.layers.filter((l, idx)=> usedLayers[idx]),
-            layers:             navBackgroundLayers,
-            //cacheUpdate:        args.cacheUpdate,
+            
             cacheUpdate:        null,
             transformation:     args.transformation,
             transform:          (n:N)=> n.layout.z,
-            caption:            (n:N)=> undefined,
+            
             nodeRadius:         ()=> navBgNodeR,
             nodeScale:          args.nodeScale,
             nodeFilter:         args.nodeFilter,
             linkWidth:          args.linkWidth,
+            layers:             navBackgroundLayers,
             clipRadius:         1
         })
 
@@ -161,7 +160,9 @@ export class UnitDiskNav implements IUnitDisk
             className:          'nav-parameter-disc',
             position:           'translate(95,95) scale(70)',
             hypertree:          args.hypertree,
-            data:               obj2data(args.transformation.state),            
+
+            data:               obj2data(args.transformation.state),
+
             layers:             navParameterLayers,
             cacheUpdate:        (ud:UnitDisk, cache:TransformationCache)=> {
                 var t0 = performance.now()
@@ -184,7 +185,7 @@ export class UnitDiskNav implements IUnitDisk
             },
             transformation:     navTransformation,
             transform:          (n:any)=> CmulR(n, -1),
-            caption:            (n:N)=> undefined,
+            //caption:            (n:N)=> undefined,
             nodeRadius:         ()=> .16,
             nodeScale:          ()=> 1,
             nodeFilter:         ()=> true,

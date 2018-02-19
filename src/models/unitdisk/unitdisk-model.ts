@@ -13,17 +13,17 @@ export interface UnitDiskArgs
     position:          string,
     className:         string,
     hypertree:         Hypertree,
+
     data:              N,
-    layers:            ((v, ls:IUnitDisk)=> ILayer)[],
 
     transformation:    Transformation<N>,
     cacheUpdate:       (ud:IUnitDisk, cache:TransformationCache)=> void,    
     transform:         (n:N)=> C,
 
-    caption:           (n:N)=> string,
     nodeRadius:        (ud:IUnitDisk, n:N)=> number,
     nodeScale,
     nodeFilter:        (n:N)=> boolean,
     linkWidth:         (n:N)=> number,
+    layers:            ((v, ls:IUnitDisk)=> ILayer)[],
     clipRadius?:       number
 }

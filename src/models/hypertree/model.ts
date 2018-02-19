@@ -21,7 +21,7 @@ export interface HypertreeArgs
     onNodeSelect: (n:N)=> void,
     
     data:         N,
-    langmap:      {},    
+    langmap:      {},
     layout:       LayoutFunction,
     magic:        number,
     decorator:    { new(a: UnitDiskArgs) : IUnitDisk }, // replace by navigation
@@ -29,17 +29,18 @@ export interface HypertreeArgs
     objects: {
         pathes:     Path[],
         selections: N[],
-    },   
+    },
     
     geometry: {         // unitdiskModel
-        clipRadius:     number,
+        transformation: Transformation<N>,
+        cacheUpdate:    (ud:IUnitDisk, cache:TransformationCache)=> void,        
+        
         nodeRadius:     (ud:IUnitDisk, n:N)=> number,
         nodeScale:      any,
         nodeFilter:     (n:N)=> boolean,
-        linkWidth:      (n:N)=> number, 
-        transformation: Transformation<N>,
-        cacheUpdate:    (ud:IUnitDisk, cache:TransformationCache)=> void,        
+        linkWidth:      (n:N)=> number,         
         layers:         ((v, ls:IUnitDisk)=> ILayer)[],
+        clipRadius:     number,
     }
     //navigation?: {},
     //meta?: {},

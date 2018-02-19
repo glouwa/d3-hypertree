@@ -315,7 +315,7 @@ export class Hypertree
             transform:      (n:N)=> this.unitdisk.args.transformation.transformPoint(n.layout.z),
             layers:         this.args.geometry.layers,
             cacheUpdate:    this.args.geometry.cacheUpdate,
-            caption:        (n:N)=> this.args.caption(this, n),
+            //caption:        (n:N)=> this.args.caption(this, n),
             clipRadius:     this.args.geometry.clipRadius,
             nodeRadius:     this.args.geometry.nodeRadius,
             nodeScale:      this.args.geometry.nodeScale,            
