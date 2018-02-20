@@ -73,7 +73,8 @@ const modelBase : ()=> HypertreeArgs = ()=>
     magic:        1/160,
     objects: {                      // oder indizes?
         selections: [],
-        pathes: [],        
+        pathes: [],   
+        traces: []     
     },    
     decorator: UnitDiskNav,
     geometry: {

@@ -58,13 +58,14 @@
             opacity: 1;
             pointer-events:none;            
         }
-        .ping-line {              
+        .trace-polyline {              
             opacity: .8;            
+            stroke: orange; //#8d6e63;            
             stroke-width: .03;
             stroke-linecap: round;
-            stroke: orange; //#8d6e63;
-            fill: red;
-            pointer-events:none;            
+            stroke-linejoin: round;            
+            fill:none;
+            pointer-events:none;
         }
 
 

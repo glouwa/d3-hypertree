@@ -223,7 +223,6 @@ export class Hypertree
             this.hypertreeMeta.update.layout()
             this.hypertreeMeta.update.transformation()
         },
-
         toggleSelection: (n:N)=> {
             this.toggleSelection(n)
             this.update.pathes()
@@ -236,12 +235,6 @@ export class Hypertree
         },
         gotoHome: ()=>    this.animateTo({ re:0, im:0 }, null), 
         gotoNode: (n:N)=> this.animateTo(CmulR({ re:n.layout.z.re, im:n.layout.z.im }, -1), null),
-/*
-        gotoT (TS)
-
-        beginAT (TS)
-        AT (TS)
-        endAT (TS)*/
     }
 
     // private actions = {} todo: alles mit *_
@@ -256,7 +249,7 @@ export class Hypertree
             unitdisk:       ()=> { this.updateUnitdiskView(); this.updateMetaView(); },
             meta:           ()=> this.updateMetaView(),
         },        
-        data:          ()=> requestAnimationFrame(()=> {                            
+        data:           ()=> requestAnimationFrame(()=> {                            
                             this.unitdisk.update.data()
                         }),        
         langloader:     ()=> requestAnimationFrame(()=> {                            
@@ -368,7 +361,7 @@ export class Hypertree
 
     //########################################################################################################
     //##
-    //## Async Stuff
+    //## Sync blocks for async api functions
     //##
     //########################################################################################################
 
@@ -541,7 +534,7 @@ export class Hypertree
     //##
     //########################################################################################################
 
-    private updateLang_(dl=0) {
+    private updateLang_(dl=0) : void {
         const t0 = performance.now()
         for (var n of dfsFlat(this.data, n=>true)) {
             n.precalc.txt = null            
@@ -556,12 +549,12 @@ export class Hypertree
             }
     }
 
-    private updateImgHref_() {
+    private updateImgHref_() : void {
         for (var n of dfsFlat(this.data, n=>true)) 
             n.precalc.imageHref = this.args.iconmap.fileName2IconUrl(n.data.name, n.data.type)                    
     }
 
-    private updateWeights_() {
+    private updateWeights_() : void {
         this.data.sum(this.args.weight) // äää besser...
         for (var n of dfsFlat(this.data, n=>true)) 
             // ...hier selber machen
@@ -589,7 +582,7 @@ export class Hypertree
     //##
     //########################################################################################################
 
-    private animateUp() {
+    private animateUp() : void {
         this.args.geometry.transformation.state.P.re = 0
         this.args.geometry.transformation.state.P.im = 0
         
@@ -632,7 +625,7 @@ export class Hypertree
         requestAnimationFrame(()=> frame())
     }
 
-    private animateTo(newP:C, newλ) {
+    private animateTo(newP:C, newλ) : void {
         if (this.animation) return
         else this.animation = true
 
@@ -654,7 +647,7 @@ export class Hypertree
         requestAnimationFrame(()=> frame())
     }
 
-    public isAnimationRunning() {
+    public isAnimationRunning() : boolean {
         var view = this.unitdisk.args.transformation.isMoving()
         var nav = this.unitdisk.navParameter 
                && this.unitdisk.navParameter.args.transformation.isMoving()

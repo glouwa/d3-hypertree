@@ -1,5 +1,6 @@
 import { N }                   from '../n/n'
 import { Path }                from '../path/path'
+import { Trace }               from '../trace/trace'
 import { LoaderFunction }      from '../n/n-loaders'
 import { LayoutFunction }      from '../n/n-layouts'
 import { Transformation }      from '../../models/transformation/hyperbolic-transformation'
@@ -30,6 +31,7 @@ export interface HypertreeArgs
     objects: {
         pathes:      Path[],
         selections:  N[],
+        traces:      Trace[],
     },
     
     geometry:      UnitDiskArgs

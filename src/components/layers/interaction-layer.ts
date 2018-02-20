@@ -68,7 +68,11 @@ export class InteractionLayer implements ILayer
         var zoom = d3.zoom() // zoomevents: start, end, mulitiple, 
             //.scaleExtent([.51, 1.49])      
             .on("zoom", ()=> {
-                
+                console.assert(d3.event)
+                /*
+                const tid = d3.event.sourceEvent.touches[0].identifier || 'mouse'
+                */
+
                 if (d3.event && 
                     d3.event.sourceEvent && 
                     d3.event.sourceEvent.type === 'wheel')
@@ -164,61 +168,19 @@ export class InteractionLayer implements ILayer
 
     //-----------------------------------------------------------------------------------------
 
-    private lastpingNodepos = null
-    private pingNode(n:N, c, s=true) {        
-        const p = n.cache
-        this.view.parent.append('circle')
-            .attr("class", "ping-circle")
-            .attr("r", s?.01:.05)
-            .attr("transform", ` translate(${p.re} ${p.im})`)
-            .attr("fill", c)
+    private ping(p:C) {
         
-        if (this.lastpingNodepos)
-            this.view.parent.append('line')
-                .attr("class", "ping-line")
-                .attr('x1',             p.re)
-                .attr('y1',             p.im)
-                .attr('x2',             this.lastpingNodepos.re)
-                .attr('y2',             this.lastpingNodepos.im)                
-
-        this.lastpingNodepos = p
-    }
-
-    private traceColors = {
-        begin: '#ff5722',
-        mouse: '#2196f3',
-        frame: 'red',
-        end: '#4caf50',
-    }
-    private lastpingpos = null
-    private ping(p:C, c, s=true) {
-        /*addping
-        shift
-        pattern*/  
-        return  
-                   
-        if (this.lastpingpos)
-            this.view.parent.append('line')
-                .attr("class", "ping-line")
-                .attr('x1',             p.re)
-                .attr('y1',             p.im)
-                .attr('x2',             this.lastpingpos.re)
-                .attr('y2',             this.lastpingpos.im)                
-
-        this.view.parent.append('circle')
-            .attr("class", "ping-circle")
-            .attr("r", s?.01:.05)
-            .attr("transform", ` translate(${p.re} ${p.im})`)
-            .attr("fill", c)
-
-        this.lastpingpos = p
-        
-        //this...addCircle().addAAnimation().noFertig(removecircle)
+        if (this.view.hypertree.args.objects.traces.length === 0)
+            this.view.hypertree.args.objects.traces.push({
+                id: 'gibt eh nur ans',
+                points: []
+            })
+        this.view.hypertree.args.objects.traces[0].points.push(p)
     }
 
     private onDragStart = (n:N, m:C)=> {
-        this.ping(m, this.traceColors.begin, false)
-        //this.pingNode(n, 'green', false)
+        this.ping(m)                                             //#####################
+        
         if (!this.animationTimer)
             this.view.unitdisk.args.transformation.onDragStart(m)
     }
@@ -240,23 +202,20 @@ export class InteractionLayer implements ILayer
         else {
             this.view.unitdisk.args.transformation.onDragP(s, e)
             this.view.hypertree.update.transformation()
-            this.ping(e, this.traceColors.mouse)
-            //this.pingNode(n, 'orange')            
+            this.ping(e)                                         //#####################            
         }
     }
 
     private onDragEnd = (n:N, s:C, e:C)=> {  
         
-        const ti3 = d3.timer(()=> {
-            this.lastpingpos = null
-            this.lastpingNodepos = null
+        const ti3 = d3.timer(()=> {                              //#####################            
             ti3.stop()
-            this.view.parent.selectAll('.ping-circle').remove()
-            this.view.parent.selectAll('.ping-line').remove()            
+            this.view.hypertree.args.objects.traces.length = 0            
+            this.view.hypertree.update.transformation()
         }, 2000)
 
-        this.ping(e, this.traceColors.end, false)
-        //this.pingNode(n, 'blue', false)
+        this.ping(e)                                             //#####################
+        
         var dc = CsubC(s, e)        
         var dist = Math.sqrt(dc.re*dc.re + dc.im*dc.im)
         
@@ -325,16 +284,6 @@ export class InteractionLayer implements ILayer
         this.cancelClickTimer()
         //this.animateTo(n, ArrtoC(d3.mouse(this.args.parent)))
         this.args.onClick(n, m)
-    }
-
-    // DEFINE EVENTS!!!
-    /*
-
-        pan (drag)
-        click
-        dblclick
-
-
-     */
+    }    
 }
 

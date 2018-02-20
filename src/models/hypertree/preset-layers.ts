@@ -9,6 +9,7 @@ import { SymbolLayer }              from '../../components/layers/symbol-layer'
 import { ArcLayer }                 from '../../components/layers/link-layer'
 import { LabelLayer }               from '../../components/layers/label-layer'
 import { InteractionLayer }         from '../../components/layers/interaction-layer'
+import { TraceLayer }               from '../../components/layers/trace-layer'
 import { ImageLayer }               from '../../components/layers/image-layer'
 import { FocusLayer }               from '../../components/layers/focus-layer'
 import { bboxOffset }               from '../../index'
@@ -52,7 +53,7 @@ export const layerSrc = [
     (v, ud:UnitDisk)=> new FocusLayer(v, {        
         invisible:  true,
         hideOnDrag: true,
-        name:       'labels-𝐖-r',
+        name:       'labels-r-𝐖',
         r:          ()=> ud.cache.wikiR
     }),    
     (v, ud:UnitDisk)=> new FocusLayer(v, {
@@ -217,5 +218,9 @@ export const layerSrc = [
                         ud.view.hypertree.api.toggleSelection(s)          // toggle selection 
                         ud.view.hypertree.args.onNodeSelect(s)        // focus splitter
         }
+    }),
+    (v, ud:UnitDisk)=> new TraceLayer(v, {  
+        name:         'traces',
+        data:         ()=> ud.view.hypertree.args.objects.traces        
     })
 ]
