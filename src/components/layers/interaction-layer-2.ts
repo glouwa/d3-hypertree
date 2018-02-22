@@ -1,9 +1,9 @@
-import * as d3              from 'd3'
-import { ILayer }           from '../layerstack/layer'
-import { ILayerView }       from '../layerstack/layer'
-import { ILayerArgs }       from '../layerstack/layer'
-import { LayerStack }       from '../layerstack/layerstack'
-import { N }                from '../../models/n/n'
+import * as d3                    from 'd3'
+import { ILayer }                 from '../layerstack/layer'
+import { ILayerView }             from '../layerstack/layer'
+import { ILayerArgs }             from '../layerstack/layer'
+import { LayerStack }             from '../layerstack/layerstack'
+import { N }                      from '../../models/n/n'
 import { C }                      from '../../models/transformation/hyperbolic-math'
 import { CptoCk, CktoCp, ArrtoC } from '../../models/transformation/hyperbolic-math'
 import { CsubC, πify, sigmoid }   from '../../models/transformation/hyperbolic-math'
@@ -14,6 +14,8 @@ export interface InteractionLayer2Args extends ILayerArgs
     mouseRadius,
     onClick
 }
+
+const π = Math.PI
 
 export class InteractionLayer2 implements ILayer
 {
@@ -44,7 +46,8 @@ export class InteractionLayer2 implements ILayer
         if (!this.args.nohover) 
             this.view.parent.append('circle')
                 .attr("class", "mouse-circle")
-                .attr("r", this.args.mouseRadius)                
+                .attr("r", this.args.mouseRadius)       
+                .on('click',        e=> this.fireMouseWheelEvent())         
                 .on('wheel',        e=> this.fireMouseWheelEvent())
                 .on("mousedown",    e=> this.fireMouseDown())
                 .on("mousemove",    e=> this.fireMouseMove())
@@ -100,20 +103,22 @@ export class InteractionLayer2 implements ILayer
          
             this[eventName](pid, m)
         }
-        this.view.hypertree.update.transformation()        
+        if (changedTouches.length === 2)
+            this.view.hypertree.update.layout()
+        else
+            this.view.hypertree.update.transformation()        
     }
 
+    private minλ = .1 * π
+    private maxλ = .8 * π*2
     private fireMouseWheelEvent()
     {
         const mΔ = d3.event.deltaY
-        const λΔ = mΔ/100*2*Math.PI/16                
+        const λΔ = mΔ/100 * 2 * π / 16
         const oldλp = CktoCp(this.view.unitdisk.args.transformation.state.λ)
         const newλp = { θ:πify(oldλp.θ - λΔ), r:1 }
         
-        const min = .1 * Math.PI
-        const max = .8 * Math.PI*2        
-
-        if (newλp.θ < max && newλp.θ > min) 
+        if (newλp.θ < this.maxλ && newλp.θ > this.minλ) 
         {
             this.view.unitdisk.args.transformation.onDragλ(null, CptoCk(newλp))
             this.view.hypertree.updateLayout_()
@@ -123,19 +128,51 @@ export class InteractionLayer2 implements ILayer
 
     //-----------------------------------------------------------------------------------------
 
+    private pinchInitDist = null
+    private pinchInitλp = null
     private onPointerStart(pid, m) 
     {        
         this.view.hypertree.args.objects.traces.push({
             id: pid,
-            points: []
-        })
-        this.addTracePoint(pid, m)
+            points: [m]
+        })        
+
+        if (this.view.hypertree.args.objects.traces.length === 1) {
+            this.view.unitdisk.args.transformation.onDragStart(m)
+        }
+        else if (this.view.hypertree.args.objects.traces.length === 2) {
+            const t0 = this.view.hypertree.args.objects.traces[0]
+            this.pinchInitDist = this.dist(t0.points[t0.points.length-1], m) 
+            this.pinchInitλp = CktoCp(this.view.unitdisk.args.transformation.state.λ)
+        }
+        else {
+        }
     }
 
     private onPointerMove(pid, m) 
     {
-        if (this.view.hypertree.args.objects.traces.length > 0) {                        
-            this.addTracePoint(pid, m)
+        const trace = this.findTrace(pid)
+        trace.points.push(m)
+
+        if (this.view.hypertree.args.objects.traces.length === 1) 
+        {            
+            this.view.unitdisk.args.transformation.onDragP(trace.points[0], m)
+        }
+        if (this.view.hypertree.args.objects.traces.length === 2) 
+        {
+            const t1 = this.view.hypertree.args.objects.traces[0]
+            const t0 = this.view.hypertree.args.objects.traces[1]
+            const dist = this.dist(t0.points[t0.points.length-1], t1.points[t1.points.length-1])
+
+            const f = dist / this.pinchInitDist
+            const newλp = { θ:πify(this.pinchInitλp.θ * f), r:1 }
+
+            if (newλp.θ < this.maxλ && newλp.θ > this.minλ) 
+            {
+                console.log(f, this.pinchInitλp.θ/2/π, newλp.θ/2/π)
+                this.view.unitdisk.args.transformation.onDragλ(null, CptoCk(newλp))
+                this.view.hypertree.updateLayout_()
+            }
         }
     }
 
@@ -143,22 +180,35 @@ export class InteractionLayer2 implements ILayer
     {
         this.view.hypertree.args.objects.traces 
             = this.view.hypertree.args.objects.traces.filter(e=> e.id !== pid)
+
+        if (this.view.hypertree.args.objects.traces.length === 0) {
+            this.view.unitdisk.args.transformation.onDragEnd(m)
+        }
+        else if (this.view.hypertree.args.objects.traces.length === 1) {
+            this.view.unitdisk.args.transformation.onDragStart(m)
+        }
+        else {
+        }
     }
 
     //-----------------------------------------------------------------------------------------
  
-    private addTracePoint(pid, p:C) 
+    private findTrace(pid) 
     {
-        const t = this.view.hypertree.args.objects.traces.find(e=> e.id === pid)
-        t.points.push(p)
+        return this.view.hypertree.args.objects.traces.find(e=> e.id === pid)        
     }
 
-    currMousePosAsArr = ()=> d3.mouse(this.view.parent.node())
-    currMousePosAsC = ()=> ArrtoC(this.currMousePosAsArr())
-    findNodeByCell = ()=> {
+    private currMousePosAsArr = ()=> d3.mouse(this.view.parent.node())
+    private currMousePosAsC = ()=> ArrtoC(this.currMousePosAsArr())
+    private findNodeByCell = ()=> {
         var m = this.currMousePosAsArr()
         var find = this.view.unitdisk.cache.voronoiDiagram.find(m[0], m[1])
         return find ? find.data : undefined
+    }
+
+    private dist(a:C, b:C) {
+        const diff = CsubC(a, b)
+        return Math.sqrt(diff.re*diff.re + diff.im*diff.im)
     }
 }
 
