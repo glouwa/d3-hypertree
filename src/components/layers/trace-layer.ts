@@ -12,7 +12,7 @@ export interface TraceLayerArgs extends ILayerArgs
 }
 
 export class TraceLayer implements ILayer
-{  
+{
     view:            ILayerView  
     args:            TraceLayerArgs
     d3updatePattern: D3UpdatePattern

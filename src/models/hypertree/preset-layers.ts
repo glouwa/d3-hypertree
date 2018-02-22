@@ -9,6 +9,7 @@ import { SymbolLayer }              from '../../components/layers/symbol-layer'
 import { ArcLayer }                 from '../../components/layers/link-layer'
 import { LabelLayer }               from '../../components/layers/label-layer'
 import { InteractionLayer }         from '../../components/layers/interaction-layer'
+import { InteractionLayer2 }        from '../../components/layers/interaction-layer-2'
 import { TraceLayer }               from '../../components/layers/trace-layer'
 import { ImageLayer }               from '../../components/layers/image-layer'
 import { FocusLayer }               from '../../components/layers/focus-layer'
@@ -210,6 +211,16 @@ export const layerSrc = [
                         + d.scaleStrText                            
     }),
     (v, ud:UnitDisk)=> new InteractionLayer(v, {                            
+        mouseRadius: .95,
+        nohover:     false,
+        onClick:     (n:N, m:C)=> {
+                        var s = n.ancestors().find(e=> true)          // obsolete
+                        //ud.args.hypertree.updatePath('SelectionPath', s) // toggle selection 
+                        ud.view.hypertree.api.toggleSelection(s)          // toggle selection 
+                        ud.view.hypertree.args.onNodeSelect(s)        // focus splitter
+        }
+    }),
+    (v, ud:UnitDisk)=> new InteractionLayer2(v, {                            
         mouseRadius: .95,
         nohover:     false,
         onClick:     (n:N, m:C)=> {

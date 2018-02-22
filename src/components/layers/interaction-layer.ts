@@ -5,11 +5,14 @@ import { ILayerArgs }       from '../layerstack/layer'
 import { LayerStack }       from '../layerstack/layerstack'
 import { N }                from '../../models/n/n'
 import { C, CptoCk, CktoCp,
-    CassignC, ArrtoC,
-    dfsFlat, CsubC,
-    arcCenter, πify,
+  //  CassignC, 
+  ArrtoC,
+  //  dfsFlat, 
+  CsubC,
+    //arcCenter,
+     πify,
     sigmoid }               from '../../models/transformation/hyperbolic-math'
-import { shift } from '../../index';
+//import { shift } from '../../index';
 
 export interface InteractionLayerArgs extends ILayerArgs
 {    

@@ -48,7 +48,8 @@
             pointer-events: none;
         }
         .mouse-circle {
-            pointer-events:visibleFill;
+            pointer-events:visibleFill;            
+            //touch-action:  pan-x pan-y pinch-zoom;
             cursor: crosshair;
         }
         .focus-circle {        

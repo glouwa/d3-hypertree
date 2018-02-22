@@ -14,12 +14,14 @@ export * from './components/layerstack/d3updatePattern'
 import * as cell from './components/layers/cell-layer'
 import * as arc  from './components/layers/link-layer'
 import * as node from './components/layers/node-layer'
+import * as img  from './components/layers/image-layer'
 import * as sym  from './components/layers/symbol-layer'
 import * as text from './components/layers/label-layer'
 import * as bg   from './components/layers/background-layer'
 import * as foc  from './components/layers/focus-layer'
 import * as int  from './components/layers/interaction-layer'
-import * as img  from './components/layers/image-layer'
+import * as int2  from './components/layers/interaction-layer-2'
+
 
 export namespace layers
 {
@@ -29,6 +31,8 @@ export namespace layers
     export type ArcLayerArgs         = arc.ArcLayerArgs
     export var  NodeLayer            = node.NodeLayer
     export type NodeLayerArgs        = node.NodeLayerArgs
+    export var  ImageLayer           = img.ImageLayer
+    export type ImageLayerArgs       = img.ImageLayerArgs
     export var  SymbolLayer          = sym.SymbolLayer
     export type SymbolLayerArgs      = sym.SymbolLayerArgs
     export var  LabelLayer           = text.LabelLayer
@@ -39,8 +43,9 @@ export namespace layers
     export type FocusLayerArgs       = foc.FocusLayerArgs
     export var  InteractionLayer     = int.InteractionLayer
     export type InteractionLayerArgs = int.InteractionLayerArgs
-    export var  ImageLayer           = img.ImageLayer
-    export type ImageLayerArgs       = img.ImageLayerArgs
+    export var  InteractionLayer2     = int2.InteractionLayer2
+    export type InteractionLayer2Args = int2.InteractionLayer2Args
+    
 }
 
 export * from './components/unitdisk/unitdisk'
