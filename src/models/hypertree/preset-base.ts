@@ -73,10 +73,10 @@ const modelBase : ()=> HypertreeArgs = ()=>
     magic:        1/160,
     objects: {                      // oder indizes?
         selections: [],
-        pathes: [],   
-        traces: []     
+        pathes: [],
+        traces: []
     },    
-    decorator:   UnitDisk,
+    decorator:   UnitDiskNav,
     geometry: {
         clipRadius:     1,
         nodeRadius:     nodeInitR(.01),   
@@ -89,7 +89,7 @@ const modelBase : ()=> HypertreeArgs = ()=>
             λ:.1
         }),
         cacheUpdate:    cacheUpdate,
-        layers:         layerSrc        
+        layers:         layerSrc
     }
 })
 

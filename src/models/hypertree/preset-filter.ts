@@ -99,7 +99,7 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
     doImageStuff(ud, cache)
     
     // only for meta view
-    ud.cacheMeta = {        
+    ud.cacheMeta = {
         minWeight: path.map(n=> tr(n.value)),
         Δ: [t1-t0, t2-t1, t3-t2, performance.now()-t3]        
     }
@@ -156,6 +156,7 @@ function pathToLastVisible(ud:IUnitDisk, cache:TransformationCache) {
 function peocessNodeTransformation(ud:IUnitDisk, cache:TransformationCache, n:N) {
     n.cache = n.cache || { re:0, im:0 }
     CassignC(n.cache, ud.args.transform(n)) 
+    //CassignC(n.cache, n.layout.z) 
     n.cachep = CktoCp(n.cache)   
 }
 

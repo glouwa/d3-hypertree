@@ -126,7 +126,7 @@ export function deepStar(ok, arms=4, depth=30) {
 }
 
 /**
- * spaecial tactics loader for navDisks
+ * special tactics loader for navDisks
  * generates a path containing nodes for each member of 'o'
  *
  * no new object created, o is extended by tree stuff.
@@ -150,6 +150,20 @@ export function obj2data(o)
             root = newN
         cur = newN
     }
+    return root
+}
+
+export function navdata() : any
+{
+    const createNode = (id:number, name:string)=> ({        
+        mergeId:  id,
+        name:     name,
+        precalc:  {},
+        children: []
+    })
+    const root =       createNode(1, 'λ')
+    root.children.push(createNode(2, 'P'))
+    root.children.push(createNode(3, 'θ'))
     return root
 }
 

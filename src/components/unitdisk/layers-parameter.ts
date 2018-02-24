@@ -25,9 +25,8 @@ var deltaMap = { // label offsets (font correction)
 }
 
 var Pscale =  (ud:UnitDisk)=> (d:any)=>
-    lengthDilledation(d)
-    * (1 - ud.args.transformation.state.λ)
-    / ud.args.nodeRadius(ud, d)
+    lengthDilledation(d.cache)
+    * (1 - ud.args.transformation.state.λ)    
 
 export const navParameterLayers = [
     (v, ud:UnitDisk)=> new CellLayer(v, {
@@ -39,9 +38,10 @@ export const navParameterLayers = [
     (v, ud:UnitDisk)=> new NodeLayer(v, {
         name:        'nodes',
         className:   'node',
-        data:        ()=> ud.cache.unculledNodes,
-        r:           (d:N)=> ud.args.nodeRadius(ud, d) 
-                           * (d.name==='P' ? Pscale(ud)(d) : 1),
+        data:        ()=> ud.cache.unculledNodes,     
+        r:           (d:N)=> (d.name==='P' 
+            ? Pscale(ud)(d) 
+            : ud.args.nodeRadius(ud, d)),
         transform:   (d:N)=> d.transformStrCache,
     }),
     (v, ud:UnitDisk)=> new LabelLayer(v, {

@@ -1,7 +1,7 @@
 import * as d3                     from 'd3'
 import { HTML }                    from 'ducd'
 import { N }                       from '../../models/n/n'
-import { obj2data }                from '../../models/n/n-loaders'
+import { navdata }                 from '../../models/n/n-loaders'
 import { C, CktoCp, CptoCk }       from '../../models/transformation/hyperbolic-math'
 import { CmulR, CsubC, CaddC }     from '../../models/transformation/hyperbolic-math'
 import { dfsFlat, πify, CassignC } from '../../models/transformation/hyperbolic-math'
@@ -172,24 +172,23 @@ export class UnitDiskNav implements IUnitDisk
             hypertree:          view.hypertree
         },
         {            
-            data:               obj2data(args.transformation.state),
-
+            data:               navdata(),
             layers:             navParameterLayers,
             cacheUpdate:        (ud:UnitDisk, cache:TransformationCache)=> {
                 var t0 = performance.now()
                 cache.unculledNodes = dfsFlat(ud.args.data)
-                for (var n of cache.unculledNodes) {
-                    n.cache = n.cache || { re:0, im:0 }
-                    var np = ud.args.transform(n)
-                    if (n.name == 'θ' || n.name == 'λ')
-                        np = CmulR(np, 1.08)
-                    CassignC(n.cache, np)
-
+                function setCacheZ(n:N, v) {
+                    n.cache             = v
                     n.cachep            = CktoCp(n.cache)
                     n.strCache          = n.cache.re + ' ' + n.cache.im
                     n.scaleStrText      = ` scale(1)`
                     n.transformStrCache = ` translate(${n.strCache})`
                 }
+                const spr = 1.08
+                setCacheZ(cache.unculledNodes[0], CptoCk({ θ:args.transformation.state.λ*2*Math.PI, r:-spr}))
+                setCacheZ(cache.unculledNodes[1], CmulR(args.transformation.state.P, -1))
+                setCacheZ(cache.unculledNodes[2], CmulR(args.transformation.state.θ, -spr))
+
                 cache.voronoiDiagram = ud.voronoiLayout(cache.unculledNodes)
                 cache.cells = <any>cache.voronoiDiagram.polygons()
                 ud.cacheMeta = { minWeight:[0], Δ:[performance.now()-t0] }              
