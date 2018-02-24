@@ -41,8 +41,7 @@ export function doVoronoiStuff(ud:IUnitDisk, cache:TransformationCache) {
 
 export function doLabelStuff(ud:IUnitDisk, cache:TransformationCache) {    
     var λmap = λ=> {
-        λ = ud.args.transformation.state.λ
-        λ = πify(CktoCp(λ).θ) / 2 / Math.PI
+        λ = ud.args.transformation.state.λ        
         return λ + .3 * lengthDilledation(CptoCk({ θ:0, r:λ }))
     }
     

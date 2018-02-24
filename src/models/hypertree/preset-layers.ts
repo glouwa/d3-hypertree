@@ -49,7 +49,7 @@ export const layerSrc = [
         invisible:  true,
         hideOnDrag: true,
         name:       'labels-r',
-        r:          ()=> 1.2 * πify(CktoCp(ud.args.transformation.state.λ).θ) / 2 / Math.PI                            
+        r:          ()=> 1.2 * ud.args.transformation.state.λ
     }),    
     (v, ud:UnitDisk)=> new FocusLayer(v, {        
         invisible:  true,
@@ -61,7 +61,7 @@ export const layerSrc = [
         invisible:  true,
         hideOnDrag: true,
         name:       'λ',
-        r:          ()=> πify(CktoCp(ud.args.transformation.state.λ).θ) / 2 / Math.PI                            
+        r:          ()=> ud.args.transformation.state.λ
     }),
     (v, ud:UnitDisk)=> new FocusLayer(v, {        
         invisible:  false,

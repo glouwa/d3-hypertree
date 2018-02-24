@@ -180,6 +180,6 @@ export function layoutBergé(n, t)
     }
     setZ(n, { re:0, im:0 })
 
-    const λrNorm = πify(CktoCp(t.λ).θ) / 2 / π
+    const λrNorm = t.λ
     return layoutNode(n, n.layout.wedge, λrNorm)
 }

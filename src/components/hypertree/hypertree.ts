@@ -597,9 +597,8 @@ export class Hypertree
             else {
                 // new P, λ values
                 var λ = .03 + p * .98
-                var animλ = CptoCk({ θ:2*π*λ, r:1 })
-                this.args.geometry.transformation.state.λ.re = animλ.re
-                this.args.geometry.transformation.state.λ.im = animλ.im
+                var animλ = λ
+                this.args.geometry.transformation.state.λ = animλ                
 
                 //app.toast('Layout')
                 this.args.layout(this.data, this.args.geometry.transformation.state)

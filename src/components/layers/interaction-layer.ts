@@ -82,16 +82,16 @@ export class InteractionLayer implements ILayer
                 {
                     const mΔ = d3.event.sourceEvent.deltaY
                     const λΔ = mΔ/100*2*Math.PI/16                
-                    const oldλp = CktoCp(this.view.unitdisk.args.transformation.state.λ)
-                    const newλp = { θ:πify(oldλp.θ - λΔ), r:1 }
+                    const oldλp = this.view.unitdisk.args.transformation.state.λ
+                    const newλp = oldλp - λΔ
                     
                     const min = .1 * Math.PI
                     const max = .8 * Math.PI*2
                     //if (newλp.θ >= max) console.log('to big')
                     //if (newλp.θ <= min) console.log('to small')
 
-                    if (newλp.θ < max && newλp.θ > min) 
-                        this.onDragλ(null, CptoCk(newλp))
+                    if (newλp < max && newλp > min) 
+                        this.onDragλ(newλp)
                 } 
                 //               
                 else if (d3.event && 
@@ -101,7 +101,7 @@ export class InteractionLayer implements ILayer
                     if (d3.event.transform.k !== lasttransform) {
                         lasttransform = d3.event.transform.k
 
-                        const newλp = { θ:πify(d3.event.transform.k+.5), r:1 }
+                        const newλp = d3.event.transform.k+.5
                         
                         //console.log('touch zoom', newλp.θ)
                         const min = .1 * Math.PI
@@ -110,7 +110,7 @@ export class InteractionLayer implements ILayer
                         //if (newλp.θ <= min) console.log('to small')
 
                         if (newλp.θ < max && newλp.θ > min) 
-                            this.onDragλ(null, CptoCk(newλp))                        
+                            this.onDragλ(newλp)                        
                     }
                     else {
                         //console.log('touch drag')
@@ -188,8 +188,8 @@ export class InteractionLayer implements ILayer
             this.view.unitdisk.args.transformation.onDragStart(m)
     }
 
-    private onDragλ = (s:C, e:C)=> {
-        this.view.unitdisk.args.transformation.onDragλ(s, e)
+    private onDragλ = (l:number)=> {
+        this.view.unitdisk.args.transformation.onDragλ(l)
         this.view.hypertree.updateLayout_()
         this.view.hypertree.update.layout()
     }
@@ -200,7 +200,7 @@ export class InteractionLayer implements ILayer
             this.view.hypertree.update.transformation()
         }
         else if (n && n.name == 'λ') {
-            this.onDragλ(s, e)
+            this.onDragλ(CktoCp(e).θ)
         }
         else {
             this.view.unitdisk.args.transformation.onDragP(s, e)

@@ -110,18 +110,18 @@ export class InteractionLayer2 implements ILayer
             this.view.hypertree.update.transformation()        
     }
 
-    private minλ = .1 * π
-    private maxλ = .8 * π*2
+    private minλ = .1 
+    private maxλ = .8
     private fireMouseWheelEvent()
     {
         const mΔ = d3.event.deltaY
-        const λΔ = mΔ/100 * 2 * π / 16
-        const oldλp = CktoCp(this.view.unitdisk.args.transformation.state.λ)
-        const newλp = { θ:πify(oldλp.θ - λΔ), r:1 }
+        const λΔ = mΔ/100 / 8
+        const oldλp = this.view.unitdisk.args.transformation.state.λ
+        const newλp = oldλp - λΔ
         
-        if (newλp.θ < this.maxλ && newλp.θ > this.minλ) 
+        if (newλp < this.maxλ && newλp > this.minλ) 
         {
-            this.view.unitdisk.args.transformation.onDragλ(null, CptoCk(newλp))
+            this.view.unitdisk.args.transformation.onDragλ(newλp)
             this.view.hypertree.updateLayout_()
             this.view.hypertree.update.layout()
         }
@@ -135,7 +135,7 @@ export class InteractionLayer2 implements ILayer
 
     private panStart:C           = null
     private pinchInitDist:number = null
-    private pinchInitλp:Cp       = null
+    private pinchInitλp:number   = null
     private onPointerStart(pid, m) 
     {
         this.view.hypertree.args.objects.traces.push({
@@ -151,7 +151,7 @@ export class InteractionLayer2 implements ILayer
         else if (this.view.hypertree.args.objects.traces.length === 2) {
             const t0 = this.view.hypertree.args.objects.traces[0]
             this.pinchInitDist = this.dist(t0.points[t0.points.length-1], m) 
-            this.pinchInitλp = CktoCp(this.view.unitdisk.args.transformation.state.λ)
+            this.pinchInitλp = this.view.unitdisk.args.transformation.state.λ
             //this.pinchcenter = middlepoit(t0, t1)
             console.log('pan --> pinch')
         }
@@ -168,19 +168,19 @@ export class InteractionLayer2 implements ILayer
         {            
             this.view.unitdisk.args.transformation.onDragP(this.panStart, m)
         }
-        else if (this.view.hypertree.args.objects.traces.length === 2) 
+        else if (this.view.hypertree.args.objects.traces.length === 2)
         {
             const t1 = this.view.hypertree.args.objects.traces[0]
             const t0 = this.view.hypertree.args.objects.traces[1]
             const dist = this.dist(t0.points[t0.points.length-1], t1.points[t1.points.length-1])
 
             const f = dist / this.pinchInitDist
-            const newλp = { θ:πify(this.pinchInitλp.θ * f), r:1 }
+            const newλp = this.pinchInitλp
 
-            if (newλp.θ < this.maxλ && newλp.θ > this.minλ) 
+            if (newλp < this.maxλ && newλp > this.minλ) 
             {
-                console.log(f, this.pinchInitλp.θ/2/π, newλp.θ/2/π)
-                this.view.unitdisk.args.transformation.onDragλ(null, CptoCk(newλp))
+                console.log(f, this.pinchInitλp, newλp)
+                this.view.unitdisk.args.transformation.onDragλ(newλp)
                 this.view.hypertree.updateLayout_()
             }
         }

@@ -17,7 +17,7 @@ var minLabelR =       0.85
 export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
     // constants 
     const t0 =        performance.now()
-    const normλ =     πify(CktoCp(ud.args.transformation.state.λ).θ) / 2 / Math.PI
+    const normλ =     ud.args.transformation.state.λ
     const maxLabelR = Math.min(normλ * labelλExtension, minLabelR)
 
     const range = { min:50, max:300}

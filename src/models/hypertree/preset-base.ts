@@ -76,7 +76,7 @@ const modelBase : ()=> HypertreeArgs = ()=>
         pathes: [],   
         traces: []     
     },    
-    decorator: UnitDiskNav,
+    decorator:   UnitDisk,
     geometry: {
         clipRadius:     1,
         nodeRadius:     nodeInitR(.01),   
@@ -86,7 +86,7 @@ const modelBase : ()=> HypertreeArgs = ()=>
         transformation: new HyperbolicTransformation({
             P:{ re: 0, im:0 },
             θ:{ re: 1, im:0 },
-            λ:CptoCk({ θ:.1 * 2 * Math.PI, r:1 })
+            λ:.1
         }),
         cacheUpdate:    cacheUpdate,
         layers:         layerSrc        

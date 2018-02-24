@@ -26,7 +26,7 @@ var deltaMap = { // label offsets (font correction)
 
 var Pscale =  (ud:UnitDisk)=> (d:any)=>
     lengthDilledation(d)
-    * (1 - πify(CktoCp(ud.args.transformation.state.λ).θ) / 2 / Math.PI)
+    * (1 - ud.args.transformation.state.λ)
     / ud.args.nodeRadius(ud, d)
 
 export const navParameterLayers = [

@@ -95,7 +95,7 @@ export function πify(α:number) : number {
 
 //----------------------------------------------------------------------------------------
 
-export interface T { P:C, θ:C, λ:C }
+export interface T { P:C, θ:C, λ:number }
 export function makeT(a, b) { return { P:a, θ:b,  λ:null }}
 export var one = { re:1, im:0 }
 
