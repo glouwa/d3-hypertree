@@ -136,6 +136,7 @@ export class InteractionLayer2 implements ILayer
     private panStart:C           = null
     private pinchInitDist:number = null
     private pinchInitλp:number   = null
+    private nopinch:boolean      = null
     private onPointerStart(pid, m) 
     {
         this.view.hypertree.args.objects.traces.push({
@@ -146,12 +147,14 @@ export class InteractionLayer2 implements ILayer
         if (this.view.hypertree.args.objects.traces.length === 1) {
             this.view.unitdisk.args.transformation.onDragStart(m)
             this.panStart = m
+            this.nopinch = true
             console.log('still --> pan')
         }
         else if (this.view.hypertree.args.objects.traces.length === 2) {
             const t0 = this.view.hypertree.args.objects.traces[0]
             this.pinchInitDist = this.dist(t0.points[t0.points.length-1], m) 
             this.pinchInitλp = this.view.unitdisk.args.transformation.state.λ
+            this.nopinch = false
             //this.pinchcenter = middlepoit(t0, t1)
             console.log('pan --> pinch')
         }
@@ -159,13 +162,13 @@ export class InteractionLayer2 implements ILayer
         }
     }
 
-    private onPointerMove(pid, m) 
+    private onPointerMove(pid, m)
     {
         const trace = this.findTrace(pid)
         trace.points.push(m)
 
         if (this.view.hypertree.args.objects.traces.length === 1) 
-        {            
+        {
             this.view.unitdisk.args.transformation.onDragP(this.panStart, m)
         }
         else if (this.view.hypertree.args.objects.traces.length === 2)
@@ -173,18 +176,19 @@ export class InteractionLayer2 implements ILayer
             const t1 = this.view.hypertree.args.objects.traces[0]
             const t0 = this.view.hypertree.args.objects.traces[1]
             const dist = this.dist(t0.points[t0.points.length-1], t1.points[t1.points.length-1])
-
             const f = dist / this.pinchInitDist
-            const newλp = this.pinchInitλp
+            const newλp = this.pinchInitλp * f
+            console.log('pinch~')
 
             if (newλp < this.maxλ && newλp > this.minλ) 
             {
-                console.log(f, this.pinchInitλp, newλp)
+                console.log('pinch ok', f, this.pinchInitλp, newλp)
                 this.view.unitdisk.args.transformation.onDragλ(newλp)
                 this.view.hypertree.updateLayout_()
             }
         }
-        else {            
+        else 
+        {
         }
     }
 
@@ -192,23 +196,49 @@ export class InteractionLayer2 implements ILayer
     {
         this.view.hypertree.args.objects.traces 
             = this.view.hypertree.args.objects.traces.filter(e=> e.id !== pid)
-
-        if (this.view.hypertree.args.objects.traces.length === 0) {
-            this.view.unitdisk.args.transformation.onDragEnd(m)
-            console.log('pan --> still')
+        
+        if (this.view.hypertree.args.objects.traces.length === 0) 
+        {
+            if (this.dist(this.panStart, m) < .006 && this.nopinch) 
+            {
+                this.click(m)
+            }
+            else 
+            {
+                this.view.unitdisk.args.transformation.onDragEnd(m)
+                console.log('pan --> still')
+            }
         }
-        else if (this.view.hypertree.args.objects.traces.length === 1) {
+        else if (this.view.hypertree.args.objects.traces.length === 1) 
+        {
             this.view.unitdisk.args.transformation.onDragStart(m)
             const otherPoints = this.view.hypertree.args.objects.traces[0].points
             this.panStart = otherPoints[otherPoints.length-1] //others.lastpoint
             console.log('pinch --> pan')
         }
-        else {
-        }
+        else 
+        {
+        }        
     }
 
     //-----------------------------------------------------------------------------------------
  
+    private click(m:C) {
+        const q = this.view.unitdisk.cache.voronoiDiagram.find(m.re, m.im)
+        const n = q ? q.data : undefined
+        console.log('click', this.dist(this.panStart, m), n, 
+            this.view.unitdisk.args.transformation.cache.centerNode)
+
+        if (n.mergeId !== this.view.unitdisk.args.transformation.cache.centerNode.mergeId) {
+            console.log('not same --> goto node')
+            this.view.hypertree.api.gotoNode(n)
+        }
+        else {
+            console.log('click on center')
+            this.args.onClick(n, m)
+        }
+    }
+
     private findTrace(pid) {
         return this.view.hypertree.args.objects.traces.find(e=> e.id === pid)        
     }

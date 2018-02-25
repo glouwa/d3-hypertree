@@ -185,9 +185,9 @@ export class UnitDiskNav implements IUnitDisk
                     n.transformStrCache = ` translate(${n.strCache})`
                 }
                 const spr = 1.08
-                setCacheZ(cache.unculledNodes[0], CptoCk({ θ:args.transformation.state.λ*2*Math.PI, r:-spr}))
-                setCacheZ(cache.unculledNodes[1], CmulR(args.transformation.state.P, -1))
-                setCacheZ(cache.unculledNodes[2], CmulR(args.transformation.state.θ, -spr))
+                setCacheZ(cache.unculledNodes[0], CmulR(args.transformation.state.P, -1))                
+                setCacheZ(cache.unculledNodes[1], CmulR(args.transformation.state.θ, -spr))
+                setCacheZ(cache.unculledNodes[2], CptoCk({ θ:args.transformation.state.λ*2*Math.PI, r:-spr}))                
 
                 cache.voronoiDiagram = ud.voronoiLayout(cache.unculledNodes)
                 cache.cells = <any>cache.voronoiDiagram.polygons()

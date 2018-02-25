@@ -1,18 +1,12 @@
 import * as d3              from 'd3'
 import { ILayer }           from '../layerstack/layer'
 import { ILayerView }       from '../layerstack/layer'
-import { ILayerArgs }       from '../layerstack/layer'
-import { LayerStack }       from '../layerstack/layerstack'
-import { N }                from '../../models/n/n'
-import { C, CptoCk, CktoCp,
-  //  CassignC, 
-  ArrtoC,
-  //  dfsFlat, 
-  CsubC,
-    //arcCenter,
-     πify,
-    sigmoid }               from '../../models/transformation/hyperbolic-math'
-//import { shift } from '../../index';
+import { ILayerArgs }           from '../layerstack/layer'
+import { LayerStack }           from '../layerstack/layerstack'
+import { N }                    from '../../models/n/n'
+import { C, CptoCk, CktoCp }    from '../../models/transformation/hyperbolic-math'  
+import { ArrtoC, CsubC, CmulR } from '../../models/transformation/hyperbolic-math'   
+import { πify, sigmoid }        from '../../models/transformation/hyperbolic-math'
 
 export interface InteractionLayerArgs extends ILayerArgs
 {    
@@ -199,8 +193,8 @@ export class InteractionLayer implements ILayer
             this.view.unitdisk.args.transformation.onDragθ(s, e)
             this.view.hypertree.update.transformation()
         }
-        else if (n && n.name == 'λ') {
-            this.onDragλ(CktoCp(e).θ)
+        else if (n && n.name == 'λ') {            
+            this.onDragλ(πify(CktoCp(CmulR(e, -1)).θ)/2/Math.PI)
         }
         else {
             this.view.unitdisk.args.transformation.onDragP(s, e)
@@ -209,7 +203,7 @@ export class InteractionLayer implements ILayer
         }
     }
 
-    private onDragEnd = (n:N, s:C, e:C)=> {  
+    private onDragEnd = (n:N, s:C, e:C)=> {
         
         const ti3 = d3.timer(()=> {                              //#####################            
             ti3.stop()

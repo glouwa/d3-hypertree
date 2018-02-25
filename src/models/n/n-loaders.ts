@@ -161,9 +161,9 @@ export function navdata() : any
         precalc:  {},
         children: []
     })
-    const root =       createNode(1, 'λ')
-    root.children.push(createNode(2, 'P'))
-    root.children.push(createNode(3, 'θ'))
+    const root =       createNode(1, 'P')
+    root.children.push(createNode(2, 'θ'))
+    root.children.push(createNode(3, 'λ'))
     return root
 }
 
