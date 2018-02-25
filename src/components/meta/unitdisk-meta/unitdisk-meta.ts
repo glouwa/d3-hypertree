@@ -190,13 +190,12 @@ function UnitdiskMeta_({ parent, ud, className })
 
     const sliderBindingλ = {
         toView: (slider)=> {
-            slider.value = 1 - πify(CktoCp(ud.args.transformation.state.λ).θ) / 2 / π            
+            slider.value = 1-ud.args.transformation.state.λ
         },
-        fromView: (slider)=> {
-            const λk = CptoCk({ θ:(1-slider.value)*π*2, r:1})
-            ud.args.transformation.state.λ.re = λk.re
-            ud.args.transformation.state.λ.im = λk.im
-            ud.view.hypertree.updateLayout()
+        fromView: (slider)=> {            
+            ud.args.transformation.state.λ = 1-slider.value
+            ud.view.hypertree.updateLayout_()
+            ud.view.hypertree.update.layout()
         }
     }
 
@@ -206,7 +205,7 @@ function UnitdiskMeta_({ parent, ud, className })
         },
         fromView: (slider)=> {
             ud.view.hypertree.args.magic = 1 / slider.value
-            ud.view.hypertree.updateTransformation()
+            ud.view.hypertree.update.transformation()
         }
     }
 
@@ -258,8 +257,8 @@ function UnitdiskMeta_({ parent, ud, className })
     
     ui.updateλω = ()=> {
         var π = Math.PI
-        rows.lambda.slider.querySelector('input').value = 1 - πify(CktoCp(ud.args.transformation.state.λ).θ) / 2 / π        
-        rows.cullmaxw.slider.querySelector('input').value = 1 / ud.view.hypertree.args.magic
+        rows.lambda.slider.querySelector('input').value = 1-ud.args.transformation.state.λ
+        rows.cullmaxw.slider.querySelector('input').value = 1/ud.view.hypertree.args.magic
     }
 
     ui.updateSvgInfo = ()=> {

@@ -9,7 +9,7 @@ import { CptoCk, CktoCp, ArrtoC } from '../../models/transformation/hyperbolic-m
 import { CsubC, πify, sigmoid }   from '../../models/transformation/hyperbolic-math'
 
 export interface InteractionLayer2Args extends ILayerArgs
-{    
+{
     nohover: boolean,
     mouseRadius,
     onClick
@@ -97,7 +97,7 @@ export class InteractionLayer2 implements ILayer
 
         const changedTouches = d3.event.changedTouches
         for (let i=0; i < changedTouches.length; ++i) 
-        {            
+        {
             const t = changedTouches[i]
             const pid = t.identifier   
             const m = ArrtoC(d3.touches(this.view.parent.node(), changedTouches)[i])
