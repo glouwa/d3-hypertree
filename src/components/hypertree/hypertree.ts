@@ -335,7 +335,7 @@ export class Hypertree
             hypertree:      this,
         },
         {            
-            data:           this.data,            
+            data:           null, //this.data,            
             transformation: this.args.geometry.transformation,
             transform:      (n:N)=> this.unitdisk.args.transformation.transformPoint(n.layout.z),
             layers:         this.args.geometry.layers,
