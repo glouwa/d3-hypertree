@@ -6,7 +6,8 @@ import { LayerStack }             from '../layerstack/layerstack'
 import { N }                      from '../../models/n/n'
 import { C, Cp }                  from '../../models/transformation/hyperbolic-math'
 import { CptoCk, CktoCp, ArrtoC } from '../../models/transformation/hyperbolic-math'
-import { CsubC, πify, sigmoid }   from '../../models/transformation/hyperbolic-math'
+import { CaddC, CsubC, CmulR }    from '../../models/transformation/hyperbolic-math'
+import { πify, sigmoid }          from '../../models/transformation/hyperbolic-math'
 
 export interface InteractionLayer2Args extends ILayerArgs
 {
@@ -137,6 +138,7 @@ export class InteractionLayer2 implements ILayer
     private pinchInitDist:number = null
     private pinchInitλp:number   = null
     private nopinch:boolean      = null
+    private pinchcenter:C        = null
     private onPointerStart(pid, m) 
     {
         this.view.hypertree.args.objects.traces.push({
@@ -152,10 +154,11 @@ export class InteractionLayer2 implements ILayer
         }
         else if (this.view.hypertree.args.objects.traces.length === 2) {
             const t0 = this.view.hypertree.args.objects.traces[0]
-            this.pinchInitDist = this.dist(t0.points[t0.points.length-1], m) 
+            const t0e = t0.points[t0.points.length-1]
+            this.pinchInitDist = this.dist(t0e, m) 
             this.pinchInitλp = this.view.unitdisk.args.transformation.state.λ
             this.nopinch = false
-            //this.pinchcenter = middlepoit(t0, t1)
+            this.pinchcenter = CmulR(CaddC(t0e, m), .5)
             console.log('pan --> pinch')
         }
         else {
@@ -182,9 +185,10 @@ export class InteractionLayer2 implements ILayer
 
             if (newλp < this.maxλ && newλp > this.minλ) 
             {
-                console.log('pinch ok', f, this.pinchInitλp, newλp)
+                console.log('pinch ok', f, this.pinchInitλp, newλp)                
                 this.view.unitdisk.args.transformation.onDragλ(newλp)
                 this.view.hypertree.updateLayout_()
+                //this.view.unitdisk.args.transformation.onDragP(this.pinchcenter, m) 
             }
         }
         else 

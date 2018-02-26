@@ -475,7 +475,7 @@ export class Hypertree
         n.ancestors().forEach((pn:N)=> {
             pn.pathes.partof = this.addIfNotInSafe(                
                 pn.pathes.partof, 
-                newpath,
+                newpath,                
                 pathType === 'HoverPath' ? 'push' : 'unshift'
             )
 
