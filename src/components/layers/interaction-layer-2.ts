@@ -176,19 +176,22 @@ export class InteractionLayer2 implements ILayer
         }
         else if (this.view.hypertree.args.objects.traces.length === 2)
         {
-            const t1 = this.view.hypertree.args.objects.traces[0]
-            const t0 = this.view.hypertree.args.objects.traces[1]
-            const dist = this.dist(t0.points[t0.points.length-1], t1.points[t1.points.length-1])
+            const t0 = this.view.hypertree.args.objects.traces[0]
+            const t0e = t0.points[t0.points.length-1]
+            const t1 = this.view.hypertree.args.objects.traces[1]
+            const t1e = t1.points[t1.points.length-1]
+            const dist = this.dist(t0e, t1e)
             const f = dist / this.pinchInitDist
             const newλp = this.pinchInitλp * f
             console.log('pinch~')
 
             if (newλp < this.maxλ && newλp > this.minλ) 
             {
-                console.log('pinch ok', f, this.pinchInitλp, newλp)                
+                console.log('pinch ok', f, this.pinchInitλp, newλp)
                 this.view.unitdisk.args.transformation.onDragλ(newλp)
                 this.view.hypertree.updateLayout_()
-                //this.view.unitdisk.args.transformation.onDragP(this.pinchcenter, m) 
+                const pinchcenter2 = CmulR(CaddC(t0e, t1e), .5)
+                this.view.unitdisk.args.transformation.onDragP(this.pinchcenter, pinchcenter2)                
             }
         }
         else 

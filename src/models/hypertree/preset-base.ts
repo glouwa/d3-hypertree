@@ -70,7 +70,7 @@ const modelBase : ()=> HypertreeArgs = ()=>
     caption:      (ht:Hypertree, n:N)=> undefined,
     onNodeSelect: ()=> {},
     layout:       layoutBergé, // [0, π/2]
-    magic:        1/160,
+    magic:        160,
     objects: {                      // oder indizes?
         selections: [],
         pathes: [],

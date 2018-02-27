@@ -231,6 +231,8 @@ export const layerSrc = [
         }
     }),
     (v, ud:UnitDisk)=> new TraceLayer(v, {  
+        invisible:    true,
+        hideOnDrag:   true,
         name:         'traces',
         data:         ()=> ud.view.hypertree.args.objects.traces        
     })
