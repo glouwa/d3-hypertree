@@ -562,17 +562,16 @@ export class Hypertree
                           / (Math.log2(this.data.value || this.data.children.length) || 1)        
     }
 
-    private updateLayout_() : void {
+    private updateLayout_(/*preservingnode*/) : void {
         //app.toast('Layout')
         var t0 = performance.now()
         this.args.layout(this.data, this.args.geometry.transformation.state)                
         //this.unitdiskMeta.update.layout(this.args.geometry.transformation.cache, performance.now() - t0)
         
         const t = this.args.geometry.transformation
-        if (t.cache.centerNode) {
-            t.state.P.re = -t.cache.centerNode.layout.z.re
-            t.state.P.im = -t.cache.centerNode.layout.z.im
-        }
+        if (t.cache.centerNode) 
+            t.state.P = CmulR(t.cache.centerNode.layout.z, -1) 
+            
         this.layoutMeta = { Δ: performance.now()-t0 }
     }
 

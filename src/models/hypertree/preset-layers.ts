@@ -186,7 +186,7 @@ export const layerSrc = [
                         + ` scale(${d.distScale})`
     }),
     (v, ud:UnitDisk)=> new LabelLayer(v, {                            
-        hideOnDrag: false,                            
+        hideOnDrag: true,                            
         name:       'labels',
         className:  'caption',
         data:       ()=> ud.cache.labels,

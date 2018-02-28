@@ -8,6 +8,7 @@ import { C, Cp }                  from '../../models/transformation/hyperbolic-m
 import { CptoCk, CktoCp, ArrtoC } from '../../models/transformation/hyperbolic-math'
 import { CaddC, CsubC, CmulR }    from '../../models/transformation/hyperbolic-math'
 import { πify, sigmoid }          from '../../models/transformation/hyperbolic-math'
+import { compose, shift }         from '../../models/transformation/hyperbolic-math'
 
 export interface InteractionLayer2Args extends ILayerArgs
 {
@@ -108,22 +109,34 @@ export class InteractionLayer2 implements ILayer
         if (changedTouches.length === 2)
             this.view.hypertree.update.layout()
         else
-            this.view.hypertree.update.transformation()        
+            this.view.hypertree.update.transformation()
     }
+    /*
+    onDragλ = (l:number)=> this.state.λ = l
+    onDragP = (s:C, e:C)=> 
+        CassignC(this.state.P, compose(this.dST, shift(this.dST, s, maxR(e, this.maxMouseR))).P)
+        this.state.P = compose(this.dST, shift(this.dST, s, maxR(e, this.maxMouseR))).P
+    */
 
     private minλ = .1 
     private maxλ = .8
     private fireMouseWheelEvent()
     {
         const mΔ = d3.event.deltaY
-        const λΔ = mΔ/100 / 8
+        const λΔ = mΔ / 100 / 8
         const oldλp = this.view.unitdisk.args.transformation.state.λ
         const newλp = oldλp - λΔ
         
         if (newλp < this.maxλ && newλp > this.minλ) 
         {
-            this.view.unitdisk.args.transformation.onDragλ(newλp)
+            const t = this.view.unitdisk.args.transformation
+            const origCenterNodePos = t.cache.centerNode.cache 
+            console.assert(t.cache.centerNode)
+
+            t.onDragλ(newλp)
             this.view.hypertree.updateLayout_()
+            t.state.P = compose(t.state, shift(t.state, { re:0, im:0 }, origCenterNodePos)).P
+
             this.view.hypertree.update.layout()
         }
     }
@@ -155,7 +168,7 @@ export class InteractionLayer2 implements ILayer
         else if (this.view.hypertree.args.objects.traces.length === 2) {
             const t0 = this.view.hypertree.args.objects.traces[0]
             const t0e = t0.points[t0.points.length-1]
-            this.pinchInitDist = this.dist(t0e, m) 
+            this.pinchInitDist = this.dist(t0e, m)
             this.pinchInitλp = this.view.unitdisk.args.transformation.state.λ
             this.nopinch = false
             this.pinchcenter = CmulR(CaddC(t0e, m), .5)
@@ -183,15 +196,22 @@ export class InteractionLayer2 implements ILayer
             const dist = this.dist(t0e, t1e)
             const f = dist / this.pinchInitDist
             const newλp = this.pinchInitλp * f
-            console.log('pinch~')
-
+            
             if (newλp < this.maxλ && newλp > this.minλ) 
             {
                 console.log('pinch ok', f, this.pinchInitλp, newλp)
-                this.view.unitdisk.args.transformation.onDragλ(newλp)
-                this.view.hypertree.updateLayout_()
+                const t = this.view.unitdisk.args.transformation
+                const origCenterNodePos = t.cache.centerNode.cache 
                 const pinchcenter2 = CmulR(CaddC(t0e, t1e), .5)
-                this.view.unitdisk.args.transformation.onDragP(this.pinchcenter, pinchcenter2)                
+
+                t.onDragλ(newλp)
+                this.view.hypertree.updateLayout_()
+                t.state.P = compose(t.state, shift(t.state, { re:0, im:0 }, origCenterNodePos)).P
+                t.state.P = compose(t.state, shift(t.state, this.pinchcenter, pinchcenter2)).P
+
+                this.pinchcenter = CmulR(CaddC(this.pinchcenter, pinchcenter2), .5)
+                //this.view.unitdisk.args.transformation.onDragP(this.pinchcenter, pinchcenter2)
+                //t.state.P = compose(t.state, shift(t.state, this.pinchcenter, pinchcenter2)).P                
             }
         }
         else 
@@ -236,7 +256,7 @@ export class InteractionLayer2 implements ILayer
         console.log('click', this.dist(this.panStart, m), n, 
             this.view.unitdisk.args.transformation.cache.centerNode)
 
-        if (n.mergeId !== this.view.unitdisk.args.transformation.cache.centerNode.mergeId) {
+        if (false && n.mergeId !== this.view.unitdisk.args.transformation.cache.centerNode.mergeId) {
             console.log('not same --> goto node')
             this.view.hypertree.api.gotoNode(n)
         }

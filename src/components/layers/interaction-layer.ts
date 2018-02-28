@@ -166,13 +166,14 @@ export class InteractionLayer implements ILayer
     //-----------------------------------------------------------------------------------------
 
     private ping(p:C) {
-        
+        /*
         if (this.view.hypertree.args.objects.traces.length === 0)
             this.view.hypertree.args.objects.traces.push({
                 id: 'gibt eh nur ans',
                 points: []
             })
         this.view.hypertree.args.objects.traces[0].points.push(p)
+        */
     }
 
     private onDragStart = (n:N, m:C)=> {
