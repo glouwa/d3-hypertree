@@ -14,6 +14,10 @@ var cullingRadius =   0.98
 var labelλExtension = 1.2
 var minLabelR =       0.85 
 
+function adjustMagic() {
+
+}
+
 export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
     // constants 
     const t0 =        performance.now()
@@ -69,21 +73,6 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
         highway:     path
     })
     
-    /*    
-    auto measured functions
-
-    [
-        (ud:UnitDisk, cache:TransformationCache)=> void
-    ]
-
-    [
-        filteredSets,
-        doVoronoiStuff,
-        doLabelStuff,
-        doImageStuff
-    ]
-    */
-
     // groups of nodes
     const t1 = performance.now()
     cache.links =      cache.unculledNodes.slice(1)     

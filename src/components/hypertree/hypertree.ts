@@ -12,7 +12,8 @@ import { N }                   from '../../models/n/n'
 import { Path }                from '../../models/path/path'
 import { LoaderFunction }      from '../../models/n/n-loaders'
 import { LayoutFunction }      from '../../models/n/n-layouts'
-import { dfsFlat }             from '../../models/transformation/hyperbolic-math'
+import { setZ }                from '../../models/n/n-layouts'
+import { dfsFlat, πify }       from '../../models/transformation/hyperbolic-math'
 import { C, CktoCp, CptoCk }   from '../../models/transformation/hyperbolic-math'
 import { CassignC }            from '../../models/transformation/hyperbolic-math'
 import { CaddC, CsubC, CmulR } from '../../models/transformation/hyperbolic-math'
@@ -198,7 +199,8 @@ export class Hypertree
             this.update.langloader() 
         },*/
         //setLang: (langmap)
-        //setData: (N*)        
+        //setData: (N*)
+        /*        
         onDragλ: ()=> {
             this.updateLayout_()
             this.update.layout()
@@ -206,7 +208,7 @@ export class Hypertree
         onDragP: ()=> {
             this.updateLayout_()
             this.update.layout()
-        },
+        },*/
         //setWeigths (w)
         toggleNav: ()=> {
             this.args.decorator = this.args.decorator === UnitDiskNav ? UnitDisk : UnitDiskNav
@@ -401,7 +403,8 @@ export class Hypertree
         this.modelMeta = { Δ: [t1-t0, t2-t1, performance.now()-t2], filesize:dl }
         
         var t3 = performance.now()
-        this.data = this.args.layout(this.data, this.args.geometry.transformation.state)
+        this.updateLayout_()
+        //this.data = this.args.layout(this.data, this.args.geometry.transformation.state)
         this.unitdisk.args.data = this.data
         this.args.geometry.transformation.cache.N = this.data.descendants().length
         this.updateWeights_()
@@ -565,6 +568,21 @@ export class Hypertree
     private updateLayout_(/*preservingnode*/) : void {
         //app.toast('Layout')
         var t0 = performance.now()
+
+        const π = Math.PI  
+        const startAngle    = 0
+        const defAngleWidth = π * 1.999999999999
+        const sad           = 2.0
+        
+        this.data.layout = {
+            wedge: {
+                α: πify(startAngle - defAngleWidth/sad),
+                Ω: πify(startAngle + defAngleWidth/sad)
+            }
+        }
+        setZ(this.data, { re:0, im:0 })
+
+
         this.args.layout(this.data, this.args.geometry.transformation.state)                
         //this.unitdiskMeta.update.layout(this.args.geometry.transformation.cache, performance.now() - t0)
         

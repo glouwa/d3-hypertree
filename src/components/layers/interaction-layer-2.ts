@@ -226,13 +226,12 @@ export class InteractionLayer2 implements ILayer
         
         if (this.view.hypertree.args.objects.traces.length === 0) 
         {
-            if (this.dist(this.panStart, m) < .006 && this.nopinch) 
-            {
+            this.view.unitdisk.args.transformation.onDragEnd(m)
+
+            if (this.dist(this.panStart, m) < .006 && this.nopinch) {
                 this.click(m)
             }
-            else 
-            {
-                this.view.unitdisk.args.transformation.onDragEnd(m)
+            else {
                 console.log('pan --> still')
             }
         }

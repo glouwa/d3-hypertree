@@ -11,7 +11,7 @@ export type LayoutFunction = (root:N, t?:T) => N
 
 const unitVectors = [{ re:1, im:0 }, { re:0, im:1 }, { re:-1, im:0 }, { re:0, im:-1 }]
 
-function setZ(container, z) {
+export function setZ(container, z) {
     container.layout = container.layout || {}    
     container.layout.z = z
     container.layout.zStrCache = `${z.re} ${z.im}`
@@ -168,7 +168,7 @@ export function layoutBergé(n, t)
         return n
     }
 
-    const startAngle    = 3 * π / 2
+    const startAngle    = 0 //3.0 * π / 2.0
     const defAngleWidth = π * 1.999999999999
     const sad           = 2.0
 
@@ -176,10 +176,9 @@ export function layoutBergé(n, t)
         wedge: {
             α: πify(startAngle - defAngleWidth/sad),
             Ω: πify(startAngle + defAngleWidth/sad)
-        }        
+        }
     }
     setZ(n, { re:0, im:0 })
 
-    const λrNorm = t.λ
-    return layoutNode(n, n.layout.wedge, λrNorm)
+    return layoutNode(n, n.layout.wedge, t.λ)
 }
