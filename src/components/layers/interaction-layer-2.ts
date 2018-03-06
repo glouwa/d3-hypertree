@@ -134,7 +134,7 @@ export class InteractionLayer2 implements ILayer
             console.assert(t.cache.centerNode)
 
             t.onDragλ(newλp)
-            this.view.hypertree.updateLayout_()
+            this.view.hypertree.updateLayout_() // only path to center
             t.state.P = compose(t.state, shift(t.state, { re:0, im:0 }, origCenterNodePos)).P
 
             this.view.hypertree.update.layout()
@@ -205,7 +205,7 @@ export class InteractionLayer2 implements ILayer
                 const pinchcenter2 = CmulR(CaddC(t0e, t1e), .5)
 
                 t.onDragλ(newλp)
-                this.view.hypertree.updateLayout_()
+                this.view.hypertree.updateLayout_() // only path to center
                 t.state.P = compose(t.state, shift(t.state, { re:0, im:0 }, origCenterNodePos)).P
                 t.state.P = compose(t.state, shift(t.state, this.pinchcenter, pinchcenter2)).P
 

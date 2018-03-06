@@ -30,6 +30,8 @@ import { UnitDiskNav }         from '../unitdisk/unitdisk'
 import { HypertreeMeta }       from '../meta/hypertree-meta/hypertree-meta'
 import { NoHypertreeMeta }     from '../meta/hypertree-meta/hypertree-meta'
 
+let globelhtid = 0
+
 const π = Math.PI
 const htmlpreloader = `
     <div class="preloader-wrapper big active">
@@ -192,24 +194,6 @@ export class Hypertree
                 this.initData(d3h, t0, t1, dl)
             )
         },
-        /*
-        setLoaders: (dl, ll)=> { 
-            this.args.dataloader = dl
-            this.args.langloader = ll
-            this.update.langloader() 
-        },*/
-        //setLang: (langmap)
-        //setData: (N*)
-        /*        
-        onDragλ: ()=> {
-            this.updateLayout_()
-            this.update.layout()
-        },
-        onDragP: ()=> {
-            this.updateLayout_()
-            this.update.layout()
-        },*/
-        //setWeigths (w)
         toggleNav: ()=> {
             this.args.decorator = this.args.decorator === UnitDiskNav ? UnitDisk : UnitDiskNav
             this.update.view.unitdisk()
@@ -387,6 +371,7 @@ export class Hypertree
     private initData(d3h, t0, t1, dl) {
         var t2 = performance.now()
         var ncount = 1
+        globelhtid++
         this.data = <N & d3.HierarchyNode<N>>d3
             .hierarchy(d3h)
             .each((n:any)=> {
@@ -396,6 +381,7 @@ export class Hypertree
                 n.layout = null
                 n.layoutReference = null
                 n.pathes = {}
+                n.globelhtid = globelhtid
             })
             //.sum(this.args.weight) // this.updateWeights()
 
@@ -403,7 +389,7 @@ export class Hypertree
         this.modelMeta = { Δ: [t1-t0, t2-t1, performance.now()-t2], filesize:dl }
         
         var t3 = performance.now()
-        this.updateLayout_()
+        this.updateLayout_() // all?
         //this.data = this.args.layout(this.data, this.args.geometry.transformation.state)
         this.unitdisk.args.data = this.data
         this.args.geometry.transformation.cache.N = this.data.descendants().length
@@ -582,8 +568,13 @@ export class Hypertree
         }
         setZ(this.data, { re:0, im:0 })
 
+        const count = this.args.layout(this.data, this.args.geometry.transformation.state.λ)                
+        console.log(count)
 
-        this.args.layout(this.data, this.args.geometry.transformation.state)                
+        for (var n of dfsFlat(this.data, n=>true)) {
+            console.assert(n.layout.z)
+            console.assert(n.layout.wedge)
+        }
         //this.unitdiskMeta.update.layout(this.args.geometry.transformation.cache, performance.now() - t0)
         
         const t = this.args.geometry.transformation
@@ -618,7 +609,8 @@ export class Hypertree
                 this.args.geometry.transformation.state.λ = animλ                
 
                 //app.toast('Layout')
-                this.args.layout(this.data, this.args.geometry.transformation.state)
+                //this.args.layout(this.data, this.args.geometry.transformation.state.λ)
+                this.updateLayout_()
                 
                 if (this.data
                     .leaves()

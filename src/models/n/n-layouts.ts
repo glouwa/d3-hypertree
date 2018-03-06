@@ -6,12 +6,16 @@ import { Cneg, CmulR }         from '../../models/transformation/hyperbolic-math
 import { Clog, Cpow }          from '../../models/transformation/hyperbolic-math'
 import { h2e }                 from '../../models/transformation/hyperbolic-math'
 import { πify, dfs, dfsFlat}   from '../../models/transformation/hyperbolic-math' 
+import { Z_VERSION_ERROR } from 'zlib';
 
-export type LayoutFunction = (root:N, t?:T) => N
+export type LayoutFunction = (root:N, t?:number, noRecursion?:boolean) => N
 
+const π = Math.PI    
 const unitVectors = [{ re:1, im:0 }, { re:0, im:1 }, { re:-1, im:0 }, { re:0, im:-1 }]
 
 export function setZ(container, z) {
+    console.assert(z, "set Z to null!")
+    if (!z) return 
     container.layout = container.layout || {}    
     container.layout.z = z
     container.layout.zStrCache = `${z.re} ${z.im}`
@@ -117,22 +121,23 @@ export function layoutLamping(n, wedge = { p:{ re:0, im:0 }, m:{ re:0, im:1 }, �
     return n
 }
 
-export function layoutBergé(n, t)
+function wedgeTranslate(w, P)
 {
-    const π = Math.PI    
+    const t = makeT(P, one)
 
-    function wedgeTranslate(w, P)
+    const pα = { re:Math.cos(w.α), im:Math.sin(w.α) }
+    w.α = CktoCp(h2e(t, pα)).θ
+    const pΩ = { re:Math.cos(w.Ω), im:Math.sin(w.Ω) }
+    w.Ω = CktoCp(h2e(t, pΩ)).θ
+}
+
+export function layoutBergé(n:N, λ:number, noRecursion=false)
+{    
+    let count = 0
+    function layoutNode(n:N, length:number)
     {
-        const t = makeT(P, one)
-
-        const pα = { re:Math.cos(w.α), im:Math.sin(w.α) }
-        w.α = CktoCp(h2e(t, pα)).θ
-        const pΩ = { re:Math.cos(w.Ω), im:Math.sin(w.Ω) }
-        w.Ω = CktoCp(h2e(t, pΩ)).θ
-    }
-
-    function layoutNode(n:N, wedge:{α,Ω}, length:number)
-    {
+        count++
+        const wedge = n.layout.wedge
         if (n.parent)
         {
             const angleWidth = πify(wedge.Ω - wedge.α)
@@ -156,18 +161,21 @@ export function layoutBergé(n, t)
         }
 
         let currentAngle = wedge.α
-        for (let cn of n.children||[])
+        for (let cn of n.children || [])
         {
             const α = currentAngle             //   +.5
             currentAngle += angleWidth * ((cn.value||1) / (n.value||n.children.length||1))
             const Ω = πify(currentAngle)
 
-            cn.layout = { wedge: { α:α, Ω:Ω } }
-            layoutNode(cn, cn.layout.wedge, length)
+            cn.layout = cn.layout || {}
+            cn.layout.wedge = { α, Ω }
         }
-        return n
-    }
 
+        if (!noRecursion)
+            for (let cn of n.children || [])        
+                layoutNode(cn, length)
+    }
+/*
     const startAngle    = 0 //3.0 * π / 2.0
     const defAngleWidth = π * 1.999999999999
     const sad           = 2.0
@@ -179,6 +187,8 @@ export function layoutBergé(n, t)
         }
     }
     setZ(n, { re:0, im:0 })
-
-    return layoutNode(n, n.layout.wedge, t.λ)
+*/
+    console.assert(n.layout.z !== undefined, JSON.stringify(n.layout))
+    layoutNode(n, λ)
+    return count        
 }

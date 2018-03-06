@@ -179,7 +179,7 @@ function UnitdiskMeta_({ parent, ud, className })
         },
         fromView: (slider)=> {            
             ud.args.transformation.state.λ = 1-slider.value
-            ud.view.hypertree.updateLayout_()
+            ud.view.hypertree.updateLayout_() // evr called? 
             ud.view.hypertree.update.layout()
         }
     }
