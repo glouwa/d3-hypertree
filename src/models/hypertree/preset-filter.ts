@@ -1,7 +1,7 @@
 import { N }                        from '../n/n'
-import { IUnitDisk }                 from "../../components/unitdisk/unitdisk"
+import { IUnitDisk }                from '../../components/unitdisk/unitdisk'
 import { dfs2, dfsFlat2, dfsFlat }  from '../../models/transformation/hyperbolic-math'
-import { TransformationCache }      from "../../models/transformation/hyperbolic-transformation"
+import { TransformationCache }      from '../../models/transformation/hyperbolic-transformation'
 import { C, CptoCk, CktoCp, πify }  from '../../models/transformation/hyperbolic-math'
 import { CaddC, CsubC, CmulR }      from '../../models/transformation/hyperbolic-math'
 import { CassignC }                 from '../../models/transformation/hyperbolic-math'
@@ -14,8 +14,24 @@ var cullingRadius =   0.98
 var labelλExtension = 1.2
 var minLabelR =       0.85 
 
-function adjustMagic() {
-
+function adjustMagic(ud:IUnitDisk, cache:TransformationCache) {
+    const rangeNodes = { min:50, max:300 }
+    const rangeMagic = { min:2,  max:500 }
+    const alpha      = 1.05
+    //stopUp
+    //stopDown
+    if (cache.unculledNodes) {
+        if (cache.unculledNodes.length > rangeNodes.max) {
+            if (ud.view.hypertree.args.magic > rangeMagic.min) { // ???
+                ud.view.hypertree.args.magic /= alpha                
+            }
+        }
+        if (cache.unculledNodes.length < rangeNodes.min) {
+            if (ud.view.hypertree.args.magic < rangeMagic.max) { // ???
+                ud.view.hypertree.args.magic *= alpha
+            }
+        }
+    }
 }
 
 export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
@@ -24,25 +40,7 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
     const normλ =     ud.args.transformation.state.λ
     const maxLabelR = Math.min(normλ * labelλExtension, minLabelR)
 
-    const rangeNodes = { min:50, max:300}
-    const rangeMagic = { min:2,  max:500}
-    const alpha = 1.05
-    //stopUp
-    //stopDown
-    if (cache.unculledNodes) {
-        if (cache.unculledNodes.length > rangeNodes.max) {
-            if (ud.view.hypertree.args.magic > rangeMagic.min) { // ???
-                ud.view.hypertree.args.magic /= alpha
-                //console.log('to big', (ud.args.hypertree.args.magic).toFixed(0))
-            }
-        }
-        if (cache.unculledNodes.length < rangeNodes.min) {
-            if (ud.view.hypertree.args.magic < rangeMagic.max) { // ???
-                ud.view.hypertree.args.magic *= alpha
-                //console.log('to small', (ud.args.hypertree.args.magic).toFixed(0))
-            }
-        }
-    }
+    adjustMagic(ud, cache)
 
     // select visible nodes
     const path =          pathToLastVisible(ud, cache)  
@@ -55,8 +53,7 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
         peocessNodeTransformation(ud, cache, n)
         peocessNode(ud, cache, n, maxLabelR, minWeight)        
         return !n.isOut
-    }
-    
+    }    
 
     // select visible nodes - rootnode extra
     if (ud.args.data) {
@@ -64,6 +61,7 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
         peocessNode(ud, cache, ud.args.data, maxLabelR, 0)
         // root ist nicht in uncullednodes! (gut)
     }
+
     // select visible nodes - alle anderen (von startnode bis abortfilter)
     dfs2({
         node:        startNode,
@@ -73,7 +71,25 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
     })
 
     // groups of nodes
-    const t1 = performance.now()
+    const t1 = performance.now()    
+    ud.view.hypertree.args.objects.pathes.forEach(p=> {
+        if (p.type !== 'HoverPath') {
+            const pathnodes = []
+            // go down
+            let n = p.head
+            while (n.parent && !cache.unculledNodes.includes(n)) {                
+                pathnodes.push(n)
+                n = n.parent
+            }
+            // go up and transform
+            pathnodes.reverse().forEach(n=> {
+                peocessNodeTransformation(ud, cache, n)
+                peocessNode(ud, cache, n, maxLabelR, 0)
+            })
+            cache.unculledNodes = cache.unculledNodes.concat(pathnodes)            
+        }           
+    })    
+    
     cache.links =      cache.unculledNodes.slice(1)     
     cache.leafOrLazy = cache.unculledNodes.filter(ud.args.nodeFilter) 
     cache.paths =      cache.links.filter((n:N)=> n.pathes.partof && n.pathes.partof.length)

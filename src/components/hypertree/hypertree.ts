@@ -640,18 +640,20 @@ export class Hypertree
         else this.animation = true
 
         const initTS = clone(this.args.geometry.transformation.state)
-        const way = CsubC(newP, initTS.P)
+        const way = CsubC(initTS.P, newP)
 
-        const steps = 16
+        const steps = 20
         let step = 1
 
         const frame = ()=> {                                                
-            const animP = CaddC(initTS.P, CmulR(way, sigmoid(step/steps)))
+            const waydone01 = step === steps ? 0 : 1-sigmoid(step/steps)
+            const waydone = CmulR(way, waydone01)
+            const animP = CaddC(newP, waydone)
             CassignC(this.args.geometry.transformation.state.P, animP)
             
             this.update.transformation()
 
-            if (step++ > steps) this.animation = false                    
+            if (step++ >= steps) this.animation = false                    
             else requestAnimationFrame(()=> frame())                
         }
         requestAnimationFrame(()=> frame())
