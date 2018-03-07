@@ -124,10 +124,9 @@ export function layoutLamping(n, wedge = { p:{ re:0, im:0 }, m:{ re:0, im:1 }, �
 function wedgeTranslate(w, P)
 {
     const t = makeT(P, one)
-
-    const pα = { re:Math.cos(w.α), im:Math.sin(w.α) }
-    w.α = CktoCp(h2e(t, pα)).θ
+    const pα = { re:Math.cos(w.α), im:Math.sin(w.α) }    
     const pΩ = { re:Math.cos(w.Ω), im:Math.sin(w.Ω) }
+    w.α = CktoCp(h2e(t, pα)).θ
     w.Ω = CktoCp(h2e(t, pΩ)).θ
 }
 
@@ -137,7 +136,7 @@ export function layoutBergé(n:N, λ:number, noRecursion=false)
     function layoutNode(n:N, length:number)
     {
         count++
-        const wedge = n.layout.wedge
+        const wedge = { Ω:n.layout.wedge.Ω, α:n.layout.wedge.α }
         if (n.parent)
         {
             const angleWidth = πify(wedge.Ω - wedge.α)
@@ -145,7 +144,7 @@ export function layoutBergé(n:N, λ:number, noRecursion=false)
             
             const nz1 = CptoCk({ θ:bisectionAngle, r:length })
             setZ(n, h2e(makeT(n.parent.layout.z, one), nz1))
-
+            
             wedgeTranslate(wedge, n.parent.layout.z)
             wedgeTranslate(wedge, Cneg(n.layout.z))
         }
@@ -167,7 +166,7 @@ export function layoutBergé(n:N, λ:number, noRecursion=false)
             currentAngle += angleWidth * ((cn.value||1) / (n.value||n.children.length||1))
             const Ω = πify(currentAngle)
 
-            cn.layout = cn.layout || {}
+            cn.layout = cn.layout || { wedge: { α, Ω }}
             cn.layout.wedge = { α, Ω }
         }
 
@@ -175,20 +174,7 @@ export function layoutBergé(n:N, λ:number, noRecursion=false)
             for (let cn of n.children || [])        
                 layoutNode(cn, length)
     }
-/*
-    const startAngle    = 0 //3.0 * π / 2.0
-    const defAngleWidth = π * 1.999999999999
-    const sad           = 2.0
-
-    n.layout = {
-        wedge: {
-            α: πify(startAngle - defAngleWidth/sad),
-            Ω: πify(startAngle + defAngleWidth/sad)
-        }
-    }
-    setZ(n, { re:0, im:0 })
-*/
-    console.assert(n.layout.z !== undefined, JSON.stringify(n.layout))
+    
     layoutNode(n, λ)
     return count        
 }

@@ -47,15 +47,16 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
     // select visible nodes
     const path =          pathToLastVisible(ud, cache)  
     const startNode =     path[0]
-    cache.unculledNodes = []
+    cache.unculledNodes = []    
     cache.spezialNodes =  [ud.args.data, startNode].filter(e=> e)
-
+    
     function abortfilter(n, idx, highway) { // return false to abort
         const minWeight = highway[0].value / ud.view.hypertree.args.magic
         peocessNodeTransformation(ud, cache, n)
         peocessNode(ud, cache, n, maxLabelR, minWeight)        
         return !n.isOut
     }
+    
 
     // select visible nodes - rootnode extra
     if (ud.args.data) {
@@ -70,7 +71,7 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
         preAction:   n=> cache.unculledNodes.push(n),
         highway:     path
     })
-    
+
     // groups of nodes
     const t1 = performance.now()
     cache.links =      cache.unculledNodes.slice(1)     
@@ -144,7 +145,7 @@ function pathToLastVisible(ud:IUnitDisk, cache:TransformationCache) {
 
 function peocessNodeTransformation(ud:IUnitDisk, cache:TransformationCache, n:N) {
     n.cache = n.cache || { re:0, im:0 }    
-    //ud.view.hypertree.args.layout(n, ud.args.transformation.state.λ, true)
+    ud.view.hypertree.args.layout(n, ud.args.transformation.state.λ, true)
     CassignC(n.cache, ud.args.transform(n)) 
     //CassignC(n.cache, n.layout.z) 
     n.cachep = CktoCp(n.cache)   

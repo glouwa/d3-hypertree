@@ -69,7 +69,8 @@ export const layerSrc = [
         r:          ()=> .004
     }),
     (v, ud:UnitDisk)=> new CellLayer(v, {
-        invisible:  false,
+        invisible:  true,
+        hideOnDrag: true,
         clip:       '#circle-clip' + ud.args.clipRadius,
         data:       ()=> ud.cache.cells,                            
     }),

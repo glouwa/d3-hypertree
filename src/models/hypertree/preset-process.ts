@@ -34,7 +34,7 @@ export function doVoronoiStuff(ud:IUnitDisk, cache:TransformationCache) {
         }
     }
     else {
-        //console.trace('centercell not found')
+        console.warn('centercell not found')
         cache.centerNode = undefined
     }
 }

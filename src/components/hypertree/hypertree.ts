@@ -568,18 +568,20 @@ export class Hypertree
         }
         setZ(this.data, { re:0, im:0 })
 
-        const count = this.args.layout(this.data, this.args.geometry.transformation.state.λ)                
-        console.log(count)
-
-        for (var n of dfsFlat(this.data, n=>true)) {
-            console.assert(n.layout.z)
-            console.assert(n.layout.wedge)
-        }
-        //this.unitdiskMeta.update.layout(this.args.geometry.transformation.cache, performance.now() - t0)
-        
         const t = this.args.geometry.transformation
+
+        if (t.cache.centerNode)
+            t.cache.centerNode.ancestors().reverse().forEach(n=> {
+                this.args.layout(n, this.args.geometry.transformation.state.λ, true)    
+            })
+        else
+            this.args.layout(this.data, this.args.geometry.transformation.state.λ)
+       
+        
         if (t.cache.centerNode) 
             t.state.P = CmulR(t.cache.centerNode.layout.z, -1) 
+        else
+            console.warn('no layout compensation')
             
         this.layoutMeta = { Δ: performance.now()-t0 }
     }
