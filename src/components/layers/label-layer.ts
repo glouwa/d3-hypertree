@@ -22,6 +22,7 @@ export class LabelLayer implements ILayer
     args:            LabelLayerArgs
     d3updatePattern: D3UpdatePattern
     name:            string   
+    simulation
     update = {
         parent:         ()=> this.attach(),      
         data:           ()=> this.d3updatePattern.update.data(),
@@ -32,7 +33,7 @@ export class LabelLayer implements ILayer
     constructor(view:ILayerView, args:LabelLayerArgs) {
         this.view = view
         this.args = args  
-        this.name = args.name      
+        this.name = args.name
     }
 
     private attach() {
@@ -47,11 +48,12 @@ export class LabelLayer implements ILayer
             create:            s=> s.classed("P",            d=> d.name == 'P')
                                     .classed("caption-icon", d=> d.precalc.icon && navigator.platform.includes('inux'))
                                     //.style("fill",           d=> d.pathes.finalcolor)
-                                    .style("stroke",          d=> d.pathes && d.pathes.labelcolor)
+                                    .style("stroke",         d=> d.pathes && d.pathes.labelcolor)
                                     .text(                   this.args.text),
-            updateColor:       s=> s.style("stroke",          d=> d.pathes && d.pathes.labelcolor),
-            updateTransform:   s=> s.attr("transform", (d, i, v)=> this.args.transform(d, this.args.delta(d, i, v)))
-                                    .text(                   this.args.text)
+            updateColor:       s=> s.style("stroke",         d=> d.pathes && d.pathes.labelcolor),
+            updateTransform:   s=> s.attr("transform", 
+                (d, i, v)=> this.args.transform(d, this.args.delta(d, i, v)))
+                //.text(                   this.args.text)
         })
     }
 }

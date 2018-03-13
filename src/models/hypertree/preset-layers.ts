@@ -8,6 +8,7 @@ import { BackgroundLayer }          from '../../components/layers/background-lay
 import { SymbolLayer }              from '../../components/layers/symbol-layer'
 import { ArcLayer }                 from '../../components/layers/link-layer'
 import { LabelLayer }               from '../../components/layers/label-layer'
+import { LabelForceLayer }          from '../../components/layers/label-force-layer'
 import { InteractionLayer }         from '../../components/layers/interaction-layer'
 import { InteractionLayer2 }        from '../../components/layers/interaction-layer-2'
 import { TraceLayer }               from '../../components/layers/trace-layer'
@@ -187,8 +188,22 @@ export const layerSrc = [
                         + ` scale(${d.distScale})`
     }),
     (v, ud:UnitDisk)=> new LabelLayer(v, {                            
+        invisible:  true,
         hideOnDrag: true,                            
         name:       'labels',
+        className:  'caption',
+        data:       ()=> ud.cache.labels,
+        text:       (d)=> d.precalc.label,
+        delta:      (d, i, v)=> CaddC(
+                        nodeRadiusOffset(ud)(d),
+                        bboxOffset(d)(v[i])), 
+        transform:  (d, delta)=> 
+                        ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` 
+                        + d.scaleStrText                            
+    }),
+    (v, ud:UnitDisk)=> new LabelForceLayer(v, {                            
+        hideOnDrag: true,                            
+        name:       'labels-force',
         className:  'caption',
         data:       ()=> ud.cache.labels,
         text:       (d)=> d.precalc.label,
