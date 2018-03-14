@@ -188,7 +188,7 @@ export const layerSrc = [
                         + ` scale(${d.distScale})`
     }),
     (v, ud:UnitDisk)=> new LabelLayer(v, {                            
-        invisible:  true,
+        invisible:  false,
         hideOnDrag: true,                            
         name:       'labels',
         className:  'caption',
@@ -202,6 +202,7 @@ export const layerSrc = [
                         + d.scaleStrText                            
     }),
     (v, ud:UnitDisk)=> new LabelForceLayer(v, {                            
+        invisible:  true,
         hideOnDrag: true,                            
         name:       'labels-force',
         className:  'caption',

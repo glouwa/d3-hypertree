@@ -130,26 +130,32 @@ function wedgeTranslate(w, P)
     w.Ω = CktoCp(h2e(t, pΩ)).θ
 }
 
+function r2g(r) {
+    return r/π * 360
+}
+
 export function layoutBergé(n:N, λ:number, noRecursion=false)
-{    
-    let count = 0
-    function layoutNode(n:N, length:number)
-    {
-        count++
+{
+    function layoutNode(n:N)
+    { 
         const wedge = { Ω:n.layout.wedge.Ω, α:n.layout.wedge.α }
+        const L = n.layout.wedge.L
+        //if (L !== 1)
+        //    console.log(L)
         if (n.parent)
         {
             const angleWidth = πify(wedge.Ω - wedge.α)
             const bisectionAngle = wedge.α + (angleWidth / 2.0)
             
-            const nz1 = CptoCk({ θ:bisectionAngle, r:length })
+            const nz1 = CptoCk({ θ:bisectionAngle, r:λ*(.5+L||1) })
             setZ(n, h2e(makeT(n.parent.layout.z, one), nz1))
             
             wedgeTranslate(wedge, n.parent.layout.z)
             wedgeTranslate(wedge, Cneg(n.layout.z))
         }
 
-        let angleWidth = πify(wedge.Ω - wedge.α )
+        let angleWidth = πify(wedge.Ω - wedge.α)
+        /*
         if (angleWidth > 2*π)
         {
             const anglediff = angleWidth - 2 * π            
@@ -157,24 +163,42 @@ export function layoutBergé(n:N, λ:number, noRecursion=false)
             wedge.Ω = πify(wedge.Ω - anglediff / 2.0)
             angleWidth = 2 * π
             console.assert('angleWidth > 2*π')
-        }
+        }*/
 
         let currentAngle = wedge.α
-        for (let cn of n.children || [])
-        {
-            const α = currentAngle             //   +.5
-            currentAngle += angleWidth * ((cn.value||1) / (n.value||n.children.length||1))
-            const Ω = πify(currentAngle)
-
-            cn.layout = cn.layout || { wedge: { α, Ω }}
-            cn.layout.wedge = { α, Ω }
+        const cl = n.children || []        
+        let linecount = 0
+        let liner = 0
+        cl.forEach((cn,i)=> 
+        {            
+            const angleWeight = (cn.value||1) / (n.value||n.children.length||1)
+            //const angleWeight = 1
+            const angleOffset = angleWidth * angleWeight
+            const α  = currentAngle 
+            //const αg = r2g(α)
+            currentAngle += angleOffset
+            const Ω  = πify(currentAngle)
+            //const Ωg = r2g(Ω) 
+            
+            //const cL = (i+1)/n.children.length/10           
+            const cL = liner
+            const wedge = { α, Ω, L:cL }
+            cn.layout = cn.layout || { wedge }
+            cn.layout.wedge = wedge
+            linecount++
+            liner += .2
+            if (linecount > 4)
+            {
+                linecount = 0
+                liner = 0                
+                //currentAngle = wedge.α         
+            }
         }
 
         if (!noRecursion)
             for (let cn of n.children || [])        
-                layoutNode(cn, length)
+                layoutNode(cn)
     }
     
-    layoutNode(n, λ)
-    return count        
+    layoutNode(n)    
 }

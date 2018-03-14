@@ -73,8 +73,8 @@ export class InteractionLayer2 implements ILayer
         
         if (this.mousedown)
             this.fireMouseEvent('onPointerMove')                    
-       // else
-       //     this.htapi.setPathHead(this.hoverpath, this.findNodeByCell())
+        else
+            this.htapi.setPathHead(this.hoverpath, this.findNodeByCell())
     }
 
     private fireMouseUp() {
