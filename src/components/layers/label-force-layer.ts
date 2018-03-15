@@ -32,18 +32,18 @@ export class LabelForceLayer implements ILayer
     simulation 
     update = {
         parent:         ()=> this.attach(),    
-        force:          ()=> {
-            if (!this.args.invisible) 
+        force:          ()=> { 
+            if (!this.args.invisible && !this.view.hypertree.isAnimationRunning()) 
             {
                 this.labelSetUpdate()
                 //this.simulation.alpha(.7).restart()
                 //this.simulation.alpha(.7)
-                for (let i=0; i<100; i++)
+                for (let i=0; i<50; i++)
                     this.simulation.tick()
             }
         },
         data:           ()=> {
-            //this.update.force()
+            this.update.force()
             this.d3updatePattern.update.data()
             this.d3updatePattern2.update.data()
         },
@@ -85,7 +85,8 @@ export class LabelForceLayer implements ILayer
         
         const labelpoints = []
         const labellinks = []
-        this.args.data() .forEach(n=> {
+        this.args.data().forEach(n=>
+        {
             n.forcepoints   = n.forcepoints || {}            
             n.forcepoints.index = n.mergeId
             const initxyp = CaddC(n.cache, CptoCk({ θ:n.cachep.θ, r:.1}))
@@ -94,7 +95,7 @@ export class LabelForceLayer implements ILayer
             console.assert(typeof n.forcepoints.x === 'number')
             console.assert(typeof n.forcepoints.y === 'number')
 
-            n.forcepoints2   = n.forcepoints2 || {}            
+            n.forcepoints2    = n.forcepoints2 || {}            
             n.forcepoints2.index = n.mergeId+1000
             n.forcepoints2.fx = n.cache.re
             n.forcepoints2.fy = n.cache.im
@@ -108,7 +109,6 @@ export class LabelForceLayer implements ILayer
                 target: n.forcepoints2,
             }))
         })
-
         
         this.simulation
             .nodes(labelpoints) // labels aka this.args.data
@@ -140,6 +140,8 @@ export class LabelForceLayer implements ILayer
             updateColor:       s=> s.style("stroke",         d=> d.pathes && d.pathes.labelcolor),
             updateTransform:   s=> s.attr("transform",       (d, i, v)=> {
                     bboxOffset(d)(v[i])
+                    if (!d.forcepoints)
+                        return ` translate(0 0)`
                     console.assert(d.forcepoints.x || d.depth === 0)
                     return ` translate(${(d.forcepoints.x||0)-d.precalc.labellen/2} ${d.forcepoints.y||0})`
                 })

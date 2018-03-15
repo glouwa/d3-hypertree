@@ -237,8 +237,7 @@ export class UnitDiskNav implements IUnitDisk
             this.navBackground.layerStack.update.pathes()
         },
         pathes: ()=> {
-            this.mainView.update.cache()            
-
+            this.mainView.update.cache()
             this.mainView.layerStack.update.transformation()
             this.navBackground.layerStack.update.pathes()
             this.navParameter.layerStack.update.transformation() // wegen node hover

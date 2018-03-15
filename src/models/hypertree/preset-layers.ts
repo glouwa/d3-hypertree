@@ -167,7 +167,7 @@ export const layerSrc = [
         name:       'nodes',
         className:  'node',
         data:       ()=> ud.cache.leafOrLazy,
-        r:          d=> ud.args.nodeRadius(ud, d),
+        r:          d=> ud.args.nodeRadius(ud, d),        
         transform:  d=> d.transformStrCache                            
                         + ` scale(${ud.args.nodeScale(d)})`,
     }),                        

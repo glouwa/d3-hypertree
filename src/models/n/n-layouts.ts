@@ -167,34 +167,39 @@ export function layoutBergé(n:N, λ:number, noRecursion=false)
 
         let currentAngle = wedge.α
         const cl = n.children || []        
+        const cllen = cl.length
         let linecount = 0
         let liner = 0
+        let resetCount = 0
         cl.forEach((cn,i)=> 
-        {            
-            const angleWeight = (cn.value||1) / (n.value||n.children.length||1)
-            //const angleWeight = 1
+        {          
+            const cnlen = (cn.children || []).length
+            const angleWeight = (cn.value||1) / (n.value||cllen||1) 
+            //const angleWeight = 1 / cllen
             const angleOffset = angleWidth * angleWeight
-            const α  = currentAngle 
-            //const αg = r2g(α)
+            const α  = currentAngle             
             currentAngle += angleOffset
-            const Ω  = πify(currentAngle)
-            //const Ωg = r2g(Ω) 
+            const Ω  = πify(currentAngle)            
             
-            //const cL = (i+1)/n.children.length/10           
             const cL = liner
-            const wedge = { α, Ω, L:cL }
-            cn.layout = cn.layout || { wedge }
-            cn.layout.wedge = wedge
+            const w = { α, Ω, L:cL }
+            cn.layout = cn.layout || { wedge:w }
+            cn.layout.wedge = w
+
             linecount++
             if (cn.height === 0)
                 liner += .2
-            if (linecount > 4)
+ 
+            const rowcount = cllen / Math.log(cllen) / 2
+            if (n.data.name === 'isr')
+                console.log(n.data.name, rowcount)
+            if (linecount >= rowcount /*|| cnlen === 0*/)
             {
                 linecount = 0
-                liner = 0                
-                //currentAngle = wedge.α         
+                liner = 0    
+                resetCount++                            
             }
-        }
+        })
 
         if (!noRecursion)
             for (let cn of n.children || [])        

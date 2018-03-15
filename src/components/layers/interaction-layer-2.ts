@@ -73,8 +73,9 @@ export class InteractionLayer2 implements ILayer
         
         if (this.mousedown)
             this.fireMouseEvent('onPointerMove')                    
-        else
+        else {            
             this.htapi.setPathHead(this.hoverpath, this.findNodeByCell())
+        }
     }
 
     private fireMouseUp() {
@@ -138,7 +139,7 @@ export class InteractionLayer2 implements ILayer
             t.state.P = compose(t.state, shift(t.state, { re:0, im:0 }, origCenterNodePos)).P
 
             this.view.hypertree.update.layout()
-            this.view.layerstack.layers['labels-force'].update.force()   
+            //this.view.layerstack.layers['labels-force'].update.force()   
         }
     }
 
@@ -246,7 +247,7 @@ export class InteractionLayer2 implements ILayer
         else 
         {
         }     
-        this.view.layerstack.layers['labels-force'].update.force()   
+        //this.view.layerstack.layers['labels-force'].update.force()   
     }
 
     //-----------------------------------------------------------------------------------------
