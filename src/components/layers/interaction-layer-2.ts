@@ -138,6 +138,7 @@ export class InteractionLayer2 implements ILayer
             t.state.P = compose(t.state, shift(t.state, { re:0, im:0 }, origCenterNodePos)).P
 
             this.view.hypertree.update.layout()
+            this.view.layerstack.layers['labels-force'].update.force()   
         }
     }
 
@@ -244,7 +245,8 @@ export class InteractionLayer2 implements ILayer
         }
         else 
         {
-        }        
+        }     
+        this.view.layerstack.layers['labels-force'].update.force()   
     }
 
     //-----------------------------------------------------------------------------------------

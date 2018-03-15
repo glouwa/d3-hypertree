@@ -31,10 +31,19 @@ export class LabelForceLayer implements ILayer
     name:            string   
     simulation 
     update = {
-        parent:         ()=> this.attach(),      
+        parent:         ()=> this.attach(),    
+        force:          ()=> {
+            if (!this.args.invisible) 
+            {
+                this.labelSetUpdate()
+                //this.simulation.alpha(.7).restart()
+                //this.simulation.alpha(.7)
+                for (let i=0; i<100; i++)
+                    this.simulation.tick()
+            }
+        },
         data:           ()=> {
-            this.labelSetUpdate()
-            this.simulation.alpha(.7).restart()
+            //this.update.force()
             this.d3updatePattern.update.data()
             this.d3updatePattern2.update.data()
         },
@@ -65,10 +74,11 @@ export class LabelForceLayer implements ILayer
                 .radius(.08))
             .force('gravity', d3f(0,0)                
                 .strength(-.001))
-            .on("tick", ()=> {
+            /*.on("tick", ()=> {
                 //console.log('sim tick')
                 this.update.transformation() 
-            })
+            })*/
+            .stop()
     }
 
     labelSetUpdate() {         
@@ -102,7 +112,7 @@ export class LabelForceLayer implements ILayer
         
         this.simulation
             .nodes(labelpoints) // labels aka this.args.data
-            .restart() 
+            //.restart() 
            
         this.simulation.force("link")
             .links(labellinks)
@@ -144,7 +154,7 @@ export class LabelForceLayer implements ILayer
             name:              'label-link',
             className:         'label-link',
             elementType:       'line',
-            create:            s=> s.attr('stroke',         '#eee'),
+            create:            s=> {},
             updateColor:       s=> {},
             updateTransform:   s=> s.attr('x1',             d=> d.forcepoints.x||0)
                                     .attr('y1',             d=> d.forcepoints.y||0)

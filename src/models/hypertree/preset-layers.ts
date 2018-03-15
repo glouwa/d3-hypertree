@@ -17,7 +17,7 @@ import { FocusLayer }               from '../../components/layers/focus-layer'
 import { bboxOffset }               from '../../index'
 
 var cullingRadius =   0.98
-var labelλExtension = 1.2
+var labelλExtension = 1.1
 var minLabelR =       0.85 
 var animateUpR =      0.99
 
@@ -188,7 +188,7 @@ export const layerSrc = [
                         + ` scale(${d.distScale})`
     }),
     (v, ud:UnitDisk)=> new LabelLayer(v, {                            
-        invisible:  false,
+        invisible:  true,
         hideOnDrag: true,                            
         name:       'labels',
         className:  'caption',
@@ -202,7 +202,7 @@ export const layerSrc = [
                         + d.scaleStrText                            
     }),
     (v, ud:UnitDisk)=> new LabelForceLayer(v, {                            
-        invisible:  true,
+        invisible:  false,
         hideOnDrag: true,                            
         name:       'labels-force',
         className:  'caption',

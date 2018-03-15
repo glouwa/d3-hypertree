@@ -50,6 +50,10 @@ $nodeStroke:    #90caf9;
             opacity: .7;         
         }
 
+        .label-link {
+            stroke: #eee;
+        }
+        
         //.cell.leaf      { stroke: rgba($leafcolor, .25);             fill: rgba(lighten($leafcolor, 0%), .03);    }
 
         .root           { stroke: darken($rootcolor, 15%);           fill: lighten($rootcolor, 5%);               }
