@@ -191,8 +191,7 @@ export function layoutBergé(n:N, λ:number, noRecursion=false)
                 liner += .2
  
             const rowcount = cllen / Math.log(cllen) / 2
-            if (n.data.name === 'isr')
-                console.log(n.data.name, rowcount)
+     
             if (linecount >= rowcount /*|| cnlen === 0*/)
             {
                 linecount = 0

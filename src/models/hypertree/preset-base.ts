@@ -84,7 +84,7 @@ const modelBase : ()=> HypertreeArgs = ()=>
         nodeFilter:     hasCircle,
         linkWidth:      arcWidth,
         transformation: new HyperbolicTransformation({
-            P:{ re: 0, im:0 },
+            P:{ re: 0, im:.5 },
             θ:{ re: 1, im:0 },
             λ:.1
         }),

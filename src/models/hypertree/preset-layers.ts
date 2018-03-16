@@ -23,7 +23,7 @@ var animateUpR =      0.99
 
 var nodeRadiusOffset = (ls:UnitDisk)=> (d:N)=>
     CptoCk({ θ:d.cachep.θ, r:ls.args.nodeRadius(ls, d)*2 })
-
+ 
 export const layerSrc = [    
     // nodes
     // nodes-leafs
@@ -109,7 +109,7 @@ export const layerSrc = [
         hideOnDrag: false,
         name:       'path-arcs',
         className:  'arc',
-        curvature:  '-', // + - 0 l
+        curvature:  '-', // + - 0 l        
         data:       ()=> ud.cache.paths,                            
         nodePos:    n=> n.cache,
         nodePosStr: n=> n.strCache,
@@ -138,6 +138,7 @@ export const layerSrc = [
         name:       'link-arcs',                            
         className:  'arc',
         curvature:  '-', // + - 0 l
+        clip:       '#circle-clip' + ud.args.clipRadius,
         data:       ()=> ud.cache.links,                            
         nodePos:    n=> n.cache,
         nodePosStr: n=> n.strCache,
@@ -154,6 +155,7 @@ export const layerSrc = [
         name:       'link-lines',                            
         className:  'arc',
         curvature:  'l', // + - 0 l
+        clip:       '#circle-clip' + ud.args.clipRadius,
         data:       ()=> ud.cache.links,                            
         nodePos:    n=> n.cache,
         nodePosStr: n=> n.strCache,

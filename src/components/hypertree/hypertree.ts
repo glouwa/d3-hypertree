@@ -113,6 +113,14 @@ const hypertreehtml =
 
     </div>`
 
+    function shuffleArray(array) {
+        if (array)
+        for (let i = array.length - 1; i > 0; i--) {
+            let j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
 /**
 * pipeline implementation:
 * ajax -> weights -> layout -> transformation -> unitdisk / langmaps
@@ -382,6 +390,7 @@ export class Hypertree
                 n.layoutReference = null
                 n.pathes = {}
                 n.globelhtid = globelhtid
+                shuffleArray(n.children)
             })
             //.sum(this.args.weight) // this.updateWeights()
 
@@ -556,8 +565,8 @@ export class Hypertree
         var t0 = performance.now()
 
         const π = Math.PI  
-        const startAngle    = 0
-        const defAngleWidth = π * 1.999999999999
+        const startAngle    = 3 * π / 2
+        const defAngleWidth = π //* 1.999999999999
         const sad           = 2.0
         
         this.data.layout = {
