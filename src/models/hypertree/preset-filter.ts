@@ -15,8 +15,8 @@ var labelλExtension = 1.2
 var minLabelR =       0.85 
 
 function adjustMagic(ud:IUnitDisk, cache:TransformationCache) {
-    const rangeNodes = { min:50, max:300 }
-    const rangeMagic = { min:2,  max:500 }
+    const rangeNodes = { min:150, max:400 }
+    const rangeMagic = { min:2,   max:500 }
     const alpha      = 1.05
     //stopUp
     //stopDown

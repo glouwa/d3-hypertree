@@ -119,7 +119,7 @@ export class InteractionLayer2 implements ILayer
         this.state.P = compose(this.dST, shift(this.dST, s, maxR(e, this.maxMouseR))).P
     */
 
-    private minλ = .1 
+    private minλ = .01 
     private maxλ = .8
     private fireMouseWheelEvent()
     {
