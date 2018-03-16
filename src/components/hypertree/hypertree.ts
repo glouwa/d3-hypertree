@@ -362,6 +362,7 @@ export class Hypertree
     private resetData() {        
         this.view_.html.querySelector('.preloader').innerHTML = htmlpreloader
         this.unitdisk.args.data = undefined
+        this.data = undefined 
      
         this.args.objects.selections = []
         this.args.objects.pathes = []
@@ -603,7 +604,7 @@ export class Hypertree
 
     private animateUp() : void {
         this.args.geometry.transformation.state.P.re = 0
-        this.args.geometry.transformation.state.P.im = 0
+        this.args.geometry.transformation.state.P.im = .3
         
         this.animation = true
         var step = 0, steps = 16

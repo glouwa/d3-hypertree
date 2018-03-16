@@ -95,11 +95,11 @@ export class ArcLayer implements ILayer
                      .attr('y1',             d=> this.args.nodePos(d).im)
                      .attr('x2',             d=> this.args.nodePos(d).re)
                      .attr('y2',             d=> 1)
-                     .attr("stroke-width",   d=> this.args.width(d))
+                     .attr("stroke-width",   d=> this.args.width(d)+.01)
                      .attr("stroke-linecap", d=> "round")
-                else
+                else 
                     s.attr("d",              d=> this.arcOptions[this.args.curvature](d))
-                     .attr("stroke-width",   d=> this.args.width(d))
+                     .attr("stroke-width",   d=> this.args.width(d)+.01)
                      .attr("stroke-linecap", d=> "round")
             },
         })
