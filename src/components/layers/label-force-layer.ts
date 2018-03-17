@@ -33,21 +33,24 @@ export class LabelForceLayer implements ILayer
     update = {
         parent:         ()=> this.attach(),    
         force:          ()=> { 
-            if (!this.args.invisible && !this.view.hypertree.isAnimationRunning()) 
-            {
-                this.labelSetUpdate()
-                //this.simulation.alpha(.7).restart()
-                //this.simulation.alpha(.7)
-                for (let i=0; i<50; i++)
-                    this.simulation.tick()
-            }
+            if (!this.view.hypertree.isAnimationRunning() && this.args.invisible)
+                return
+            
+            if (this.view.hypertree.isAnimationRunning() && this.args.hideOnDrag)
+                return
+
+            this.labelSetUpdate()
+            for (let i=0; i<75; i++)
+                this.simulation.tick()
+            
         },
         data:           ()=> {
             this.update.force()
             this.d3updatePattern.update.data()
             this.d3updatePattern2.update.data()
         },
-        transformation: ()=> {            
+        transformation: ()=> { 
+            this.update.force()           
             this.d3updatePattern.update.transformation()
             this.d3updatePattern2.update.transformation()
         },
@@ -65,13 +68,13 @@ export class LabelForceLayer implements ILayer
         this.simulation = d3.forceSimulation()
             .alphaTarget(.001)
             .force("link",    d3.forceLink()
-                .distance(.01)
+                //.distance(2)
                 .strength(-.05))
             .force("charge",  d3.forceManyBody()
                 .strength(-.00005))
             .force("collide", d3.forceCollide()
-                .strength(.02)
-                .radius(.08))
+                .strength(.015)
+                .radius(.15))
             .force('gravity', d3f(0,0)                
                 .strength(-.001))
             /*.on("tick", ()=> {
@@ -89,7 +92,7 @@ export class LabelForceLayer implements ILayer
         {
             n.forcepoints   = n.forcepoints || {}            
             n.forcepoints.index = n.mergeId
-            const initxyp = CaddC(n.cache, CptoCk({ θ:n.cachep.θ, r:.1}))
+            const initxyp = CaddC(n.cache, CptoCk({ θ:n.cachep.θ, r:.01}))
             n.forcepoints.x = initxyp.re
             n.forcepoints.y = initxyp.im
             console.assert(typeof n.forcepoints.x === 'number')
@@ -141,7 +144,7 @@ export class LabelForceLayer implements ILayer
             updateTransform:   s=> s.attr("transform",       (d, i, v)=> {
                     bboxOffset(d)(v[i])
                     if (!d.forcepoints)
-                        return ` translate(0 0)`
+                        return ``
                     console.assert(d.forcepoints.x || d.depth === 0)
                     return ` translate(${(d.forcepoints.x||0)-d.precalc.labellen/2} ${d.forcepoints.y||0})`
                 })

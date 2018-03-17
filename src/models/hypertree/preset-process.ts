@@ -39,6 +39,18 @@ export function doVoronoiStuff(ud:IUnitDisk, cache:TransformationCache) {
     }
 }
 
+// add labales
+// add pathes
+// filter 
+
+
+/*
+
+cache.emojis = hasicon
+cache.labels = haslabel + inpath - hasicon
+cache.wikis  = haslabel + inpath - labels - wikis
+
+ */
 export function doLabelStuff(ud:IUnitDisk, cache:TransformationCache) {    
     var λmap = λ=> {
         λ = ud.args.transformation.state.λ        

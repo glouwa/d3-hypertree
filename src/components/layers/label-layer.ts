@@ -21,13 +21,23 @@ export class LabelLayer implements ILayer
     view:            ILayerView
     args:            LabelLayerArgs
     d3updatePattern: D3UpdatePattern
+    d3updatePattern2: D3UpdatePattern
     name:            string   
     simulation
     update = {
         parent:         ()=> this.attach(),      
-        data:           ()=> this.d3updatePattern.update.data(),
-        transformation: ()=> this.d3updatePattern.update.transformation(),
-        style:          ()=> this.d3updatePattern.update.style()
+        data:           ()=> {
+            this.d3updatePattern.update.data()
+            this.d3updatePattern2.update.data()
+        },
+        transformation: ()=> {            
+            this.d3updatePattern.update.transformation()
+            this.d3updatePattern2.update.transformation()
+        },
+        style:          ()=> { 
+            this.d3updatePattern.update.style()
+            this.d3updatePattern2.update.style()
+        }
     }
 
     constructor(view:ILayerView, args:LabelLayerArgs) {
@@ -55,5 +65,23 @@ export class LabelLayer implements ILayer
                 (d, i, v)=> this.args.transform(d, this.args.delta(d, i, v)))
                 //.text(                   this.args.text)
         })
+        this.d3updatePattern2 = new D3UpdatePattern({
+            parent:            this.view.parent,
+            layer:             this,
+            clip:              this.args.clip,
+            data:              [],//this.args.data,
+            name:              'label-link',
+            className:         'label-link',
+            elementType:       'line',
+            create:            s=> {},
+            updateColor:       s=> {},
+            updateTransform:   s=> s.attr('x1',             d=> d.forcepoints.x||0)
+                                    .attr('y1',             d=> d.forcepoints.y||0)
+                                    .attr('x2',             d=> d.forcepoints2.x||0)
+                                    .attr('y2',             d=> d.forcepoints2.y||0)
+                                    .attr("stroke-width",   d=> .002)
+                                    .attr("stroke-linecap", d=> "round")
+                //.text(                   this.args.text)
+        })    
     }
 }

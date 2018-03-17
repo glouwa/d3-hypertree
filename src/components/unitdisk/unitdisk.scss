@@ -14,10 +14,7 @@
             0%   { opacity: 0; }            
             100% { opacity: 1; }
         }
-        .caption-icon {
-            font-family: 'NotoColorEmoji', Roboto;
-            font-size: .8;
-        }
+        
         .caption {
             //font-family: 'NotoColorEmoji';
             //text-transform: uppercase;
@@ -32,12 +29,24 @@
             pointer-events: none;
 
             text-rendering: optimizeSpeed;
-            animation: fade-in 750ms ease-in-out;
+            //animation: fade-in 750ms ease-in-out;
+
+
+            transition-property: transform;
+            transition-duration: 250ms;
+            transition-timing-function: ease-in-out;
+            transition-delay: 20ms;
         }
 
         @keyframes fade-in {
             from { opacity: 0; }
             to   { opacity: 1; }
+        }
+        .caption-icon {
+            font-family: 'NotoColorEmoji', Roboto;
+            font-size: .8;
+
+            transition-property: none;
         }
 
         .caption-background {
