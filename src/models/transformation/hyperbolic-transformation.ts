@@ -28,7 +28,7 @@ export class HyperbolicTransformation implements Transformation<N>
     cache: TransformationCache = new TransformationCache()
     state: T
     dST:   T    
-    maxMouseR = .99
+    maxMouseR = .95
     
     constructor(tp:T)  { this.state = tp }
 
@@ -64,7 +64,7 @@ export class PanTransformation implements Transformation<N>
     onDragStart =    (m:C)=> this.dST = clone(this.state)
     onDragEnd =      (m:C)=> this.dST = undefined
     isMoving =       ()=>    this.dST !== undefined
-    onDragP =        (s:C, e:C)=> CassignC(this.state.P, maxR(CaddC(this.dST.P, CsubC(e, s)), .999))
+    onDragP =        (s:C, e:C)=> CassignC(this.state.P, maxR(CaddC(this.dST.P, CsubC(e, s)), .95))
     onDragθ =        (s:C, e:C)=> CassignC(this.state.θ, setR(e, 1))
     onDragλ =        (l:number)=> this.state.λ = l
 }
