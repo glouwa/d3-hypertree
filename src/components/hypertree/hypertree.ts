@@ -567,7 +567,7 @@ export class Hypertree
 
         const π = Math.PI  
         const startAngle    = 3 * π / 2
-        const defAngleWidth = 1.5 * π //* 1.999999999999
+        const defAngleWidth = 1.75 * π //* 1.999999999999
         const sad           = 2.0
         
         this.data.layout = {
@@ -604,7 +604,7 @@ export class Hypertree
 
     private animateUp() : void {
         this.args.geometry.transformation.state.P.re = 0
-        this.args.geometry.transformation.state.P.im = .3
+        this.args.geometry.transformation.state.P.im = 0
         
         this.animation = true
         var step = 0, steps = 16
