@@ -31,11 +31,11 @@
             text-rendering: optimizeSpeed;
             //animation: fade-in 750ms ease-in-out;
 
-
+/*
             transition-property: transform;
             transition-duration: 250ms;
             transition-timing-function: ease-in-out;
-            transition-delay: 20ms;
+            transition-delay: 20ms;*/
         }
 
         @keyframes fade-in {
@@ -45,8 +45,9 @@
         .caption-icon {
             font-family: 'NotoColorEmoji', Roboto;
             font-size: .8;
-
-            transition-property: none;
+            
+            transition-property: none;                       
+            transition-duration: 0ms;            
         }
 
         .caption-background {

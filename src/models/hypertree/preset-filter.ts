@@ -11,8 +11,8 @@ import { doLabelStuff }             from './preset-process'
 import { doImageStuff }             from './preset-process'
 
 var cullingRadius =   0.98
-var labelλExtension = 1.2
-var minLabelR =       0.85 
+var labelλExtension = 1.8
+var absMaxLabelR =    0.85 
 
 function adjustMagic(ud:IUnitDisk, cache:TransformationCache) {
     const rangeNodes = { min:120, max:420 }
@@ -38,7 +38,7 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
     // constants 
     const t0 =        performance.now()
     const normλ =     ud.args.transformation.state.λ
-    const maxLabelR = Math.min(normλ * labelλExtension, minLabelR)
+    const maxLabelR = Math.min(normλ * labelλExtension, absMaxLabelR)
 
     adjustMagic(ud, cache)
 
@@ -49,9 +49,9 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
     cache.spezialNodes =  [ud.args.data, startNode].filter(e=> e)
     
     function abortfilter(n, idx, highway) { // return false to abort
-        const minWeight = highway[0].value / ud.view.hypertree.args.magic
+        n.minWeight = highway[0].value / ud.view.hypertree.args.magic
         peocessNodeTransformation(ud, cache, n)
-        peocessNode(ud, cache, n, maxLabelR, minWeight)        
+        peocessNode(ud, cache, n, maxLabelR, n.minWeight)        
         return !n.isOut
     }    
 
@@ -70,7 +70,7 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
         highway:     path
     })
 
-    // groups of nodes
+    // add pathes to unculled nodes
     const t1 = performance.now()    
     ud.view.hypertree.args.objects.pathes.forEach(p=> {
         if (p.type !== 'HoverPath') {
@@ -90,6 +90,7 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
         }           
     })    
     
+    // groups of nodes
     cache.links =      cache.unculledNodes.slice(1)     
     cache.leafOrLazy = cache.unculledNodes.filter(ud.args.nodeFilter) 
     cache.paths =      cache.links.filter((n:N)=> n.pathes.partof && n.pathes.partof.length)
@@ -108,32 +109,6 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
         Δ: [t1-t0, t2-t1, t3-t2, performance.now()-t3]        
     }
 }
-
-/*
-function findStartNode(interaction:IUnitDisk, cache:TransformationCache) {
-    let startNode = null
-    let prev_startNode = null
-    if (interaction.args.data) {
-        startNode = cache.centerNode || interaction.args.data
-        prev_startNode = startNode
-
-        while (true) {            
-            peocessNodeTransformation(interaction, cache, startNode) 
-
-            if (startNode.cachep.r >= cullingRadius) {
-                startNode = prev_startNode
-                break
-            }
-            if(!startNode.parent) 
-                break
-
-            prev_startNode = startNode
-            startNode = startNode.parent
-        }
-    }
-    return startNode
-}
-*/
 
 function pathToLastVisible(ud:IUnitDisk, cache:TransformationCache) {
     let startNode : N = null
