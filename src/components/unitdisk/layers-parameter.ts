@@ -36,6 +36,8 @@ export const navParameterLayers = [
         data:        ()=> ud.cache.cells,                                        
     }), 
     (v, ud:UnitDisk)=> new NodeLayer(v, {
+        invisible:   true,
+        hideOnDrag:  true,
         name:        'nodes',
         className:   'node',
         data:        ()=> ud.cache.unculledNodes,     

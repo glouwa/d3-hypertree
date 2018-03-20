@@ -188,11 +188,11 @@ export function layoutBergé(n:N, λ:number, noRecursion=false)
 
             linecount++
             if (cn.height === 0)
-                liner += .2
- 
+                liner += .1
+
             const rowcount = cllen / Math.log(cllen) / 2
-     
-            if (linecount >= rowcount /*|| cnlen === 0*/)
+        
+            if (linecount >= rowcount)
             {
                 linecount = 0
                 liner = 0    
@@ -207,3 +207,40 @@ export function layoutBergé(n:N, λ:number, noRecursion=false)
     
     layoutNode(n)    
 }
+
+/*
+    let currentAngle = wedge.α
+    const cl = n.children || []        
+    const cllen = cl.length
+    let linecount = 0
+    let liner = 0
+    let resetCount = 0
+    cl.forEach((cn,i)=> 
+    {          
+        const cnlen = (cn.children || []).length
+        const angleWeight = (cn.value||1) / (n.value||cllen||1) 
+        //const angleWeight = 1 / cllen
+        const angleOffset = angleWidth * angleWeight
+        const α  = currentAngle             
+        currentAngle += angleOffset
+        const Ω  = πify(currentAngle)            
+        
+        const cL = liner
+        const w = { α, Ω, L:cL }
+        cn.layout = cn.layout || { wedge:w }
+        cn.layout.wedge = w
+
+        linecount++
+        if (cn.height === 0)
+            liner += .1
+
+        const rowcount = cllen / Math.log(cllen) / 2
+    
+        if (linecount >= rowcount)
+        {
+            linecount = 0
+            liner = 0    
+            resetCount++                            
+        }
+    })
+*/
