@@ -171,15 +171,20 @@ export function layoutBergé(n:N, λ:number, noRecursion=false)
         let linecount = 0
         let liner = 0
         let resetCount = 0
+        let anglesum = 0
         cl.forEach((cn,i)=> 
         {          
-            const cnlen = (cn.children || []).length
-            const angleWeight = (cn.value||1) / (n.value||cllen||1) 
+            const cnlen = (cn.children || []).length            
+            //const angleWeight = (Math.log10(n.value  || cllen || 1))
+            //                  / (Math.log10(cn.value || 1))
+            const angleWeight = (cn.value || 1)
+                              / (n.value  || cllen || 1)            
+            anglesum += angleWeight
             //const angleWeight = 1 / cllen
             const angleOffset = angleWidth * angleWeight
             const α  = currentAngle             
             currentAngle += angleOffset
-            const Ω  = πify(currentAngle)            
+            const Ω  = πify(currentAngle)
             
             const cL = liner
             const w = { α, Ω, L:cL }
@@ -199,6 +204,7 @@ export function layoutBergé(n:N, λ:number, noRecursion=false)
                 resetCount++                            
             }
         })
+        //console.log(anglesum)
 
         if (!noRecursion)
             for (let cn of n.children || [])        

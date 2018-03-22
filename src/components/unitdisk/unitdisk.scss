@@ -33,9 +33,11 @@
 
 /*
             transition-property: transform;
-            transition-duration: 250ms;
+            //transition-duration: 250ms;
+            transition-duration: 0ms;
             transition-timing-function: ease-in-out;
-            transition-delay: 20ms;*/
+            transition-delay: 150ms;
+            */
         }
 
         @keyframes fade-in {
