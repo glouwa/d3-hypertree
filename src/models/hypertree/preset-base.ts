@@ -46,7 +46,7 @@ var nodeInitRNoInner = (c:number)=> (ud:UnitDisk, d:N)=>
 
 var nodeScale = d=>
     d.distScale
-    * (hasLazy(d) ? 1.8 : 1)    
+    * (hasLazy(d) ? .8 : 1)    
 
 var nodeScaleNoInner = d=>
     d.distScale
