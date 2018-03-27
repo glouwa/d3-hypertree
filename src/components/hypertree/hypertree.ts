@@ -227,6 +227,28 @@ export class Hypertree
             this.setPathHead(pathType, n)
             this.update.pathes()
         },
+        selectQuery: (query:string)=> {
+            const lq = query ? query.toLowerCase() : null
+            this.data.each(n=> {
+                n.pathes.partof = []
+                n.pathes.headof = undefined
+                n.pathes.labelcolor = undefined
+                n.pathes.finalcolor = undefined                
+                n.pathes.isPartOfAnyQuery = false                
+            })            
+            console.log('QUERY:', lq)
+            this.args.objects.pathes = []
+            this.data.each(n=> {                
+                if (n.data) {
+                    if (n.data.name.toLowerCase().includes(lq))
+                        this.addPath('Query', n)
+                    if (n.precalc && n.precalc.label)
+                        if (n.precalc.label.toLowerCase().includes(lq))
+                        this.addPath('Query', n)
+                }
+            })            
+            this.update.pathes()
+        },
         gotoHome: ()=>    this.animateTo({ re:0, im:0 }, null), 
         gotoNode: (n:N)=> this.animateTo(CmulR({ re:n.layout.z.re, im:n.layout.z.im }, -1), null),
     }
@@ -455,6 +477,11 @@ export class Hypertree
 
     private addPath(pathType:string, n:N) {
         const plidx = stringhash(n.precalc.txt)
+        const color = ({
+            'HoverPath':'none', 
+            'Query':googlePalette(1) 
+        })[pathType] || googlePalette(plidx) || 'red'
+
         const newpath:Path = {
             type:      pathType,
             id:        this.btnPathId(pathType, n),
@@ -462,7 +489,7 @@ export class Hypertree
             head:      n,
             headName:  n.precalc.label,
             ancestors: n.ancestors(),            
-            color:     ({ 'HoverPath':'none' })[pathType] || googlePalette(plidx) || 'red' ,            
+            color:     color,            
         }
 
         // model mod
@@ -484,6 +511,8 @@ export class Hypertree
             pn.pathes[`isPartOfAny${pathType}`] = true            
         })        
         
+        if (pathType === 'Query') return
+
         // view: btn   ==> update.btntoolbar()    
         const btnElem = HTML.parse(btn(
             newpath.id, 
@@ -605,6 +634,7 @@ export class Hypertree
     private animateUp() : void {
         this.args.geometry.transformation.state.P.re = 0
         this.args.geometry.transformation.state.P.im = 0
+        this.args.magic = 250
         
         this.animation = true
         var step = 0, steps = 16
