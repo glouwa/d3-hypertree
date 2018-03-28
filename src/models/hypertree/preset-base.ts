@@ -127,7 +127,7 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
     fsModel: ()=> 
     {
         const model = modelBase()   
-        model.geometry.nodeRadius = nodeInitRNoInner(.031)
+        model.geometry.nodeRadius = nodeInitRNoInner(.035)
         model.geometry.nodeScale = nodeScaleNoInner
         model.geometry.nodeFilter = n=> true
         model.caption = (ht:Hypertree, n:N)=> {            

@@ -227,7 +227,7 @@ export const layerSrc = [
                         bboxOffset(d)(v[i])),
         transform:  (d, delta)=> 
                         ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` 
-                        + `scale(${d.dampedDistScale*1.5})`
+                        + `scale(${d.dampedDistScale*2})`
     }),
     (v, ud:UnitDisk)=> new InteractionLayer(v, {                            
         mouseRadius: .95,

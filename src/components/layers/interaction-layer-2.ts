@@ -126,7 +126,8 @@ export class InteractionLayer2 implements ILayer
         const mΔ = d3.event.deltaY
         const λΔ = mΔ / 100 / 8
         const oldλp = this.view.unitdisk.args.transformation.state.λ
-        const newλp = oldλp - λΔ
+        const Δsens = 1.5
+        const newλp = (mΔ>=0 ? oldλp/Δsens : oldλp*Δsens) //- λΔ
         
         if (newλp < this.maxλ && newλp > this.minλ) 
         {
@@ -136,7 +137,10 @@ export class InteractionLayer2 implements ILayer
 
             t.onDragλ(newλp)
             this.view.hypertree.updateLayout_() // only path to center
-            t.state.P = compose(t.state, shift(t.state, { re:0, im:0 }, origCenterNodePos)).P
+            t.state.P = compose(
+                t.state, 
+                shift(t.state, { re:0, im:0 }, origCenterNodePos)
+            ).P
 
             this.view.hypertree.update.layout()
             //this.view.layerstack.layers['labels-force'].update.force()   

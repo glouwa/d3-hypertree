@@ -681,7 +681,7 @@ export class Hypertree
 
     private animateTo(newP:C, newλ) : void {
         if (this.animation) return
-        else this.animation = true
+        else                this.animation = true
 
         const initTS = clone(this.args.geometry.transformation.state)
         const way = CsubC(initTS.P, newP)
@@ -698,7 +698,7 @@ export class Hypertree
             this.update.transformation()
 
             if (step++ >= steps) this.animation = false                    
-            else requestAnimationFrame(()=> frame())                
+            else                 requestAnimationFrame(()=> frame())                
         }
         requestAnimationFrame(()=> frame())
     }
