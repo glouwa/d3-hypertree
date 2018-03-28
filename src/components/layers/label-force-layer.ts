@@ -164,9 +164,7 @@ export class LabelForceLayer implements ILayer
             updateTransform:   s=> s.attr('x1',             d=> d.forcepoints.x||0)
                                     .attr('y1',             d=> d.forcepoints.y||0)
                                     .attr('x2',             d=> d.forcepoints2.x||0)
-                                    .attr('y2',             d=> d.forcepoints2.y||0)
-                                    .attr("stroke-width",   d=> .002)
-                                    .attr("stroke-linecap", d=> "round")
+                                    .attr('y2',             d=> d.forcepoints2.y||0)                                    
                 //.text(                   this.args.text)
         })        
     }

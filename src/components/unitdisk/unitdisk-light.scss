@@ -52,8 +52,11 @@ $nodeStroke:    #90caf9;
         }
 
         .label-link {
-            stroke: lightblue;
-            stroke-width: .001;
+            stroke: #2196F3;            
+            stroke-width: .00075;
+            stroke-dasharray: .01, .01;
+            //stroke-dasharray: .006, .0075;
+
         }
         
         //.cell.leaf      { stroke: rgba($leafcolor, .25);             fill: rgba(lighten($leafcolor, 0%), .03);    }

@@ -5,8 +5,8 @@ import { C, CktoCp, CptoCk }   from '../../models/transformation/hyperbolic-math
 import { Cneg, CmulR }         from '../../models/transformation/hyperbolic-math'
 import { Clog, Cpow }          from '../../models/transformation/hyperbolic-math'
 import { h2e }                 from '../../models/transformation/hyperbolic-math'
-import { πify, dfs, dfsFlat}   from '../../models/transformation/hyperbolic-math' 
-import { Z_VERSION_ERROR } from 'zlib';
+import { πify, dfs, dfsFlat }  from '../../models/transformation/hyperbolic-math' 
+import { maxR }                from '../../models/transformation/hyperbolic-math' 
 
 export type LayoutFunction = (root:N, t?:number, noRecursion?:boolean) => N
 
@@ -16,6 +16,7 @@ const unitVectors = [{ re:1, im:0 }, { re:0, im:1 }, { re:-1, im:0 }, { re:0, im
 export function setZ(container, z) {
     console.assert(z, "set Z to null!")
     if (!z) return 
+    z = maxR(z, .99999999)
     container.layout = container.layout || {}    
     container.layout.z = z
     container.layout.zStrCache = `${z.re} ${z.im}`

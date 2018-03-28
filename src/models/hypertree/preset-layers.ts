@@ -207,7 +207,7 @@ export const layerSrc = [
         invisible:  false,
         hideOnDrag: true,                            
         name:       'labels-force',
-        className:  'caption',
+        className:  'caption caption-label',
         data:       ()=> ud.cache.labels,
         text:       (d)=> d.precalc.label,
         delta:      (d, i, v)=> CaddC(
