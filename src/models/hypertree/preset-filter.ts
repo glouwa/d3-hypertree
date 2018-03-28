@@ -96,12 +96,17 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
     cache.paths =      cache.links.filter((n:N)=> n.pathes.partof && n.pathes.partof.length)
     cache.weights =    []
     
+    
     const t2 = performance.now()
-    doVoronoiStuff(ud, cache)
+    if (!ud.view.hypertree.isAnimationRunning())
+        doVoronoiStuff(ud, cache) 
 
     const t3 = performance.now()
-    doLabelStuff(ud, cache)
-    doImageStuff(ud, cache)
+    if (!ud.view.hypertree.isAnimationRunning()) 
+        doLabelStuff(ud, cache)        
+
+    if (!ud.view.hypertree.isAnimationRunning())
+        doImageStuff(ud, cache)
     
     // only for meta view
     ud.cacheMeta = {

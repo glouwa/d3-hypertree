@@ -703,10 +703,14 @@ export class Hypertree
         requestAnimationFrame(()=> frame())
     }
 
-    public isAnimationRunning() : boolean {
-        var view = this.unitdisk.args.transformation.isMoving()
-        var nav = this.unitdisk.navParameter 
+    public isAnimationRunning() : boolean {        
+        var view = this.unitdisk 
+                && this.unitdisk.args.transformation.isMoving()
+
+        var nav = this.unitdisk
+               && this.unitdisk.navParameter 
                && this.unitdisk.navParameter.args.transformation.isMoving()
+
         return view || nav || this.animation
     }  
 }
