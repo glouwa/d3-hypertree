@@ -97,6 +97,10 @@ const hypertreehtml =
             ${btn('btnadd', 'add')}
             ${btn('btnedit', 'border_color')}
             ${btn('btndelte', 'delete')}
+
+            swap
+            open
+            search from here
             -->
         </div> 
 
@@ -313,11 +317,11 @@ export class Hypertree
         this.view_.btnNav.onclick      = ()=> this.api.toggleNav()        
         this.view_.btnSize.onclick     = ()=> {            
             const view = [
-                'translate(520,500) scale(470)', // small
-                'translate(520,500) scale(490)', // big
-                'translate(520,500) scale(720, 490)', // oval 
-                'translate(520,500) scale(720, 590)', // overlap
-                'translate(520,600) scale(680, 800)', // mobile (vertical)
+                'translate(500,520) scale(470)', // small
+                'translate(500,520) scale(490)', // big
+                'translate(500,520) scale(720, 490)', // oval 
+                'translate(500,520) scale(720, 590)', // overlap
+                'translate(500,620) scale(680, 800)', // mobile (vertical)
             ]
             const nav = [
                 'translate(95,95) scale(70)',
@@ -347,7 +351,7 @@ export class Hypertree
         this.unitdisk = new this.args.decorator({
             parent:         udparent,
             className:      'unitDisc',
-            position:       'translate(520,500) scale(470)',
+            position:       'translate(500,520) scale(470)',
             hypertree:      this,
         },
         {            
