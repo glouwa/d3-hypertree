@@ -660,7 +660,8 @@ export class Hypertree
                 
                 if (this.data
                     .leaves()
-                    .reduce((max, n)=> Math.max(max, CktoCp(n.layout.z).r), 0) > .95)                     
+                    .reduce((max, n)=> Math.max(max, CktoCp(n.layout.z).r), 0)
+                         > (this.args.initMaxL || .95))
                 {
                     // on abort
                     this.animation = false

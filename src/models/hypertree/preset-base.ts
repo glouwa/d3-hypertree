@@ -136,5 +136,15 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
             return n.precalc.txt + tosub(w) 
         }        
         return model
+    },
+    mainModel: ()=> 
+    {
+        const model = presets.otolModel()   
+        model.geometry.nodeRadius = nodeInitRNoInner(.0001)
+        model.geometry.nodeScale = nodeScaleNoInner
+        model.initMaxL = .75
+        model.geometry.nodeFilter = n=> true                
+        return model
     }    
+    
 }

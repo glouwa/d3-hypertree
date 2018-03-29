@@ -27,7 +27,7 @@ export interface HypertreeArgs
     layout:        LayoutFunction,
     magic:         number,
     decorator:     { new(view:UnitDiskView, args:UnitDiskArgs) : IUnitDisk }, // replace by navigation
-
+    initMaxL:      number,
     objects: {
         pathes:      Path[],
         selections:  N[],
