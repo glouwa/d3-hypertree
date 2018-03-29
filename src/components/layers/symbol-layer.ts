@@ -13,7 +13,7 @@ export interface SymbolLayerArgs extends ILayerArgs
     clip?:     string,
 }
 
-var symbol = d3.symbol().size(.004)
+var symbol = d3.symbol().size(.002)
 var d_star = symbol.type(d3['symbolStar'])()
 
 const home = 'M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z'
