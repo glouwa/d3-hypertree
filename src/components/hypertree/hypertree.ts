@@ -85,9 +85,11 @@ const hypertreehtml =
             ${btn('btnsize', 'all_out')}
             ${btn('btnmeta', 'layers')}            
 
-            ${btn('btnhome', 'home', 'tool-seperator')}
-            ${btn('btnsearch', 'search', 'disabled')}
-            ${btn('btndownload', 'file_download', 'disabled')}
+            ${btn('btndownload', 'file_download', 'tool-seperator disabled')}
+            ${btn('btnupload', 'cloud_upload', 'disabled')}            
+            ${btn('btnhome', 'home', 'disabled')}
+            ${btn('btnsearch', 'search')}
+            
             <!--
             ,530, 470
             ${btn('btncut', 'content_cut')}

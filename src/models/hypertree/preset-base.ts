@@ -143,6 +143,7 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
         model.geometry.nodeRadius = nodeInitRNoInner(.0001)
         model.geometry.nodeScale = nodeScaleNoInner
         model.initMaxL = .75
+        model.onNodeSelect = s=> { console.log('###########', s) }
         model.geometry.nodeFilter = n=> true                
         return model
     }    
