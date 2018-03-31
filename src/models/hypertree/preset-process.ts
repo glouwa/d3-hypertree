@@ -15,12 +15,27 @@ export function doVoronoiStuff(ud:IUnitDisk, cache:TransformationCache) {
                 || e.data.isPartOfAnySelectionPath*/
             )
 
-    const centerCell = cache.voronoiDiagram.find(0, 0)
+    updateCenterNodeStuff(ud, cache)        
+
+    return
+    const centerCell = cache.voronoiDiagram.find(0, 0)    
     if (centerCell) {
         cache.centerNode = centerCell.data
+        updateCenterNodeStuff(ud, cache)
+    }
+    else {
+        console.warn('centercell not found')
+        cache.centerNode = undefined
+    }
+}
+
+export function updateCenterNodeStuff(ud:IUnitDisk, cache:TransformationCache) 
+{
+    if (cache.centerNode) {
         const pathStr = cache.centerNode
             .ancestors()
             .reduce((a, e)=> `${e.precalc.txt?("  "+e.precalc.txt+"  "):''}${a?"›":""}${a}`, '') 
+
         const hypertree = ud.view.hypertree
         hypertree.view_.path.innerText = pathStr // todo: html m frame?
 
@@ -33,12 +48,7 @@ export function doVoronoiStuff(ud:IUnitDisk, cache:TransformationCache) {
             hypertree.view_.btnPathHome.classList.remove('disabled')
         }
     }
-    else {
-        console.warn('centercell not found')
-        cache.centerNode = undefined
-    }
 }
-
 // add labales
 // add pathes
 // filter 
@@ -79,12 +89,14 @@ export function doLabelStuff(ud:IUnitDisk, cache:TransformationCache) {
         damping /= .8
     }
 
+    /*
     var emojis = labels
         .filter((e:N)=> e.precalc.icon)
+        */
 
     cache.labels = stdlabels.concat(pathLabels)
         .filter(e=> !e.precalc.icon)
-    cache.emojis = emojis
+    //cache.emojis = emojis
 }
 
 export function doImageStuff(ud:IUnitDisk, cache:TransformationCache) {

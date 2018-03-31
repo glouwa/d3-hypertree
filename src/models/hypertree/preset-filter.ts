@@ -47,6 +47,7 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
     const startNode =     path[0]
     cache.unculledNodes = []    
     cache.spezialNodes =  [ud.args.data, startNode].filter(e=> e)
+    cache.emojis =        []
     
     function abortfilter(n, idx, highway) { // return false to abort
         n.minWeight = highway[0].value / ud.view.hypertree.args.magic
@@ -55,13 +56,17 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
         return !n.isOut
     }    
 
+    // dont do it before pathToLastVisible. it uses centerNode
+    cache.centerNode = undefined// ud.args.data
+    
+    const t1 = performance.now()    
     // select visible nodes - rootnode extra
     if (ud.args.data) {
         peocessNodeTransformation(ud, cache, ud.args.data)
         peocessNode(ud, cache, ud.args.data, maxLabelR, 0)
         // root ist nicht in uncullednodes! (gut)
     }
-
+    
     // select visible nodes - alle anderen (von startnode bis abortfilter)
     dfs2({
         node:        startNode,
@@ -70,8 +75,9 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
         highway:     path
     })
 
-    // add pathes to unculled nodes
-    const t1 = performance.now()    
+    const t2 = performance.now()
+
+    // add pathes to unculled nodes    
     ud.view.hypertree.args.objects.pathes.forEach(p=> {
         if (p.type !== 'HoverPath') {
             const pathnodes = []
@@ -96,12 +102,11 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
     cache.paths =      cache.links.filter((n:N)=> n.pathes.partof && n.pathes.partof.length)
     cache.weights =    []
     
-    
-    const t2 = performance.now()
+    const t3 = performance.now()
+
     if (!ud.view.hypertree.isAnimationRunning())
         doVoronoiStuff(ud, cache) 
-
-    const t3 = performance.now()
+    
     if (!ud.view.hypertree.isAnimationRunning()) 
         doLabelStuff(ud, cache)        
 
@@ -165,4 +170,10 @@ function peocessNode(ud:IUnitDisk, cache:TransformationCache, n:N, maxLabelR, mi
     if (n.parent && n.isOut99)     n.parent.hasOutPeriChildren = true
     if (n.parent && n.isOutWeight) n.parent.hasOutWeightChildren = true
     if (n.parent && n.isOut)       n.parent.hasOutChildren = true
+
+    if (!cache.centerNode || cache.centerNode.cachep.r > n.cachep.r)
+        cache.centerNode = n
+
+    if (n.precalc.icon)
+        cache.emojis.push(n)
 }

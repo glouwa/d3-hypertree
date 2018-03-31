@@ -391,7 +391,9 @@ export class Hypertree
         this.view_.html.querySelector('.preloader').innerHTML = htmlpreloader
         this.unitdisk.args.data = undefined
         this.data = undefined 
-     
+        //if (this.view_.unitdisk && this.view_.unitdisk.cache)
+        //    this.view_.unitdisk.cache.centerNode = undefined
+
         this.args.objects.selections = []
         this.args.objects.pathes = []
         this.view_.path.innerText = ''

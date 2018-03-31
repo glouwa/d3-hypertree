@@ -287,7 +287,7 @@ function UnitdiskMeta_({ parent, ud, className })
         v.info.innerHTML  = `state, sets, voro`
         v.info.title      = `Visible node count: ${na}\n`        
         v.info.title     += `Min weigth: ${hwexits}\n` 
-        v.info.title     += `${Δms[0]} culling\n${Δms[1]} lazysearch\n${Δms[2]} voronoi\n${Δms[3]} labels`
+        v.info.title     += `${Δms[0]} init\n${Δms[1]} culling\n${Δms[2]} pathes+sets\n${Δms[3]} voronoi+labels`
         v.q.innerHTML     = `${t}`        
 
         updateBar(v.bar, Δ.map(e=> e*mag_time), ['#2196f3', '#ffc107', '#673ab7', '#4caf50'])        
