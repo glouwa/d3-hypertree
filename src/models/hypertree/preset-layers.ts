@@ -222,9 +222,9 @@ export const layerSrc = [
         className:  'caption',                          
         data:       ()=> ud.cache.emojis,
         text:       (d)=> d.precalc.label,
-        delta:      (d, i, v)=> CaddC(
-                        nodeRadiusOffset(ud)(d),
-                        bboxOffset(d)(v[i])),
+        delta:      (d, i, v)=> ({ re:0, im:0 }), //bboxOffset(d)(v[i]) /*CaddC(
+                        //nodeRadiusOffset(ud)(d), 
+                        //bboxOffset(d)(v[i]))*/,
         transform:  (d, delta)=> 
                         ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` 
                         + `scale(${d.dampedDistScale*2})`
