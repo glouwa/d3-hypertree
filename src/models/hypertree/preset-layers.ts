@@ -193,7 +193,7 @@ export const layerSrc = [
         name:       'emojis',  
         className:  'caption',                          
         data:       ()=> ud.cache.emojis,
-        text:       (d)=> d.precalc.label,
+        text:       (d)=> d.precalc.icon,
         delta:      (d, i, v)=> ({ re:0, im:0 }), //bboxOffset(d)(v[i]) /*CaddC(
                         //nodeRadiusOffset(ud)(d), 
                         //bboxOffset(d)(v[i]))*/,
@@ -207,7 +207,7 @@ export const layerSrc = [
         name:       'labels',
         className:  'caption',
         data:       ()=> ud.cache.labels,
-        text:       (d)=> d.precalc.label,
+        text:       (d)=> d.precalc.txt2,
         delta:      (d, i, v)=> CaddC(
                         nodeRadiusOffset(ud)(d),
                         bboxOffset(d)(v[i])), 
@@ -221,7 +221,7 @@ export const layerSrc = [
         name:       'labels-force',
         className:  'caption caption-label',
         data:       ()=> ud.cache.labels,
-        text:       (d)=> d.precalc.label,
+        text:       (d)=> d.precalc.txt2,
         delta:      (d, i, v)=> CaddC(
                         nodeRadiusOffset(ud)(d),
                         bboxOffset(d)(v[i])), 

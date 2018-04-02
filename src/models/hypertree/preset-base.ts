@@ -107,6 +107,7 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
             const i  = ht.args.iconmap.emojimap[id]
             n.precalc.icon = i                        
             n.precalc.txt = i || l || id
+            n.precalc.txt2 = l || id
 
             if (n.precalc.txt) return n.precalc.txt + tosub(w) 
             else return undefined

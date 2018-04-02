@@ -66,7 +66,7 @@ export function doLabelStuff(ud:IUnitDisk, cache:TransformationCache) {
     
     var wikiR = ud.cache.wikiR = λmap(undefined)
     var labels = cache.unculledNodes
-        .filter((e:N)=> e.precalc.label)
+        .filter((e:N)=> e.precalc.label || e.precalc.icon)
 
     var pathLabels = labels
         .filter((e:N)=> e.pathes.partof && e.pathes.partof.length)
@@ -95,7 +95,7 @@ export function doLabelStuff(ud:IUnitDisk, cache:TransformationCache) {
         */
 
     cache.labels = stdlabels.concat(pathLabels)
-        .filter(e=> !e.precalc.icon)
+        //.filter(e=> !e.precalc.icon)
     //cache.emojis = emojis
 }
 

@@ -72,10 +72,10 @@ export class LabelForceLayer implements ILayer
                 //.distance(2)
                 .strength(-.05))
             .force("charge",  d3.forceManyBody()
-                .strength(-.00005))
+                .strength(-.05))
             .force("collide", d3.forceCollide()
-                .strength(.015)
-                .radius(.15))
+                .strength(.003)
+                .radius(.18)) // .18
             .force('gravity', d3f(0,0)                
                 .strength(-.001))
             /*.on("tick", ()=> {
