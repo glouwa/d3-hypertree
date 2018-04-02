@@ -31,6 +31,9 @@
             text-rendering: optimizeSpeed;
             //animation: fade-in 750ms ease-in-out;
         }
+        .caption:lang(zh) {
+            font-size: .0025em;            
+        }
 
         @keyframes fade-in {
             from { opacity: 0; }

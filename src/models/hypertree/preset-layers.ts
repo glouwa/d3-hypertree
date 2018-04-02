@@ -189,6 +189,18 @@ export const layerSrc = [
                         ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` 
                         + ` scale(${d.distScale})`
     }),
+    (v, ud:UnitDisk)=> new LabelLayer(v, {
+        name:       'emojis',  
+        className:  'caption',                          
+        data:       ()=> ud.cache.emojis,
+        text:       (d)=> d.precalc.label,
+        delta:      (d, i, v)=> ({ re:0, im:0 }), //bboxOffset(d)(v[i]) /*CaddC(
+                        //nodeRadiusOffset(ud)(d), 
+                        //bboxOffset(d)(v[i]))*/,
+        transform:  (d, delta)=> 
+                        ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` 
+                        + `scale(${d.dampedDistScale*2})`
+    }),
     (v, ud:UnitDisk)=> new LabelLayer(v, {                            
         invisible:  true,
         hideOnDrag: true,                            
@@ -216,19 +228,7 @@ export const layerSrc = [
         transform:  (d, delta)=> 
                         ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` 
                         + d.scaleStrText                            
-    }),
-    (v, ud:UnitDisk)=> new LabelLayer(v, {
-        name:       'emojis',  
-        className:  'caption',                          
-        data:       ()=> ud.cache.emojis,
-        text:       (d)=> d.precalc.label,
-        delta:      (d, i, v)=> ({ re:0, im:0 }), //bboxOffset(d)(v[i]) /*CaddC(
-                        //nodeRadiusOffset(ud)(d), 
-                        //bboxOffset(d)(v[i]))*/,
-        transform:  (d, delta)=> 
-                        ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` 
-                        + `scale(${d.dampedDistScale*2})`
-    }),
+    }),    
     (v, ud:UnitDisk)=> new InteractionLayer(v, {                            
         mouseRadius: .95,
         nohover:     false,
