@@ -137,6 +137,7 @@ function r2g(r) {
 
 export function layoutBergé(n:N, λ:number, noRecursion=false)
 {
+    let count = 0
     function layoutNode(n:N)
     { 
         const wedge = { Ω:n.layout.wedge.Ω, α:n.layout.wedge.α }
@@ -210,9 +211,12 @@ export function layoutBergé(n:N, λ:number, noRecursion=false)
         if (!noRecursion)
             for (let cn of n.children || [])        
                 layoutNode(cn)
+
+        count++
     }
     
     layoutNode(n)    
+    //console.log('layouted nodes ', count, λ)
 }
 
 /*

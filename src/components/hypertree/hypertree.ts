@@ -276,7 +276,7 @@ export class Hypertree
                         }),        
         langloader:     ()=> requestAnimationFrame(()=> {                            
                             this.hypertreeMeta.update.lang()
-                            this.update.transformation()
+                            this.update.data()
                         }),        
         layout:         ()=> requestAnimationFrame(()=> {
                             this.unitdisk.update.transformation() 
@@ -393,6 +393,12 @@ export class Hypertree
         this.data = undefined 
         //if (this.view_.unitdisk && this.view_.unitdisk.cache)
         //    this.view_.unitdisk.cache.centerNode = undefined
+
+        this.args.geometry.transformation.state.λ = .001
+        this.args.geometry.transformation.state.P.re = 0
+        this.args.geometry.transformation.state.P.im = 0        
+        this.args.magic = 250
+        this.args.geometry.transformation.cache.centerNode = undefined
 
         this.args.objects.selections = []
         this.args.objects.pathes = []
@@ -639,13 +645,11 @@ export class Hypertree
     //##
     //########################################################################################################
 
-    private animateUp() : void {
-        this.args.geometry.transformation.state.P.re = 0
-        this.args.geometry.transformation.state.P.im = 0
-        this.args.magic = 250
+    private animateUp() : void {        
+        //this.args.geometry.transformation.cache.centerNode = undefined
         
         this.animation = true
-        var step = 0, steps = 16
+        var step = 0, steps = 50
         var frame = ()=>
         {
             var p = step++/steps
@@ -654,19 +658,28 @@ export class Hypertree
             
             else {
                 // new P, λ values
-                var λ = .03 + p * .98
+                var λ = .02 + p * .9
                 var animλ = λ
                 this.args.geometry.transformation.state.λ = animλ                
 
                 //app.toast('Layout')
                 //this.args.layout(this.data, this.args.geometry.transformation.state.λ)
                 this.updateLayout_()
+                //this.update.layout()
                 
-                if (this.data
-                    .leaves()
-                    .reduce((max, n)=> Math.max(max, CktoCp(n.layout.z).r), 0)
-                         > (this.args.initMaxL || .95))
-                {
+                const maxR = this.args.geometry.transformation.cache.unculledNodes                    
+                    .reduce((max, n)=> {                        
+                        //console.log(r)
+                        return Math.max(max, n.layout.zp.r)
+                    }, 0)
+
+                console.log('maxR, lambda, uccount',
+                 maxR.toFixed(2), 
+                 animλ.toFixed(2), 
+                 this.args.geometry.transformation.cache.unculledNodes.length)
+
+                if (maxR > (this.args.initMaxL || .85))
+                {   
                     // on abort
                     this.animation = false
                     this.data.each((n:N)=> n.layoutReference = clone(n.layout))

@@ -74,7 +74,7 @@ export class LabelForceLayer implements ILayer
             .force("charge",  d3.forceManyBody()
                 .strength(-.05))
             .force("collide", d3.forceCollide()
-                .strength(.003)
+                .strength(.002)
                 .radius(.18)) // .18
             .force('gravity', d3f(0,0)                
                 .strength(-.001))
@@ -93,7 +93,7 @@ export class LabelForceLayer implements ILayer
         {
             n.forcepoints   = n.forcepoints || {}            
             n.forcepoints.index = n.mergeId
-            const initxyp = CaddC(n.cache, CptoCk({ θ:n.cachep.θ, r:.01}))
+            const initxyp = CaddC(n.cache, CptoCk({ θ:n.cachep.θ, r:.001}))
             n.forcepoints.x = initxyp.re
             n.forcepoints.y = initxyp.im
             console.assert(typeof n.forcepoints.x === 'number')
@@ -154,6 +154,9 @@ export class LabelForceLayer implements ILayer
             updateTransform:   s=> s.attr("transform",       calctransform)
         })
 
+        function calcXY(d, xy, fp) {
+            
+        }
         this.d3updatePattern2 = new D3UpdatePattern({
             parent:            this.view.parent,
             layer:             this,
@@ -164,10 +167,10 @@ export class LabelForceLayer implements ILayer
             elementType:       'line',
             create:            s=> {},
             updateColor:       s=> {},
-            updateTransform:   s=> s.attr('x1',             d=> d.forcepoints.x||0)
-                                    .attr('y1',             d=> d.forcepoints.y||0)
-                                    .attr('x2',             d=> d.forcepoints2.x||0)
-                                    .attr('y2',             d=> d.forcepoints2.y||0)                                    
+            updateTransform:   s=> s.attr('x1',             d=> (d.forcepoints && d.forcepoints.x)||0)
+                                    .attr('y1',             d=> (d.forcepoints && d.forcepoints.y)||0)
+                                    .attr('x2',             d=> (d.forcepoints2 && d.forcepoints2.x)||0)
+                                    .attr('y2',             d=> (d.forcepoints2 && d.forcepoints2.y)||0)                                    
                 //.text(                   this.args.text)
         })        
     }
