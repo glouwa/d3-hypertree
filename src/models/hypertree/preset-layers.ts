@@ -48,7 +48,7 @@ export const layerSrc = [
     }),
     (v, ud:UnitDisk)=> new FocusLayer(v, {        
         invisible:  true,
-        hideOnDrag: true,
+        hideOnDrag: false,
         name:       'labels-r',
         r:          ()=> 1.2 * ud.args.transformation.state.λ
     }),    

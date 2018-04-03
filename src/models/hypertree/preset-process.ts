@@ -5,28 +5,25 @@ import { C, CptoCk, CktoCp, πify }  from '../../models/transformation/hyperboli
 import { lengthDilledation }        from '../../models/transformation/hyperbolic-math'
 import { TransformationCache }      from "../../models/transformation/hyperbolic-transformation"
 
-export function doVoronoiStuff(ud:IUnitDisk, cache:TransformationCache) {
-    
-    cache.voronoiDiagram = ud.voronoiLayout(cache.unculledNodes)
-    cache.cells = cache.voronoiDiagram
-        .polygons()
-        .filter(e=> ud.args.nodeFilter(e.data)
+export function doVoronoiStuff(ud:IUnitDisk, cache:TransformationCache) {    
+    //voro muss mindestens clickable enthalten für mousetonode bei click
+        
+    cache.voronoiDiagram = ud.voronoiLayout(
+        cache.unculledNodes.filter((n:N)=> n.precalc.clickable)
+        //cache.labels
+        /*.filter(n=> 
+            (n.cachep.r <= ud.cache.wikiR && n.precalc.label.startsWith('𝐖')) ||
+            (n.data && n.data.name == 'carnivora') 
+        )*/
+    )
+    //cache.voronoiDiagram = ud.voronoiLayout(cache.unculledNodes)
+    cache.cells = cache.voronoiDiagram.polygons()
+        //.filter(e=> ud.args.nodeFilter(e.data)
                 /*|| e.data.isPartOfAnyHoverPath 
                 || e.data.isPartOfAnySelectionPath*/
-            )
+        //    )
 
-    updateCenterNodeStuff(ud, cache)        
-
-    return
-    const centerCell = cache.voronoiDiagram.find(0, 0)    
-    if (centerCell) {
-        cache.centerNode = centerCell.data
-        updateCenterNodeStuff(ud, cache)
-    }
-    else {
-        console.warn('centercell not found')
-        cache.centerNode = undefined
-    }
+    updateCenterNodeStuff(ud, cache)    
 }
 
 export function updateCenterNodeStuff(ud:IUnitDisk, cache:TransformationCache) 
@@ -49,30 +46,24 @@ export function updateCenterNodeStuff(ud:IUnitDisk, cache:TransformationCache)
         }
     }
 }
-// add labales
-// add pathes
-// filter 
 
 /*
 cache.emojis = hasicon
 cache.labels = haslabel + inpath - hasicon
 cache.wikis  = haslabel + inpath - labels - wikis
 */
+const wikiR = .9
 export function doLabelStuff(ud:IUnitDisk, cache:TransformationCache) {    
-    var λmap = λ=> {
-        λ = ud.args.transformation.state.λ        
-        return .9// λ + .3 * lengthDilledation(CptoCk({ θ:0, r:λ }))
-    }
     
-    var wikiR = ud.cache.wikiR = λmap(undefined)
+    ud.cache.wikiR = wikiR
     var labels = cache.unculledNodes
         .filter((e:N)=> e.precalc.label || e.precalc.icon)
 
-    var pathLabels = labels
-        .filter((e:N)=> e.pathes.partof && e.pathes.partof.length)
+    //var pathLabels = labels
+    //    .filter((e:N)=> e.pathes.partof && e.pathes.partof.length)
         
     var stdlabels = labels
-        .filter(e=> pathLabels.indexOf(e) === -1)        
+    //    .filter(e=> pathLabels.indexOf(e) === -1)        
         .filter(e=>                         
                (e.cachep.r <= wikiR  && e.precalc.label.startsWith('𝐖'))
             || !e.parent                
@@ -89,14 +80,7 @@ export function doLabelStuff(ud:IUnitDisk, cache:TransformationCache) {
         damping /= .8
     }
 
-    /*
-    var emojis = labels
-        .filter((e:N)=> e.precalc.icon)
-        */
-
-    cache.labels = stdlabels.concat(pathLabels)
-        //.filter(e=> !e.precalc.icon)
-    //cache.emojis = emojis
+    cache.labels = stdlabels//.concat(pathLabels)
 }
 
 export function doImageStuff(ud:IUnitDisk, cache:TransformationCache) {

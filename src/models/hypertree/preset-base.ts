@@ -102,12 +102,15 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
             // better: set of initial node actions [label, imghref, scalef, ...]
             const w  = (!n.value || n.value==1) ? '' : n.value + ' '
             const id = ( n.data && n.data.name) ? n.data.name : ''
-            const l  = ht.langMap && ht.langMap[id] ? '𝐖 ' + ht.langMap[id] : ''
-            
+            const l = ht.langMap && ht.langMap[id] ? '𝐖 ' + ht.langMap[id] : ''                        
             const i  = ht.args.iconmap.emojimap[id]
-            n.precalc.icon = i                        
+
+            n.precalc.icon = i                     
+            n.precalc.wiki = l   
             n.precalc.txt = i || l || id
             n.precalc.txt2 = l || id
+            
+            n.precalc.clickable = l
 
             if (n.precalc.txt) return n.precalc.txt + tosub(w) 
             else return undefined
@@ -146,6 +149,20 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
         model.initMaxL = .75
         model.onNodeSelect = s=> { console.log('###########', s) }
         model.geometry.nodeFilter = n=> true                
+        model.caption = (ht:Hypertree, n:N)=> {
+            const id = ( n.data && n.data.name) ? n.data.name : ''            
+            const i  = ht.args.iconmap.emojimap[id]
+
+            n.precalc.icon = i            
+            n.precalc.txt = i || id            
+            n.precalc.clickable = (n.parent 
+                &&  n.parent.data 
+                && (n.parent.data.name === 'Open-Tree-of-Life'))
+            n.precalc.txt2 = n.precalc.clickable ? id : ''
+            
+            if (n.precalc.txt) return n.precalc.txt 
+            else return undefined
+        }  
         return model
     }    
     

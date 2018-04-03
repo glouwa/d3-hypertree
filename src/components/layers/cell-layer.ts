@@ -36,10 +36,11 @@ export class CellLayer implements ILayer
             name:              this.name,
             className:         'cell',
             elementType:       'polygon',
-            create:            s=> s.classed("root",      d=> !d.data.parent)   
+            create:            s=> s.classed("leaf", false)/*s.classed("root",      d=> !d.data.parent)   */
+                                    .classed("lazy", true),/*
                                     .classed("lazy",      d=> d.data.hasOutChildren)                                 
-                                    .classed("leaf",      d=> !d.data.children),
-            updateColor:       s=> s.classed("lazy",      d=> d.data.hasOutChildren),
+                                    .classed("leaf",      d=> !d.data.children),*/
+            updateColor:       s=> {},//s.classed("lazy",      d=> d.data.hasOutChildren),
                                     //.classed("hovered",   d=> d.data.isPartOfAnyHoverPath && d.data.parent)
                                     //.classed("selected",  d=> d.data.isPartOfAnySelectionPath && d.data.parent),
             updateTransform:   s=> s//.classed("lazy",      d=> d.data.hasOutChildren)                                 

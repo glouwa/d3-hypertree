@@ -104,11 +104,18 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
     
     const t3 = performance.now()
 
-    if (!ud.view.hypertree.isAnimationRunning())
-        doVoronoiStuff(ud, cache) 
-    
     if (!ud.view.hypertree.isAnimationRunning()) 
         doLabelStuff(ud, cache)        
+
+    /*
+    voro wrid gebraucht:
+    - mouse up: um click voro zu berechnen
+    - celllayer still enabled
+    - cellayer anitmation enabled        
+    */
+    if (!ud.view.hypertree.isAnimationRunning() || 
+        (ud.layerStack && !ud.layerStack.layers['cells'].args.hideOnDrag)) 
+        doVoronoiStuff(ud, cache) 
 
     if (!ud.view.hypertree.isAnimationRunning())
         doImageStuff(ud, cache)
