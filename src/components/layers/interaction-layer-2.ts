@@ -169,7 +169,7 @@ export class InteractionLayer2 implements ILayer
             this.view.unitdisk.args.transformation.onDragStart(m)
             this.panStart = m
             this.nopinch = true
-            console.log('still --> pan')
+            //console.log('still --> pan')
         }
         else if (this.view.hypertree.args.objects.traces.length === 2) {
             const t0 = this.view.hypertree.args.objects.traces[0]
@@ -178,7 +178,7 @@ export class InteractionLayer2 implements ILayer
             this.pinchInitλp = this.view.unitdisk.args.transformation.state.λ
             this.nopinch = false
             this.pinchcenter = CmulR(CaddC(t0e, m), .5)
-            console.log('pan --> pinch')
+            //console.log('pan --> pinch')
         }
         else {
         }
@@ -205,7 +205,7 @@ export class InteractionLayer2 implements ILayer
             
             if (newλp < this.maxλ && newλp > this.minλ) 
             {
-                console.log('pinch ok', f, this.pinchInitλp, newλp)
+                //console.log('pinch ok', f, this.pinchInitλp, newλp)
                 const t = this.view.unitdisk.args.transformation
                 const origCenterNodePos = t.cache.centerNode.cache 
                 const pinchcenter2 = CmulR(CaddC(t0e, t1e), .5)
@@ -238,7 +238,7 @@ export class InteractionLayer2 implements ILayer
                 this.click(m)
             }
             else {
-                console.log('pan --> still')
+                //console.log('pan --> still')
             }
         }
         else if (this.view.hypertree.args.objects.traces.length === 1) 
@@ -246,7 +246,7 @@ export class InteractionLayer2 implements ILayer
             this.view.unitdisk.args.transformation.onDragStart(m)
             const otherPoints = this.view.hypertree.args.objects.traces[0].points
             this.panStart = otherPoints[otherPoints.length-1] //others.lastpoint
-            console.log('pinch --> pan')
+            //console.log('pinch --> pan')
         }
         else 
         {

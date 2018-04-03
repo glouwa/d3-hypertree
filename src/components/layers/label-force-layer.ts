@@ -121,13 +121,21 @@ export class LabelForceLayer implements ILayer
         this.simulation.force("link")
             .links(labellinks)
 
-        console.log('labelSetUpdate')
+        //console.log('labelSetUpdate')
     }
 
     simulationTick() {
     }
 
     private attach() {
+        function calctransform(d, i, v) {
+            bboxOffset(d)(v[i])
+            if (!d.forcepoints)
+                return ` translate(${d.cache.re} ${d.cache.im})` 
+            console.assert(d.forcepoints.x || d.depth === 0)
+            return ` translate(${(d.forcepoints.x||0)-d.precalc.labellen/2} ${d.forcepoints.y||0})`
+        }
+
         this.d3updatePattern = new D3UpdatePattern({
             parent:            this.view.parent,
             layer:             this,
@@ -140,15 +148,10 @@ export class LabelForceLayer implements ILayer
                                     .classed("caption-icon", d=> d.precalc.icon && navigator.platform.includes('inux'))
                                     //.style("fill",           d=> d.pathes.finalcolor)
                                     .style("stroke",         d=> d.pathes && d.pathes.labelcolor)
-                                    .text(                   this.args.text),
+                                    .text(                   this.args.text)
+                                    .attr("transform",       calctransform),
             updateColor:       s=> s.style("stroke",         d=> d.pathes && d.pathes.labelcolor),
-            updateTransform:   s=> s.attr("transform",       (d, i, v)=> {
-                                        bboxOffset(d)(v[i])
-                                        if (!d.forcepoints)
-                                            return ``
-                                        console.assert(d.forcepoints.x || d.depth === 0)
-                                        return ` translate(${(d.forcepoints.x||0)-d.precalc.labellen/2} ${d.forcepoints.y||0})`
-                                    })
+            updateTransform:   s=> s.attr("transform",       calctransform)
         })
 
         this.d3updatePattern2 = new D3UpdatePattern({
