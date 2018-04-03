@@ -74,7 +74,7 @@ export class LabelForceLayer implements ILayer
             .force("charge",  d3.forceManyBody()
                 .strength(-.05))
             .force("collide", d3.forceCollide()
-                .strength(.003)
+                .strength(.002)
                 .radius(.18)) // .18
             .force('gravity', d3f(0,0)                
                 .strength(-.001))
