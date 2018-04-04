@@ -673,10 +673,11 @@ export class Hypertree
                         return Math.max(max, n.layout.zp.r)
                     }, 0)
 
+                    /*
                 console.log('maxR, lambda, uccount',
                  maxR.toFixed(2), 
                  animλ.toFixed(2), 
-                 this.args.geometry.transformation.cache.unculledNodes.length)
+                 this.args.geometry.transformation.cache.unculledNodes.length)*/
 
                 if (maxR > (this.args.initMaxL || .85))
                 {   

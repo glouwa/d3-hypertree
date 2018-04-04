@@ -104,7 +104,9 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
     
     const t3 = performance.now()
 
-    if (!ud.view.hypertree.isAnimationRunning()) 
+    if (!ud.view.hypertree.isAnimationRunning() ||
+        (ud.layerStack && !ud.layerStack.layers['labels-force'].args.hideOnDrag) ||
+        (ud.layerStack && !ud.layerStack.layers['labels'].args.hideOnDrag)) 
         doLabelStuff(ud, cache)        
 
     /*
