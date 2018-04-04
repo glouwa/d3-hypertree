@@ -152,6 +152,7 @@ export class LabelForceLayer implements ILayer
                                     .attr("transform",       calctransform),
             updateColor:       s=> s.style("stroke",         d=> d.pathes && d.pathes.labelcolor),
             updateTransform:   s=> s.attr("transform",       calctransform)
+                                    .text(                   this.args.text)
         })
 
         function calcXY(d, xy, fp) {

@@ -146,7 +146,7 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
         const model = presets.otolModel()   
         model.geometry.nodeRadius = nodeInitRNoInner(.0001)
         model.geometry.nodeScale = nodeScaleNoInner
-        model.initMaxL = .75
+        model.initMaxL = .55
         model.onNodeSelect = s=> { console.log('###########', s) }
         model.geometry.nodeFilter = n=> true                
         model.caption = (ht:Hypertree, n:N)=> {

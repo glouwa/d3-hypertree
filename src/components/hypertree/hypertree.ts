@@ -428,9 +428,21 @@ export class Hypertree
                 n.layoutReference = null
                 n.pathes = {}
                 n.globelhtid = globelhtid
-                shuffleArray(n.children)
+                shuffleArray(n.children) // get index
             })
             //.sum(this.args.weight) // this.updateWeights()
+
+        
+        const startAngle    = 3 * π / 2
+        const defAngleWidth = 1.5 * π //* 1.999999999999
+        const sad           = 2.0
+        this.data.layout = {
+            wedge: {
+                α: πify(startAngle - defAngleWidth/sad),
+                Ω: πify(startAngle + defAngleWidth/sad)
+            }
+        }
+        setZ(this.data, { re:0, im:0 })
 
         this.view_.html.querySelector('.preloader').innerHTML = ''
         this.modelMeta = { Δ: [t1-t0, t2-t1, performance.now()-t2], filesize:dl }
@@ -607,23 +619,8 @@ export class Hypertree
 
     private updateLayout_(preservingnode:N) : void {
         //app.toast('Layout')
-        var t0 = performance.now()
-
-        const π = Math.PI  
-        const startAngle    = 3 * π / 2
-        const defAngleWidth = 1.5 * π //* 1.999999999999
-        const sad           = 2.0
-        
-        this.data.layout = {
-            wedge: {
-                α: πify(startAngle - defAngleWidth/sad),
-                Ω: πify(startAngle + defAngleWidth/sad)
-            }
-        }
-        setZ(this.data, { re:0, im:0 })
-
+        const t0 = performance.now()        
         const t = this.args.geometry.transformation
-
         preservingnode = preservingnode || t.cache.centerNode
 
         if (preservingnode)
@@ -652,16 +649,16 @@ export class Hypertree
         //this.args.geometry.transformation.cache.centerNode = undefined
         
         this.animation = true
-        var step = 0, steps = 50
+        var step = 0, steps = 25
         var frame = ()=>
         {
-            var p = step++/steps
+            const p = sigmoid(step++/steps)
             if (step > steps)
                 this.animation = false
             
             else {
                 // new P, λ values
-                var λ = .02 + p * .9
+                var λ = .02 + p * .7
                 var animλ = λ
                 this.args.geometry.transformation.state.λ = animλ                
 
