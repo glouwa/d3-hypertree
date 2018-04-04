@@ -74,7 +74,7 @@ export class LabelForceLayer implements ILayer
             .force("charge",  d3.forceManyBody()
                 .strength(-.05))
             .force("collide", d3.forceCollide()
-                .strength(.002)
+                .strength(.0025)
                 .radius(.18)) // .18
             .force('gravity', d3f(0,0)                
                 .strength(-.001))
@@ -100,7 +100,7 @@ export class LabelForceLayer implements ILayer
             console.assert(typeof n.forcepoints.y === 'number')
 
             n.forcepoints2    = n.forcepoints2 || {}            
-            n.forcepoints2.index = n.mergeId+1000
+            n.forcepoints2.index = n.mergeId+2000
             n.forcepoints2.fx = n.cache.re
             n.forcepoints2.fy = n.cache.im
             console.assert(typeof n.forcepoints2.fx === 'number')
