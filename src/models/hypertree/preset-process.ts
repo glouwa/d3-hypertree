@@ -9,7 +9,7 @@ export function doVoronoiStuff(ud:IUnitDisk, cache:TransformationCache) {
     //voro muss mindestens clickable enthalten für mousetonode bei click
         
     cache.voronoiDiagram = ud.voronoiLayout(
-        cache.unculledNodes.filter((n:N)=> n.precalc.clickable)
+        cache.unculledNodes.filter((n:N)=> n.precalc.clickable || n.data.idx)
         //cache.labels
         /*.filter(n=> 
             (n.cachep.r <= ud.cache.wikiR && n.precalc.label.startsWith('𝐖')) ||

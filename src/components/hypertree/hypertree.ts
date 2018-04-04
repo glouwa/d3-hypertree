@@ -422,6 +422,7 @@ export class Hypertree
             .each((n:any)=> {
                 n.mergeId = ncount++
                 n.value = null
+                n.data = n.data || {}
                 n.precalc = {}
                 n.layout = null
                 n.layoutReference = null
@@ -435,7 +436,7 @@ export class Hypertree
         this.modelMeta = { Δ: [t1-t0, t2-t1, performance.now()-t2], filesize:dl }
         
         var t3 = performance.now()
-        this.updateLayout_() // all?
+        //this.updateLayout_() // all?
         //this.data = this.args.layout(this.data, this.args.geometry.transformation.state)
         this.unitdisk.args.data = this.data
         this.args.geometry.transformation.cache.N = this.data.descendants().length
@@ -604,7 +605,7 @@ export class Hypertree
                           / (Math.log2(this.data.value || this.data.children.length) || 1)        
     }
 
-    private updateLayout_(/*preservingnode*/) : void {
+    private updateLayout_(preservingnode:N) : void {
         //app.toast('Layout')
         var t0 = performance.now()
 
@@ -623,16 +624,18 @@ export class Hypertree
 
         const t = this.args.geometry.transformation
 
-        if (t.cache.centerNode)
-            t.cache.centerNode.ancestors().reverse().forEach(n=> {
+        preservingnode = preservingnode || t.cache.centerNode
+
+        if (preservingnode)
+            preservingnode.ancestors().reverse().forEach(n=> {
                 this.args.layout(n, this.args.geometry.transformation.state.λ, true)    
             })
         else
             this.args.layout(this.data, this.args.geometry.transformation.state.λ)
        
         
-        if (t.cache.centerNode) 
-            t.state.P = CmulR(t.cache.centerNode.layout.z, -1) 
+        if (preservingnode) 
+            t.state.P = CmulR(preservingnode.layout.z, -1) 
         else
             console.warn('no layout compensation')
             

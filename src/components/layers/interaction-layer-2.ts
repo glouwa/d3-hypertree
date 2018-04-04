@@ -74,7 +74,7 @@ export class InteractionLayer2 implements ILayer
         if (this.mousedown)
             this.fireMouseEvent('onPointerMove')                    
         else {            
-            //this.htapi.setPathHead(this.hoverpath, this.findNodeByCell())
+            this.htapi.setPathHead(this.hoverpath, this.findNodeByCell())
         }
     }
 
@@ -132,15 +132,12 @@ export class InteractionLayer2 implements ILayer
         if (newλp < this.maxλ && newλp > this.minλ) 
         {
             const t = this.view.unitdisk.args.transformation
-            const origCenterNodePos = t.cache.centerNode.cache 
-            console.assert(t.cache.centerNode)
+            //const preservingNode = t.cache.centerNode
+            const preservingNode = this.findUnculledNodeByCell(ArrtoC(this.currMousePosAsArr()))
 
             t.onDragλ(newλp)
-            this.view.hypertree.updateLayout_() // only path to center
-            t.state.P = compose(
-                t.state, 
-                shift(t.state, { re:0, im:0 }, origCenterNodePos)
-            ).P
+            this.view.hypertree.updateLayout_(preservingNode) // only path to center
+            t.state.P = compose(t.state, shift(t.state, { re:0, im:0 }, preservingNode.cache)).P
 
             this.view.hypertree.update.layout()
             //this.view.layerstack.layers['labels-force'].update.force()   
@@ -207,12 +204,14 @@ export class InteractionLayer2 implements ILayer
             {
                 //console.log('pinch ok', f, this.pinchInitλp, newλp)
                 const t = this.view.unitdisk.args.transformation
-                const origCenterNodePos = t.cache.centerNode.cache 
+                //const preservingNode = t.cache.centerNode
+                const preservingNode = this.findUnculledNodeByCell(this.pinchcenter)            
+                
                 const pinchcenter2 = CmulR(CaddC(t0e, t1e), .5)
 
                 t.onDragλ(newλp)
-                this.view.hypertree.updateLayout_() // only path to center
-                t.state.P = compose(t.state, shift(t.state, { re:0, im:0 }, origCenterNodePos)).P
+                this.view.hypertree.updateLayout_(preservingNode) // only path to center
+                t.state.P = compose(t.state, shift(t.state, { re:0, im:0 }, preservingNode.cache )).P
                 t.state.P = compose(t.state, shift(t.state, this.pinchcenter, pinchcenter2)).P
 
                 this.pinchcenter = CmulR(CaddC(this.pinchcenter, pinchcenter2), .5)
@@ -281,6 +280,16 @@ export class InteractionLayer2 implements ILayer
     private findNodeByCell = ()=> {
         var m = this.currMousePosAsArr()
         var find = this.view.unitdisk.cache.voronoiDiagram.find(m[0], m[1])
+        return find ? find.data : undefined
+    }
+
+    private findUnculledNodeByCell = (m:C)=> {   
+        const voronoiLayout = d3.voronoi<N>()
+            .x(d=> d.cache.re)
+            .y(d=> d.cache.im)
+            .extent([[-2,-2], [2,2]])             
+        const voronoiDiagram = voronoiLayout(this.view.unitdisk.cache.unculledNodes)
+        const find = voronoiDiagram.find(m.re, m.im)
         return find ? find.data : undefined
     }
 
