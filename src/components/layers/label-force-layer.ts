@@ -76,8 +76,8 @@ export class LabelForceLayer implements ILayer
             .force("collide", d3.forceCollide()
                 .strength(.0025)
                 .radius(.18)) // .18
-            .force('gravity', d3f(0,0)                
-                .strength(-.001))
+          //  .force('gravity', d3f(0,0)                
+         //       .strength(-.001))
             /*.on("tick", ()=> {
                 //console.log('sim tick')
                 this.update.transformation() 
