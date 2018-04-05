@@ -67,7 +67,7 @@ $nodeStroke:    #90caf9;
 
         .lazy           { stroke: darken($lazycolor, 15%);           fill: lighten($lazycolor, 5%);               }
         //.lazy.cell      { stroke: rgba(#fff, 1);                   fill: rgba(#2196f3, 0.08);            }
-        .lazy.cell      { stroke: rgba(#fff, 1); stroke-width:.0028;  fill: rgba(#2196f3, 0.022);            }
+        .lazy.cell      { stroke: rgba(#fff, 1); stroke-width:.0028;  fill: rgba(#2196f3, 0.05);            }
         .lazy.node      { stroke: rgba(darken($lazycolor, 20%), .5);                                              }
 
         .exit           { stroke: darken($exitcolor, 15%);           fill: lighten($exitcolor, 5%);               }
