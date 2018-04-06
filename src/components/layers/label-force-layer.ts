@@ -40,7 +40,7 @@ export class LabelForceLayer implements ILayer
                 return
 
             this.labelSetUpdate()
-            for (let i=0; i<75; i++)
+            for (let i=0; i<175; ++i)
                 this.simulation.tick()
             
         },
