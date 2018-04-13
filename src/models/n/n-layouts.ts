@@ -37,11 +37,12 @@ export function layoutUnitVectors(root) {
     return root
 }
 
-export function layoutUnitLines(root) {
+export function layoutUnitLines(root:N, λ:number, noRecursion=false) {
     //root.z = { re:0, im:0 }
     setZ(root, { re:0, im:0 })
-    for (let i=0; i<4; i++)
-        layoutPath(root.children[i], unitVectors[i], root.children[i].height)
+    if (root.children)
+        for (let i=0; i<root.children.length; i++)
+            layoutPath(root.children[i], unitVectors[i], root.children[i].height)
 
     function layoutPath(pathBegin, target, depth=30)
     {

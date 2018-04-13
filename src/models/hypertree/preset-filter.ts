@@ -14,6 +14,40 @@ var cullingRadius =   0.98
 var labelλExtension = 1.8
 var absMaxLabelR =    0.85 
 
+
+class Culler {
+    rangeNodes = { min:120, max:420 }
+    rangeMagic = { min:2,   max:500 }
+    alpha      = 1.05
+
+    public adjustMagic(ud:IUnitDisk, cache:TransformationCache) {
+        const rangeNodes = { min:120, max:420 }
+        const rangeMagic = { min:2,   max:500 }
+        const alpha      = 1.05
+        //stopUp
+        //stopDown
+        if (cache.unculledNodes) {
+            if (cache.unculledNodes.length > rangeNodes.max) {
+                if (ud.view.hypertree.args.magic > rangeMagic.min) { // ???
+                    ud.view.hypertree.args.magic /= alpha                
+                }
+            }
+            if (cache.unculledNodes.length < rangeNodes.min) {
+                if (ud.view.hypertree.args.magic < rangeMagic.max) { // ???
+                    ud.view.hypertree.args.magic *= alpha
+                }
+            }
+        }
+    }
+
+    public abortfilter(n, idx, highway) { // return false to abort
+        n.minWeight = highway[0].value / ud.view.hypertree.args.magic * mf
+        peocessNodeTransformation(ud, cache, n)
+        peocessNode(ud, cache, n, maxLabelR, n.minWeight)        
+        return !n.isOut
+    }
+}
+
 function adjustMagic(ud:IUnitDisk, cache:TransformationCache) {
     const rangeNodes = { min:120, max:420 }
     const rangeMagic = { min:2,   max:500 }
@@ -48,9 +82,10 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
     cache.unculledNodes = []    
     cache.spezialNodes =  [ud.args.data, startNode].filter(e=> e)
     cache.emojis =        []
-    
+  
+    const mf = ud.view.hypertree.isAnimationRunning() ? 1:1
     function abortfilter(n, idx, highway) { // return false to abort
-        n.minWeight = highway[0].value / ud.view.hypertree.args.magic
+        n.minWeight = highway[0].value / ud.view.hypertree.args.magic / mf
         peocessNodeTransformation(ud, cache, n)
         peocessNode(ud, cache, n, maxLabelR, n.minWeight)        
         return !n.isOut
