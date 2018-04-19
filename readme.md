@@ -1,117 +1,169 @@
 # Hypertree
 
-## Installation
+## Installing
 
-```bash
-git clone git@github.com:glouwa/gulp.git
-sudo npm run globalinstall
-npm install
+## Embedding
+
+## API Reference
+
+```typescript
+export interface HypertreeViewModel
+{    
+    model: HierarchyModel,
+    filter: Filter,
+    unitdisk: Space,
+    interaction: Interaction,
+}
 ```
 
-## Generating Tree of Life data
+Data D contains:
+- hierarchy, langmap,
+- and stuff calculated at load (of data or langmap).
+- at load also: convert objectrefs to N,
+- collect wikinodes
 
-```bash
-cd res
-
-gulp download
-
-gulp translate --lang en
-gulp translate --lang de
-
-gulp deploy
-
-cd ..
+```typescript
+export interface HierarchyModel
+{   
+    iconmap:      {},    
+    langmap:      {},
+    data:         N,
+    preactions:   ((hypertree:Hypertree, n:N)=> void)[],
+    objects: {
+        pathes:     Path[],
+        selections: N[],
+        traces:     Trace[],
+    },
+    
+}
 ```
 
-### The fast way (all languages pretranslated)
+This produces the rendered model EM (D->EM). contains:
+- (selective) layout 
+- (selective) transformation
+- sets or other for d3 prepared data structures
 
-```bash
-cd res
-gulp deploy
-cd ..
+```typescript
+export interface Filter
+{       
+    cullingRadius:   number,
+    cullingWeight:   number,
+    autoCw:          boolean | { min:number, max:number }, 
+    layout:          LayoutFunction,
+    transformation:  Transformation<N>,
+    cacheUpdate:     (ud:IUnitDisk)=> void,      
+    cache: {
+        centerNode:     N,
+        startNode:      N,
+        unculledNodes:  N[],
+        links:          N[],
+        leafOrLazy:     N[],                             
+        partOfAnyPath:  N[],
+        labels:         N[],
+        emojis:         N[],
+        images:         N[],                             
+        wikiRadius:     number,                              
+        voronoiDiagram: d3.VoronoiDiagram<N>,                              
+        cells:          d3.VoronoiPolygon<N>[]
+    }    
+}
 ```
 
-and download prebuild [data](https://drive.google.com/open?id=0B8M0Y20s74LkbG1XSHctME00NXc)
-and copy content to res/hierarchy/Open-Tree-of-Life/.
+contains
+- layers
+- global layer settings
+- used to create renderer(EM) 
+- renderer(EM) produces SVG
 
-'res/hierarchy/Open-Tree-of-Life/afrotheria/afrotheria.d3.json-de.lang.json'
-should be a valid path if done correctly.
-
-
-## Run
-
-```bash
-gulp watch
+```typescript
+export interface Space
+{   
+    layers:          ((ls:IUnitDisk)=> ILayer)[],
+    nodeFilter:      (n:N)=> options.filters.hasCircle,
+    nodeRadius:      number,
+    nodeScale:       d=> number,        
+    arcWidth:        d=> number,        
+    clipRadius:      number,                      
+    labelRadius:     number,
+    animateUpRadius: number    
+}
 ```
 
-Will build and open a browser window.
+```typescript
+export interface HypertreeModel
+{   
+    interaction: {
+        onNodeSelect: ((hypertree:Hypertree, n:N)=> void, 
+    },
+    model: {
+        preactions:   ((hypertree:Hypertree, n:N)=> void)[],                      
+        iconmap:      {},
+        langmap:      {},
+        data:         N,        
+        objects: {
+            pathes:     Path[],
+            selections: N[],
+            traces:     Trace[],
+        }
+    },
+    filter: {
+        cullingRadius:   number,
+        cullingWeight:   number,
+        autoCw:          boolean | { min:number, max:number}, 
+        layout:          LayoutFunction,
+        transformation:  Transformation<N>,
+        cacheUpdate:     (ud:IUnitDisk)=> void,      
+        nodeFilter:      (n:N)=> options.filters.hasCircle,
+        cache: {
+            centerNode:     N,
+            startNode:      N,
+            unculledNodes:  N[],
+            links:          N[],
+            leafOrLazy:     N[],                             
+            partOfAnyPath:  N[],
+            labels:         N[],
+            emojis:         N[],
+            images:         N[],                             
+            wikiRadius:     number,                              
+            voronoiDiagram: d3.VoronoiDiagram<N>,                              
+            cells:          d3.VoronoiPolygon<N>[]
+        }
+    },
+    unitdisk: {
+        layers:          ((ls:IUnitDisk)=> ILayer)[],
+        addLayer:        ['Traces', 'Axes'],
+        removeLayer:     ['Stem'],
+        
+        nodeRadius:      number,
+        nodeScale:       d=> number,        
+        arcWidth:        d=> number,        
+        clipRadius:      number,                      
+        labelRadius:     number,
+        animateUpRadius: number,
+    }
+}
+```
 
+```typescript
+export interface Interaction
+{   
+    onNodeSelect: ((hypertree:Hypertree, n:N)=> void
+}
+```
 
-## ISDS Project10
-Michael Glatzhofer
-0230699
-michael.glatzhofer@student.tugraz.at
-706.505  Projekt Informationssysteme  10 ECTS
-
-### refactoring
-    - split in 3, rollup, webpack (tests!), npm
-    - define api, extract infterface
-    - write howto
-    - reduce package size
-    - predefine api for
-    - configrable component, with configuation ui
-
-### features
-o upto a few thousand nodes
-o "perimeter culling"
-o hyperbolic zoom = radius adjustment
-o default zoom level (see whole tree)
-o label filtering
-    - by data (importance is defined in dataset)
-    - by algo
-o multi-touch events / responsive
-o level-of-detail drag (lines on drag, curves on refresh)
-    - lines on drag, curves on refresh
-    - hide labels on drag
-    - hide nodes on drag if nessessary
-o save as svg
-
-[o semantic (doi) filtering]
-
-
-### performace consderations
-    - svg into frame buffer = miniature using css transform ?
-    - is css fast? how to save as svg?
-    - dataset will be loaded completly
-    - svg elements limited
-    - javascript limitations
-        - currently all nodes are transformed from hyperbolic space to euclidian
-        - keep this if possible, otherwise:
-            - get a visible node, (the one under mouse?)
-            - transform children unitl r > .995 and add to visible set
-            - transform parent unitl r > .995 and add to visible set
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+```typescript
+export interface DecoModel
+{  
+    pathbuttons?: boolean,
+    metabuttons?: boolean            
+    navigation?: boolean | UnitdiskModel,  
+    meta?: boolean,  
+}
+```
+Youtube:
+- Hyperbolic Geometry: An Introduction
+  Uncommon Nonsense
+- Illuminating hyperbolic geometry
+  Henry Segerman
+- What Is The Shape of Space? (ft. PhD Comics)
+  minutephysics

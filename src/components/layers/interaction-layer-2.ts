@@ -126,7 +126,7 @@ export class InteractionLayer2 implements ILayer
         const mΔ = d3.event.deltaY
         const λΔ = mΔ / 100 / 8
         const oldλp = this.view.unitdisk.args.transformation.state.λ
-        const Δsens = 1.3
+        const Δsens = 1.175
         const newλp = (mΔ>=0 ? oldλp/Δsens : oldλp*Δsens) //- λΔ
         
         if (newλp < this.maxλ && newλp > this.minλ) 

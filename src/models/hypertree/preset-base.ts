@@ -55,7 +55,7 @@ var innerNodeScale = d=>
     d.precalc.weightScale
 
 var arcWidth = d=>
-    .022
+    .025
     * d.distScale
     * d.precalc.weightScale
 
