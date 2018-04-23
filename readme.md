@@ -161,6 +161,8 @@ export interface DecoModel
 }
 ```
 Youtube:
+- Visualizing the sphere and the hyperbolic plane: five projections of each
+  David Madorevivi
 - Hyperbolic Geometry: An Introduction
   Uncommon Nonsense
 - Illuminating hyperbolic geometry

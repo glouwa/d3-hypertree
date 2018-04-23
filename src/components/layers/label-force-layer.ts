@@ -147,10 +147,10 @@ export class LabelForceLayer implements ILayer
             create:            s=> s.classed("P",            d=> d.name == 'P')
                                     .classed("caption-icon", d=> d.precalc.icon && navigator.platform.includes('inux'))
                                     //.style("fill",           d=> d.pathes.finalcolor)
-                                    .style("stroke",         d=> d.pathes && d.pathes.labelcolor)
+                                    .style("fill",         d=> d.pathes && d.pathes.labelcolor)
                                     .text(                   this.args.text)
                                     .attr("transform",       calctransform),
-            updateColor:       s=> s.style("stroke",         d=> d.pathes && d.pathes.labelcolor),
+            updateColor:       s=> s.style("fill",         d=> d.pathes && d.pathes.labelcolor),
             updateTransform:   s=> s.attr("transform",       calctransform)
                                     .text(                   this.args.text)
         })
