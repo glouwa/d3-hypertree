@@ -1,8 +1,54 @@
 # Hypertree
 
+A Scalable Intercative Web Component for Hyperbolic Tree Visualisation
+
+![Screen shot](res/img/screenshot.png?raw=true)
+
 ## Installing
 
+```bash
+npm install d3-hypertree --save
+```
+
 ## Embedding
+The d3-hypertree component is build with Webpack and exposes a prebuild CommonJS module (dist/index.js). For custom builds please import "dist/js/components/hypertree/hypertree".
+The Components constructor taks two arguments: Parent element relation, 
+and hypertree component configuration (HypertreeViewModel), see API Reference for details.
+
+To embedd the component in a CommonJS module, add one of the folloing lines to your css file:
+
+```css
+@import 'd3-hypertree/dist/index-browser-light';
+```
+or
+```css
+@import 'd3-hypertree/dist/index-browser-dark';
+```
+
+And instantiate (in this case as child of document.body) the Component: 
+
+```typescript
+import { Hypertree } from 'd3-hypertree'
+const hypertree = new Hypertree(
+    {
+        parent: document.body,
+        preserveAspectRatio: "xMidYMid meet",
+    },
+    {
+        model: HierarchyModel,
+        filter: Filter,
+        unitdisk: Space,
+        interaction: Interaction,
+    })
+```
+
+If no packaging tool is used, the imports can be replaced by adding the following lines to your html:
+
+```html
+<link  href="(path to module)/d3-hypertree/dist/index-browser-light.css" rel="stylesheet">
+<script src="(path to module)/d3-hypertree/dist/index.js"></script>
+```
+
 
 ## API Reference
 
@@ -33,8 +79,7 @@ export interface HierarchyModel
         pathes:     Path[],
         selections: N[],
         traces:     Trace[],
-    },
-    
+    }
 }
 ```
 
