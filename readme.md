@@ -13,7 +13,7 @@ npm install d3-hypertree --save
 ## Embedding
 The d3-hypertree component is build with Webpack and exposes a prebuild CommonJS module (dist/index.js). For custom builds please import "dist/js/components/hypertree/hypertree".
 The Components constructor taks two arguments: Parent element relation, 
-and hypertree component configuration (HypertreeViewModel), see API Reference for details.
+and hypertree component configuration (HypertreeViewModel), see [API-Reference](#API-Reference) for details.
 
 To embedd the component in a CommonJS module, add one of the folloing lines to your css file:
 
@@ -25,10 +25,11 @@ or
 @import 'd3-hypertree/dist/index-browser-dark';
 ```
 
-And instantiate (in this case as child of document.body) the Component: 
+and instantiate (in this case as child of document.body) the Component: 
 
 ```typescript
 import { Hypertree } from 'd3-hypertree'
+
 const hypertree = new Hypertree(
     {
         parent: document.body,
@@ -50,7 +51,10 @@ If no packaging tool is used, the imports can be replaced by adding the followin
 ```
 
 
-## API Reference
+## API-Reference
+
+A HypertreeViewModel object is passed as second argument to the Hypertree contructor.
+
 
 ```typescript
 export interface HypertreeViewModel
@@ -61,6 +65,15 @@ export interface HypertreeViewModel
     interaction: Interaction,
 }
 ```
+
+
+| Name            | Type            | Default       | Description            |         
+|-----------------|-----------------|---------------|------------------------|
+| model           | {}              | -             | visualized hierarchy data, including additional objects like tree pathes and selected (highlighted) nodes, as well as a icon map  for landmark nodes, and a language translation map. See section [HierarchyModel](#HierarchyModel).
+| filter          | {}              |               | visualized hierarchy data, including additional objects like tree pathes and selected (highlighted) nodes, as well as a icon map  for landmark nodes, and a language translation map. See section [HierarchyModel](#HierarchyModel).
+
+
+## HierarchyModel
 
 Data D contains:
 - hierarchy, langmap,
