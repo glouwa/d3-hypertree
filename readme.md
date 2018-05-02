@@ -1,8 +1,19 @@
 # Hypertree
 
-A Scalable Intercative Web Component for Hyperbolic Tree Visualisation
+A Scalable Intercative Web Component for Hyperbolic Tree Visualisations
 
 ![Screen shot](res/img/screenshot.png?raw=true)
+
+## Contents
+- [Installing](#installing)
+- [Embedding](#embedding)
+- [API Reference](#apireference)
+    - [Hypertree](#hypertree)
+    - [Hypertree Configuration](#hypertreeviewmodel)
+        - [Hierarchy model](#hierarchymodel)
+        - [Filter](#filter)
+        - [Geometry](#geometry)
+        - [Interaction](#interaction)
 
 ## Installing
 
@@ -11,11 +22,14 @@ npm install d3-hypertree --save
 ```
 
 ## Embedding
-The d3-hypertree component is build with Webpack and exposes a prebuild CommonJS module (dist/index.js). For custom builds please import "dist/js/components/hypertree/hypertree".
-The Components constructor taks two arguments: Parent element relation, 
-and hypertree component configuration (HypertreeViewModel), see [API-Reference](#apireference) for details.
+The d3-hypertree component is build with Webpack and exposes a prebuild CommonJS
+module (dist/index.js). For custom builds please import 
+"dist/js/components/hypertree/hypertree". The Components constructor takes two 
+arguments: Parent element relation, and hypertree component configuration 
+(HypertreeViewModel), see [API-Reference](#apireference) for details.
 
-To embedd the component in a CommonJS module, add one of the folloing lines to your css file:
+To embedd the component in a CommonJS module, add one of the folloing lines 
+to your css file:
 
 ```css
 @import 'd3-hypertree/dist/index-browser-light';
@@ -38,94 +52,78 @@ const hypertree = new Hypertree(
     {
         model: HierarchyModel,
         filter: Filter,
-        unitdisk: Space,
+        geometry: Geometry,
         interaction: Interaction,
-    })
+    }
+)
 ```
 
-If no packaging tool is used, the imports can be replaced by adding the following lines to your html:
+If no packaging tool is used, the imports can be replaced by adding the following 
+lines to your html:
 
 ```html
 <link  href="(path to module)/d3-hypertree/dist/index-browser-light.css" rel="stylesheet">
 <script src="(path to module)/d3-hypertree/dist/index.js"></script>
 ```
 
+## <a name="apireference"></a> API Reference
 
-## <a name="apireference"></a> API-Reference
+TODO: describe Hypertree
 
-A HypertreeViewModel object is passed as second argument to the Hypertree contructor.
+### <a name="hypertree"></a> Hypertree Component
 
+### <a name="hypertreeviewmodel"></a> HypertreeViewModel
+
+The HypertreeViewModel object is passed as second argument to the Hypertree
+contructor.
 
 ```typescript
 export interface HypertreeViewModel
 {    
     model: HierarchyModel,
     filter: Filter,
-    unitdisk: Space,
+    geometry: Space,
     interaction: Interaction,
 }
 ```
 
-
 | Name            | Type            | Default       | Description            |         
 |-----------------|-----------------|---------------|------------------------|
-| model           | {}              | -             | visualized hierarchy data, including additional objects like tree pathes and selected (highlighted) nodes, as well as a icon map  for landmark nodes, and a language translation map. See section [HierarchyModel](#HierarchyModel).
-| filter          | {}              |               | visualized hierarchy data, including additional objects like tree pathes and selected (highlighted) nodes, as well as a icon map  for landmark nodes, and a language translation map. See section [HierarchyModel](#HierarchyModel).
+| model           | {}              | -             | Visualized hierarchy data, including additional objects like tree pathes and selected (highlighted) nodes, as well as a icon map  for landmark nodes, and a language translation map. See section [HierarchyModel](#hierarchymodel) for details. |
+| filter          | {}              |               | Scalability is achieved by permieter culling and weight culling. Permimeter culling removed small nodes near the unit circle, weight culling removes nodes width small weight. This configuration is only necessary if the dataset contains more than 1000 nodes. See section [Filter](#filter) for details. |
+| filter          | {}              |               | See section [Filter](#filter). |
+| geometry        | {}              |               | See section [Geometry](#geometry). |
+| interaction     | {}              |               | See section [Interaction](#interaction). |
 
-
-## HierarchyModel
-
-Data D contains:
-- hierarchy, langmap,
-- and stuff calculated at load (of data or langmap).
-- at load also: convert objectrefs to N,
-- collect wikinodes
+#### <a name="hierarchymodel"></a> HierarchyModel
 
 ```typescript
 export interface HierarchyModel
 {   
     iconmap:      {},    
     langmap:      {},
-    data:         N,
-    preactions:   ((hypertree:Hypertree, n:N)=> void)[],
+    data:         N,    
     objects: {
         pathes:     Path[],
         selections: N[],
-        traces:     Trace[],
     }
 }
 ```
 
-This produces the rendered model EM (D->EM). contains:
-- (selective) layout 
-- (selective) transformation
-- sets or other for d3 prepared data structures
+####  <a name="filter"></a> Filter
 
 ```typescript
 export interface Filter
 {       
     cullingRadius:   number,
-    cullingWeight:   number,
-    autoCw:          boolean | { min:number, max:number }, 
+    cullingWeight:   number | { min:number, max:number }, 
+    weightfunction:  (n)=> number,
     layout:          LayoutFunction,
     transformation:  Transformation<N>,
-    cacheUpdate:     (ud:IUnitDisk)=> void,      
-    cache: {
-        centerNode:     N,
-        startNode:      N,
-        unculledNodes:  N[],
-        links:          N[],
-        leafOrLazy:     N[],                             
-        partOfAnyPath:  N[],
-        labels:         N[],
-        emojis:         N[],
-        images:         N[],                             
-        wikiRadius:     number,                              
-        voronoiDiagram: d3.VoronoiDiagram<N>,                              
-        cells:          d3.VoronoiPolygon<N>[]
-    }    
 }
 ```
+
+####  <a name="geometry"></a> Geometry
 
 contains
 - layers
@@ -146,6 +144,28 @@ export interface Space
     animateUpRadius: number    
 }
 ```
+
+
+####  <a name="interaction"></a> Interaction
+
+```typescript
+export interface Interaction
+{   
+    onNodeSelect: ((hypertree:Hypertree, n:N)=> void
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
 
 ```typescript
 export interface HypertreeModel
@@ -202,12 +222,7 @@ export interface HypertreeModel
 }
 ```
 
-```typescript
-export interface Interaction
-{   
-    onNodeSelect: ((hypertree:Hypertree, n:N)=> void
-}
-```
+
 
 ```typescript
 export interface DecoModel
