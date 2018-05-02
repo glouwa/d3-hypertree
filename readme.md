@@ -68,10 +68,10 @@ lines to your html:
 ```
 
 ## <a name="apireference"></a> API Reference
-
 TODO: describe Hypertree
 
 ### <a name="hypertreecomponent"></a> Hypertree Component
+TODO: describe Hypertree Component (api, update)
 
 ### <a name="hypertreeviewmodel"></a> HypertreeViewModel
 
@@ -110,6 +110,14 @@ export interface HierarchyModel
 }
 ```
 
+| Name            | Type            | Default       | Description            |         
+|-----------------|-----------------|---------------|------------------------|
+| model           | {}              | -             |                        |
+| filter          | {}              |               |                        |
+| geometry        | {}              |               |                        |
+| interaction     | {}              |               |                        |
+
+
 ####  <a name="filter"></a> Filter
 
 ```typescript
@@ -123,13 +131,14 @@ export interface Filter
 }
 ```
 
-####  <a name="geometry"></a> Geometry
+| Name            | Type            | Default       | Description            |         
+|-----------------|-----------------|---------------|------------------------|
+| model           | {}              | -             |                        |
+| filter          | {}              |               |                        |
+| geometry        | {}              |               |                        |
+| interaction     | {}              |               |                        |
 
-contains
-- layers
-- global layer settings
-- used to create renderer(EM) 
-- renderer(EM) produces SVG
+####  <a name="geometry"></a> Geometry
 
 ```typescript
 export interface Space
@@ -144,7 +153,12 @@ export interface Space
     animateUpRadius: number    
 }
 ```
-
+| Name            | Type            | Default       | Description            |         
+|-----------------|-----------------|---------------|------------------------|
+| model           | {}              | -             |                        |
+| filter          | {}              |               |                        |
+| geometry        | {}              |               |                        |
+| interaction     | {}              |               |                        |
 
 #### <a name="interaction"></a> Interaction
 
@@ -154,6 +168,13 @@ export interface Interaction
     onNodeSelect: ((hypertree:Hypertree, n:N)=> void
 }
 ```
+
+| Name            | Type            | Default       | Description            |         
+|-----------------|-----------------|---------------|------------------------|
+| model           | {}              | -             |                        |
+| filter          | {}              |               |                        |
+| geometry        | {}              |               |                        |
+| interaction     | {}              |               |                        |
 
 ## <a name="default"></a> Example Configuration (Default Configuration)
 
