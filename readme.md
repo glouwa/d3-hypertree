@@ -8,12 +8,13 @@ A Scalable Intercative Web Component for Hyperbolic Tree Visualisations
 - [Installing](#installing)
 - [Embedding](#embedding)
 - [API Reference](#apireference)
-    - [Hypertree](#hypertree)
+    - [Hypertree Component](#hypertreecomponent)
     - [Hypertree Configuration](#hypertreeviewmodel)
-        - [Hierarchy model](#hierarchymodel)
+        - [Model](#hierarchymodel)
         - [Filter](#filter)
         - [Geometry](#geometry)
         - [Interaction](#interaction)
+- [Example Configuration](#default)
 
 ## Installing
 
@@ -26,7 +27,7 @@ The d3-hypertree component is build with Webpack and exposes a prebuild CommonJS
 module (dist/index.js). For custom builds please import 
 "dist/js/components/hypertree/hypertree". The Components constructor takes two 
 arguments: Parent element relation, and hypertree component configuration 
-(HypertreeViewModel), see [API-Reference](#apireference) for details.
+(HypertreeViewModel), see [Hypertree Configuration](#hypertreeviewmodel) for details.
 
 To embedd the component in a CommonJS module, add one of the folloing lines 
 to your css file:
@@ -70,7 +71,7 @@ lines to your html:
 
 TODO: describe Hypertree
 
-### <a name="hypertree"></a> Hypertree Component
+### <a name="hypertreecomponent"></a> Hypertree Component
 
 ### <a name="hypertreeviewmodel"></a> HypertreeViewModel
 
@@ -91,7 +92,6 @@ export interface HypertreeViewModel
 |-----------------|-----------------|---------------|------------------------|
 | model           | {}              | -             | Visualized hierarchy data, including additional objects like tree pathes and selected (highlighted) nodes, as well as a icon map  for landmark nodes, and a language translation map. See section [HierarchyModel](#hierarchymodel) for details. |
 | filter          | {}              |               | Scalability is achieved by permieter culling and weight culling. Permimeter culling removed small nodes near the unit circle, weight culling removes nodes width small weight. This configuration is only necessary if the dataset contains more than 1000 nodes. See section [Filter](#filter) for details. |
-| filter          | {}              |               | See section [Filter](#filter). |
 | geometry        | {}              |               | See section [Geometry](#geometry). |
 | interaction     | {}              |               | See section [Interaction](#interaction). |
 
@@ -117,7 +117,7 @@ export interface Filter
 {       
     cullingRadius:   number,
     cullingWeight:   number | { min:number, max:number }, 
-    weightfunction:  (n)=> number,
+    weights:         (n)=> number,
     layout:          LayoutFunction,
     transformation:  Transformation<N>,
 }
@@ -146,7 +146,7 @@ export interface Space
 ```
 
 
-####  <a name="interaction"></a> Interaction
+#### <a name="interaction"></a> Interaction
 
 ```typescript
 export interface Interaction
@@ -155,16 +155,7 @@ export interface Interaction
 }
 ```
 
-
-
-
-
-
-
-
-
-
-
+## <a name="default"></a> Example Configuration (Default Configuration)
 
 
 ```typescript
@@ -173,41 +164,22 @@ export interface HypertreeModel
     interaction: {
         onNodeSelect: ((hypertree:Hypertree, n:N)=> void, 
     },
-    model: {
-        preactions:   ((hypertree:Hypertree, n:N)=> void)[],                      
+    model: {        
         iconmap:      {},
         langmap:      {},
         data:         N,        
         objects: {
             pathes:     Path[],
-            selections: N[],
-            traces:     Trace[],
+            selections: N[],            
         }
     },
     filter: {
         cullingRadius:   number,
-        cullingWeight:   number,
-        autoCw:          boolean | { min:number, max:number}, 
+        cullingWeight:   number | { min:number, max:number}, 
         layout:          LayoutFunction,
-        transformation:  Transformation<N>,
-        cacheUpdate:     (ud:IUnitDisk)=> void,      
-        nodeFilter:      (n:N)=> options.filters.hasCircle,
-        cache: {
-            centerNode:     N,
-            startNode:      N,
-            unculledNodes:  N[],
-            links:          N[],
-            leafOrLazy:     N[],                             
-            partOfAnyPath:  N[],
-            labels:         N[],
-            emojis:         N[],
-            images:         N[],                             
-            wikiRadius:     number,                              
-            voronoiDiagram: d3.VoronoiDiagram<N>,                              
-            cells:          d3.VoronoiPolygon<N>[]
-        }
+        transformation:  Transformation<N>,        
     },
-    unitdisk: {
+    geometry: {
         layers:          ((ls:IUnitDisk)=> ILayer)[],
         addLayer:        ['Traces', 'Axes'],
         removeLayer:     ['Stem'],
@@ -222,7 +194,7 @@ export interface HypertreeModel
 }
 ```
 
-
+## Ignore it
 
 ```typescript
 export interface DecoModel
