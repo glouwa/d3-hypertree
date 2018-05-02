@@ -51,10 +51,10 @@ const htmlpreloader = `
 const bubbleSvgDef =
     `<defs>
         <radialGradient id="exampleGradient">            
-            <stop offset="58%"  stop-color="rgba(255,255,255, .08)"/>            
-            <stop offset="92%"  stop-color="rgba( 96, 96, 96, .08)"/>
-            <stop offset="98%"  stop-color="rgba( 36, 36, 36, .08)"/>
-            <stop offset="100%" stop-color="rgba( 0, 0, 0, .08)"   />
+            <stop offset="58%"  stop-color="rgb(255,255,255)" stop-opacity=".08"/>            
+            <stop offset="92%"  stop-color="rgb( 96, 96, 96)" stop-opacity=".08"/>
+            <stop offset="98%"  stop-color="rgb( 36, 36, 36)" stop-opacity=".08"/>
+            <stop offset="100%" stop-color="rgb(  0,  0,  0)" stop-opacity=".08"/>
         </radialGradient>
     </defs>` 
 
