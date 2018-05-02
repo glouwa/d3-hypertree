@@ -7,13 +7,12 @@ A Scalable Intercative Web Component for Hyperbolic Tree Visualisations
 ## Contents
 - [Installing](#installing)
 - [Embedding](#embedding)
-- [API Reference](#apireference)
-    - [Hypertree Component](#hypertreecomponent)
-    - [Hypertree Configuration](#hypertreeviewmodel)
-        - [Model](#hierarchymodel)
-        - [Filter](#filter)
-        - [Geometry](#geometry)
-        - [Interaction](#interaction)
+- [API Reference](#apireference)       
+    - [Model](#hierarchymodel)
+    - [Filter](#filter)
+    - [Geometry](#geometry)
+    - [Interaction](#interaction)
+- [Available Layers](#layers)        
 - [Example Configuration](#default)
 
 ## Installing
@@ -69,11 +68,7 @@ lines to your html:
 
 ## <a name="apireference"></a> API Reference
 TODO: describe Hypertree
-
-### <a name="hypertreecomponent"></a> Hypertree Component
-TODO: describe Hypertree Component (api, update)
-
-### <a name="hypertreeviewmodel"></a> HypertreeViewModel
+api and update table
 
 The HypertreeViewModel object is passed as second argument to the Hypertree
 contructor.
@@ -95,7 +90,7 @@ export interface HypertreeViewModel
 | geometry        | {}              |               | See section [Geometry](#geometry). |
 | interaction     | {}              |               | See section [Interaction](#interaction). |
 
-#### <a name="hierarchymodel"></a> HierarchyModel
+### <a name="hierarchymodel"></a> HierarchyModel
 
 ```typescript
 export interface HierarchyModel
@@ -118,7 +113,7 @@ export interface HierarchyModel
 | interaction     | {}              |               |                        |
 
 
-####  <a name="filter"></a> Filter
+###  <a name="filter"></a> Filter
 
 ```typescript
 export interface Filter
@@ -138,7 +133,7 @@ export interface Filter
 | geometry        | {}              |               |                        |
 | interaction     | {}              |               |                        |
 
-####  <a name="geometry"></a> Geometry
+###  <a name="geometry"></a> Geometry
 
 ```typescript
 export interface Space
@@ -160,7 +155,7 @@ export interface Space
 | geometry        | {}              |               |                        |
 | interaction     | {}              |               |                        |
 
-#### <a name="interaction"></a> Interaction
+### <a name="interaction"></a> Interaction
 
 ```typescript
 export interface Interaction
