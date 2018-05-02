@@ -13,7 +13,7 @@ npm install d3-hypertree --save
 ## Embedding
 The d3-hypertree component is build with Webpack and exposes a prebuild CommonJS module (dist/index.js). For custom builds please import "dist/js/components/hypertree/hypertree".
 The Components constructor taks two arguments: Parent element relation, 
-and hypertree component configuration (HypertreeViewModel), see [API-Reference](#API-Reference) for details.
+and hypertree component configuration (HypertreeViewModel), see [API-Reference](#apireference) for details.
 
 To embedd the component in a CommonJS module, add one of the folloing lines to your css file:
 
@@ -51,7 +51,7 @@ If no packaging tool is used, the imports can be replaced by adding the followin
 ```
 
 
-## API-Reference
+## <a name="apireference"></a> API-Reference
 
 A HypertreeViewModel object is passed as second argument to the Hypertree contructor.
 
