@@ -67,11 +67,13 @@ lines to your html:
 ```
 
 ## <a name="apireference"></a> API Reference
+<!-- 
 TODO: describe Hypertree
 api and update table
+-->
 
-The HypertreeViewModel object is passed as second argument to the Hypertree
-contructor.
+The Hypertree Configuration object is passed as second argument to the Hypertree
+contructor. It contains four sections which of only the model is obligate.
 
 ```typescript
 export interface HypertreeViewModel
@@ -87,10 +89,10 @@ export interface HypertreeViewModel
 |-----------------|-----------------|---------------|------------------------|
 | model           | {}              | -             | Visualized hierarchy data, including additional objects like tree pathes and selected (highlighted) nodes, as well as a icon map  for landmark nodes, and a language translation map. See section [HierarchyModel](#hierarchymodel) for details. |
 | filter          | {}              |               | Scalability is achieved by permieter culling and weight culling. Permimeter culling removed small nodes near the unit circle, weight culling removes nodes width small weight. This configuration is only necessary if the dataset contains more than 1000 nodes. See section [Filter](#filter) for details. |
-| geometry        | {}              |               | See section [Geometry](#geometry). |
-| interaction     | {}              |               | See section [Interaction](#interaction). |
+| geometry        | {}              |               | Defines visible layers and geometrical properties like node size, link curvature and others. See section [Geometry](#geometry). |
+| interaction     | {}              |               | Used for user defined interaction events. See section [Interaction](#interaction). |
 
-### <a name="hierarchymodel"></a> HierarchyModel
+### <a name="hierarchymodel"></a> Model
 
 ```typescript
 export interface HierarchyModel
@@ -99,7 +101,7 @@ export interface HierarchyModel
     langmap:      {},
     data:         N,    
     objects: {
-        pathes:     Path[],
+        pathes:     { N, N }[],
         selections: N[],
     }
 }
@@ -107,10 +109,11 @@ export interface HierarchyModel
 
 | Name            | Type            | Default       | Description            |         
 |-----------------|-----------------|---------------|------------------------|
-| model           | {}              | -             |                        |
-| filter          | {}              |               |                        |
-| geometry        | {}              |               |                        |
-| interaction     | {}              |               |                        |
+| iconmap         | {}              | {}            |                        |
+| langmap         | {}              | {}            |                        |
+| data            | N               | -             |                        |
+| objects.pathes  | { N, N }[]      | []            |                        |
+| objects.selections | N[]          | []            |                        |
 
 
 ###  <a name="filter"></a> Filter
@@ -136,7 +139,7 @@ export interface Filter
 ###  <a name="geometry"></a> Geometry
 
 ```typescript
-export interface Space
+export interface Geometry
 {   
     layers:          ((ls:IUnitDisk)=> ILayer)[],
     nodeFilter:      (n:N)=> options.filters.hasCircle,
@@ -159,17 +162,16 @@ export interface Space
 
 ```typescript
 export interface Interaction
-{   
+{
     onNodeSelect: ((hypertree:Hypertree, n:N)=> void
 }
 ```
 
 | Name            | Type            | Default       | Description            |         
 |-----------------|-----------------|---------------|------------------------|
-| model           | {}              | -             |                        |
-| filter          | {}              |               |                        |
-| geometry        | {}              |               |                        |
-| interaction     | {}              |               |                        |
+| omNodeSelect | ((hypertree:Hypertree, n:N)=> void | ()=> {} | Will be called when the user selects a node.     |
+
+### <a name="layers"></a> Available Layers
 
 ## <a name="default"></a> Example Configuration (Default Configuration)
 
