@@ -73,7 +73,7 @@ api and update table
 -->
 
 The Hypertree Configuration object is passed as second argument to the Hypertree
-contructor. It contains four sections which of only the model is obligate.
+contructor. It contains four sections which of only `model` is obligate.
 
 ```typescript
 export interface HypertreeViewModel
@@ -87,19 +87,19 @@ export interface HypertreeViewModel
 
 | Name            | Type            | Default       | Description            |         
 |-----------------|-----------------|---------------|------------------------|
-| model           | {}              | -             | Visualized hierarchy data, including additional objects like tree pathes and selected (highlighted) nodes, as well as a icon map  for landmark nodes, and a language translation map. See section [HierarchyModel](#hierarchymodel) for details. |
-| filter          | {}              |               | Scalability is achieved by permieter culling and weight culling. Permimeter culling removed small nodes near the unit circle, weight culling removes nodes width small weight. This configuration is only necessary if the dataset contains more than 1000 nodes. See section [Filter](#filter) for details. |
-| geometry        | {}              |               | Defines visible layers and geometrical properties like node size, link curvature and others. See section [Geometry](#geometry). |
-| interaction     | {}              |               | Used for user defined interaction events. See section [Interaction](#interaction). |
+| model           | `{}`            | -             | Visualized hierarchy data, including additional objects like tree pathes and selected (highlighted) nodes, as well as a icon map  for landmark nodes, and a language translation map. See section [HierarchyModel](#hierarchymodel) for details. |
+| filter          | `{}`            |               | Scalability is achieved by permieter culling and weight culling. Permimeter culling removed small nodes near the unit circle, weight culling removes nodes width small weight. This configuration is only necessary if the dataset contains more than 1000 nodes. See section [Filter](#filter) for details. |
+| geometry        | `{}`            |               | Defines visible layers and geometrical properties like node size, link curvature and others. See section [Geometry](#geometry). |
+| interaction     | `{}`            |               | Used for user defined interaction events. See section [Interaction](#interaction). |
 
 ### <a name="hierarchymodel"></a> Model
 
 ```typescript
 export interface HierarchyModel
 {   
-    iconmap:      {},    
-    langmap:      {},
     data:         N,    
+    iconmap:      {},    
+    langmap:      {},    
     objects: {
         pathes:     { N, N }[],
         selections: N[],
@@ -109,12 +109,11 @@ export interface HierarchyModel
 
 | Name            | Type            | Default       | Description            |         
 |-----------------|-----------------|---------------|------------------------|
-| iconmap         | {}              | {}            |                        |
-| langmap         | {}              | {}            |                        |
-| data            | N               | -             |                        |
-| objects.pathes  | { N, N }[]      | []            |                        |
-| objects.selections | N[]          | []            |                        |
-
+| data            | `N`             | -             | `N` is derived from d3-hierarchy node. See [D3 documentation](https://github.com/d3/d3-hierarchy/blob/master/README.md#hierarchy). It requirres an additional member id, which is used as key in iconmap and langmap to identify a node. d3.hierarchy and d3.stratify can be used if their input data contains such a member. |
+| langmap         | `{}`            | `{}`          | If data files should be language independant this translatino map may be used to translate node labels. |
+| iconmap         | `{}`            | `{}`          | Supports only unicode emojies |
+| objects.pathes  | `{ N, N }[]`    | `[]`          | This array specifys highlighted pathes within the tree. The used nodes must be references to nodes within data. |
+| objects.selections | `N[]`        | `[]`          | This array specifys highlighted nodes within the tree. The used nodes must be references to nodes within data. |
 
 ###  <a name="filter"></a> Filter
 
@@ -125,16 +124,20 @@ export interface Filter
     cullingWeight:   number | { min:number, max:number }, 
     weights:         (n)=> number,
     layout:          LayoutFunction,
-    transformation:  Transformation<N>,
+    transformation:  {
+        P: C,
+        λ: C,
+        θ: C,
+    }
 }
 ```
 
 | Name            | Type            | Default       | Description            |         
 |-----------------|-----------------|---------------|------------------------|
-| model           | {}              | -             |                        |
-| filter          | {}              |               |                        |
-| geometry        | {}              |               |                        |
-| interaction     | {}              |               |                        |
+| model           | `{}`            | -             |                        |
+| filter          | `{}`            |               |                        |
+| geometry        | `{}`            |               |                        |
+| interaction     | `{}`            |               |                        |
 
 ###  <a name="geometry"></a> Geometry
 
@@ -153,10 +156,10 @@ export interface Geometry
 ```
 | Name            | Type            | Default       | Description            |         
 |-----------------|-----------------|---------------|------------------------|
-| model           | {}              | -             |                        |
-| filter          | {}              |               |                        |
-| geometry        | {}              |               |                        |
-| interaction     | {}              |               |                        |
+| model           | `{}`            | -             |                        |
+| filter          | `{}`            |               |                        |
+| geometry        | `{}`            |               |                        |
+| interaction     | `{}`            |               |                        |
 
 ### <a name="interaction"></a> Interaction
 
@@ -169,48 +172,61 @@ export interface Interaction
 
 | Name            | Type            | Default       | Description            |         
 |-----------------|-----------------|---------------|------------------------|
-| omNodeSelect | ((hypertree:Hypertree, n:N)=> void | ()=> {} | Will be called when the user selects a node.     |
+| onNodeSelect | `((Hypertree, N)=> void` | `()=> {}` | Will be called when the user selects a node.     |
 
 ### <a name="layers"></a> Available Layers
+
+| Name            | Description                                              |         
+|-----------------|----------------------------------------------------------|
+|                 |                                                          |
 
 ## <a name="default"></a> Example Configuration (Default Configuration)
 
 
 ```typescript
-export interface HypertreeModel
-{   
-    interaction: {
-        onNodeSelect: ((hypertree:Hypertree, n:N)=> void, 
+import { Hypertree } from 'd3-hypertree'
+import { layouts } from 'd3-hypertree'
+
+const hypertree = new Hypertree(
+    {
+        parent: document.body,
+        preserveAspectRatio: "xMidYMid meet",
     },
-    model: {        
-        iconmap:      {},
-        langmap:      {},
-        data:         N,        
-        objects: {
-            pathes:     Path[],
-            selections: N[],            
-        }
-    },
-    filter: {
-        cullingRadius:   number,
-        cullingWeight:   number | { min:number, max:number}, 
-        layout:          LayoutFunction,
-        transformation:  Transformation<N>,        
-    },
-    geometry: {
-        layers:          ((ls:IUnitDisk)=> ILayer)[],
-        addLayer:        ['Traces', 'Axes'],
-        removeLayer:     ['Stem'],
-        
-        nodeRadius:      number,
-        nodeScale:       d=> number,        
-        arcWidth:        d=> number,        
-        clipRadius:      number,                      
-        labelRadius:     number,
-        animateUpRadius: number,
+    {   
+        model: {
+            iconmap: {},
+            langmap: {},
+            data:    d3.hierarchy(...),        
+            objects: {}
+        },
+        filter: {
+            cullingRadius:   .98,
+            cullingWeight:   { min:200, max:400 }, 
+            layout:          layouts.bergé,
+            transformation:  {
+                P: C,
+                θ: C,
+                λ: number,                
+            }
+        },
+        geometry: {            
+            addLayer:        ['Traces', 'Axes'],
+            removeLayer:     ['Stem'],            
+            nodeRadius:      .002,
+            nodeScale:       d=> scales.hyperbolic,        
+            arcWidth:        d=> Math.log(d.weight) * .002,        
+            clipRadius:      1,                      
+            labelRadius:     .9,
+            animateUpRadius: .7,
+        },
+        interaction: {
+            onNodeSelect: ((hypertree:Hypertree, n:N)=> void, 
+        },
     }
 }
 ```
+
+Note that filter, geometry and interaction can be omitted if default configuration should be used.
 
 ## Ignore it
 
