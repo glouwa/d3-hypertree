@@ -149,6 +149,8 @@ export interface Filter
 ```typescript
 export interface Geometry
 {   
+    addLayer:        ['traces', 'images'],
+    removeLayer:     ['stem-arc'],    
     nodeScale:       d=> number,
     arcWidth:        d=> number,
     clipRadius:      number,                      
@@ -158,11 +160,13 @@ export interface Geometry
 ```
 | Name            | Type            | Default       | Description            |         
 |-----------------|-----------------|---------------|------------------------|
+| nodeRadius      | `string[]`      | `[]`          | Enables additional layers. See [Layers](#layers) for details |
+| nodeRadius      | `string[]`      | `[]`          | Disables default layers. See [Layers](#layers) for details  |
 | nodeRadius      | `d=> number`    | `d=> acosh(d.pos.r)*.02` | Define node size for a node  |
 | arcWidth        | `d=> number`    | `d=> acosh(d.pos.r)*.015` | Define link width for a node  |
 | clipRadius      | `number`        | `1`           | Component clipping circle radius. Circle center at 0,0 |
 | labelRadius     | `number`        | `.005`        | Distance between label center and node center. Not applied on force dirceted label layout. |
-| animateUpRadius | `number|undefined` | `.8`       | If specified, transformation.λ will be set to a value such that the initial tree will fit within a circle with radius `animateUpRadius`. This circle is centered at transformation.P. |
+| animateUpRadius | `number or undefined` | `.8`       | If specified, transformation.λ will be set to a value such that the initial tree will fit within a circle with radius `animateUpRadius`. This circle is centered at transformation.P. |
 
 ### <a name="interaction"></a> Interaction
 
@@ -179,12 +183,22 @@ export interface Interaction
 
 ### <a name="layers"></a> Available Layers
 
-| Name            | Description                                              |         
-|-----------------|----------------------------------------------------------|
-|                 |                                                          |
+| Name            | Visibility (default) | Description                       |   
+|-----------------|---------|------------------------------------------------|
+| cell-layer      |         | Renders voronoi cells of nodes. Voronoi cells define mouse area of a node. |
+| center-node     | ✓       | Gray circle background for node next to 0,0    |
+| path-arcs       | ✓       | Hyperbolic arc links for pathes                |
+| path-lines      |         | Straight line links for pathes                 |
+| link-arcs       | ✓       | Hyperbolic arc links                           |
+| link-lines      |         | Straight line links                            |
+| nodes           | ✓       | Circle nodes                                   |
+| images          |         | Renders a image for each node with a imgref member. Imgref must be a valid image url. The image is centered at the node position |
+| emojis          | ✓       | Renders a emojie for each node occurring in iconmap |
+| labels          |         | Renders labels nex to node                     |
+| labels-force    | ✓       | Avoids label overlapping by a force directed layout. |
+| traces          |         | Shows touch interaction by rendering a polyline for each touch  |
 
 ## <a name="default"></a> Example Configuration (Default Configuration)
-
 
 ```typescript
 import { Hypertree } from 'd3-hypertree'
@@ -212,8 +226,8 @@ const hypertree = new Hypertree(
             }
         },
         geometry: {            
-            addLayer:        ['Traces', 'Axes'],
-            removeLayer:     ['Stem'],            
+            addLayer:        ['traces', 'images'],
+            removeLayer:     ['stem-arc'],            
             nodeRadius:      .002,
             nodeScale:       d=> scales.hyperbolic,        
             arcWidth:        d=> Math.log(d.weight) * .002,        
