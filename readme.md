@@ -75,6 +75,8 @@ api and update table
 The Hypertree Configuration object is passed as second argument to the Hypertree
 contructor. It contains four sections which of only `model` is obligate.
 
+Predefined configurations are found `d3-hypertree.presets`.
+
 ```typescript
 export interface HypertreeViewModel
 {    
@@ -112,7 +114,7 @@ export interface HierarchyModel
 | data            | `N`             | -             | `N` is derived from d3-hierarchy node. See [D3 documentation](https://github.com/d3/d3-hierarchy/blob/master/README.md#hierarchy). It requirres an additional member id, which is used as key in iconmap and langmap to identify a node. d3.hierarchy and d3.stratify can be used if their input data contains such a member. |
 | langmap         | `{}`            | `{}`          | If data files should be language independant this translatino map may be used to translate node labels. |
 | iconmap         | `{}`            | `{}`          | Supports only unicode emojies |
-| objects.pathes  | `{ N, N }[]`    | `[]`          | This array specifys highlighted pathes within the tree. The used nodes must be references to nodes within data. |
+| objects.pathes  | `{s:N,e:N}[]`   | `[]`          | This array specifys highlighted pathes within the tree. The used nodes must be references to nodes within data. |
 | objects.selections | `N[]`        | `[]`          | This array specifys highlighted nodes within the tree. The used nodes must be references to nodes within data. |
 
 ###  <a name="filter"></a> Filter
@@ -125,30 +127,30 @@ export interface Filter
     weights:         (n)=> number,
     layout:          LayoutFunction,
     transformation:  {
-        P: C,
-        λ: C,
+        P: C,        
         θ: C,
+        λ: C,
     }
 }
 ```
 
 | Name            | Type            | Default       | Description            |         
 |-----------------|-----------------|---------------|------------------------|
-| model           | `{}`            | -             |                        |
-| filter          | `{}`            |               |                        |
-| geometry        | `{}`            |               |                        |
-| interaction     | `{}`            |               |                        |
+| cullingRadius   | `number`        | `.98`         | Nodes outside the circle with center 0,0 and radius `cullingRadius` will be hidden. |
+| cullingWeight   | `number | { min:number, max:number}` | `{ min:200, max:400 }` | Culling weight can be specified as constant weight, or as a range which defined the minimun and maximum number of visible nodes. If so, the culling weight will be calculated automatically. |
+| weights         | `(n)=> number`  | `d=> d.value?1:0` | Will be used as argument for d3 node.sum. See [D3 documentation](https://github.com/d3/d3-hierarchy/blob/master/README.md#hierarchy). |
+| layout          | `(n)=> {}`      | `layouts.bergè` | Bergé layout implementation. Currently the only one which supports efficient node culling. |
+| transformation.P | `C`            | { re:0, im:0 } | Initial hyperbolic translation. Use P to define the initial root node position. |
+| transformation.λ | `number`       | `undefined`     | Defines the initial link lenght. Valid values are  in intervall (0,1). This parameter is not used if geometry.animateUpRadius is defined. |
+
 
 ###  <a name="geometry"></a> Geometry
 
 ```typescript
 export interface Geometry
 {   
-    layers:          ((ls:IUnitDisk)=> ILayer)[],
-    nodeFilter:      (n:N)=> options.filters.hasCircle,
-    nodeRadius:      number,
-    nodeScale:       d=> number,        
-    arcWidth:        d=> number,        
+    nodeScale:       d=> number,
+    arcWidth:        d=> number,
     clipRadius:      number,                      
     labelRadius:     number,
     animateUpRadius: number    
@@ -156,23 +158,24 @@ export interface Geometry
 ```
 | Name            | Type            | Default       | Description            |         
 |-----------------|-----------------|---------------|------------------------|
-| model           | `{}`            | -             |                        |
-| filter          | `{}`            |               |                        |
-| geometry        | `{}`            |               |                        |
-| interaction     | `{}`            |               |                        |
+| nodeRadius      | `d=> number`    | `d=> acosh(d.pos.r)*.02` | Define node size for a node  |
+| arcWidth        | `d=> number`    | `d=> acosh(d.pos.r)*.015` | Define link width for a node  |
+| clipRadius      | `number`        | `1`           | Component clipping circle radius. Circle center at 0,0 |
+| labelRadius     | `number`        | `.005`        | Distance between label center and node center. Not applied on force dirceted label layout. |
+| animateUpRadius | `number|undefined` | `.8`       | If specified, transformation.λ will be set to a value such that the initial tree will fit within a circle with radius `animateUpRadius`. This circle is centered at transformation.P. |
 
 ### <a name="interaction"></a> Interaction
 
 ```typescript
 export interface Interaction
 {
-    onNodeSelect: ((hypertree:Hypertree, n:N)=> void
+    onNodeSelect: (n:N)=> void
 }
 ```
 
 | Name            | Type            | Default       | Description            |         
 |-----------------|-----------------|---------------|------------------------|
-| onNodeSelect | `((Hypertree, N)=> void` | `()=> {}` | Will be called when the user selects a node.     |
+| onNodeSelect | `(n:N)=>void` | `()=>{}` | Will be called when the user selects or deselects a node given by parameter `n` |
 
 ### <a name="layers"></a> Available Layers
 
@@ -205,7 +208,6 @@ const hypertree = new Hypertree(
             layout:          layouts.bergé,
             transformation:  {
                 P: C,
-                θ: C,
                 λ: number,                
             }
         },
