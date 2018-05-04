@@ -185,7 +185,7 @@ export interface Interaction
 
 | Name            | Visibility (default) | Description                       |   
 |-----------------|---------|------------------------------------------------|
-| cell-layer      |         | Renders voronoi cells of nodes. Voronoi cells define mouse area of a node. |
+| cell-layer      |         | Renders voronoi cells of nodes. Cell defines mouse area of a node. |
 | center-node     | ✓       | Gray circle background for node next to 0,0    |
 | path-arcs       | ✓       | Hyperbolic arc links for pathes                |
 | path-lines      |         | Straight line links for pathes                 |

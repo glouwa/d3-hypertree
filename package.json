@@ -20,26 +20,26 @@
     "globalinstall": "npm i -g gulp"
   },
   "dependencies": {
-    "d3": "^4.10.0",
+    "d3": "^4.13.0",
     "d3-force-gravity": "^1.0.2",
     "xml2js": "^0.4.17"
   },
   "devDependencies": {
-    "@types/d3": "^4.10.0",
-    "@types/node": "^7.0.27",
-    "browser-sync": "^2.18.13",
+    "@types/d3": "^4.13.0",
+    "@types/node": "^7.0.63",
+    "browser-sync": "^2.24.4",
     "del": "^3.0.0",
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.1",
-    "gulp-debug": "^3.1.0",
-    "gulp-plumber": "^1.1.0",
-    "gulp-sass": "^3.1.0",
-    "gulp-typescript": "^3.2.1",
+    "gulp-debug": "^3.2.0",
+    "gulp-plumber": "^1.2.0",
+    "gulp-sass": "^3.2.1",
+    "gulp-typescript": "^3.2.4",
     "gulp-util": "^3.0.8",
-    "merge2": "^1.1.0",
-    "typescript": "^2.6.2",
+    "merge2": "^1.2.2",
+    "typescript": "^2.8.3",
     "webpack": "^3.11.0",
-    "webpack-stream": "^4.0.1",
+    "webpack-stream": "^4.0.3",
     "yargs": "^8.0.2"
   }
 }
