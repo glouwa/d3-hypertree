@@ -10,6 +10,10 @@ export interface NodePrecalulations {
     label:              string
     labellen:           number
     imageHref:          string
+
+    txt2: string
+    wiki: string
+    clickable: boolean
 }
 
 export interface NodeLayout {
