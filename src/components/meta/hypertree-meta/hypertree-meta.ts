@@ -2,7 +2,7 @@ import { HTML }           from 'ducd'
 import { UnitdiskMeta }   from '../unitdisk-meta/unitdisk-meta'
 import { LayerStackMeta } from '../layerstack-meta/layerstack-meta'
 import { Hypertree }      from '../../hypertree/hypertree'
-import { UnitDiskNav }    from '../../../index';
+import { UnitDiskNav }    from '../../../index'
 
 export class NoHypertreeMeta
 {
@@ -132,7 +132,7 @@ export class HypertreeMetaNav
         this.view.html2 = HTML.parse<HTMLElement>(this.htmlCarLs)()
         this.view.parent.appendChild(this.view.html2)
         
-        $('.carousel').carousel({ 
+        M.Carousel.init(document.querySelectorAll('.carousel'), { 
             fullWidth:true, 
             noWrap:true
         })

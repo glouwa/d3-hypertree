@@ -265,7 +265,7 @@ export class Hypertree
     * this functions assume the model/view (this class internal state)
     * has changes, and call the according ui updates (animatin frames)
     */
-    private update = {        
+    public update = {        
         view: {
             parent:         ()=> this.updateParent(),
             unitdisk:       ()=> { this.updateUnitdiskView(); this.updateMetaView(); },
@@ -617,7 +617,7 @@ export class Hypertree
                           / (Math.log2(this.data.value || this.data.children.length) || 1)        
     }
 
-    private updateLayout_(preservingnode:N) : void {
+    public updateLayout_(preservingnode?:N) : void {
         //app.toast('Layout')
         const t0 = performance.now()        
         const t = this.args.geometry.transformation

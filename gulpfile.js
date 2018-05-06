@@ -73,7 +73,7 @@ gulp.task('deploy')
 
 gulp.task('default',  ['watch'])
 gulp.task('watch',    ['build'], () => {    
-    gulp.watch('../ducd/dist/index.js',   ['build'])
+    gulp.watch('../ducd/dist/index.js', ['build'])
     gulp.watch(paths.src + '**/*.ts',   ['build'])
     gulp.watch(paths.src + '**/*.scss', ['sass'])
 })

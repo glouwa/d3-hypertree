@@ -48,10 +48,16 @@ var labelHtml  = (id)=>     `<div class="label"></div> `
 var countHtml  = (id)=>     `<div class="nodes"></div> `
 var timeHtml   = (id)=>     `<div class="time"></div> `
 var switchHtml = (id)=>     `<div class="switch"></div> `
+/*
 var check1Html = (id, c)=>  `<div class="cbx">           
                                 <input type="checkbox" id="${id}" class="filled-in" ${c?'checked':''}/>
                                 <label for="${id}"></label>
                              </div>`
+*/
+var check1Html = (id, c)=>  `<label class="cbx">           
+                                <input type="checkbox" id="${id}" class="filled-in" ${c?'checked':''}/>
+                                <span></span>
+                            </label>`
 var barHtml    = (id)=>     `<div class="bar-bg"><div class="bar"></div></div>`
 var html       =            `<div class="layer-info"></div>`
 

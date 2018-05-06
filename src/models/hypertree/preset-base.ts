@@ -110,7 +110,7 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
             n.precalc.txt = i || l || id
             n.precalc.txt2 = l || id
             
-            n.precalc.clickable = l
+            n.precalc.clickable = Boolean(l)
 
             if (n.precalc.txt) return n.precalc.txt + tosub(w) 
             else return undefined

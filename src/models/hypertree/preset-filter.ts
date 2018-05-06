@@ -14,7 +14,7 @@ var cullingRadius =   0.98
 var labelλExtension = 1.8
 var absMaxLabelR =    0.85 
 
-
+/*
 class Culler {
     rangeNodes = { min:120, max:420 }
     rangeMagic = { min:2,   max:500 }
@@ -47,7 +47,7 @@ class Culler {
         return !n.isOut
     }
 }
-
+*/
 function adjustMagic(ud:IUnitDisk, cache:TransformationCache) {
     const rangeNodes = { min:120, max:420 }
     const rangeMagic = { min:2,   max:500 }

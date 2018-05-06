@@ -130,7 +130,7 @@ export class ArcLayer implements ILayer
             console.assert(arcP2)
             var arcC = arcCenter(arcP1, arcP2)
 
-            var r = CktoCp(CsubC(arcP2, arcC.c)).r; if (isNaN(r)) r = 0;            
+            var r = CktoCp(CsubC(arcP2, arcC.c)).r; if (isNaN(r) || r > 1000) r = 0;            
             var f = arcC.d>0 ? a : b
             var s = $this.args.nodePosStr(d)
             var e = d.parent 

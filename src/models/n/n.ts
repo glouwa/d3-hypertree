@@ -20,6 +20,7 @@ export interface NodeLayout {
     wedge: {
         α:              number,
         Ω:              number,
+        L?:             number,
     },
     z?:                 Ck,
     zStrCache?:         string,
@@ -77,6 +78,8 @@ export interface N extends NodeTransformation {
     precalc:            NodePrecalulations
     pathes:             NodePath    
 
+    minWeight:          number
+/*
     unitdisk: 
     {
         layout:         NodeLayout,
@@ -87,6 +90,7 @@ export interface N extends NodeTransformation {
         layout:         NodeLayout,
         transformation: NodeTransformation
     }    
+    */
     layout:             NodeLayout
     layoutReference:    NodeLayout
 }

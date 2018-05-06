@@ -8,7 +8,7 @@ import { h2e }                 from '../../models/transformation/hyperbolic-math
 import { πify, dfs, dfsFlat }  from '../../models/transformation/hyperbolic-math' 
 import { maxR }                from '../../models/transformation/hyperbolic-math' 
 
-export type LayoutFunction = (root:N, t?:number, noRecursion?:boolean) => N
+export type LayoutFunction = (root:N, t?:number, noRecursion?:boolean) => void
 
 const π = Math.PI    
 const unitVectors = [{ re:1, im:0 }, { re:0, im:1 }, { re:-1, im:0 }, { re:0, im:-1 }]

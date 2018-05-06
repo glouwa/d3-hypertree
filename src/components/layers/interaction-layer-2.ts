@@ -262,8 +262,8 @@ export class InteractionLayer2 implements ILayer
             this.view.unitdisk.args.transformation.cache.centerNode)
 
         if (false && n.mergeId !== this.view.unitdisk.args.transformation.cache.centerNode.mergeId) {
-            console.log('not same --> goto node')
-            this.view.hypertree.api.gotoNode(n)
+            //console.log('not same --> goto node')
+            //this.view.hypertree.api.gotoNode(n)
         }
         else {
             console.log('click on center')
