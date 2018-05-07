@@ -73,7 +73,12 @@ export class D3UpdatePattern
 
         this.elements = this.elements.data(this.data, d=> d.mergeId)
 
-        this.elements.exit().remove()
+        this.elements.exit()
+            /*.transition()
+            .duration(1000)
+            .attr("fill-opacity", 0)
+            .attr("stroke-opacity", 0)*/
+            .remove()
         var newElements = this.elements.enter().append(this.args.elementType)
                 .attr("class", this.args.className)
                 .call(this.args.create)
@@ -85,8 +90,8 @@ export class D3UpdatePattern
             .call(this.args.updateColor)
         
 // extrashit
-        if (this.args.name === 'labels')
-            this.addTextBackgroundRects()
+        //if (this.args.name === 'labels-force')
+        //    this.addTextBackgroundRects()
     }
 
     private addTextBackgroundRects()
@@ -96,13 +101,13 @@ export class D3UpdatePattern
         var svgRootHere = this.mainSvgGroup
         var T = this
         
-        if (T.args.layer.args.ud) {
+        if (T.args.layer.view.unitdisk) {
             this.mainSvgGroup.selectAll("text").each(function(d:N, i, v:SVGTextElement[]) {
-                if (   d === T.args.layer.args.ud.cache.centerNode 
-                    /*|| d.cachep.r < 0.6*/)
+                if (true ||   d === T.args.layer.view.unitdisk.cache.centerNode 
+                    || d.cachep.r < 0.6)
                 {
                     var view:any = v[i]
-                    var w = d.precalc.labellen = d.precalc.labellen || view.getComputedTextLength()
+                    var w = d.precalc.labellen //= d.precalc.labellen || view.getComputedTextLength()
                     var h = 0.04
                     var paddingLeftRight = .08
                     var paddingTopBottom = .02
@@ -123,7 +128,7 @@ export class D3UpdatePattern
 }
 
 export var bboxOffset = (d, cacheId='labellen', θn=undefined)=> v=> {
-    var w = d.precalc[cacheId] = d.precalc[cacheId] || v.getComputedTextLength()  //var bb = v.getBBox() war schlechter
+    var w = d.precalc[cacheId] //= d.precalc[cacheId] || v.getComputedTextLength()  //var bb = v.getBBox() war schlechter
     var h = .045
     var paddingLeftRight = .08
     var paddingTopBottom = .02

@@ -454,7 +454,7 @@ export class Hypertree
         this.args.geometry.transformation.cache.N = this.data.descendants().length
         this.updateWeights_()
         this.updateLang_()
-        this.updateImgHref_()            
+        this.updateImgHref_()        
         this.layoutMeta = { Δ: performance.now()-t3 }
         
         this.hypertreeMeta.update.model()
@@ -602,6 +602,24 @@ export class Hypertree
                 map:this.langMap, 
                 filesize:dl 
             }
+
+        this.updateLabelLen_()
+    }
+
+    virtualCanvas
+    private updateLabelLen_() : void {
+        var canvas = this.updateLabelLen_.canvas 
+            || (this.updateLabelLen_.canvas = document.createElement("canvas"));
+        var context = canvas.getContext("2d");
+        context.font = ".002em Roboto";
+        console.log(window.devicePixelRatio)
+
+        for (var n of dfsFlat(this.data, n=>true)) {
+            if (n.precalc.txt2) {
+                const metrics = context.measureText(n.precalc.txt2)
+                n.precalc.labellen = metrics.width/200/window.devicePixelRatio
+            }
+        }
     }
 
     private updateImgHref_() : void {

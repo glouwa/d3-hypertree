@@ -215,6 +215,7 @@ export class InteractionLayer2 implements ILayer
                 t.state.P = compose(t.state, shift(t.state, this.pinchcenter, pinchcenter2)).P
 
                 this.pinchcenter = CmulR(CaddC(this.pinchcenter, pinchcenter2), .5)
+                this.view.unitdisk.pinchcenter = this.pinchcenter
                 //this.view.unitdisk.args.transformation.onDragP(this.pinchcenter, pinchcenter2)
                 //t.state.P = compose(t.state, shift(t.state, this.pinchcenter, pinchcenter2)).P                
             }
@@ -229,6 +230,9 @@ export class InteractionLayer2 implements ILayer
         this.view.hypertree.args.objects.traces 
             = this.view.hypertree.args.objects.traces.filter(e=> e.id !== pid)
         
+        this.pinchcenter = undefined
+        this.view.unitdisk.pinchcenter = this.pinchcenter
+
         if (this.view.hypertree.args.objects.traces.length === 0) 
         {
             this.view.unitdisk.args.transformation.onDragEnd(m)

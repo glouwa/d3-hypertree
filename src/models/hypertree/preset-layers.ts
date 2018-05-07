@@ -38,36 +38,42 @@ export const layerSrc = [
         invisible:  true,
         hideOnDrag: true,
         name:       'culling-r',
-        r:          ()=> cullingRadius
+        r:          ()=> cullingRadius,
+        center:     ()=> '0 0'
     }),
     (v, ud:UnitDisk)=> new FocusLayer(v, {        
         invisible:  true,
         hideOnDrag: true,
         name:       'mouse-r',
-        r:          ()=> .98
+        r:          ()=> .98,
+        center:     ()=> '0 0'
     }),
     (v, ud:UnitDisk)=> new FocusLayer(v, {        
         invisible:  true,
         hideOnDrag: false,
         name:       'labels-r',
-        r:          ()=> 1.2 * ud.args.transformation.state.λ
+        r:          ()=> 1.2 * ud.args.transformation.state.λ,
+        center:     ()=> `${(ud.pinchcenter||{re:0}).re} ${(ud.pinchcenter||{im:0}).im}`
     }),    
     (v, ud:UnitDisk)=> new FocusLayer(v, {        
         invisible:  true,
         hideOnDrag: true,
         name:       'labels-r-𝐖',
-        r:          ()=> ud.cache.wikiR
+        r:          ()=> ud.cache.wikiR,
+        center:     ()=> '0 0'
     }),    
     (v, ud:UnitDisk)=> new FocusLayer(v, {
         invisible:  true,
         hideOnDrag: true,
         name:       'λ',
-        r:          ()=> ud.args.transformation.state.λ
+        r:          ()=> ud.args.transformation.state.λ,
+        center:     ()=> '0 0'
     }),
     (v, ud:UnitDisk)=> new FocusLayer(v, {        
         invisible:  false,
         name:       '(0,0)',
-        r:          ()=> .004
+        r:          ()=> .004,
+        center:     ()=> '0 0'
     }),
     (v, ud:UnitDisk)=> new CellLayer(v, {
         invisible:  true,
