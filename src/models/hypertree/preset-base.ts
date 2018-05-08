@@ -76,7 +76,7 @@ const modelBase : ()=> HypertreeArgs = ()=>
         pathes: [],
         traces: []
     },    
-    decorator:   UnitDiskNav,
+    decorator:   UnitDisk,
     geometry: {
         clipRadius:     1,
         nodeRadius:     nodeInitR(.01),   

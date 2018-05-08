@@ -607,10 +607,12 @@ export class Hypertree
     }
 
     virtualCanvas
+    virtualCanvasContext
     private updateLabelLen_() : void {
-        var canvas = this.updateLabelLen_.canvas 
-            || (this.updateLabelLen_.canvas = document.createElement("canvas"));
-        var context = canvas.getContext("2d");
+        var canvas = this.virtualCanvas 
+            || (this.virtualCanvas = document.createElement("canvas"))
+        var context = this.virtualCanvasContext 
+            || (this.virtualCanvasContext = canvas.getContext("2d"))
         context.font = ".002em Roboto";
         console.log(window.devicePixelRatio)
 
@@ -619,6 +621,8 @@ export class Hypertree
                 const metrics = context.measureText(n.precalc.txt2)
                 n.precalc.labellen = metrics.width/200/window.devicePixelRatio
             }
+            else
+                n.precalc.labellen = 0 
         }
     }
 

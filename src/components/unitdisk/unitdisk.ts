@@ -57,9 +57,10 @@ export class UnitDisk implements IUnitDisk
     public layerStack    : LayerStack
     public HypertreeMetaType = HypertreeMeta
     public cacheMeta
+    public pinchcenter
 
     private mainsvg // d3 select          
-    
+        
     constructor(view:UnitDiskView, args : UnitDiskArgs) {
         this.view = view
         this.args = args
