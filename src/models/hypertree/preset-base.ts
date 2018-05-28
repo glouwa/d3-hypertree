@@ -5,13 +5,13 @@ import { N }                        from '../n/n'
 
 import { C, CptoCk, CktoCp, πify }  from '../../models/transformation/hyperbolic-math'
 import { lengthDilledation }        from '../../models/transformation/hyperbolic-math'
-import { loaders }                  from '../../index'
+import { loaders }                  from '../../d3-hypertree'
 import { layoutBergé }              from '../n/n-layouts'
 import { layoutBuchheim }           from '../n/n-layouts'
 import { layoutSpiral }             from '../n/n-layouts'
 
-import { HyperbolicTransformation } from '../../index'
-import { PanTransformation }        from '../../index'
+import { HyperbolicTransformation } from '../../d3-hypertree'
+import { PanTransformation }        from '../../d3-hypertree'
 
 import { HypertreeArgs }            from '../../models/hypertree/model'
 import { UnitDisk }                 from '../../components/unitdisk/unitdisk'
@@ -102,8 +102,9 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
             // better: set of initial node actions [label, imghref, scalef, ...]
             const w  = (!n.value || n.value==1) ? '' : n.value + ' '
             const id = ( n.data && n.data.name) ? n.data.name : ''
+            
             const l = ht.langMap && ht.langMap[id] ? '𝐖 ' + ht.langMap[id] : ''                        
-            const i  = ht.args.iconmap.emojimap[id]
+            const i  = ht.args.iconmap ? ht.args.iconmap.emojimap[id] : ''
 
             n.precalc.icon = i                     
             n.precalc.wiki = l   

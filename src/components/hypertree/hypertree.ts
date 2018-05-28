@@ -627,8 +627,9 @@ export class Hypertree
     }
 
     private updateImgHref_() : void {
-        for (var n of dfsFlat(this.data, n=>true)) 
-            n.precalc.imageHref = this.args.iconmap.fileName2IconUrl(n.data.name, n.data.type)                    
+        if (this.args.iconmap)
+            for (var n of dfsFlat(this.data, n=>true))             
+                n.precalc.imageHref = this.args.iconmap.fileName2IconUrl(n.data.name, n.data.type)                    
     }
 
     private updateWeights_() : void {

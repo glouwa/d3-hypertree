@@ -50,12 +50,12 @@ gulp.task('tsc', () => {
 })
 
 gulp.task('webpack', ['tsc'], () =>
-    gulp.src(paths.dist + 'js/index.js')
+    gulp.src(paths.dist + 'js/' + files.mainjs)
         .pipe(plumber())
         .pipe(webpack({
             output: { 
-                filename:files.mainjs,                
-                library: 'd3hypertree'
+                filename: files.mainjs,
+                library: 'hypertree'
             },
             devtool: 'source-map',            
         }))

@@ -14,7 +14,7 @@ import { InteractionLayer2 }        from '../../components/layers/interaction-la
 import { TraceLayer }               from '../../components/layers/trace-layer'
 import { ImageLayer }               from '../../components/layers/image-layer'
 import { FocusLayer }               from '../../components/layers/focus-layer'
-import { bboxOffset }               from '../../index'
+import { bboxOffset }               from '../../d3-hypertree'
 
 var cullingRadius =   0.98
 var labelλExtension = 1.1

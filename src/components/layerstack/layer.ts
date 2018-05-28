@@ -1,6 +1,6 @@
 import { LayerStack } from './layerstack'
-import { UnitDisk }   from '../../index';
-import { Hypertree }  from '../../index';
+import { UnitDisk }   from '../../d3-hypertree';
+import { Hypertree }  from '../../d3-hypertree';
 
 export interface ILayerView 
 {

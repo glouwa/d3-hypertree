@@ -22,6 +22,8 @@ npm install d3-hypertree --save
 ```
 
 ## Embedding
+
+### CommonJs
 The d3-hypertree component is build with Webpack and exposes a prebuild CommonJS
 module (dist/index.js). For custom builds please import 
 "dist/js/components/hypertree/hypertree". The Components constructor takes two 
@@ -58,6 +60,8 @@ const hypertree = new Hypertree(
 )
 ```
 
+### Plain HTML
+
 If no packaging tool is used, the imports can be replaced by adding the following 
 lines to your html:
 
@@ -65,6 +69,8 @@ lines to your html:
 <link  href="(path to module)/d3-hypertree/dist/index-browser-light.css" rel="stylesheet">
 <script src="(path to module)/d3-hypertree/dist/index.js"></script>
 ```
+Use the global variable `hypertree` to access the module. 
+See https://github.com/glouwa/d3-hypertree-examples for minimal working examples.
 
 ## <a name="apireference"></a> API Reference
 <!-- 
