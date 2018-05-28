@@ -17,9 +17,9 @@ var paths = {
 }
 
 var files = {
-    darkcss:  'index-browser-dark.css',
-    lightcss: 'index-browser-light.css',
-    mainjs:   'index.js'
+    darkcss:  'd3-hypertree-dark.css',
+    lightcss: 'd3-hypertree-light.css',
+    mainjs:   'd3-hypertree.js'
 }
 
 var scss = (t)=> gulp.src(paths.src + `**/*${t}.scss`)
@@ -50,7 +50,7 @@ gulp.task('tsc', () => {
 })
 
 gulp.task('webpack', ['tsc'], () =>
-    gulp.src(paths.dist + 'js/' + files.mainjs)
+    gulp.src(paths.dist + 'js/index.js')
         .pipe(plumber())
         .pipe(webpack({
             output: { filename:files.mainjs },
@@ -73,7 +73,7 @@ gulp.task('deploy')
 
 gulp.task('default',  ['watch'])
 gulp.task('watch',    ['build'], () => {    
-    gulp.watch('../ducd/dist/index.js', ['build'])
+    gulp.watch('../ducd/dist/ducd.js',  ['build'])
     gulp.watch(paths.src + '**/*.ts',   ['build'])
     gulp.watch(paths.src + '**/*.scss', ['sass'])
 })
