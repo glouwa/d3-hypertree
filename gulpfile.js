@@ -53,8 +53,11 @@ gulp.task('webpack', ['tsc'], () =>
     gulp.src(paths.dist + 'js/index.js')
         .pipe(plumber())
         .pipe(webpack({
-            output: { filename:files.mainjs },
-            devtool: 'source-map'
+            output: { 
+                filename:files.mainjs,                
+                library: 'd3hypertree'
+            },
+            devtool: 'source-map',            
         }))
         .pipe(gulp.dest(paths.dist)) 
 )
