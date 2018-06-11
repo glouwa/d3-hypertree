@@ -123,6 +123,9 @@ export class InteractionLayer2 implements ILayer
     private maxλ = .8
     private fireMouseWheelEvent()
     {
+        d3.event.stopPropagation()
+        d3.event.preventDefault()
+        
         const mΔ = d3.event.deltaY
         const λΔ = mΔ / 100 / 8
         const oldλp = this.view.unitdisk.args.transformation.state.λ

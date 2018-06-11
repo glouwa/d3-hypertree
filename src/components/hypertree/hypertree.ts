@@ -119,13 +119,28 @@ const hypertreehtml =
 
     </div>`
 
-    function shuffleArray(array) {
-        if (array)
-        for (let i = array.length - 1; i > 0; i--) {
-            let j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
+function shuffleArray(array, n) {        
+    if (array)
+    for (let i = array.length - 1; i > 0; i--) {
+        let r = (i * i + n.height) % array.length 
+        //let r = Math.random()
+        let j = Math.floor(r);
+        [array[i], array[j]] = [array[j], array[i]];
     }
+}
+
+/*
+mach im moment
+- path
+- action buttons
+- path buttons
+- meta views
+
+- async data load
+- animations
+
+hat keine events
+*/
 
 /**
 * pipeline implementation:
@@ -233,7 +248,7 @@ export class Hypertree
             this.setPathHead(pathType, n)
             this.update.pathes()
         },
-        selectQuery: (query:string)=> {
+        selectQuery: (query:string, prop:string)=> {
             const lq = query ? query.toLowerCase() : null
             this.data.each(n=> {
                 n.pathes.partof = []
@@ -428,7 +443,7 @@ export class Hypertree
                 n.layoutReference = null
                 n.pathes = {}
                 n.globelhtid = globelhtid
-                shuffleArray(n.children) // get index
+                shuffleArray(n.children, n) // get index
             })
             //.sum(this.args.weight) // this.updateWeights()
 
