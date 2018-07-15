@@ -2,7 +2,7 @@
 
 A Scalable Intercative Web Component for Hyperbolic Tree Visualisations
 
-![Screen shot](res/img/screenshot.png?raw=true)
+![Screen shot](doc/img/screenshot.png?raw=true)
 
 ## Contents
 - [Installing](#installing)

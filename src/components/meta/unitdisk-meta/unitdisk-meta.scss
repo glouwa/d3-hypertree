@@ -5,6 +5,21 @@
     //top:1em;
     //bottom:35em;
 }
+
+
+#meta {
+    > .layer-info.data {
+        position: absolute;
+        bottom: 1.2em;
+        right: .75em;
+    }
+    > .render-info.data {
+        position: absolute;
+        bottom: 1em;        
+        left: .75em;
+    }
+}
+
 .render-info {
     z-index: 1000;   
     width:21.2em;

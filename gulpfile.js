@@ -9,7 +9,8 @@ var merge       = require('merge2')
 var del         = require('del')
 var webpack     = require('webpack-stream')
 
-var debug = false // conditional pipe element? how?
+// commonjs lib (hypertree)
+var projectname = 'd3-hypertree'
 
 var paths = {
     src: './src/',
@@ -17,27 +18,24 @@ var paths = {
 }
 
 var files = {
-    darkcss:  'd3-hypertree-dark.css',
-    lightcss: 'd3-hypertree-light.css',
-    mainjs:   'd3-hypertree.js'
+    darkcss:  projectname+`-dark.css`,
+    lightcss: projectname+`-light.css`,
+    mainjs:   projectname+`.js`
 }
-
-var scss = (t)=> gulp.src(paths.src + `**/*${t}.scss`)
-    .pipe(plumber())
-    //.pipe(debug())
-    .pipe(sass())
-    .pipe(concat(files[t+'css']))
-    .pipe(gulp.dest(paths.dist))
 
 // ---------------------------------------------------------------------------------------------
 
-gulp.task('clean', () =>
-    del([
-        'dist/js/**/*',
-        'dist/d/**/*'
-    ])
-)
+gulp.task('clean', () => del(['dist/**/*']))
+gulp.task('default',  ['watch'])
+gulp.task('watch',    ['build'], () => {    
+    gulp.watch('../ducd/dist/ducd.js',  ['build'])
+    gulp.watch(paths.src + '**/*.ts',   ['build'])
+    gulp.watch(paths.src + '**/*.scss', ['sass'])
+})
 
+// ---------------------------------------------------------------------------------------------
+
+gulp.task('build',    ['webpack', 'sass'])
 gulp.task('tsc', () => {
     var tsResult = gulp.src(paths.src + '**/*.ts')
         .pipe(plumber())
@@ -48,35 +46,25 @@ gulp.task('tsc', () => {
         tsResult.js.pipe(gulp.dest(paths.dist + 'js/'))
     ])
 })
-
 gulp.task('webpack', ['tsc'], () =>
     gulp.src(paths.dist + 'js/' + files.mainjs)
         .pipe(plumber())
         .pipe(webpack({
             output: { 
                 filename: files.mainjs,
-                library: 'hypertree'
+                library: 'hypertree'                  // use hypertree... in browser
             },
             devtool: 'source-map',            
         }))
         .pipe(gulp.dest(paths.dist)) 
 )
 
+var scss = (t)=> gulp.src(paths.src + `**/*${t}.scss`) // all *light.scss or *dark.scss
+    .pipe(plumber())
+    .pipe(sass())
+    .pipe(concat(files[t+'css']))                      // files.lightcss or files.darkcss
+    .pipe(gulp.dest(paths.dist))
 gulp.task('sass',    ()=> merge([scss('light'), scss('dark')]))   
 
-// ---------------------------------------------------------------------------------------------
 
-gulp.task('build',    ['webpack', 'sass'])
-gulp.task('test',     ['build'])
-gulp.task('data')
 
-gulp.task('commit',   ['test'])
-gulp.task('push',     ['commit'])
-gulp.task('deploy')
-
-gulp.task('default',  ['watch'])
-gulp.task('watch',    ['build'], () => {    
-    gulp.watch('../ducd/dist/ducd.js',  ['build'])
-    gulp.watch(paths.src + '**/*.ts',   ['build'])
-    gulp.watch(paths.src + '**/*.scss', ['sass'])
-})

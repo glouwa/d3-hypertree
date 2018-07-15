@@ -159,7 +159,7 @@ export function layoutBergé(n:N, λ:number, noRecursion=false)
 
         let angleWidth = πify(wedge.Ω - wedge.α)
         /*
-        if (angleWidth > 2*π)
+        if (angleWidth > 2*π) 
         {
             const anglediff = angleWidth - 2 * π            
             wedge.α = πify(wedge.α + anglediff / 2.0)            
