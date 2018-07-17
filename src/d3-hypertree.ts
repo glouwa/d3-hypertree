@@ -1,9 +1,10 @@
 export { Hypertree }     from "./components/hypertree/hypertree"
+export { Hypertree2 }     from "./components/hypertree/hypertree2"
 export { HypertreeArgs } from "./models/hypertree/model"
 
 export * from './models/transformation/hyperbolic-math'
 export * from './models/transformation/hyperbolic-transformation'
-
+ 
 export * from './models/n/n'
 export * from './models/n/n-loaders'
 export * from './models/n/n-layouts'
@@ -22,7 +23,6 @@ import * as bg   from './components/layers/background-layer'
 import * as foc  from './components/layers/focus-layer'
 import * as int  from './components/layers/interaction-layer'
 import * as int2  from './components/layers/interaction-layer-2'
-
 
 export namespace layers
 {
@@ -48,7 +48,6 @@ export namespace layers
     export type InteractionLayerArgs = int.InteractionLayerArgs
     export var  InteractionLayer2     = int2.InteractionLayer2
     export type InteractionLayer2Args = int2.InteractionLayer2Args
-    
 }
 
 export * from './components/unitdisk/unitdisk'
