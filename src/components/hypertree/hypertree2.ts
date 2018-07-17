@@ -58,11 +58,6 @@ const bubbleSvgDef =
         </radialGradient>
     </defs>` 
 
-const btn = (name, icon, classes='', iconColor=undefined)=>
-    `<button id="${name}" class="btn btn-small waves-effect waves-orange pn ${classes}">        
-        <i class="material-icons" ${iconColor?'style="color:'+iconColor+';"':''}>${icon}</i>
-    </button>`
-
 // explore | near_me | fingerprint
 // edit | content_cut | border_color | edit_location
 // pan_tool | open_with | search | settings_overscan
@@ -71,52 +66,11 @@ const btn = (name, icon, classes='', iconColor=undefined)=>
 //${btn('btndownload', 'cloud_download')}                   
 
 const hypertreehtml =
-    `<div class="unitdisk-nav">      
-
-        <div id="meta"></div>        
-
-        <div class="tool-bar">
-            <div id="path" class="absolute-center">...</div>
-            <!--
-            ${btn('btnundo', 'undo')}
-            ${btn('btncommit', 'check')}
-            -->
-            ${btn('btnnav', 'explore', 'tool-seperator')}
-            ${btn('btnsize', 'all_out')}
-            ${btn('btnmeta', 'layers')}            
-
-            ${btn('btndownload', 'file_download', 'tool-seperator disabled')}
-            ${btn('btnupload', 'cloud_upload', 'disabled')}            
-            ${btn('btnhome', 'home', 'disabled')}
-            ${btn('btnsearch', 'search')}
-            
-            <!--
-            ,530, 470
-            ${btn('btncut', 'content_cut')}
-            ${btn('btncopy', 'content_copy')}
-            ${btn('btnpaste', 'content_paste')}
-            ${btn('btnbrowse', 'open_with', 'tool-seperator tool-active')}
-            ${btn('btnadd', 'add')}
-            ${btn('btnedit', 'border_color')}
-            ${btn('btndelte', 'delete')}
-
-            swap
-            open
-            search from here
-            -->
-        </div> 
-
-        <div id="path-toolbar" class="tool-bar path-bar">            
-            ${btn('btn-path-home', 'grade', 'tool-seperator'/*, '#ffee55'*/)}
-            ${btn('btn-path-center', 'add_circle', /*, '#b5b5b5'*/)}
-        </div> 
-        
+    `<div class="unitdisk-nav">        
         <svg width="calc(100% - 3em)" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">
             ${bubbleSvgDef}
-        </svg>        
-
+        </svg>
         <div class="preloader"></div>
-
     </div>`
 
 function shuffleArray(array, n) {        
@@ -154,26 +108,9 @@ export class Hypertree2
 {
     args            : HypertreeArgs    
     view_: {
-        parent         : HTMLElement,
-        path?          : HTMLElement,
-
-        btnHome?       : HTMLElement,
-        btnMeta?       : HTMLElement,
-        btnNav?        : HTMLElement,
-        btnSize?       : HTMLElement,
-
-        pathesToolbar? : HTMLElement,
-        btnPathHome?   : HTMLElement,
-
+        parent         : HTMLElement,        
         html?          : HTMLElement,
-        unitdisk?      : IUnitDisk,
-        hypertreeMeta? : HypertreeMeta,
-        /*
-        modelMeta,
-        langMeta,
-        layoutMeta,
-        noHypertreeMeta,
-        */
+        unitdisk?      : IUnitDisk,        
     }
     animation      : boolean = false
     
@@ -181,12 +118,9 @@ export class Hypertree2
     modelMeta
     langMeta
     layoutMeta
-    noHypertreeMeta
     
     unitdisk       : IUnitDisk
-    hypertreeMeta  : HypertreeMeta
-    // end todo
-
+    
     // todo: move to args    
     data           : N
     langMap        : {}    
@@ -219,25 +153,11 @@ export class Hypertree2
             this.args.dataloader = dl
             const t0 = performance.now()
             this.resetData()
-            this.args.dataloader((d3h, t1, dl)=> 
+            this.args.dataloader((d3h, t1, dl)=> {
                 this.initData(d3h, t0, t1, dl)
-            )
-        },
-        toggleNav: ()=> {
-            this.args.decorator = this.args.decorator === UnitDiskNav ? UnitDisk : UnitDiskNav
-            this.update.view.unitdisk()
-            this.update.data()
-            this.hypertreeMeta.update.model()
-            this.hypertreeMeta.update.layout()
-            this.hypertreeMeta.update.transformation()
-        },
-        toggleMeta: ()=> {
-            this.noHypertreeMeta = this.noHypertreeMeta ? undefined : new NoHypertreeMeta()
-            this.update.view.meta()
-            this.hypertreeMeta.update.model()
-            this.hypertreeMeta.update.layout()
-            this.hypertreeMeta.update.transformation()
-        },
+                this.animateUp()
+            })
+        },       
         toggleSelection: (n:N)=> {
             this.toggleSelection(n)
             this.update.pathes()
@@ -283,29 +203,13 @@ export class Hypertree2
     public update = {        
         view: {
             parent:         ()=> this.updateParent(),
-            unitdisk:       ()=> { this.updateUnitdiskView(); this.updateMetaView(); },
-            meta:           ()=> this.updateMetaView(),
+            unitdisk:       ()=> this.updateUnitdiskView(),            
         },        
-        data:           ()=> requestAnimationFrame(()=> {                            
-                            this.unitdisk.update.data()
-                        }),        
-        langloader:     ()=> requestAnimationFrame(()=> {                            
-                            this.hypertreeMeta.update.lang()
-                            this.update.data()
-                        }),        
-        layout:         ()=> requestAnimationFrame(()=> {
-                            this.unitdisk.update.transformation() 
-                            this.hypertreeMeta.update.layout()
-                            this.hypertreeMeta.update.transformation()           
-                        }),
-        transformation: ()=> requestAnimationFrame(()=> {
-                            this.unitdisk.update.transformation() 
-                            this.hypertreeMeta.update.transformation()     
-                        }),
-        pathes:         ()=> requestAnimationFrame(()=> {
-                            this.unitdisk.update.pathes()
-                            this.hypertreeMeta.update.transformation()     
-                        })
+        data:           ()=> requestAnimationFrame(()=> this.unitdisk.update.data()),        
+        langloader:     ()=> requestAnimationFrame(()=> this.update.data()),        
+        layout:         ()=> requestAnimationFrame(()=> this.unitdisk.update.transformation()),
+        transformation: ()=> requestAnimationFrame(()=> this.unitdisk.update.transformation()),
+        pathes:         ()=> requestAnimationFrame(()=> this.unitdisk.update.pathes())
     }
 
     //########################################################################################################
@@ -319,43 +223,8 @@ export class Hypertree2
         this.view_.parent.innerHTML = '' // actually just remove this.view if present ... do less
         this.view_.html = HTML.parse<HTMLElement>(hypertreehtml)()
         this.view_.parent.appendChild(this.view_.html)
-        this.noHypertreeMeta   = new NoHypertreeMeta()
-        this.view_.btnMeta     = <HTMLButtonElement>this.view_.html.querySelector('#btnmeta')
-        this.view_.btnNav      = <HTMLButtonElement>this.view_.html.querySelector('#btnnav')
-        this.view_.btnHome     = <HTMLButtonElement>this.view_.html.querySelector('#btnhome')
-        this.view_.btnSize     = <HTMLButtonElement>this.view_.html.querySelector('#btnsize')
-
-        this.view_.pathesToolbar = <HTMLButtonElement>this.view_.html.querySelector('#path-toolbar')        
-        this.view_.btnPathHome   = <HTMLButtonElement>this.view_.html.querySelector('#btn-path-home')
-                
-        this.view_.btnHome.onclick     = ()=> this.api.gotoHome()
-        this.view_.btnPathHome.onclick = ()=> this.api.gotoHome()
-        this.view_.btnMeta.onclick     = ()=> this.api.toggleMeta()
-        this.view_.btnNav.onclick      = ()=> this.api.toggleNav()        
-        this.view_.btnSize.onclick     = ()=> {            
-            const view = [
-                'translate(500,520) scale(470)', // small
-                'translate(500,520) scale(490)', // big
-                'translate(500,520) scale(720, 490)', // oval 
-                'translate(500,520) scale(720, 590)', // overlap
-                'translate(500,620) scale(680, 800)', // mobile (vertical)
-            ]
-            const nav = [
-                'translate(95,95) scale(70)',
-                'translate(95,95) scale(70)',
-                'translate(-150,105) scale(70)',
-                'translate(-160,95) scale(70)',
-                'translate(-150,105) scale(70)'
-            ]
-            sizeidx = ++sizeidx % 5
-            this.unitdisk.api.setTransform(view[sizeidx], nav[sizeidx])
-        }
-        let sizeidx = 0
-
-        this.view_.path = <HTMLElement>this.view_.html.querySelector('#path')
-
+       
         this.updateUnitdiskView()
-        this.updateMetaView()    
 
         this.api.setDataloader(this.args.dataloader)        
         this.api.setLangloader(this.args.langloader)
@@ -371,7 +240,7 @@ export class Hypertree2
             position:       'translate(500,520) scale(470)',
             hypertree:      this,
         },
-        {            
+        {
             data:           null, //this.data,            
             transformation: this.args.geometry.transformation,
             transform:      (n:N)=> this.unitdisk.args.transformation.transformPoint(n.layout.z),
@@ -384,16 +253,6 @@ export class Hypertree2
             nodeFilter:     this.args.geometry.nodeFilter,
             linkWidth:      this.args.geometry.linkWidth
         })
-    }
-
-    private updateMetaView()
-    {
-        var metaparent = this.view_.html.querySelector('.unitdisk-nav > #meta')
-        metaparent.innerHTML = ''
-        this.hypertreeMeta = this.noHypertreeMeta || new this.unitdisk.HypertreeMetaType({ 
-                view: { parent:metaparent },
-                model: this
-            })
     }
 
     //########################################################################################################
@@ -417,14 +276,7 @@ export class Hypertree2
 
         this.args.objects.selections = []
         this.args.objects.pathes = []
-        this.view_.path.innerText = ''
-        this.view_.pathesToolbar.innerHTML = 
-            btn('btn-path-home', 'grade', 'tool-seperator', '#e2d773') //'#ffee55'
-          + btn('btn-path-center', 'add_circle', 'disabled'/*, '#b5b5b5'*/)
-        this.view_.pathesToolbar
-            .querySelector<HTMLButtonElement>('#btn-path-home')
-            .onclick = ()=> this.api.gotoHome()
-
+        
         this.update.data()   
     }
 
@@ -471,9 +323,6 @@ export class Hypertree2
         this.updateLang_()
         this.updateImgHref_()        
         this.layoutMeta = { Δ: performance.now()-t3 }
-        
-        this.hypertreeMeta.update.model()
-        this.animateUp()
     }
 
     //########################################################################################################
@@ -553,17 +402,7 @@ export class Hypertree2
             pn.pathes[`isPartOfAny${pathType}`] = true            
         })        
         
-        if (pathType === 'Query') return
-
-        // view: btn   ==> update.btntoolbar()    
-        const btnElem = HTML.parse(btn(
-            newpath.id, 
-            newpath.icon, 
-            pathType === 'HoverPath' ? 'disabled' : '', 
-            newpath.color))()        
-        btnElem.onclick = ()=> this.api.gotoNode(n)
-        btnElem.title = `${n.precalc.txt} ${plidx}`
-        this.view_.pathesToolbar.insertBefore(btnElem, pathType==='HoverPath' ? null : this.view_.pathesToolbar.firstChild)        
+        if (pathType === 'Query') return     
     }
 
     private removePath(pathType:string, n:N) {
@@ -587,16 +426,7 @@ export class Hypertree2
             const nodeFlagName = `isPartOfAny${pathType}`         
             pn.pathes[nodeFlagName] = pn.pathes.partof.some(e=> e.type === pathType)
         })
-
-        // btn
-        const btnElem = this.view_.pathesToolbar.querySelector(`#${pathId}`)
-        this.view_.pathesToolbar.removeChild(btnElem)
     }
-
-    private d3updatePath()
-    {
-        // this.args.objects.pathes --> Btn[]
-    }    
 
     //########################################################################################################
     //##
@@ -722,9 +552,7 @@ export class Hypertree2
                     // on abort
                     this.animation = false
                     this.data.each((n:N)=> n.layoutReference = clone(n.layout))
-                    // on abort - ui.update(s)
-                    this.hypertreeMeta.update.transformation()
-                    this.hypertreeMeta.update.layout()
+                    // on abort - ui.update(s)                    
                 }
                 else 
                     requestAnimationFrame(()=> frame())

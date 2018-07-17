@@ -138,6 +138,7 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
         model.caption = (ht:Hypertree, n:N)=> {            
             const w  = (!n.value || n.value==1) ? '' : n.value + ' '
             n.precalc.txt = ( n.data && n.data.name) ? n.data.name : ''
+            n.precalc.clickable = true
             return n.precalc.txt + tosub(w) 
         }        
         return model
