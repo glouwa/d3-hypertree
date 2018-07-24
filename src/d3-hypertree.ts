@@ -1,5 +1,5 @@
 export { Hypertree }     from "./components/hypertree/hypertree"
-export { Hypertree2 }     from "./components/hypertree/hypertree2"
+export { HypertreeEx }     from "./components/hypertree/hypertreeex"
 export { HypertreeArgs } from "./models/hypertree/model"
 
 export * from './models/transformation/hyperbolic-math'

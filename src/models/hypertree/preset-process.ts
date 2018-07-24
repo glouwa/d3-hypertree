@@ -23,7 +23,7 @@ export function doVoronoiStuff(ud:IUnitDisk, cache:TransformationCache) {
                 || e.data.isPartOfAnySelectionPath*/
         //    )
 
-    updateCenterNodeStuff(ud, cache)    
+    updateCenterNodeStuff(ud, cache)
 }
 
 export function updateCenterNodeStuff(ud:IUnitDisk, cache:TransformationCache) 
