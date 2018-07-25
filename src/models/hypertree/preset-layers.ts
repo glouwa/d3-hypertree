@@ -102,6 +102,8 @@ export const layerSrc = [
                         + ` scale(${ud.args.nodeScale(d)})`,
     }),
     (v, ud:UnitDisk)=> new NodeLayer(v, {                            
+        invisible:  false,
+        hideOnDrag: true,
         name:       'center-node',
         className:  'center-node', 
         //clip:       '#node-32-clip', centernode.id
@@ -171,7 +173,7 @@ export const layerSrc = [
                          .style("stroke",      d=> d.pathes && d.pathes.finalcolor)
 
     }),                        
-    (v, ud:UnitDisk)=> new NodeLayer(v, {
+    (v, ud:UnitDisk)=> new NodeLayer(v, {        
         name:       'nodes',
         className:  'node',
         data:       ()=> ud.cache.leafOrLazy,
@@ -180,6 +182,8 @@ export const layerSrc = [
                         + ` scale(${ud.args.nodeScale(d)})`,
     }),                        
     (v, ud:UnitDisk)=> new SymbolLayer(v, {
+        invisible:  true,
+        hideOnDrag: true,
         name:       'symbols',
         data:       ()=> ud.cache.spezialNodes,
         r:          d=> .03,
@@ -235,7 +239,9 @@ export const layerSrc = [
                         ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` 
                         + d.scaleStrText                            
     }),    
-    (v, ud:UnitDisk)=> new InteractionLayer(v, {                            
+    (v, ud:UnitDisk)=> new InteractionLayer(v, {    
+        invisible:  true,
+        hideOnDrag: true,                        
         mouseRadius: .95,
         nohover:     false,
         onClick:     (n:N, m:C)=> {

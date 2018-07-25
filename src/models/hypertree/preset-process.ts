@@ -1,8 +1,5 @@
 import { N }                        from '../n/n'
 import { IUnitDisk }                 from "../../components/unitdisk/unitdisk"
-import { dfs2, dfsFlat2, dfsFlat }  from '../../models/transformation/hyperbolic-math'
-import { C, CptoCk, CktoCp, πify }  from '../../models/transformation/hyperbolic-math'
-import { lengthDilledation }        from '../../models/transformation/hyperbolic-math'
 import { TransformationCache }      from "../../models/transformation/hyperbolic-transformation"
 
 export function doVoronoiStuff(ud:IUnitDisk, cache:TransformationCache) {    
@@ -28,25 +25,8 @@ export function doVoronoiStuff(ud:IUnitDisk, cache:TransformationCache) {
 
 export function updateCenterNodeStuff(ud:IUnitDisk, cache:TransformationCache) 
 {
-    if (cache.centerNode) {
-        const pathStr = cache.centerNode
-            .ancestors()
-            .reduce((a, e)=> `${e.precalc.txt?("  "+e.precalc.txt+"  "):''}${a?"›":""}${a}`, '') 
-        
-        const hypertree = ud.view.hypertree
-        if (hypertree.view_.path) {            
-            hypertree.view_.path.innerText = pathStr // todo: html m frame?
-
-            if (cache.centerNode === hypertree.data && !hypertree.view_.btnHome.classList.contains('disabled')) {
-                hypertree.view_.btnHome.classList.add('disabled')
-                hypertree.view_.btnPathHome.classList.add('disabled')
-            }
-            if (cache.centerNode !== hypertree.data && hypertree.view_.btnHome.classList.contains('disabled')) {
-                hypertree.view_.btnHome.classList.remove('disabled')
-                hypertree.view_.btnPathHome.classList.remove('disabled')
-            }
-        }
-    }
+    if (cache.centerNode)         
+        ud.view.hypertree.update.centernode(cache.centerNode)    
 }
 
 /*

@@ -49,8 +49,8 @@ class Culler {
 }
 */
 function adjustMagic(ud:IUnitDisk, cache:TransformationCache) {
-    const rangeNodes = { min:120, max:420 }
-    const rangeMagic = { min:2,   max:500 }
+    const rangeNodes = { min:300, max:700 }
+    const rangeMagic = { min:4,   max:500 }
     const alpha      = 1.05
     //stopUp
     //stopDown
@@ -162,6 +162,13 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
         minWeight: path.map(n=> n.value / ud.view.hypertree.args.magic),
         Δ: [t1-t0, t2-t1, t3-t2, performance.now()-t3]        
     }
+
+    if (ud.view.hypertree.transition  
+     && ud.view.hypertree.transition.currentframe)
+        ud.view.hypertree.transition.currentframe.filter = ud.cacheMeta
+    else
+        console.log("why is there a cache update without a assigne transition?")
+
 }
 
 function pathToLastVisible(ud:IUnitDisk, cache:TransformationCache) {
