@@ -216,6 +216,7 @@ export class UnitDiskNav implements IUnitDisk
 
     update = {
         data: ()=> { 
+            // TODO: wenns h bei jeden des gleiche ist dann getter
             this.navBackground.args.data = this.args.data
             this.mainView.args.data = this.args.data
 
