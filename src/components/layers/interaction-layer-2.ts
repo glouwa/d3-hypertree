@@ -88,10 +88,12 @@ export class InteractionLayer2 implements ILayer
     private fireMouseEvent(eventName:string) {
         d3.event.stopPropagation()
         d3.event.preventDefault()
-           
+        
         const m = this.currMousePosAsC()         
-        this[eventName]('mouse', m)
-        this.view.hypertree.update.transformation()        
+        requestAnimationFrame(()=> {
+            this[eventName]('mouse', m)
+            this.view.hypertree.update.transformation()
+        })        
     }
 
     private fireTouchEvent(eventName:string) {
@@ -107,10 +109,12 @@ export class InteractionLayer2 implements ILayer
          
             this[eventName](pid, m)
         }
-        if (changedTouches.length === 2)
-            this.view.hypertree.update.layout()
-        else
-            this.view.hypertree.update.transformation()
+        requestAnimationFrame(()=> {
+            if (changedTouches.length === 2)
+                this.view.hypertree.update.layout()
+            else
+                this.view.hypertree.update.transformation()
+        })
     }
     /*
     onDragλ = (l:number)=> this.state.λ = l
@@ -142,7 +146,9 @@ export class InteractionLayer2 implements ILayer
             this.view.hypertree.updateLayout_(preservingNode) // only path to center
             t.state.P = compose(t.state, shift(t.state, { re:0, im:0 }, preservingNode.cache)).P
 
-            this.view.hypertree.update.layout()
+            requestAnimationFrame(()=> {
+                this.view.hypertree.update.layout()
+            })
             //this.view.layerstack.layers['labels-force'].update.force()   
         }
     }
