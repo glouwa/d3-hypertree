@@ -77,6 +77,9 @@ export class HypertreeEx extends Hypertree
 {
     view_: {
         parent         : HTMLElement,
+        html?          : HTMLElement,
+        unitdisk?      : IUnitDisk,
+        
         path?          : HTMLElement,
 
         btnHome?       : HTMLElement,
@@ -86,9 +89,7 @@ export class HypertreeEx extends Hypertree
 
         pathesToolbar? : HTMLElement,
         btnPathHome?   : HTMLElement,
-
-        html?          : HTMLElement,
-        unitdisk?      : IUnitDisk,
+        
         hypertreeMeta? : HypertreeMeta,        
     }
  
@@ -105,26 +106,36 @@ export class HypertreeEx extends Hypertree
     */
     public api = {
         setModel: (model: HypertreeArgs)=> {
+            console.group("set model")
             this.args = model        
             this.update.view.parent()
+            console.groupEnd()
         },
         setLangloader: ll=> { 
+            console.group("langloader initiate")
             this.args.langloader = ll            
-            this.args.langloader((langMap, t1, dl)=> {            
+            this.args.langloader((langMap, t1, dl)=> {
+                console.group("langloader")
                 this.langMap = langMap
                 this.updateLang_(dl)
                 this.update.langloader() 
+                console.groupEnd()
             })
+            console.groupEnd()
         },
-        setDataloader: dl=> { 
+        setDataloader: dl=> {            
+            console.group("dataloader initiate")
             this.args.dataloader = dl
             const t0 = performance.now()
             this.resetData()
             this.args.dataloader((d3h, t1, dl)=> {
-                this.initData(d3h, t0, t1, dl)                
-                this.animateUp()
+                console.group("dataloader")
+                this.initData(d3h, t0, t1, dl)
+                this.findInitλ_()
+                console.groupEnd()
             })
-        },
+            console.groupEnd()
+        },   
         toggleNav: ()=> {
             this.args.decorator = this.args.decorator === UnitDiskNav ? UnitDisk : UnitDiskNav
             this.update.view.unitdisk()
@@ -172,8 +183,11 @@ export class HypertreeEx extends Hypertree
             })            
             this.update.pathes()
         },
-        gotoHome: ()=>    this.animateTo({ re:0, im:0 }, null), 
-        gotoNode: (n:N)=> this.animateTo(CmulR({ re:n.layout.z.re, im:n.layout.z.im }, -1), null),
+        gotoHome: ()=>    this.animateTo(()=>{}, ()=>{}, { re:0, im:0 }, null), 
+        gotoNode: (n:N)=> this.animateTo(()=>{}, ()=>{}, CmulR({ re:n.layout.z.re, im:n.layout.z.im }, -1), null),        
+        goto:     ()=>    new Promise((resolve, reject) => {                                
+                                this.animateTo(resolve, reject, { re:0, im:0 }, null)                                 
+                          })
     }
 
     /*
@@ -208,7 +222,24 @@ export class HypertreeEx extends Hypertree
         pathes:         ()=> requestAnimationFrame(()=> {
                             this.unitdisk.update.pathes()
                             this.hypertreeMeta.update.transformation()     
-                        })
+                        }),
+        centernode:     (centerNode)=> {
+                            const pathStr = centerNode
+                                .ancestors()
+                                .reduce((a, e)=> `${e.precalc.txt?("  "+e.precalc.txt+"  "):''}${a?"›":""}${a}`, '') 
+        
+                            this.view_.path.innerText = pathStr // todo: html m frame?
+
+                            if (centerNode === this.data && !this.view_.btnHome.classList.contains('disabled')) {
+                                this.view_.btnHome.classList.add('disabled')
+                                this.view_.btnPathHome.classList.add('disabled')
+                            }
+                            if (centerNode !== this.data && this.view_.btnHome.classList.contains('disabled')) {
+                                this.view_.btnHome.classList.remove('disabled')
+                                this.view_.btnPathHome.classList.remove('disabled')
+                            }
+
+                        }
     }
 
     //########################################################################################################
@@ -239,9 +270,9 @@ export class HypertreeEx extends Hypertree
             const view = [
                 'translate(500,520) scale(470)', // small
                 'translate(500,520) scale(490)', // big
-                'translate(500,520) scale(720, 490)', // oval 
+                'translate(500,520) scale(620, 490)', // oval 
                 'translate(500,520) scale(720, 590)', // overlap
-                'translate(500,620) scale(680, 800)', // mobile (vertical)
+                'translate(480,620) scale(800, 800)', // mobile (vertical)
             ]
             const nav = [
                 'translate(95,95) scale(70)',
