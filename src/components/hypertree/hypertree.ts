@@ -12,6 +12,7 @@ import { CassignC }            from '../../models/transformation/hyperbolic-math
 import { CaddC, CsubC, CmulR } from '../../models/transformation/hyperbolic-math'
 import { sigmoid }             from '../../models/transformation/hyperbolic-math'
 import { IUnitDisk }           from '../unitdisk/unitdisk'
+import { ok } from 'assert';
 
 let globelhtid = 0
  
@@ -66,22 +67,40 @@ export class Hypertree
     langMap        : {}
 
     view_: {
-        parent         : HTMLElement,        
+        parent         : HTMLElement,   
         html?          : HTMLElement,
         //unitdisk?      : IUnitDisk,        
     }
 
     unitdisk       : IUnitDisk
-    animation      : boolean = false
+    transition     : Transition
+    log            = []
 
     modelMeta
     langMeta
-    layoutMeta
+    layoutMeta 
+
+    initPromise : Promise<void>
+    initPromisHandler : { resolve, reject }
     
     constructor(view:{ parent:HTMLElement }, args:HypertreeArgs) {
-        this.view_ = view
-        this.args = args        
+        console.group("hypertree constructor")
+        this.view_ = view        
+        this.args = args
         this.update.view.parent()
+
+        this.initPromise = new Promise((ok, err)=> {
+            this.initPromisHandler = { 
+                resolve: ok,
+                reject: err
+            }
+        })
+        this.initPromise.then(()=> {
+            console.log('then: ready to render frame. ?')
+            return new Promise(r=> r())
+        })
+
+        console.groupEnd()
     }
 
     /*
@@ -90,25 +109,36 @@ export class Hypertree
     */    
     public api = {
         setModel: (model: HypertreeArgs)=> {
+            console.group("set model")
             this.args = model        
             this.update.view.parent()
+            console.groupEnd()
         },
         setLangloader: ll=> { 
+            console.group("langloader initiate")
             this.args.langloader = ll            
             this.args.langloader((langMap, t1, dl)=> {
+                console.group("langloader")
                 this.langMap = langMap
                 this.updateLang_(dl)
                 this.update.langloader() 
+                console.groupEnd()
             })
+            console.groupEnd()
         },
-        setDataloader: dl=> {
+        setDataloader: dl=> {            
+            console.group("dataloader initiate")
             this.args.dataloader = dl
             const t0 = performance.now()
             this.resetData()
             this.args.dataloader((d3h, t1, dl)=> {
+                console.group("dataloader")
                 this.initData(d3h, t0, t1, dl)
-                this.animateUp()
+                this.findInitλ_()
+                //this.initpromiscontroler.resolve()
+                console.groupEnd()
             })
+            console.groupEnd()
         },       
         toggleSelection: (n:N)=> {
             this.toggleSelection(n)
@@ -142,24 +172,27 @@ export class Hypertree
             })            
             this.update.pathes()
         },
-        gotoHome: ()=>    this.animateTo({ re:0, im:0 }, null), 
-        gotoNode: (n:N)=> this.animateTo(CmulR({ re:n.layout.z.re, im:n.layout.z.im }, -1), null),
+        gotoHome: ()=>     this.animateTo(()=>{}, ()=>{}, { re:0, im:0 }, null), 
+        gotoNode: (n:N)=>  this.animateTo(()=>{}, ()=>{}, CmulR({ re:n.layout.z.re, im:n.layout.z.im }, -1), null),        
+        goto:     (p, l)=> new Promise((ok, err)=> this.animateTo(ok, err, p, l))
     }
 
     /*
     * this functions assume the model/view (this class internal state)
     * has changes, and call the according ui updates (animatin frames)
     */
+    requestAnimationFrameDummy = f=>f()
     public update = {
         view: {
             parent:         ()=> this.updateParent(),
-            unitdisk:       ()=> this.updateUnitdiskView(),            
+            unitdisk:       ()=> this.updateUnitdiskView(),
         },        
-        data:           ()=> requestAnimationFrame(()=> this.unitdisk.update.data()),        
-        langloader:     ()=> requestAnimationFrame(()=> this.update.data()),        
-        layout:         ()=> requestAnimationFrame(()=> this.unitdisk.update.transformation()),
-        transformation: ()=> requestAnimationFrame(()=> this.unitdisk.update.transformation()),
-        pathes:         ()=> requestAnimationFrame(()=> this.unitdisk.update.pathes())
+        data:           ()=> this.requestAnimationFrameDummy(()=> this.unitdisk.update.data()),        
+        langloader:     ()=> this.requestAnimationFrameDummy(()=> this.update.data()),        
+        layout:         ()=> this.requestAnimationFrameDummy(()=> this.unitdisk.update.transformation()),
+        transformation: ()=> this.requestAnimationFrameDummy(()=> this.unitdisk.update.transformation()),
+        pathes:         ()=> this.requestAnimationFrameDummy(()=> this.unitdisk.update.pathes()),
+        centernode:     (centerNode)=> {}
     }
 
     //########################################################################################################
@@ -170,6 +203,7 @@ export class Hypertree
 
     protected updateParent()
     {
+        console.log("_updateParent")
         this.view_.parent.innerHTML = '' // actually just remove this.view if present ... do less
         this.view_.html = HTML.parse<HTMLElement>(hypertreehtml)()
         this.view_.parent.appendChild(this.view_.html)
@@ -182,6 +216,7 @@ export class Hypertree
 
     protected updateUnitdiskView()
     {
+        console.log("_updateUnitdiskView")
         var udparent = this.view_.html.querySelector('.unitdisk-nav > svg')
         udparent.innerHTML = bubbleSvgDef
         this.unitdisk = new this.args.decorator({
@@ -212,6 +247,7 @@ export class Hypertree
     //########################################################################################################
 
     protected resetData() {        
+        console.log("_resetData")
         this.view_.html.querySelector('.preloader').innerHTML = htmlpreloader
         this.unitdisk.args.data = undefined
         this.data = undefined 
@@ -231,6 +267,7 @@ export class Hypertree
     }
 
     protected initData(d3h, t0, t1, dl) {
+        console.log("_initData")
         var t2 = performance.now()
         var ncount = 1
         globelhtid++
@@ -352,7 +389,7 @@ export class Hypertree
             if (pathType !== 'HoverPath')
                 pn.pathes.finalcolor = newpath.color
 
-            pn.pathes[`isPartOfAny${pathType}`] = true            
+            pn.pathes[`isPartOfAny${pathType}`] = true
         })  
         return newpath
     }
@@ -387,6 +424,7 @@ export class Hypertree
     //########################################################################################################
 
     protected updateLang_(dl=0) : void {
+        console.log("_updateLang")
         const t0 = performance.now()
         for (var n of dfsFlat(this.data, n=>true)) {
             n.precalc.txt = null            
@@ -395,7 +433,7 @@ export class Hypertree
         }
         if (dl || !this.langMeta)
             this.langMeta = {
-                Δ: [300+performance.now()-t0], 
+                Δ: [performance.now()-t0], 
                 map:this.langMap, 
                 filesize:dl 
             }
@@ -406,12 +444,12 @@ export class Hypertree
     private virtualCanvas = undefined
     private virtualCanvasContext = undefined
     protected updateLabelLen_() : void {
+        console.log("_updateLabelLen")
         var canvas = this.virtualCanvas 
             || (this.virtualCanvas = document.createElement("canvas"))
         var context = this.virtualCanvasContext 
             || (this.virtualCanvasContext = canvas.getContext("2d"))
-        context.font = ".002em Roboto";
-        console.log(window.devicePixelRatio)
+        context.font = ".002em Roboto"
 
         for (var n of dfsFlat(this.data, n=>true)) {
             if (n.precalc.txt2) {
@@ -424,12 +462,14 @@ export class Hypertree
     }
 
     protected updateImgHref_() : void {
+        console.log("_updateImgHref")
         if (this.args.iconmap)
             for (var n of dfsFlat(this.data, n=>true))             
                 n.precalc.imageHref = this.args.iconmap.fileName2IconUrl(n.data.name, n.data.type)                    
     }
 
     protected updateWeights_() : void {
+        console.log("_updateWeights")
         this.data.sum(this.args.weight) // äää besser...
         for (var n of dfsFlat(this.data, n=>true)) 
             // ...hier selber machen
@@ -437,8 +477,9 @@ export class Hypertree
                 / (Math.log2(this.data.value || this.data.children.length) || 1)        
     }
 
-    protected updateLayout_(preservingnode?:N) : void {
-        //app.toast('Layout')
+    public updateLayout_(preservingnode?:N) : void {
+        console.log("_updateLayout", this.args.geometry.transformation.state.λ)
+        
         const t0 = performance.now()        
         const t = this.args.geometry.transformation
         preservingnode = preservingnode || t.cache.centerNode
@@ -464,10 +505,12 @@ export class Hypertree
     //##
     //########################################################################################################
 
-    protected animateUp() : void {
+    protected animateUp_old() : void {
         new Animation({
             hypertree: this,
-            duration: 3000,
+            duration: 2000,            
+            resolve: ()=>{},
+            reject: ()=>{},
             frame: (progress01)=> {
                 const λ = .02 + sigmoid(progress01) * .75
                 this.args.geometry.transformation.state.λ = λ
@@ -475,19 +518,49 @@ export class Hypertree
                 const unculledNodes = this.args.geometry.transformation.cache.unculledNodes
                 const maxR = unculledNodes.reduce((max, n)=> Math.max(max, n.layout.zp.r), 0)                
                 this.update.layout()                
-                return maxR > (this.args.initMaxL || .85)
+                return maxR > (this.args.initMaxL || .95)
             },
             lastframe: ()=> {
-                this.data.each((n:N)=> n.layoutReference = clone(n.layout))
-                this.update.layout()                
+                this.data.each((n:N)=> n.layoutReference = clone(n.layout))                
+                this.initPromisHandler.resolve()
             }
         })
     }
+    protected findInitλ_() : void { this.animateUp_old() }
+    /*
+    protected findInitλ_() : void {
+        console.groupCollapsed('_findInitλ')
 
-    protected animateTo(newP:C, newλ:number) : void {
+        for (let i=0; i<50; i++)
+        {
+            const progress01 = i/50
+            const λ = .02 + sigmoid(progress01) * .75
+            this.args.geometry.transformation.state.λ = λ
+            this.updateLayout_()                
+            const unculledNodes = this.args.geometry.transformation.cache.unculledNodes
+            const maxR = unculledNodes.reduce((max, n)=> Math.max(max, n.layout.zp.r), 0)                                
+            this.unitdisk.args.cacheUpdate(this.unitdisk, this.unitdisk.cache)
+                
+            if (maxR > (this.args.initMaxL || .9)) {
+                console.info('MaxR at abort', maxR)
+                break
+            }
+        }
+        
+        this.update.layout()
+        this.data.each((n:N)=> n.layoutReference = clone(n.layout))                
+
+        console.groupEnd()
+        console.info('λ = ', this.args.geometry.transformation.state.λ)        
+    }
+    */
+
+    protected animateTo(resolve, reject, newP:C, newλ:number) : void {
         const initTS = clone(this.args.geometry.transformation.state)
         const way = CsubC(initTS.P, newP)
-        new Animation({
+        new Animation({            
+            resolve: resolve,
+            reject: reject,
             hypertree: this,
             duration: 1000,
             frame: (progress01)=> {
@@ -501,7 +574,7 @@ export class Hypertree
                 const animP = newP
                 CassignC(this.args.geometry.transformation.state.P, animP)            
                 this.update.transformation()
-            }
+            },            
         })
     }
 
@@ -513,70 +586,163 @@ export class Hypertree
             && this.unitdisk.navParameter 
             && this.unitdisk.navParameter.args.transformation.isMoving()
 
-        return view || nav || this.animation
+        const lowdetail = this.transition?this.transition.lowdetail:false
+        return view || nav || lowdetail
     }  
 }
 
-class Frame 
-{
-    begin
-    end
-    calculations
-    uiupdate
+
+
+class TransitionModel {
+    public hypertree : Hypertree
+    public type : 'animation' | 'interaction' | 'script'
+    public frames : Frame[] = []
+    public lowdetail = true
+    public currentframe : Frame    
+    public beginTime
+    public endTime
+
 }
 
-class Transition
-{
-    //private type = animation | interaction | script    
-    private Frames : Frame[]
+export class Transition
+{    
+    public hypertree : Hypertree
+    public type : 'animation' | 'interaction' | 'script'
+    public frames : Frame[] = []
+    public lowdetail = true
+    public currentframe : Frame    
+    public beginTime
+    public endTime
 
-    constructor() 
+    constructor(hypertree) 
     {
+        this.hypertree = hypertree
+    }
+
+    protected begin()
+    {
+        this.beginTime = performance.now()
+        
+    }
+
+    protected end()
+    {
+        this.currentframe = undefined
+        this.hypertree.transition = undefined
+        console.log('closing group, curretnf rame = undef, ht.transition=undef')
+        console.groupEnd()
+    }
+}
+
+
+export class Frame
+{
+    nr: number
+    created: number
+    begin: number
+    end: number
+    calculations: number
+    uiupdate: number
+    cachestats: {
+        n,
+        //countof culled, labels, cells whatnot
+    }
+    constructor(nr:number)
+    {
+        this.nr = nr
+        this.created = performance.now()
     }
 }
 
 class Animation extends Transition
 {
-    //frames = []
+    resolve
+    reject
     constructor(args)
     {
-        super()
-        if (args.hypertree.animation)
-            return
-        
-        args.hypertree.animation = true
+        super(args.hypertree)
 
-        const now = performance.now()
-        const timing = {
-            duraion: args.duration,
-            begin: now,
-            end: now + args.duration,            
-        }
-
-        const frame = ()=> 
-        {
-            const now = performance.now()
-            const done = now - timing.begin
-            const p01 = done / timing.duraion
-            
-            if (now > timing.end)
-            {
-                args.hypertree.animation = false
-                args.lastframe()                
+        if (args.hypertree.transition) {
+            if (args.hypertree.isAnimationRunning()) {
+                console.warn("Animaiion collision")
+                return
             }
-            else 
-            {                
-                if (!args.frame(p01)) 
+            else {
+                // last frame requestded, but not executed?
+                console.info("Skippigng last frame")
+                args.hypertree.transition.end()
+            }
+        }
+                
+        console.assert(!args.hypertree.transition)
+        console.group('Transition')
+        args.hypertree.transition = this
+        this.hypertree.log.push(this.hypertree.transition)
+        
+        const frame = ()=> 
+        {            
+            console.groupCollapsed("Frame")            
+            try{
+                this.currentframe = new Frame(0)
+                this.frames.push(this.currentframe)
+
+                const now = performance.now()   
+                if (!this.beginTime) {
+                    this.begin()
+                    this.endTime = now + args.duration                
+                }
+                
+                const done = now - this.beginTime
+                const p01 = done / args.duration
+                
+                if (now > this.endTime)
                 {
-                    requestAnimationFrame(()=> frame())
+                    this.hypertree.transition.lowdetail = false
+                    args.lastframe()         
+                    if (this.hypertree.transition === this) {
+                        this.end()
+                        args.resolve()
+                    }
                 }
                 else 
-                {
-                    args.hypertree.animation = false
-                    args.lastframe()                    
+                {                
+                    if (!args.frame(p01))
+                    {
+                        requestAnimationFrame(()=> frame())
+                    }
+                    else 
+                    {                    
+                        this.hypertree.transition.lowdetail = false
+                        args.lastframe()
+                        if (this.hypertree.transition === this) {
+                            this.end()
+                            args.resolve()
+                        }
+                    }
                 }
             }
+            catch(e)
+            {
+                console.log(e)
+            }
+            console.groupEnd()
         }
-        requestAnimationFrame(()=> frame())        
+/*
+        function frameWrapper(nr:number)
+        {
+            this.currentframe = new Frame()
+            this.frames.push(this.currentframe)
+
+            return function()
+            {
+                this.currentframe = new Frame()
+                this.frames.push(this.currentframe)
+            }
+        }
+*/
+        requestAnimationFrame(()=> frame())
+        //requestAnimationFrame(new Frame(0, frame).render)
+        //requestAnimationFrame(frameWrapper(0))
     }
 }
+
