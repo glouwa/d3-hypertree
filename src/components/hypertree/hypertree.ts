@@ -84,22 +84,18 @@ export class Hypertree
     initPromisHandler : { resolve, reject }
     
     constructor(view:{ parent:HTMLElement }, args:HypertreeArgs) {
-        console.group("hypertree constructor")
-        this.view_ = view        
-        this.args = args
-        this.update.view.parent()
-
+        console.group("hypertree constructor")        
+        
         this.initPromise = new Promise((ok, err)=> {
             this.initPromisHandler = { 
                 resolve: ok,
                 reject: err
             }
-        })
-        this.initPromise.then(()=> {
-            console.log('then: ready to render frame. ?')
-            return new Promise(r=> r())
-        })
+        })        
 
+        this.view_ = view        
+        this.args = args
+        this.update.view.parent()        
         console.groupEnd()
     }
 
@@ -133,10 +129,9 @@ export class Hypertree
             this.resetData()
             this.args.dataloader((d3h, t1, dl)=> {
                 console.group("dataloader")
-                this.initData(d3h, t0, t1, dl)
-                this.findInitλ_()
-                //this.initpromiscontroler.resolve()
-                console.groupEnd()
+                this.initData(d3h, t0, t1, dl)                                
+                console.groupEnd()                
+                this.initPromisHandler.resolve()
             })
             console.groupEnd()
         },       
@@ -303,6 +298,7 @@ export class Hypertree
         this.updateWeights_()
         this.updateLang_()
         this.updateImgHref_()        
+        this.findInitλ_()
         
         this.modelMeta = { 
             Δ: [t1-t0, t2-t1, t3-t2, performance.now()-t3], 
@@ -311,6 +307,33 @@ export class Hypertree
         }
 
         this.view_.html.querySelector('.preloader').innerHTML = ''
+    }
+
+    protected findInitλ_() : void {
+        console.groupCollapsed('_findInitλ')
+
+        for (let i=0; i<50; i++)
+        {
+            const progress01 = i/50            
+            const λ = .02 + sigmoid(progress01) * .75
+            console.log('#'+progress01, λ)
+            this.args.geometry.transformation.state.λ = λ
+            this.updateLayout_()                
+            this.unitdisk.args.cacheUpdate(this.unitdisk, this.unitdisk.cache)
+            const unculledNodes = this.args.geometry.transformation.cache.unculledNodes
+            const maxR = unculledNodes.reduce((max, n)=> Math.max(max, n.layout.zp.r), 0)           
+                
+            if (maxR > (this.args.initMaxL || .95)) {
+                console.info('MaxR at abort', maxR)
+                break
+            }
+        }
+        
+        this.update.layout()
+        this.data.each((n:N)=> n.layoutReference = clone(n.layout))                
+
+        console.groupEnd()
+        console.info('auto λ = ', this.args.geometry.transformation.state.λ)        
     }
 
     //########################################################################################################
@@ -505,60 +528,57 @@ export class Hypertree
     //##
     //########################################################################################################
 
-    protected animateUp_old() : void {
+    protected animateToλauto(ok, err) : void {
         new Animation({
+            name: 'animateToλauto',
             hypertree: this,
             duration: 2000,            
-            resolve: ()=>{},
-            reject: ()=>{},
+            resolve: ok,
+            reject: err,
             frame: (progress01)=> {
                 const λ = .02 + sigmoid(progress01) * .75
                 this.args.geometry.transformation.state.λ = λ
                 this.updateLayout_()                
-                const unculledNodes = this.args.geometry.transformation.cache.unculledNodes
-                const maxR = unculledNodes.reduce((max, n)=> Math.max(max, n.layout.zp.r), 0)                
                 this.update.layout()                
+                const unculledNodes = this.args.geometry.transformation.cache.unculledNodes
+                const maxR = unculledNodes.reduce((max, n)=> Math.max(max, n.layout.zp.r), 0)
                 return maxR > (this.args.initMaxL || .95)
             },
             lastframe: ()=> {
                 this.data.each((n:N)=> n.layoutReference = clone(n.layout))                
-                this.initPromisHandler.resolve()
+                console.log('animateToλ = '+this.args.geometry.transformation.state.λ)
             }
         })
     }
-    protected findInitλ_() : void { this.animateUp_old() }
-    /*
-    protected findInitλ_() : void {
-        console.groupCollapsed('_findInitλ')
 
-        for (let i=0; i<50; i++)
-        {
-            const progress01 = i/50
-            const λ = .02 + sigmoid(progress01) * .75
-            this.args.geometry.transformation.state.λ = λ
-            this.updateLayout_()                
-            const unculledNodes = this.args.geometry.transformation.cache.unculledNodes
-            const maxR = unculledNodes.reduce((max, n)=> Math.max(max, n.layout.zp.r), 0)                                
-            this.unitdisk.args.cacheUpdate(this.unitdisk, this.unitdisk.cache)
-                
-            if (maxR > (this.args.initMaxL || .9)) {
-                console.info('MaxR at abort', maxR)
-                break
+    protected animateToλ(ok, err, newλ) : void {
+        const initλ = this.args.geometry.transformation.state.λ
+        const way = initλ - newλ
+        new Animation({
+            name: 'animateToλ',
+            hypertree: this,
+            duration: 1000,            
+            resolve: ok,
+            reject: err,
+            frame: (progress01)=> {
+                const waydone01 = 1-sigmoid(progress01)
+                const waydone = way * waydone01
+                const λ = newλ + waydone
+                this.args.geometry.transformation.state.λ = λ
+                this.updateLayout_()                
+                this.update.layout()                
+            },
+            lastframe: ()=> {                
+                console.log('animateToλ = '+this.args.geometry.transformation.state.λ)
             }
-        }
-        
-        this.update.layout()
-        this.data.each((n:N)=> n.layoutReference = clone(n.layout))                
-
-        console.groupEnd()
-        console.info('λ = ', this.args.geometry.transformation.state.λ)        
+        })
     }
-    */
-
+    
     protected animateTo(resolve, reject, newP:C, newλ:number) : void {
         const initTS = clone(this.args.geometry.transformation.state)
         const way = CsubC(initTS.P, newP)
-        new Animation({            
+        new Animation({      
+            name: 'animateTo',            
             resolve: resolve,
             reject: reject,
             hypertree: this,
@@ -628,12 +648,10 @@ export class Transition
     protected end()
     {
         this.currentframe = undefined
-        this.hypertree.transition = undefined
-        console.log('closing group, curretnf rame = undef, ht.transition=undef')
+        this.hypertree.transition = undefined        
         console.groupEnd()
     }
 }
-
 
 export class Frame
 {
@@ -669,13 +687,13 @@ class Animation extends Transition
             }
             else {
                 // last frame requestded, but not executed?
-                console.info("Skippigng last frame")
+                console.warn("Skippigng last frame")
                 args.hypertree.transition.end()
             }
         }
                 
         console.assert(!args.hypertree.transition)
-        console.group('Transition')
+        console.groupCollapsed('Transition: ' + args.name)
         args.hypertree.transition = this
         this.hypertree.log.push(this.hypertree.transition)
         
@@ -701,6 +719,7 @@ class Animation extends Transition
                     args.lastframe()         
                     if (this.hypertree.transition === this) {
                         this.end()
+                        console.log('resolve by: time (maybe jump at end)')
                         args.resolve()
                     }
                 }
@@ -716,6 +735,7 @@ class Animation extends Transition
                         args.lastframe()
                         if (this.hypertree.transition === this) {
                             this.end()
+                            console.log('resolve by: frame return value')
                             args.resolve()
                         }
                     }
@@ -724,7 +744,7 @@ class Animation extends Transition
             catch(e)
             {
                 console.log(e)
-            }
+            }            
             console.groupEnd()
         }
 /*
