@@ -130,9 +130,9 @@ export class HypertreeEx extends Hypertree
             this.resetData()
             this.args.dataloader((d3h, t1, dl)=> {
                 console.group("dataloader")
-                this.initData(d3h, t0, t1, dl)
-                this.findInitλ_()
-                console.groupEnd()
+                this.initData(d3h, t0, t1, dl)                                
+                console.groupEnd()                
+                this.initPromisHandler.resolve()
             })
             console.groupEnd()
         },   
