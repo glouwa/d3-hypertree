@@ -330,7 +330,8 @@ function UnitdiskMeta_({ parent, ud, className })
         v.info.innerHTML  = `${kb}<sub>kB</sub>${sep}${mysi(n)}<sub>N</sub>` 
         v.info.title      = `download: ${Δ[0].toFixed(0)}ms\n`
         v.info.title     += `parse: ${Δ[1].toFixed(0)}ms\n`
-        v.info.title     += `hierarchy and weights: ${Δ[2].toFixed(0)}ms\n`
+        v.info.title     += `hierarchy: ${Δ[2].toFixed(0)}ms\n`
+        v.info.title     += `weights: ${Δ[3].toFixed(0)}ms\n`
         v.info.title     += `${lp} leaves\n`
         v.info.title     += `↕ max: ${h}\n`
         v.info.title     += `↕ μ: ?\n`
