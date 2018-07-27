@@ -85,17 +85,9 @@ export class Hypertree
     
     constructor(view:{ parent:HTMLElement }, args:HypertreeArgs) {
         console.group("hypertree constructor")        
-        
-        this.initPromise = new Promise((ok, err)=> {
-            this.initPromisHandler = { 
-                resolve: ok,
-                reject: err
-            }
-        })        
-
+       
         this.view_ = view        
-        this.args = args
-        this.update.view.parent()        
+        this.initPromise = this.api.setModel(args)
         console.groupEnd()
     }
 
@@ -104,35 +96,44 @@ export class Hypertree
     * and call the according update function(s)
     */    
     public api = {
-        setModel: (model: HypertreeArgs)=> {
+        setModel: (model: HypertreeArgs)=> new Promise<void>((ok, err)=> {        
             console.group("set model")
             this.args = model        
             this.update.view.parent()
+            this.api.setDataloader(ok, err, this.args.dataloader)
+            this.api.setLangloader(ok, err, this.args.langloader)
             console.groupEnd()
-        },
-        setLangloader: ll=> { 
+        }),
+        setLangloader: (ok, err, ll)=> { 
             console.group("langloader initiate")
-            this.args.langloader = ll            
+            this.args.langloader = ll
+
             this.args.langloader((langMap, t1, dl)=> {
                 console.group("langloader")
-                this.langMap = langMap
+                this.langMap = langMap || {}
                 this.updateLang_(dl)
-                this.update.langloader() 
+                this.update.langloader()
                 console.groupEnd()
+                
+                if (this.data)
+                    ok()
             })
             console.groupEnd()
         },
-        setDataloader: dl=> {            
+        setDataloader: (ok, err, dl)=> {            
             console.group("dataloader initiate")
             this.args.dataloader = dl
             const t0 = performance.now()
             this.resetData()
+            
             this.args.dataloader((d3h, t1, dl)=> {
                 console.group("dataloader")
-                this.initData(d3h, t0, t1, dl)                                
-                console.groupEnd()                
-                this.initPromisHandler.resolve()
-            })
+                this.data = this.initData(d3h, t0, t1, dl)                                
+                console.groupEnd()
+
+                if (this.langMap)
+                    ok()
+            })            
             console.groupEnd()
         },       
         toggleSelection: (n:N)=> {
@@ -204,9 +205,6 @@ export class Hypertree
         this.view_.parent.appendChild(this.view_.html)
        
         this.updateUnitdiskView()
-
-        this.api.setDataloader(this.args.dataloader)        
-        this.api.setLangloader(this.args.langloader)
     }
 
     protected updateUnitdiskView()
@@ -246,13 +244,15 @@ export class Hypertree
         this.view_.html.querySelector('.preloader').innerHTML = htmlpreloader
         this.unitdisk.args.data = undefined
         this.data = undefined 
+        this.langMap = undefined
         //if (this.view_.unitdisk && this.view_.unitdisk.cache)
         //    this.view_.unitdisk.cache.centerNode = undefined
+        // alias clearcache...
 
         this.args.geometry.transformation.state.λ = .001
         this.args.geometry.transformation.state.P.re = 0
         this.args.geometry.transformation.state.P.im = 0        
-        this.args.magic = 250
+        this.args.magic = 200
         this.args.geometry.transformation.cache.centerNode = undefined
 
         this.args.objects.selections = []
@@ -307,6 +307,7 @@ export class Hypertree
         }
 
         this.view_.html.querySelector('.preloader').innerHTML = ''
+        return this.data
     }
 
     protected findInitλ_() : void {
@@ -328,8 +329,10 @@ export class Hypertree
                 break
             }
         }
-        
-        this.update.layout()
+        /*this.args.geometry.transformation.state.λ = .01
+        this.updateLayout_()                
+        this.unitdisk.update.cache()
+        this.update.layout()*/
         this.data.each((n:N)=> n.layoutReference = clone(n.layout))                
 
         console.groupEnd()
@@ -528,53 +531,45 @@ export class Hypertree
     //##
     //########################################################################################################
 
-    protected animateToλauto(ok, err) : void {
-        new Animation({
-            name: 'animateToλauto',
-            hypertree: this,
-            duration: 2000,            
-            resolve: ok,
-            reject: err,
-            frame: (progress01)=> {
-                const λ = .02 + sigmoid(progress01) * .75
-                this.args.geometry.transformation.state.λ = λ
-                this.updateLayout_()                
-                this.update.layout()                
-                const unculledNodes = this.args.geometry.transformation.cache.unculledNodes
-                const maxR = unculledNodes.reduce((max, n)=> Math.max(max, n.layout.zp.r), 0)
-                return maxR > (this.args.initMaxL || .95)
-            },
-            lastframe: ()=> {
-                this.data.each((n:N)=> n.layoutReference = clone(n.layout))                
-                console.log('animateToλ = '+this.args.geometry.transformation.state.λ)
-            }
-        })
+    public drawDetailFrame()
+    {        
+        this.update.data()
     }
 
-    protected animateToλ(ok, err, newλ) : void {
+    public animateUp(ok, err) : void {
+        const newλ = this.args.geometry.transformation.state.λ 
+        this.args.geometry.transformation.state.λ = .001
+        this.animateToλ(ok, err, newλ)
+    }
+
+    public animateToλ(ok, err, newλ) : void {
         const initλ = this.args.geometry.transformation.state.λ
         const way = initλ - newλ
         new Animation({
             name: 'animateToλ',
             hypertree: this,
-            duration: 1000,            
+            duration: 500,            
             resolve: ok,
             reject: err,
             frame: (progress01)=> {
                 const waydone01 = 1-sigmoid(progress01)
+                console.assert(waydone01 >= 0 && waydone01 <= 1)
                 const waydone = way * waydone01
                 const λ = newλ + waydone
                 this.args.geometry.transformation.state.λ = λ
                 this.updateLayout_()                
-                this.update.layout()                
+                this.update.layout()
             },
             lastframe: ()=> {                
+                this.args.geometry.transformation.state.λ = newλ
+                this.updateLayout_()
+                this.update.layout()
                 console.log('animateToλ = '+this.args.geometry.transformation.state.λ)
             }
         })
     }
     
-    protected animateTo(resolve, reject, newP:C, newλ:number) : void {
+    public animateTo(resolve, reject, newP:C, newλ:number) : void {
         const initTS = clone(this.args.geometry.transformation.state)
         const way = CsubC(initTS.P, newP)
         new Animation({      
@@ -582,17 +577,17 @@ export class Hypertree
             resolve: resolve,
             reject: reject,
             hypertree: this,
-            duration: 1000,
+            duration: 500,
             frame: (progress01)=> {
                 const waydone01 = 1-sigmoid(progress01)
+                console.assert(waydone01 >= 0 && waydone01 <= 1)
                 const waydone = CmulR(way, waydone01)
                 const animP = CaddC(newP, waydone)
                 CassignC(this.args.geometry.transformation.state.P, animP)            
                 this.update.transformation()
             },
-            lastframe: ()=> {                
-                const animP = newP
-                CassignC(this.args.geometry.transformation.state.P, animP)            
+            lastframe: ()=> {
+                CassignC(this.args.geometry.transformation.state.P, newP)
                 this.update.transformation()
             },            
         })
@@ -611,8 +606,7 @@ export class Hypertree
     }  
 }
 
-
-
+/*
 class TransitionModel {
     public hypertree : Hypertree
     public type : 'animation' | 'interaction' | 'script'
@@ -621,8 +615,7 @@ class TransitionModel {
     public currentframe : Frame    
     public beginTime
     public endTime
-
-}
+}*/
 
 export class Transition
 {    
@@ -715,7 +708,7 @@ class Animation extends Transition
                 
                 if (now > this.endTime)
                 {
-                    this.hypertree.transition.lowdetail = false
+                    //this.hypertree.transition.lowdetail = false
                     args.lastframe()         
                     if (this.hypertree.transition === this) {
                         this.end()
@@ -731,7 +724,7 @@ class Animation extends Transition
                     }
                     else 
                     {                    
-                        this.hypertree.transition.lowdetail = false
+                        //this.hypertree.transition.lowdetail = false
                         args.lastframe()
                         if (this.hypertree.transition === this) {
                             this.end()

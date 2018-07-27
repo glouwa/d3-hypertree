@@ -1,12 +1,9 @@
 import * as d3                     from 'd3'
-import { HTML }                    from 'ducd'
 import { N }                       from '../../models/n/n'
 import { navdata }                 from '../../models/n/n-loaders'
 import { C, CktoCp, CptoCk }       from '../../models/transformation/hyperbolic-math'
 import { CmulR, CsubC, CaddC }     from '../../models/transformation/hyperbolic-math'
-import { dfsFlat, πify, CassignC } from '../../models/transformation/hyperbolic-math'
-import { ArrAddR }                 from '../../models/transformation/hyperbolic-math'
-import { Transformation }          from '../../models/transformation/hyperbolic-transformation'
+import { dfsFlat }                 from '../../models/transformation/hyperbolic-math'
 import { PanTransformation }       from '../../models/transformation/hyperbolic-transformation'
 import { NegTransformation }       from '../../models/transformation/hyperbolic-transformation'
 import { TransformationCache }     from '../../models/transformation/hyperbolic-transformation'
@@ -16,7 +13,6 @@ import { HypertreeMetaNav }        from '../meta/hypertree-meta/hypertree-meta'
 import { UnitDiskArgs }            from '../../models/unitdisk/unitdisk-model'
 import { UnitDiskView }            from '../../models/unitdisk/unitdisk-model'
 
-import { Hypertree }               from '../hypertree/hypertree'
 import { navBackgroundLayers }     from './layers-background'
 import { navBgNodeR }              from './layers-background'
 import { navParameterLayers }      from './layers-parameter'
@@ -38,6 +34,7 @@ export interface IUnitDisk
     }
 
     update: {
+        cache:          ()=> void,
         data:           ()=> void,
         layout:         ()=> void,
         transformation: ()=> void,
@@ -221,6 +218,10 @@ export class UnitDiskNav implements IUnitDisk
             this.mainView.args.data = this.args.data
 
             this.update.layout()
+        },
+        cache: ()=> { 
+            this.mainView.update.cache()
+            this.navParameter.update.cache()
         },
         layout: ()=> {
             this.mainView.update.cache()

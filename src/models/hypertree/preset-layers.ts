@@ -24,6 +24,8 @@ var animateUpR =      0.99
 var nodeRadiusOffset = (ls:UnitDisk)=> (d:N)=>
     CptoCk({ θ:d.cachep.θ, r:ls.args.nodeRadius(ls, d)*2 })
  
+const curvature = '-' // + - 0 l
+
 export const layerSrc = [    
     // nodes
     // nodes-leafs
@@ -76,8 +78,8 @@ export const layerSrc = [
         center:     ()=> '0 0'
     }),
     (v, ud:UnitDisk)=> new CellLayer(v, {
-        invisible:  true,
-        hideOnDrag: true,
+        invisible:  false,
+        hideOnDrag: false,
         clip:       '#circle-clip' + ud.args.clipRadius,
         data:       ()=> ud.cache.cells,                            
     }),
@@ -117,7 +119,7 @@ export const layerSrc = [
         hideOnDrag: false,
         name:       'path-arcs',
         className:  'arc',
-        curvature:  '-', // + - 0 l        
+        curvature:  curvature, // + - 0 l        
         data:       ()=> ud.cache.paths,                            
         nodePos:    n=> n.cache,
         nodePosStr: n=> n.strCache,
@@ -131,7 +133,7 @@ export const layerSrc = [
         hideOnDrag: true,
         name:       'path-lines',                            
         className:  'arc',
-        curvature:  'l', // + - 0 l
+        curvature:  curvature, // + - 0 l
         data:       ()=> ud.cache.paths,                            
         nodePos:    n=> n.cache,
         nodePosStr: n=> n.strCache,
@@ -145,7 +147,7 @@ export const layerSrc = [
         hideOnDrag: false,
         name:       'link-arcs',                            
         className:  'arc',
-        curvature:  '-', // + - 0 l
+        curvature:  curvature, // + - 0 l
         clip:       '#circle-clip' + ud.args.clipRadius,
         data:       ()=> ud.cache.links,                            
         nodePos:    n=> n.cache,
@@ -162,7 +164,7 @@ export const layerSrc = [
         hideOnDrag: true,
         name:       'link-lines',                            
         className:  'arc',
-        curvature:  'l', // + - 0 l
+        curvature:  curvature, 
         clip:       '#circle-clip' + ud.args.clipRadius,
         data:       ()=> ud.cache.links,                            
         nodePos:    n=> n.cache,
@@ -174,6 +176,8 @@ export const layerSrc = [
 
     }),                        
     (v, ud:UnitDisk)=> new NodeLayer(v, {        
+        invisible:  false,
+        hideOnDrag: true,
         name:       'nodes',
         className:  'node',
         data:       ()=> ud.cache.leafOrLazy,

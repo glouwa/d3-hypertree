@@ -97,7 +97,7 @@ export class HypertreeEx extends Hypertree
     hypertreeMeta  : HypertreeMeta
     
     constructor(view:{ parent:HTMLElement }, args:HypertreeArgs) {
-        super(view, args)        
+        super(view, args)
     }
 
     /*
@@ -105,37 +105,44 @@ export class HypertreeEx extends Hypertree
     * and call the according update function(s)
     */
     public api = {
-        setModel: (model: HypertreeArgs)=> {
+        setModel: (model: HypertreeArgs)=> new Promise<void>((ok, err)=> {        
             console.group("set model")
             this.args = model        
             this.update.view.parent()
+            this.api.setDataloader(ok, err, this.args.dataloader)
+            this.api.setLangloader(ok, err, this.args.langloader)
             console.groupEnd()
-        },
-        setLangloader: ll=> { 
+        }),
+        setLangloader: (ok, err, ll)=> { 
             console.group("langloader initiate")
-            this.args.langloader = ll            
+            this.args.langloader = ll
             this.args.langloader((langMap, t1, dl)=> {
                 console.group("langloader")
-                this.langMap = langMap
+                this.langMap = langMap || {}
                 this.updateLang_(dl)
-                this.update.langloader() 
+                this.update.langloader()
                 console.groupEnd()
+                
+                if (this.data)
+                    ok()
             })
             console.groupEnd()
         },
-        setDataloader: dl=> {            
+        setDataloader: (ok, err, dl)=> {            
             console.group("dataloader initiate")
             this.args.dataloader = dl
             const t0 = performance.now()
-            this.resetData()
+            this.resetData()            
             this.args.dataloader((d3h, t1, dl)=> {
                 console.group("dataloader")
-                this.initData(d3h, t0, t1, dl)                                
-                console.groupEnd()                
-                this.initPromisHandler.resolve()
-            })
+                this.data = this.initData(d3h, t0, t1, dl)                                
+                console.groupEnd()
+
+                if (this.langMap)
+                    ok()
+            })            
             console.groupEnd()
-        },   
+        },       
         toggleNav: ()=> {
             this.args.decorator = this.args.decorator === UnitDiskNav ? UnitDisk : UnitDiskNav
             this.update.view.unitdisk()
@@ -194,32 +201,33 @@ export class HypertreeEx extends Hypertree
     * this functions assume the model/view (this class internal state)
     * has changes, and call the according ui updates (animatin frames)
     */
+   requestAnimationFrameDummyDummy = f=>f()
     public update = {        
         view: {
             parent:         ()=> this.updateParent(),
             unitdisk:       ()=> { this.updateUnitdiskView(); this.updateMetaView(); },
             meta:           ()=> this.updateMetaView(),
         },        
-        data:           ()=> requestAnimationFrame(()=> {                            
+        data:           ()=> this.requestAnimationFrameDummy(()=> {                            
                             this.unitdisk.update.data()
                             this.hypertreeMeta.update.transformation()
                             this.hypertreeMeta.update.layout()
                             this.hypertreeMeta.update.model()
                         }),        
-        langloader:     ()=> requestAnimationFrame(()=> {                            
+        langloader:     ()=> this.requestAnimationFrameDummy(()=> {                            
                             this.hypertreeMeta.update.lang()
                             this.update.data()
                         }),        
-        layout:         ()=> requestAnimationFrame(()=> {
+        layout:         ()=> this.requestAnimationFrameDummy(()=> {
                             this.unitdisk.update.transformation() 
                             this.hypertreeMeta.update.layout()
                             this.hypertreeMeta.update.transformation()           
                         }),
-        transformation: ()=> requestAnimationFrame(()=> {
+        transformation: ()=> this.requestAnimationFrameDummy(()=> {
                             this.unitdisk.update.transformation() 
                             this.hypertreeMeta.update.transformation()     
                         }),
-        pathes:         ()=> requestAnimationFrame(()=> {
+        pathes:         ()=> this.requestAnimationFrameDummy(()=> {
                             this.unitdisk.update.pathes()
                             this.hypertreeMeta.update.transformation()     
                         }),
@@ -289,10 +297,7 @@ export class HypertreeEx extends Hypertree
         this.view_.path = <HTMLElement>this.view_.html.querySelector('#path')
 
         this.updateUnitdiskView()
-        this.updateMetaView()    
-
-        this.api.setDataloader(this.args.dataloader)        
-        this.api.setLangloader(this.args.langloader)
+        this.updateMetaView()
     }
 
     private updateMetaView()
