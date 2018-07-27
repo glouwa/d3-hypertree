@@ -98,6 +98,7 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
     otolModel: ()=> 
     {
         const model = modelBase()
+        model.geometry.nodeRadius = nodeInitR(.0075)
         model.caption = (ht:Hypertree, n:N)=> {
             // better: set of initial node actions [label, imghref, scalef, ...]
             const w  = (!n.value || n.value==1) ? '' : n.value + ' '
