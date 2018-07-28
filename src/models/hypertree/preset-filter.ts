@@ -164,11 +164,12 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
     }
 
     if (ud.view.hypertree.transition  
-     && ud.view.hypertree.transition.currentframe)
-        ud.view.hypertree.transition.currentframe.filter = ud.cacheMeta
+     && ud.view.hypertree.transition.currentframe) {
+        //ud.view.hypertree.transition.currentframe.cache = ud.cache
+        //ud.view.hypertree.transition.currentframe.cacheMeta = ud.cacheMeta
+    }
     //else
     //    console.log("why is there a cache update without a assigne transition?")
-
 }
 
 function pathToLastVisible(ud:IUnitDisk, cache:TransformationCache) {

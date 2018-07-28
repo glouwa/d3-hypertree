@@ -1,10 +1,6 @@
-import * as d3 from 'd3'
-
 import { tosub }                    from 'ducd'
 import { N }                        from '../n/n'
 
-import { C, CptoCk, CktoCp, πify }  from '../../models/transformation/hyperbolic-math'
-import { lengthDilledation }        from '../../models/transformation/hyperbolic-math'
 import { loaders }                  from '../../d3-hypertree'
 import { layoutBergé }              from '../n/n-layouts'
 import { layoutBuchheim }           from '../n/n-layouts'
@@ -18,16 +14,6 @@ import { UnitDisk }                 from '../../components/unitdisk/unitdisk'
 import { UnitDiskNav }              from '../../components/unitdisk/unitdisk'
 
 import { Hypertree }                from '../../components/hypertree/hypertree'
-
-import { NodeLayer }                from '../../components/layers/node-layer'
-import { CellLayer }                from '../../components/layers/cell-layer'
-import { BackgroundLayer }          from '../../components/layers/background-layer'
-import { SymbolLayer }              from '../../components/layers/symbol-layer'
-import { ArcLayer }                 from '../../components/layers/link-layer'
-import { LabelLayer }               from '../../components/layers/label-layer'
-import { InteractionLayer }         from '../../components/layers/interaction-layer'
-import { ImageLayer }               from '../../components/layers/image-layer'
-import { FocusLayer }               from '../../components/layers/focus-layer'
 
 import { layerSrc }                 from './preset-layers'
 import { cacheUpdate }              from './preset-filter'

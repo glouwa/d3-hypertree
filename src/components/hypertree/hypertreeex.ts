@@ -93,56 +93,20 @@ export class HypertreeEx extends Hypertree
         hypertreeMeta? : HypertreeMeta,        
     }
  
-    noHypertreeMeta        
+    noHypertreeMeta      
     hypertreeMeta  : HypertreeMeta
     
     constructor(view:{ parent:HTMLElement }, args:HypertreeArgs) {
         super(view, args)
+        this.api['toggleMeta'] = this.apiex.toggleMeta
+        this.api['toggleNav'] = this.apiex.toggleNav
     }
 
     /*
     * this functions modyfy model/view (this class internal state)
     * and call the according update function(s)
     */
-    public api = {
-        setModel: (model: HypertreeArgs)=> new Promise<void>((ok, err)=> {        
-            console.group("set model")
-            this.args = model        
-            this.update.view.parent()
-            this.api.setDataloader(ok, err, this.args.dataloader)
-            this.api.setLangloader(ok, err, this.args.langloader)
-            console.groupEnd()
-        }),
-        setLangloader: (ok, err, ll)=> { 
-            console.group("langloader initiate")
-            this.args.langloader = ll
-            this.args.langloader((langMap, t1, dl)=> {
-                console.group("langloader")
-                this.langMap = langMap || {}
-                this.updateLang_(dl)
-                this.update.langloader()
-                console.groupEnd()
-                
-                if (this.data)
-                    ok()
-            })
-            console.groupEnd()
-        },
-        setDataloader: (ok, err, dl)=> {            
-            console.group("dataloader initiate")
-            this.args.dataloader = dl
-            const t0 = performance.now()
-            this.resetData()            
-            this.args.dataloader((d3h, t1, dl)=> {
-                console.group("dataloader")
-                this.data = this.initData(d3h, t0, t1, dl)                                
-                console.groupEnd()
-
-                if (this.langMap)
-                    ok()
-            })            
-            console.groupEnd()
-        },       
+    public apiex = {         
         toggleNav: ()=> {
             this.args.decorator = this.args.decorator === UnitDiskNav ? UnitDisk : UnitDiskNav
             this.update.view.unitdisk()
@@ -157,44 +121,7 @@ export class HypertreeEx extends Hypertree
             this.hypertreeMeta.update.model()
             this.hypertreeMeta.update.layout()
             this.hypertreeMeta.update.transformation()
-        },
-        toggleSelection: (n:N)=> {
-            this.toggleSelection(n)
-            this.update.pathes()
-        },
-        //addPath: (pathid, node:N)=> { this.addPath(pathid, node) },
-        //removePath: (pathid, node:N)=> { this.removePath(pathid, node) },
-        setPathHead: (pathType:Path, n:N)=> {
-            this.setPathHead(pathType, n)
-            this.update.pathes()
-        },
-        selectQuery: (query:string, prop:string)=> {
-            const lq = query ? query.toLowerCase() : null
-            this.data.each(n=> {
-                n.pathes.partof = []
-                n.pathes.headof = undefined
-                n.pathes.labelcolor = undefined
-                n.pathes.finalcolor = undefined                
-                n.pathes.isPartOfAnyQuery = false                
-            })            
-            console.log('QUERY:', lq)
-            this.args.objects.pathes = []
-            this.data.each(n=> {                
-                if (n.data) {
-                    if (n.data.name.toLowerCase().includes(lq))
-                        this.addPath('Query', n)
-                    if (n.precalc && n.precalc.label)
-                        if (n.precalc.label.toLowerCase().includes(lq))
-                        this.addPath('Query', n)
-                }
-            })            
-            this.update.pathes()
-        },
-        gotoHome: ()=>    this.animateTo(()=>{}, ()=>{}, { re:0, im:0 }, null), 
-        gotoNode: (n:N)=> this.animateTo(()=>{}, ()=>{}, CmulR({ re:n.layout.z.re, im:n.layout.z.im }, -1), null),        
-        goto:     ()=>    new Promise((resolve, reject) => {                                
-                                this.animateTo(resolve, reject, { re:0, im:0 }, null)                                 
-                          })
+        }        
     }
 
     /*
@@ -246,7 +173,6 @@ export class HypertreeEx extends Hypertree
                                 this.view_.btnHome.classList.remove('disabled')
                                 this.view_.btnPathHome.classList.remove('disabled')
                             }
-
                         }
     }
 
@@ -262,6 +188,7 @@ export class HypertreeEx extends Hypertree
         this.view_.html = HTML.parse<HTMLElement>(hypertreehtml)()
         this.view_.parent.appendChild(this.view_.html)
         this.noHypertreeMeta   = new NoHypertreeMeta()
+
         this.view_.btnMeta     = <HTMLButtonElement>this.view_.html.querySelector('#btnmeta')
         this.view_.btnNav      = <HTMLButtonElement>this.view_.html.querySelector('#btnnav')
         this.view_.btnHome     = <HTMLButtonElement>this.view_.html.querySelector('#btnhome')
@@ -272,8 +199,8 @@ export class HypertreeEx extends Hypertree
                 
         this.view_.btnHome.onclick     = ()=> this.api.gotoHome()
         this.view_.btnPathHome.onclick = ()=> this.api.gotoHome()
-        this.view_.btnMeta.onclick     = ()=> this.api.toggleMeta()
-        this.view_.btnNav.onclick      = ()=> this.api.toggleNav()        
+        this.view_.btnMeta.onclick     = ()=> this.api['toggleMeta']()
+        this.view_.btnNav.onclick      = ()=> this.api['toggleNav']()        
         this.view_.btnSize.onclick     = ()=> {            
             const view = [
                 'translate(500,520) scale(470)', // small

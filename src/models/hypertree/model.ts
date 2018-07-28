@@ -12,7 +12,7 @@ import { IUnitDisk }           from '../../components/unitdisk/unitdisk'
 import { ILayer }              from '../../components/layerstack/layer'
 
 export interface HypertreeArgs
-{    
+{
     iconmap:       any,
 
     dataloader:    (ok: (root:N, t0:number, dl:number)=>void)=> void,    
@@ -37,4 +37,41 @@ export interface HypertreeArgs
     geometry:      UnitDiskArgs
     //navigation?: UnitDiskArgs | null,
     //meta?:       boolean,
+}
+
+export interface HypertreeArgs_Soll
+{    
+    model: {
+        data:          N
+        langmap:       {}
+        dataloader:    (ok: (root:N, t0:number, dl:number)=>void)=> void
+        langloader:    (lang)=> (ok)=> void
+        caption:       (hypertree:Hypertree, n:N)=> string        
+        iconmap:       any
+        root:          null
+        selections:    N[]
+        pathes:        Path[]
+        traces:        Trace[]
+    }
+    layout: {
+        type:          LayoutFunction
+        weight:        (n:N)=> number
+        rootWedge: {
+            orientation: number
+            angle:       number
+        }
+    }
+    transformation: {
+        type:            { new(view:UnitDiskView, args:UnitDiskArgs) : IUnitDisk }
+        P:               { re: 0, im:.5 },
+        θ:               { re: 1, im:0 },
+        λ:               'auto(.75)'
+    }
+    filter: {
+        magic:         number,
+    }    
+    interaction: {
+        onNodeSelect:  (n:N)=> void,
+    }
+    geometry:          UnitDiskArgs
 }

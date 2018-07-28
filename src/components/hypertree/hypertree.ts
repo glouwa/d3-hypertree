@@ -169,8 +169,9 @@ export class Hypertree
             this.update.pathes()
         },
         gotoHome: ()=>     this.animateTo(()=>{}, ()=>{}, { re:0, im:0 }, null), 
-        gotoNode: (n:N)=>  this.animateTo(()=>{}, ()=>{}, CmulR({ re:n.layout.z.re, im:n.layout.z.im }, -1), null),        
-        goto:     (p, l)=> new Promise((ok, err)=> this.animateTo(ok, err, p, l))
+        gotoNode: (n:N)=>  this.animateTo(()=>{}, ()=>{}, CmulR({ re:n.layout.z.re, im:n.layout.z.im }, -1), null),
+        goto:     (p, l)=> new Promise((ok, err)=> this.animateTo(ok, err, p, l)),
+        gotoλ:    (l)=>    new Promise((ok, err)=> this.animateToλ(ok, err, l))
     }
 
     /*
@@ -254,9 +255,11 @@ export class Hypertree
         this.args.geometry.transformation.state.P.im = 0        
         this.args.magic = 200
         this.args.geometry.transformation.cache.centerNode = undefined
+        //this.args.geometry.transformation.cache.hoverNode = undefined
 
         this.args.objects.selections = []
         this.args.objects.pathes = []
+        this.args.objects.traces = []
         
         this.update.data()   
     }
@@ -281,13 +284,12 @@ export class Hypertree
             })
             //.sum(this.args.weight) // this.updateWeights()
 
-        const startAngle    = 3 * π / 2
-        const defAngleWidth = 1.5 * π //* 1.999999999999
-        const sad           = 2.0
+        const startAngle    = 3 * π/2
+        const defAngleWidth = 3 * π/2 //1.5 * π //* 1.999999999999        
         this.data.layout = {
             wedge: {
-                α: πify(startAngle - defAngleWidth/sad),
-                Ω: πify(startAngle + defAngleWidth/sad)
+                α: πify(startAngle - defAngleWidth/2),
+                Ω: πify(startAngle + defAngleWidth/2)
             }
         }
         setZ(this.data, { re:0, im:0 })
@@ -329,10 +331,6 @@ export class Hypertree
                 break
             }
         }
-        /*this.args.geometry.transformation.state.λ = .01
-        this.updateLayout_()                
-        this.unitdisk.update.cache()
-        this.update.layout()*/
         this.data.each((n:N)=> n.layoutReference = clone(n.layout))                
 
         console.groupEnd()
@@ -548,7 +546,7 @@ export class Hypertree
         new Animation({
             name: 'animateToλ',
             hypertree: this,
-            duration: 500,            
+            duration: 750,            
             resolve: ok,
             reject: err,
             frame: (progress01)=> {
@@ -559,13 +557,7 @@ export class Hypertree
                 this.args.geometry.transformation.state.λ = λ
                 this.updateLayout_()                
                 this.update.layout()
-            },
-            lastframe: ()=> {                
-                this.args.geometry.transformation.state.λ = newλ
-                this.updateLayout_()
-                this.update.layout()
-                console.log('animateToλ = '+this.args.geometry.transformation.state.λ)
-            }
+            }            
         })
     }
     
@@ -577,7 +569,7 @@ export class Hypertree
             resolve: resolve,
             reject: reject,
             hypertree: this,
-            duration: 500,
+            duration: 750,
             frame: (progress01)=> {
                 const waydone01 = 1-sigmoid(progress01)
                 console.assert(waydone01 >= 0 && waydone01 <= 1)
@@ -585,11 +577,7 @@ export class Hypertree
                 const animP = CaddC(newP, waydone)
                 CassignC(this.args.geometry.transformation.state.P, animP)            
                 this.update.transformation()
-            },
-            lastframe: ()=> {
-                CassignC(this.args.geometry.transformation.state.P, newP)
-                this.update.transformation()
-            },            
+            }
         })
     }
 
@@ -672,90 +660,47 @@ class Animation extends Transition
     constructor(args)
     {
         super(args.hypertree)
-
-        if (args.hypertree.transition) {
-            if (args.hypertree.isAnimationRunning()) {
-                console.warn("Animaiion collision")
-                return
-            }
-            else {
-                // last frame requestded, but not executed?
-                console.warn("Skippigng last frame")
-                args.hypertree.transition.end()
-            }
+        if (args.hypertree.transition) {            
+            console.warn("Animaiion collision")
+            return            
         }
-                
-        console.assert(!args.hypertree.transition)
+        
         console.groupCollapsed('Transition: ' + args.name)
         args.hypertree.transition = this
         this.hypertree.log.push(this.hypertree.transition)
         
         const frame = ()=> 
-        {            
-            console.groupCollapsed("Frame")            
-            try{
-                this.currentframe = new Frame(0)
-                this.frames.push(this.currentframe)
-
-                const now = performance.now()   
-                if (!this.beginTime) {
-                    this.begin()
-                    this.endTime = now + args.duration                
-                }
-                
-                const done = now - this.beginTime
-                const p01 = done / args.duration
-                
-                if (now > this.endTime)
-                {
-                    //this.hypertree.transition.lowdetail = false
-                    args.lastframe()         
-                    if (this.hypertree.transition === this) {
-                        this.end()
-                        console.log('resolve by: time (maybe jump at end)')
-                        args.resolve()
-                    }
-                }
-                else 
-                {                
-                    if (!args.frame(p01))
-                    {
-                        requestAnimationFrame(()=> frame())
-                    }
-                    else 
-                    {                    
-                        //this.hypertree.transition.lowdetail = false
-                        args.lastframe()
-                        if (this.hypertree.transition === this) {
-                            this.end()
-                            console.log('resolve by: frame return value')
-                            args.resolve()
-                        }
-                    }
-                }
-            }
-            catch(e)
-            {
-                console.log(e)
-            }            
-            console.groupEnd()
-        }
-/*
-        function frameWrapper(nr:number)
         {
-            this.currentframe = new Frame()
+            console.groupCollapsed("Frame")            
+            
+            this.currentframe = new Frame(0)
             this.frames.push(this.currentframe)
 
-            return function()
-            {
-                this.currentframe = new Frame()
-                this.frames.push(this.currentframe)
+            const now = performance.now()   
+            if (!this.beginTime) {
+                this.begin()
+                this.endTime = now + args.duration                
             }
+            
+            const done = now - this.beginTime
+            const p01 = done / args.duration
+            
+            if (now > this.endTime) {
+                args.frame(1)
+                this.end()
+                console.log('resolve by: time (maybe jump at end)')
+                args.resolve()                
+            }
+            else {
+                args.frame(p01)                
+                requestAnimationFrame(()=> frame())                
+            }
+                             
+            this.currentframe = undefined
+            console.groupEnd()
         }
-*/
+
         requestAnimationFrame(()=> frame())
-        //requestAnimationFrame(new Frame(0, frame).render)
-        //requestAnimationFrame(frameWrapper(0))
     }
 }
 

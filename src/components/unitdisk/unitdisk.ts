@@ -25,6 +25,7 @@ export interface IUnitDisk
     args:               UnitDiskArgs
 
     cache    
+    voronoiLayout :     d3.VoronoiLayout<N>
     layerStack:         LayerStack
     HypertreeMetaType
     navParameter?:      UnitDisk,
@@ -122,6 +123,10 @@ export class UnitDiskNav implements IUnitDisk
     public args          : UnitDiskArgs
     public cache         // redircteds NOT xD to view.cache    
     public layerStack
+    
+    get voronoiLayout() : d3.VoronoiLayout<N> {
+        return this.mainView.voronoiLayout;
+    }
       
     public mainView      : UnitDisk // public wegen hypertreemeta
     public navBackground : UnitDisk // public wegen hypertreemeta
