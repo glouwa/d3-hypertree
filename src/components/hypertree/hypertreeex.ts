@@ -108,7 +108,7 @@ export class HypertreeEx extends Hypertree
     */
     public apiex = {         
         toggleNav: ()=> {
-            this.args.decorator = this.args.decorator === UnitDiskNav ? UnitDisk : UnitDiskNav
+            this.args.geometry.decorator = this.args.geometry.decorator === UnitDiskNav ? UnitDisk : UnitDiskNav
             this.update.view.unitdisk()
             this.update.data()
             this.hypertreeMeta.update.model()

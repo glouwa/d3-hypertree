@@ -47,35 +47,42 @@ var arcWidth = d=>
 
 const modelBase : ()=> HypertreeArgs = ()=>
 ({
-    iconmap:      null,
-    dataloader:   null,
-    langloader:   null,
-    data:         null,
-    langmap:      null,
-    weight:       (n:N)=> ((!n.children || !n.children.length)?1:0),
-    caption:      (ht:Hypertree, n:N)=> undefined,
-    onNodeSelect: ()=> {},
-    layout:       layoutBergé, // [0, π/2]
-    magic:        160,
-    objects: {                      // oder indizes?
-        selections: [],
-        pathes: [],
-        traces: []
+    iconmap:            null,
+    dataloader:         null,
+    langloader:         null,
+    data:               null,
+    langmap:            null,    
+    caption:            (ht:Hypertree, n:N)=> undefined,    
+    objects: {
+        selections:     [],
+        pathes:         [],
+        traces:         [],
+    },
+    layout: {
+        type:           layoutBergé,
+        weight:         (n:N)=> ((!n.children || !n.children.length)?1:0),
+        initMaxλ:       .97
     },    
-    decorator:   UnitDisk,
+    filter: {
+        magic:          160,
+    },        
     geometry: {
+        decorator:      UnitDisk,
+        cacheUpdate:    cacheUpdate,
+        layers:         layerSrc,
         clipRadius:     1,
         nodeRadius:     nodeInitR(.01),   
         nodeScale:      nodeScale,
         nodeFilter:     hasCircle,
-        linkWidth:      arcWidth,
+        linkWidth:      arcWidth,        
         transformation: new HyperbolicTransformation({
-            P:{ re: 0, im:.5 },
-            θ:{ re: 1, im:0 },
-            λ:.1
-        }),
-        cacheUpdate:    cacheUpdate,
-        layers:         layerSrc
+            P:              { re: 0, im:.5 },
+            θ:              { re: 1, im:0 },
+            λ:              .1
+        })
+    },
+    interaction: {
+        onNodeSelect:   ()=>{},
     }
 })
 
@@ -113,7 +120,7 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
     generatorSpiralModel: ()=> 
     {
         const model = modelBase()     
-        model.layout = layoutSpiral  
+        model.layout.type = layoutSpiral  
         return model
     },
     fsModel: ()=> 
@@ -135,11 +142,11 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
         const model = presets.otolModel()   
         model.geometry.nodeRadius = nodeInitRNoInner(.0001)
         model.geometry.nodeScale = nodeScaleNoInner
-        model.initMaxL = .55
-        model.onNodeSelect = s=> { console.log('###########', s) }
-        model.geometry.nodeFilter = n=> true                
+        model.geometry.nodeFilter = n=> true
+        model.layout.initMaxλ = .6
+        model.interaction.onNodeSelect = s=> { console.log('###########', s) }        
         model.caption = (ht:Hypertree, n:N)=> {
-            const id = ( n.data && n.data.name) ? n.data.name : ''            
+            const id = ( n.data && n.data.name) ? n.data.name : ''
             const i  = ht.args.iconmap.emojimap[id]
 
             n.precalc.icon = i            

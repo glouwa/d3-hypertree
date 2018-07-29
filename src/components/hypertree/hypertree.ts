@@ -213,14 +213,15 @@ export class Hypertree
         console.log("_updateUnitdiskView")
         var udparent = this.view_.html.querySelector('.unitdisk-nav > svg')
         udparent.innerHTML = bubbleSvgDef
-        this.unitdisk = new this.args.decorator({
+        this.unitdisk = new this.args.geometry.decorator({
             parent:         udparent,
             className:      'unitDisc',
             position:       'translate(500,520) scale(470)',
             hypertree:      this,
         },
         {
-            data:           null, //this.data,            
+            data:           null, //this.data,     
+            decorator:      null,       
             transformation: this.args.geometry.transformation,
             transform:      (n:N)=> this.unitdisk.args.transformation.transformPoint(n.layout.z),
             layers:         this.args.geometry.layers,
@@ -253,7 +254,7 @@ export class Hypertree
         this.args.geometry.transformation.state.λ = .001
         this.args.geometry.transformation.state.P.re = 0
         this.args.geometry.transformation.state.P.im = 0        
-        this.args.magic = 200
+        this.args.filter.magic = 200
         this.args.geometry.transformation.cache.centerNode = undefined
         //this.args.geometry.transformation.cache.hoverNode = undefined
 
@@ -326,7 +327,7 @@ export class Hypertree
             const unculledNodes = this.args.geometry.transformation.cache.unculledNodes
             const maxR = unculledNodes.reduce((max, n)=> Math.max(max, n.layout.zp.r), 0)           
                 
-            if (maxR > (this.args.initMaxL || .95)) {
+            if (maxR > (this.args.layout.initMaxλ || .95)) {
                 console.info('MaxR at abort', maxR)
                 break
             }
@@ -494,7 +495,7 @@ export class Hypertree
 
     protected updateWeights_() : void {
         console.log("_updateWeights")
-        this.data.sum(this.args.weight) // äää besser...
+        this.data.sum(this.args.layout.weight) // äää besser...
         for (var n of dfsFlat(this.data, n=>true)) 
             // ...hier selber machen
             n.precalc.weightScale = (Math.log2(n.value) || 1) 
@@ -510,10 +511,10 @@ export class Hypertree
 
         if (preservingnode)
             preservingnode.ancestors().reverse().forEach(n=> {
-                this.args.layout(n, this.args.geometry.transformation.state.λ, true)    
+                this.args.layout.type(n, this.args.geometry.transformation.state.λ, true)    
             })
         else
-            this.args.layout(this.data, this.args.geometry.transformation.state.λ)
+            this.args.layout.type(this.data, this.args.geometry.transformation.state.λ)
                
         if (preservingnode) 
             t.state.P = CmulR(preservingnode.layout.z, -1) 

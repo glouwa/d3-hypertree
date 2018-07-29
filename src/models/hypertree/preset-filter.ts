@@ -56,13 +56,13 @@ function adjustMagic(ud:IUnitDisk, cache:TransformationCache) {
     //stopDown
     if (cache.unculledNodes) {
         if (cache.unculledNodes.length > rangeNodes.max) {
-            if (ud.view.hypertree.args.magic > rangeMagic.min) { // ???
-                ud.view.hypertree.args.magic /= alpha                
+            if (ud.view.hypertree.args.filter.magic > rangeMagic.min) { // ???
+                ud.view.hypertree.args.filter.magic /= alpha                
             }
         }
         if (cache.unculledNodes.length < rangeNodes.min) {
-            if (ud.view.hypertree.args.magic < rangeMagic.max) { // ???
-                ud.view.hypertree.args.magic *= alpha
+            if (ud.view.hypertree.args.filter.magic < rangeMagic.max) { // ???
+                ud.view.hypertree.args.filter.magic *= alpha
             }
         }
     }
@@ -85,7 +85,7 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
   
     const mf = ud.view.hypertree.isAnimationRunning() ? 1:1
     function abortfilter(n, idx, highway) { // return false to abort
-        n.minWeight = highway[0].value / ud.view.hypertree.args.magic / mf
+        n.minWeight = highway[0].value / ud.view.hypertree.args.filter.magic / mf
         peocessNodeTransformation(ud, cache, n)
         peocessNode(ud, cache, n, maxLabelR, n.minWeight)        
         return !n.isOut
@@ -159,7 +159,7 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
     
     // only for meta view
     ud.cacheMeta = {
-        minWeight: path.map(n=> n.value / ud.view.hypertree.args.magic),
+        minWeight: path.map(n=> n.value / ud.view.hypertree.args.filter.magic),
         Δ: [t1-t0, t2-t1, t3-t2, performance.now()-t3]        
     }
 
@@ -198,7 +198,7 @@ function pathToLastVisible(ud:IUnitDisk, cache:TransformationCache) {
 
 function peocessNodeTransformation(ud:IUnitDisk, cache:TransformationCache, n:N) {
     n.cache = n.cache || { re:0, im:0 }    
-    ud.view.hypertree.args.layout(n, ud.args.transformation.state.λ, true)
+    ud.view.hypertree.args.layout.type(n, ud.args.transformation.state.λ, true)
     CassignC(n.cache, ud.args.transform(n)) 
     //CassignC(n.cache, n.layout.z) 
     n.cachep = CktoCp(n.cache)   

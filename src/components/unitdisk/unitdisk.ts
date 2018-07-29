@@ -150,6 +150,7 @@ export class UnitDiskNav implements IUnitDisk
         },
         {
             data:               args.data,
+            decorator:          null,
             
             cacheUpdate:        null,
             transformation:     args.transformation,
@@ -176,6 +177,7 @@ export class UnitDiskNav implements IUnitDisk
         },
         {            
             data:               navdata(),
+            decorator:          null,
             layers:             navParameterLayers,
             cacheUpdate:        (ud:UnitDisk, cache:TransformationCache)=> {
                 var t0 = performance.now()

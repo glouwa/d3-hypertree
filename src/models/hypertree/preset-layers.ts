@@ -79,7 +79,7 @@ export const layerSrc = [
     }),
     (v, ud:UnitDisk)=> new CellLayer(v, {
         invisible:  false,
-        hideOnDrag: false,
+        hideOnDrag: true,
         clip:       '#circle-clip' + ud.args.clipRadius,
         data:       ()=> ud.cache.cells,                            
     }),
@@ -252,7 +252,7 @@ export const layerSrc = [
                         var s = n.ancestors().find(e=> true)          // obsolete
                         //ud.args.hypertree.updatePath('SelectionPath', s) // toggle selection 
                         ud.view.hypertree.api.toggleSelection(s)          // toggle selection 
-                        ud.view.hypertree.args.onNodeSelect(s)        // focus splitter
+                        ud.view.hypertree.args.interaction.onNodeSelect(s)        // focus splitter
         }
     }),
     (v, ud:UnitDisk)=> new InteractionLayer2(v, {                            
@@ -262,7 +262,7 @@ export const layerSrc = [
                         var s = n.ancestors().find(e=> true)          // obsolete
                         //ud.args.hypertree.updatePath('SelectionPath', s) // toggle selection 
                         ud.view.hypertree.api.toggleSelection(s)          // toggle selection 
-                        ud.view.hypertree.args.onNodeSelect(s)        // focus splitter
+                        ud.view.hypertree.args.interaction.onNodeSelect(s)        // focus splitter
         }
     }),
     (v, ud:UnitDisk)=> new TraceLayer(v, {  

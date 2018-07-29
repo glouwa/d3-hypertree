@@ -19,6 +19,7 @@ export interface UnitDiskArgs
 {
     data?:             N,
 
+    decorator:         { new(view:UnitDiskView, args:UnitDiskArgs) : IUnitDisk },
     transformation:    Transformation<N>,
     cacheUpdate:       (ud:IUnitDisk, cache:TransformationCache)=> void,    
     transform?:        (n:N)=> C,
