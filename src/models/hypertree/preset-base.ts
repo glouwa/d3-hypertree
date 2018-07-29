@@ -9,19 +9,20 @@ import { layoutSpiral }             from '../n/n-layouts'
 import { HyperbolicTransformation } from '../../d3-hypertree'
 import { PanTransformation }        from '../../d3-hypertree'
 
-import { HypertreeArgs }            from '../../models/hypertree/model'
+import { HypertreeArgs }            from './model'
 import { UnitDisk }                 from '../../components/unitdisk/unitdisk'
 import { UnitDiskNav }              from '../../components/unitdisk/unitdisk'
 
 import { Hypertree }                from '../../components/hypertree/hypertree'
 
 import { layerSrc }                 from './preset-layers'
-import { cacheUpdate }              from './preset-filter'
+import { cacheUpdate }              from './magic-filter'
 
-var hasLazy =   n=> (n.hasOutChildren && n.isOutλ)
-var isLeaf =    n=> !n.children || !n.children.length
-var isRoot =    n=> !n.parent 
-var hasCircle = n=> hasLazy(n) || isRoot(n) || isLeaf(n)
+const π =         Math.PI
+const hasLazy =   n=> (n.hasOutChildren && n.isOutλ)
+const isLeaf =    n=> !n.children || !n.children.length
+const isRoot =    n=> !n.parent 
+const hasCircle = n=> hasLazy(n) || isRoot(n) || isLeaf(n)
 
 var nodeInitR = (c:number)=> (ud:UnitDisk, d:N)=>
     c
@@ -51,7 +52,7 @@ const modelBase : ()=> HypertreeArgs = ()=>
     dataloader:         null,
     langloader:         null,
     data:               null,
-    langmap:            null,    
+    langmap:            null,
     caption:            (ht:Hypertree, n:N)=> undefined,    
     objects: {
         selections:     [],
@@ -61,14 +62,28 @@ const modelBase : ()=> HypertreeArgs = ()=>
     layout: {
         type:           layoutBergé,
         weight:         (n:N)=> ((!n.children || !n.children.length)?1:0),
-        initMaxλ:       .97
+        initMaxλ:       .97,
+        rootWedge: {
+            orientation: 3 * π/2,
+            angle:       3 * π/2
+        }
     },    
-    filter: {
+    filter: {        
+        type:           'magic',
+        cullingRadius:  .98,
         magic:          160,
+        alpha:          1.05,
+        weight:         (n)=> ((!n.children || !n.children.length)?1:0),
+        magicRange:     { min:2,   max:500 },                    
+        cullingWeight:  { min:200, max:400 },                    
+        labelRadiusFactor: 1.8,
+        maxlabelRadius: .85,
+        maxlabels:      25,
     },        
     geometry: {
         decorator:      UnitDisk,
         cacheUpdate:    cacheUpdate,
+        layerBase:      'default',
         layers:         layerSrc,
         clipRadius:     1,
         nodeRadius:     nodeInitR(.01),   
@@ -76,13 +91,18 @@ const modelBase : ()=> HypertreeArgs = ()=>
         nodeFilter:     hasCircle,
         linkWidth:      arcWidth,        
         transformation: new HyperbolicTransformation({
-            P:              { re: 0, im:.5 },
-            θ:              { re: 1, im:0 },
-            λ:              .1
+            P:          { re: 0, im:.5 },
+            θ:          { re: 1, im:0 },
+            λ:          .1
         })
     },
     interaction: {
+        mouseRadius:    .9,
         onNodeSelect:   ()=>{},
+        onNodeHold:     ()=> {},                    
+        onNodeHover:    ()=> {},
+        λbounds:        [.1, .8],
+        wheelFactor:    1.175,                    
     }
 })
 
@@ -107,8 +127,10 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
             
             n.precalc.clickable = Boolean(l)
 
-            if (n.precalc.txt) return n.precalc.txt + tosub(w) 
-            else return undefined
+            if (n.precalc.txt) 
+                return n.precalc.txt + tosub(w) 
+            else 
+                return undefined
         }        
         return model
     },
@@ -156,8 +178,10 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
                 && (n.parent.data.name === 'Open-Tree-of-Life'))
             n.precalc.txt2 = n.precalc.clickable ? id : ''
             
-            if (n.precalc.txt) return n.precalc.txt 
-            else return undefined
+            if (n.precalc.txt) 
+                return n.precalc.txt 
+            else 
+                return undefined
         }  
         return model
     }    

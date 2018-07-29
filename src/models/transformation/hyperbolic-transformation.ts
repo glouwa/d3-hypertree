@@ -1,4 +1,4 @@
-import { N }                                     from '../../models/n/n'
+import { N }                                     from '../n/n'
 import { T }                                     from './hyperbolic-math'
 import {C, CassignC, CktoCp, CptoCk }            from './hyperbolic-math'
 import {CaddC, CsubC, CmulR, CdivR }             from './hyperbolic-math'
@@ -97,6 +97,7 @@ export class NegTransformation implements Transformation<N>
 export class TransformationCache
 {
     N:              number    
+    maxLabelR:      number
     centerNode:     N
     unculledNodes:  N[]
     links:          N[]

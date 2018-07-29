@@ -3,8 +3,8 @@ import { Path }                from '../path/path'
 import { Trace }               from '../trace/trace'
 import { LoaderFunction }      from '../n/n-loaders'
 import { LayoutFunction }      from '../n/n-layouts'
-import { UnitDiskArgs }        from '../../models/unitdisk/unitdisk-model'
-import { UnitDiskView }        from '../../models/unitdisk/unitdisk-model'
+import { UnitDiskArgs }        from '../unitdisk/unitdisk-model'
+import { UnitDiskView }        from '../unitdisk/unitdisk-model'
 import { Hypertree }           from '../../components/hypertree/hypertree'
 import { IUnitDisk }           from '../../components/unitdisk/unitdisk'
 
@@ -32,11 +32,25 @@ export interface HypertreeArgs
         }        
     }
     filter: {
+        type:            string
+        cullingRadius:   number
         magic:           number
+        alpha:           number
+        weight:          (n)=> number
+        magicRange:      { min:number,   max:number }
+        cullingWeight:   { min:number, max:number }
+        labelRadiusFactor: number
+        maxlabelRadius: number
+        maxlabels:      number
     }    
     geometry:            UnitDiskArgs    
     interaction: {
+        mouseRadius:     number,
         onNodeSelect:    (n:N)=> void
+        onNodeHold:      ()=>void
+        onNodeHover:     ()=>void
+        λbounds:         [ number, number ]
+        wheelFactor:     number
     }
 }
 
@@ -73,8 +87,12 @@ export interface HypertreeArgs_Soll
     filter: {
         magic:           number,
     }    
-    interaction: {
+    interaction: {        
         onNodeSelect:    (n:N)=> void,
+        onNodeHold:     ()=> {},                    
+        onNodeHover:    ()=> {},
+        λbounds:        [.1, .8],
+        wheelFactor:    1.175,
     }
     geometry:            UnitDiskArgs
 }

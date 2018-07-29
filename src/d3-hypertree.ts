@@ -59,4 +59,4 @@ export var layouts = layouts_
 
 export { presets } from './models/hypertree/preset-base'
 export { layerSrc } from './models/hypertree/preset-layers'
-export { cacheUpdate } from './models/hypertree/preset-filter'
+export { cacheUpdate } from './models/hypertree/magic-filter'

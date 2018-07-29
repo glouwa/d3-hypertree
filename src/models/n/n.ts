@@ -1,4 +1,4 @@
-import { C, Cp, Ck }     from '../../models/transformation/hyperbolic-math'
+import { C, Cp, Ck }     from '../transformation/hyperbolic-math'
 import { HierarchyNode } from 'd3'
 import { Path } from '../path/path';
 

@@ -1,6 +1,6 @@
 import { N }                        from '../n/n'
 import { IUnitDisk }                 from "../../components/unitdisk/unitdisk"
-import { TransformationCache }      from "../../models/transformation/hyperbolic-transformation"
+import { TransformationCache }      from "../transformation/hyperbolic-transformation"
 
 export function doVoronoiStuff(ud:IUnitDisk, cache:TransformationCache) {    
     //voro muss mindestens clickable enthalten für mousetonode bei click

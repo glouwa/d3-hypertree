@@ -1,18 +1,18 @@
 import { N }                        from '../n/n'
 import { IUnitDisk }                from '../../components/unitdisk/unitdisk'
-import { dfs2, dfsFlat2, dfsFlat }  from '../../models/transformation/hyperbolic-math'
-import { TransformationCache }      from '../../models/transformation/hyperbolic-transformation'
-import { C, CptoCk, CktoCp, πify }  from '../../models/transformation/hyperbolic-math'
-import { CaddC, CsubC, CmulR }      from '../../models/transformation/hyperbolic-math'
-import { CassignC }                 from '../../models/transformation/hyperbolic-math'
+import { dfs2, dfsFlat2, dfsFlat }  from '../transformation/hyperbolic-math'
+import { TransformationCache }      from '../transformation/hyperbolic-transformation'
+import { C, CptoCk, CktoCp, πify }  from '../transformation/hyperbolic-math'
+import { CaddC, CsubC, CmulR }      from '../transformation/hyperbolic-math'
+import { CassignC }                 from '../transformation/hyperbolic-math'
 
 import { doVoronoiStuff }           from './preset-process'
 import { doLabelStuff }             from './preset-process'
 import { doImageStuff }             from './preset-process'
 
-var cullingRadius =   0.98
-var labelλExtension = 1.8
-var absMaxLabelR =    0.85 
+var cullingRadius =   0.98 //
+var labelλExtension = 1.8  // blue cirvle is bit greater than 
+var absMaxLabelR =    0.85 // maximum bule circle radius (node + children)
 
 /*
 class Culler {
@@ -57,7 +57,7 @@ function adjustMagic(ud:IUnitDisk, cache:TransformationCache) {
     if (cache.unculledNodes) {
         if (cache.unculledNodes.length > rangeNodes.max) {
             if (ud.view.hypertree.args.filter.magic > rangeMagic.min) { // ???
-                ud.view.hypertree.args.filter.magic /= alpha                
+                ud.view.hypertree.args.filter.magic /= alpha
             }
         }
         if (cache.unculledNodes.length < rangeNodes.min) {
@@ -72,7 +72,7 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
     // constants 
     const t0 =        performance.now()
     const normλ =     ud.args.transformation.state.λ
-    const maxLabelR = Math.min(normλ * labelλExtension, absMaxLabelR)
+    cache.maxLabelR = Math.min(normλ * labelλExtension, absMaxLabelR)
 
     adjustMagic(ud, cache)
 
@@ -87,7 +87,7 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
     function abortfilter(n, idx, highway) { // return false to abort
         n.minWeight = highway[0].value / ud.view.hypertree.args.filter.magic / mf
         peocessNodeTransformation(ud, cache, n)
-        peocessNode(ud, cache, n, maxLabelR, n.minWeight)        
+        peocessNode(ud, cache, n, cache.maxLabelR, n.minWeight)        
         return !n.isOut
     }    
 
@@ -98,7 +98,7 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
     // select visible nodes - rootnode extra
     if (ud.args.data) {
         peocessNodeTransformation(ud, cache, ud.args.data)
-        peocessNode(ud, cache, ud.args.data, maxLabelR, 0)
+        peocessNode(ud, cache, ud.args.data, cache.maxLabelR, 0)
         // root ist nicht in uncullednodes! (gut)
     }
     
@@ -125,14 +125,14 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
             // go up and transform
             pathnodes.reverse().forEach(n=> {
                 peocessNodeTransformation(ud, cache, n)
-                peocessNode(ud, cache, n, maxLabelR, 0)
+                peocessNode(ud, cache, n, cache.maxLabelR, 0)
             })
             cache.unculledNodes = cache.unculledNodes.concat(pathnodes)            
         }           
     })    
     
     // groups of nodes
-    cache.links =      cache.unculledNodes.slice(1)     
+    cache.links =      cache.unculledNodes.slice(1)
     cache.leafOrLazy = cache.unculledNodes.filter(ud.args.nodeFilter) 
     cache.paths =      cache.links.filter((n:N)=> n.pathes.partof && n.pathes.partof.length)
     cache.weights =    []
@@ -160,7 +160,7 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
     // only for meta view
     ud.cacheMeta = {
         minWeight: path.map(n=> n.value / ud.view.hypertree.args.filter.magic),
-        Δ: [t1-t0, t2-t1, t3-t2, performance.now()-t3]        
+        Δ: [t1-t0, t2-t1, t3-t2, performance.now()-t3]
     }
 
     if (ud.view.hypertree.transition  

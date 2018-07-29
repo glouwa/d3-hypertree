@@ -2,10 +2,10 @@ import { ILayer }                  from '../../components/layerstack/layer'
 import { IUnitDisk }               from '../../components/unitdisk/unitdisk'
 import { Hypertree }               from '../../components/hypertree/hypertree'
 
-import { N }                       from '../../models/n/n'
-import { C }                       from '../../models/transformation/hyperbolic-math'
-import { Transformation }          from '../../models/transformation/hyperbolic-transformation'
-import { TransformationCache }     from '../../models/transformation/hyperbolic-transformation'
+import { N }                       from '../n/n'
+import { C }                       from '../transformation/hyperbolic-math'
+import { Transformation }          from '../transformation/hyperbolic-transformation'
+import { TransformationCache }     from '../transformation/hyperbolic-transformation'
 
 export interface UnitDiskView
 {

@@ -1,12 +1,12 @@
 import { tree }                from 'd3-hierarchy'
 import { N }                   from './n'
-import { T, makeT, one }       from '../../models/transformation/hyperbolic-math'
-import { C, CktoCp, CptoCk }   from '../../models/transformation/hyperbolic-math'
-import { Cneg, CmulR }         from '../../models/transformation/hyperbolic-math'
-import { Clog, Cpow }          from '../../models/transformation/hyperbolic-math'
-import { h2e }                 from '../../models/transformation/hyperbolic-math'
-import { πify, dfs, dfsFlat }  from '../../models/transformation/hyperbolic-math' 
-import { maxR }                from '../../models/transformation/hyperbolic-math' 
+import { T, makeT, one }       from '../transformation/hyperbolic-math'
+import { C, CktoCp, CptoCk }   from '../transformation/hyperbolic-math'
+import { Cneg, CmulR }         from '../transformation/hyperbolic-math'
+import { Clog, Cpow }          from '../transformation/hyperbolic-math'
+import { h2e }                 from '../transformation/hyperbolic-math'
+import { πify, dfs, dfsFlat }  from '../transformation/hyperbolic-math' 
+import { maxR }                from '../transformation/hyperbolic-math' 
 
 export type LayoutFunction = (root:N, t?:number, noRecursion?:boolean) => void
 

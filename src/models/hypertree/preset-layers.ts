@@ -1,6 +1,6 @@
 import { N }                        from '../n/n'
-import { C, CptoCk, CktoCp, πify }  from '../../models/transformation/hyperbolic-math'
-import { CaddC, CsubC, CmulR }      from '../../models/transformation/hyperbolic-math'
+import { C, CptoCk, CktoCp, πify }  from '../transformation/hyperbolic-math'
+import { CaddC, CsubC, CmulR }      from '../transformation/hyperbolic-math'
 import { UnitDisk }                 from '../../components/unitdisk/unitdisk'
 import { NodeLayer }                from '../../components/layers/node-layer'
 import { CellLayer }                from '../../components/layers/cell-layer'
@@ -37,36 +37,36 @@ export const layerSrc = [
     // interaction-hammer
     (v, ud:UnitDisk)=> new BackgroundLayer(v, {}),    
     (v, ud:UnitDisk)=> new FocusLayer(v, {        
-        invisible:  true,
-        hideOnDrag: true,
+        invisible:  false,
+        hideOnDrag: false,
         name:       'culling-r',
         r:          ()=> cullingRadius,
         center:     ()=> '0 0'
     }),
-    (v, ud:UnitDisk)=> new FocusLayer(v, {        
-        invisible:  true,
-        hideOnDrag: true,
+    (v, ud:UnitDisk)=> new FocusLayer(v, {
+        invisible:  false,
+        hideOnDrag: false,
         name:       'mouse-r',
-        r:          ()=> .98,
+        r:          ()=> ud.view.hypertree.args.interaction.mouseRadius,
         center:     ()=> '0 0'
     }),
-    (v, ud:UnitDisk)=> new FocusLayer(v, {        
-        invisible:  true,
+    (v, ud:UnitDisk)=> new FocusLayer(v, {
+        invisible:  false,
         hideOnDrag: false,
         name:       'labels-r',
-        r:          ()=> 1.2 * ud.args.transformation.state.λ,
+        r:          ()=> ud.cache.maxLabelR,
         center:     ()=> `${(ud.pinchcenter||{re:0}).re} ${(ud.pinchcenter||{im:0}).im}`
     }),    
     (v, ud:UnitDisk)=> new FocusLayer(v, {        
-        invisible:  true,
-        hideOnDrag: true,
+        invisible:  false,
+        hideOnDrag: false,
         name:       'labels-r-𝐖',
         r:          ()=> ud.cache.wikiR,
         center:     ()=> '0 0'
     }),    
     (v, ud:UnitDisk)=> new FocusLayer(v, {
-        invisible:  true,
-        hideOnDrag: true,
+        invisible:  false,
+        hideOnDrag: false,
         name:       'λ',
         r:          ()=> ud.args.transformation.state.λ,
         center:     ()=> '0 0'
@@ -246,7 +246,7 @@ export const layerSrc = [
     (v, ud:UnitDisk)=> new InteractionLayer(v, {    
         invisible:  true,
         hideOnDrag: true,                        
-        mouseRadius: .95,
+        mouseRadius: ud.view.hypertree.args.interaction.mouseRadius,
         nohover:     false,
         onClick:     (n:N, m:C)=> {
                         var s = n.ancestors().find(e=> true)          // obsolete
@@ -256,7 +256,7 @@ export const layerSrc = [
         }
     }),
     (v, ud:UnitDisk)=> new InteractionLayer2(v, {                            
-        mouseRadius: .95,
+        mouseRadius: ud.view.hypertree.args.interaction.mouseRadius,
         nohover:     false,
         onClick:     (n:N, m:C)=> {
                         var s = n.ancestors().find(e=> true)          // obsolete
