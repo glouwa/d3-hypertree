@@ -56,9 +56,11 @@ const hypertree = new Hypertree(
     }
 )
 ```
-# <a name="default"></a> Examples
-## Repository
+# <a name="default"></a> Component Embedding
+For full working examples see Example Repository
+
 ## HTML with bundle
+
 ## CommonJS minimal
 ## Typescrpt minimal
 
