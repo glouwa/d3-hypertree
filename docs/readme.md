@@ -231,10 +231,16 @@ Note that filter, geometry and interaction can be omitted if default configurati
 | labels-force    | ✓       | Avoids label overlapping by a force directed layout. |
 | traces          |         | Shows touch interaction by rendering a polyline for each touch  |
 
-# Extended API
+# Promise API
 
-## Animations
+Operations like animations or navigating to nodes are implemented as Promises, 
+zu simplyfy concatenation of such operations. 
+
+## Transformation Animations 
+### Zooom
+### Viewport
 ## Path Highlighting
+## Node Highlighting
 ## Search
 
 <!--
