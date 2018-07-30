@@ -25,7 +25,7 @@ The d3-hypertree component is build with Webpack and exposes a prebuild CommonJS
 module (dist/index.js). For custom builds please import 
 "dist/js/components/hypertree/hypertree". The Components constructor takes two 
 arguments: Parent element relation, and hypertree component configuration 
-(HypertreeViewModel), see [Hypertree Configuration](#hypertreeviewmodel) for details.
+(HypertreeViewModel), see [Hypertree Configuration](#apireference) for details.
 
 To embedd the component in a CommonJS module, add one of the folloing lines 
 to your css file:
@@ -172,22 +172,6 @@ export interface Interaction
 |-----------------|-----------------|---------------|------------------------|
 | onNodeSelect | `(n:N)=>void` | `()=>{}` | Will be called when the user selects or deselects a node given by parameter `n` |
 
-# <a name="layers"></a> Available Layers
-
-| Name            | Visibility (default) | Description                       |   
-|-----------------|---------|------------------------------------------------|
-| cell-layer      |         | Renders voronoi cells of nodes. Cell defines mouse area of a node. |
-| center-node     | ✓       | Gray circle background for node next to 0,0    |
-| path-arcs       | ✓       | Hyperbolic arc links for pathes                |
-| path-lines      |         | Straight line links for pathes                 |
-| link-arcs       | ✓       | Hyperbolic arc links                           |
-| link-lines      |         | Straight line links                            |
-| nodes           | ✓       | Circle nodes                                   |
-| images          |         | Renders a image for each node with a imgref member. Imgref must be a valid image url. The image is centered at the node position |
-| emojis          | ✓       | Renders a emojie for each node occurring in iconmap |
-| labels          |         | Renders labels nex to node                     |
-| labels-force    | ✓       | Avoids label overlapping by a force directed layout. |
-| traces          |         | Shows touch interaction by rendering a polyline for each touch  |
 
 # <a name="default"></a> Examples
 
@@ -234,6 +218,23 @@ const hypertree = new Hypertree(
 ```
 
 Note that filter, geometry and interaction can be omitted if default configuration should be used.
+
+# <a name="layers"></a> Available Layers
+
+| Name            | Visibility (default) | Description                       |   
+|-----------------|---------|------------------------------------------------|
+| cell-layer      |         | Renders voronoi cells of nodes. Cell defines mouse area of a node. |
+| center-node     | ✓       | Gray circle background for node next to 0,0    |
+| path-arcs       | ✓       | Hyperbolic arc links for pathes                |
+| path-lines      |         | Straight line links for pathes                 |
+| link-arcs       | ✓       | Hyperbolic arc links                           |
+| link-lines      |         | Straight line links                            |
+| nodes           | ✓       | Circle nodes                                   |
+| images          |         | Renders a image for each node with a imgref member. Imgref must be a valid image url. The image is centered at the node position |
+| emojis          | ✓       | Renders a emojie for each node occurring in iconmap |
+| labels          |         | Renders labels nex to node                     |
+| labels-force    | ✓       | Avoids label overlapping by a force directed layout. |
+| traces          |         | Shows touch interaction by rendering a polyline for each touch  |
 
 # Extended API
 
