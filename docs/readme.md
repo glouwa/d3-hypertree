@@ -1,5 +1,6 @@
 A Scalable Intercative Web Component for Hyperbolic Tree Visualisations
 ![Screen shot](/d3-hypertree/img/screenshot-light.png?raw=true)
+<iframe width="560" height="315" src="https://glouwa.github.io/" frameborder="0" allowfullscreen></iframe>
 
 # Embedding
 
@@ -25,7 +26,7 @@ module (dist/index.js). For custom builds please import
 import * as ht from 'd3-hypertree'
 ```
 Add one of the css files to your site. Each css file is a theme.
-- node_modules/d3-hypertree/dist/index-browser-light 
+- node_modules/d3-hypertree/dist/index-browser-light.css
 - node_modules/d3-hypertree/dist/index-browser-dark.css 
  
 and instantiate the Component as shown in [Component Embedding](#component): 
@@ -237,10 +238,10 @@ Modification operations like animations or navigating to nodes are implemented a
 zu simplify concatenation of such operations. 
 
 ## Transformation Animations 
-### Zooom
+### Zoom
 ### Viewport
-## Path Highlighting
-## Node Highlighting
+## Path highlighting
+## Node highlighting
 ## Search
 
 <!--
