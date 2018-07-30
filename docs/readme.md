@@ -41,12 +41,12 @@ see [Hypertree Configuration](#apireference) for more options.
 new ht.Hypertree(
     {
         parent: document.body,
-        preserveAspectRatio: "xMidYMid meet",
+        preserveAspectRatio: "xMidYMid meet"
     },
     {
-        model: ht.loaders.fromFile('data/LDA128-ward.d3.json'),,        
+        model: ht.loaders.fromFile('data/LDA128-ward.d3.json')
     }
-)
+);
 ```
 For working examples see [Example Repository](https://github.com/glouwa/d3-hypertree-examples).
 

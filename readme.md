@@ -18,6 +18,6 @@ new ht.Hypertree(
     {
         model: ht.loaders.fromFile('data/LDA128-ward.d3.json'),
     }
-)
+);
 ```
 ![Screen shot](docs/img/screenshot-light.png?raw=true)
