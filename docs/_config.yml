@@ -1,4 +1,4 @@
-theme: jekyll-theme-midnight
+theme: jekyll-theme-leap-day
 show_downloads: true
 github:
   zip_url: dist/bundle.min.js.zip
