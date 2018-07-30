@@ -1,9 +1,9 @@
 A Scalable Intercative Web Component for Hyperbolic Tree Visualisations
-<iframe width="590" height="500" src="https://glouwa.github.io/" frameborder="0" allowfullscreen></iframe>
+<iframe width="580" height="580" src="https://glouwa.github.io/" frameborder="0" allowfullscreen></iframe>
 
 # Embedding
 
-## As Bundle 
+## as Bundle 
 If no packaging tool is used, the imports can be replaced by adding the following 
 lines to your html:
 ```html
@@ -14,7 +14,7 @@ Adding the bundle exposes the global vaiable 'ht'.
 Use it to access the module, as shown in [Component Embedding](#component).
 For working examples (full HTML) see [Example Repository](https://github.com/glouwa/d3-hypertree-examples).
 
-## With NPM / Webpack
+## with NPM / Webpack
 ```bash
 npm install d3-hypertree --save
 ```
@@ -37,7 +37,6 @@ arguments: Parent element relation, and hypertree component configuration
 see [Hypertree Configuration](#apireference) for more options.
 ```typescript
 // ht is declared by import or global variable in bundle
-
 new ht.Hypertree(
     {
         parent: document.body,
@@ -80,7 +79,7 @@ export interface HypertreeViewModel
 | geometry        | `{}`            |               | Defines visible layers and geometrical properties like node size, link curvature and others. See section [Geometry](#geometry). |
 | interaction     | `{}`            |               | Used for user defined interaction events. See section [Interaction](#interaction). |
 
-## <a name="hierarchymodel"></a> Model
+## <a name="hierarchymodel"></a> model
 
 ```typescript
 export interface HierarchyModel
@@ -103,7 +102,7 @@ export interface HierarchyModel
 | objects.pathes  | `{s:N,e:N}[]`   | `[]`          | This array specifys highlighted pathes within the tree. The used nodes must be references to nodes within data. |
 | objects.selections | `N[]`        | `[]`          | This array specifys highlighted nodes within the tree. The used nodes must be references to nodes within data. |
 
-###  <a name="filter"></a> Filter
+###  <a name="filter"></a> filter
 
 ```typescript
 export interface Filter
@@ -130,7 +129,7 @@ export interface Filter
 | transformation.λ | `number`       | `undefined`     | Defines the initial link lenght. Valid values are  in intervall (0,1). This parameter is not used if geometry.animateUpRadius is defined. |
 
 
-###  <a name="geometry"></a> Geometry
+###  <a name="geometry"></a> geometry
 
 ```typescript
 export interface Geometry
@@ -154,7 +153,7 @@ export interface Geometry
 | labelRadius     | `number`        | `.005`        | Distance between label center and node center. Not applied on force dirceted label layout. |
 | animateUpRadius | `number or undefined` | `.8`       | If specified, transformation.λ will be set to a value such that the initial tree will fit within a circle with radius `animateUpRadius`. This circle is centered at transformation.P. |
 
-### <a name="interaction"></a> Interaction
+### <a name="interaction"></a> interaction
 
 ```typescript
 export interface Interaction
