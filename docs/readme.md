@@ -103,7 +103,7 @@ export interface HierarchyModel
 | objects.pathes  | `{s:N,e:N}[]`   | `[]`          | This array specifys highlighted pathes within the tree. The used nodes must be references to nodes within data. |
 | objects.selections | `N[]`        | `[]`          | This array specifys highlighted nodes within the tree. The used nodes must be references to nodes within data. |
 
-##  <a name="filter"></a> Filter
+###  <a name="filter"></a> Filter
 
 ```typescript
 export interface Filter
@@ -130,7 +130,7 @@ export interface Filter
 | transformation.λ | `number`       | `undefined`     | Defines the initial link lenght. Valid values are  in intervall (0,1). This parameter is not used if geometry.animateUpRadius is defined. |
 
 
-##  <a name="geometry"></a> Geometry
+###  <a name="geometry"></a> Geometry
 
 ```typescript
 export interface Geometry
@@ -154,7 +154,7 @@ export interface Geometry
 | labelRadius     | `number`        | `.005`        | Distance between label center and node center. Not applied on force dirceted label layout. |
 | animateUpRadius | `number or undefined` | `.8`       | If specified, transformation.λ will be set to a value such that the initial tree will fit within a circle with radius `animateUpRadius`. This circle is centered at transformation.P. |
 
-## <a name="interaction"></a> Interaction
+### <a name="interaction"></a> Interaction
 
 ```typescript
 export interface Interaction
