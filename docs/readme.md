@@ -50,7 +50,7 @@ new ht.Hypertree(
 ```
 For working examples see [Example Repository](https://github.com/glouwa/d3-hypertree-examples).
 
-# <a name="apireference"></a> API Reference
+# <a name="apireference"></a> Constructor API
 The core class of the API is the Hypertree Class. 
 Constructor arguments are used for configuration, see []()
 the 'api' member exposes functonis and Promises for animations and other featrues.
@@ -231,10 +231,10 @@ Note that filter, geometry and interaction can be omitted if default configurati
 | labels-force    | ✓       | Avoids label overlapping by a force directed layout. |
 | traces          |         | Shows touch interaction by rendering a polyline for each touch  |
 
-# Promise API
+# Modification API
 
-Operations like animations or navigating to nodes are implemented as Promises, 
-zu simplyfy concatenation of such operations. 
+Modification operations like animations or navigating to nodes are implemented as Promises, 
+zu simplify concatenation of such operations. 
 
 ## Transformation Animations 
 ### Zooom
