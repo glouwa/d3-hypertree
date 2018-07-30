@@ -57,9 +57,6 @@ const hypertree = new Hypertree(
 )
 ```
 
-### Plain HTML
-
-
 # <a name="apireference"></a> API Reference
 <!-- 
 TODO: describe Hypertree
@@ -192,7 +189,7 @@ export interface Interaction
 | labels-force    | ✓       | Avoids label overlapping by a force directed layout. |
 | traces          |         | Shows touch interaction by rendering a polyline for each touch  |
 
-# <a name="default"></a> Example Configuration (Default Configuration)
+# <a name="default"></a> Examples
 
 ```typescript
 import { Hypertree } from 'd3-hypertree'
@@ -237,6 +234,12 @@ const hypertree = new Hypertree(
 ```
 
 Note that filter, geometry and interaction can be omitted if default configuration should be used.
+
+# Extended API
+
+## Animations
+## Path Highlighting
+## Search
 
 <!--
 ## Ignore it
