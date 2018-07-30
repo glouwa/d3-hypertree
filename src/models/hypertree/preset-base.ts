@@ -46,11 +46,11 @@ const modelBase : ()=> HypertreeArgs = ()=>
     },
     layout: {
         type:           layoutBergé,
-        weight:         (n:N)=> ((!n.children || !n.children.length)?1:0),
+        weight:         (n:N)=> (isLeaf(n)?1:0),
         initMaxλ:       .97,
         rootWedge: {
-            orientation: 3 * π/2,
-            angle:       3 * π/2
+            orientation: 3*π/2,
+            angle:       3*π/2
         }
     },    
     filter: {        
@@ -58,7 +58,7 @@ const modelBase : ()=> HypertreeArgs = ()=>
         cullingRadius:  .99,
         magic:          160,
         alpha:          1.05,
-        weight:         (n)=> ((!n.children || !n.children.length)?1:0),
+        weight:         (n)=> (isLeaf(n)?1:0),
         magicRange:     { min:2,   max:500 },                    
         cullingWeight:  { min:200, max:400 },                    
         focusExtension: 1.6,
@@ -87,7 +87,7 @@ const modelBase : ()=> HypertreeArgs = ()=>
         onNodeSelect:   ()=>{},
         onNodeHold:     ()=> {},                    
         onNodeHover:    ()=> {},
-        λbounds:        [.1, .8],
+        λbounds:        [1/40, .4],
         wheelFactor:    1.175,                    
     }
 })
@@ -171,5 +171,4 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
         }  
         return model
     }    
-    
 }
