@@ -16,7 +16,7 @@ new ht.Hypertree(
         preserveAspectRatio: "xMidYMid meet",
     },
     {
-        model: ht.loaders.fromFile('data/LDA128-ward.d3.json'),,        
+        model: ht.loaders.fromFile('data/LDA128-ward.d3.json'),
     }
 )
 ```

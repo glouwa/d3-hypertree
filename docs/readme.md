@@ -1,5 +1,4 @@
 A Scalable Intercative Web Component for Hyperbolic Tree Visualisations
-
 ![Screen shot](/d3-hypertree/img/screenshot-light.png?raw=true)
 
 # Build Integration
@@ -7,38 +6,35 @@ A Scalable Intercative Web Component for Hyperbolic Tree Visualisations
 ## As Bundle 
 If no packaging tool is used, the imports can be replaced by adding the following 
 lines to your html:
-
 ```html
 <link  href="index-browser-light.css" rel="stylesheet">
 <script src="d3-hypertree.js"></script>
 ```
-Use the global variable `ht` to access the module. 
-See https://github.com/glouwa/d3-hypertree-examples for minimal working examples.
+Adding the bundle exposes the global vaiable 'ht'.
+Use it to access the module, as shown in [Component Embedding](#component).
+For working examples (full HTML) see [Example Repository](https://github.com/glouwa/d3-hypertree-examples).
 
 
 ## With NPM
 ```bash
 npm install d3-hypertree --save
 ```
-
 The d3-hypertree component is build with Webpack and exposes a prebuild CommonJS
 module (dist/index.js). For custom builds please import 
-"dist/js/components/hypertree/hypertree". The Components constructor takes two 
+"dist/js/components/hypertree/hypertree". 
+```Typescript
+import * as ht from 'd3-hypertree'
+```
+Add one of the css files to your site. Each css file is a theme.
+- node_modules/d3-hypertree/dist/index-browser-light 
+- node_modules/d3-hypertree/dist/index-browser-dark.css 
+ 
+and instantiate the Component as shown in [Component Embedding](#component): 
+
+# <a name="component"></a> Component Embedding
+The Components constructor takes two 
 arguments: Parent element relation, and hypertree component configuration 
 (HypertreeViewModel), see [Hypertree Configuration](#apireference) for details.
-
-To embedd the component in a CommonJS module, add one of the folloing lines 
-to your css file:
-
-```css
-@import 'd3-hypertree/dist/index-browser-light';
-```
-or
-```css
-@import 'd3-hypertree/dist/index-browser-dark';
-```
-
-and instantiate (in this case as child of document.body) the Component: 
 
 ```typescript
 import * as ht from 'd3-hypertree'
@@ -53,7 +49,6 @@ new ht.Hypertree(
     }
 )
 ```
-# <a name="default"></a> Component Embedding
 For working examples see [Example Repository](https://github.com/glouwa/d3-hypertree-examples).
 
 ## HTML with bundle
