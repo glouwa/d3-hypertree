@@ -9,8 +9,8 @@ If no packaging tool is used, the imports can be replaced by adding the followin
 lines to your html:
 
 ```html
-<link  href="(path to module)/d3-hypertree/dist/index-browser-light.css" rel="stylesheet">
-<script src="(path to module)/d3-hypertree/dist/index.js"></script>
+<link  href="index-browser-light.css" rel="stylesheet">
+<script src="d3-hypertree.js"></script>
 ```
 Use the global variable `ht` to access the module. 
 See https://github.com/glouwa/d3-hypertree-examples for minimal working examples.
@@ -54,12 +54,13 @@ new ht.Hypertree(
 )
 ```
 # <a name="default"></a> Component Embedding
-For full working examples see Example Repository
+For working examples see [Example Repository](https://github.com/glouwa/d3-hypertree-examples).
 
 ## HTML with bundle
+works like the CommonJS minimal
 
-## CommonJS minimal
-## Typescrpt minimal
+## CommonJS / Webpack
+## Typescrpt
 
 # <a name="apireference"></a> API Reference
 <!-- 
