@@ -1,7 +1,7 @@
 A Scalable Intercative Web Component for Hyperbolic Tree Visualisations
 ![Screen shot](/d3-hypertree/img/screenshot-light.png?raw=true)
 
-# Build Integration
+# Embedding
 
 ## As Bundle 
 If no packaging tool is used, the imports can be replaced by adding the following 
@@ -14,15 +14,14 @@ Adding the bundle exposes the global vaiable 'ht'.
 Use it to access the module, as shown in [Component Embedding](#component).
 For working examples (full HTML) see [Example Repository](https://github.com/glouwa/d3-hypertree-examples).
 
-
-## With NPM
+## With NPM / Webpack
 ```bash
 npm install d3-hypertree --save
 ```
 The d3-hypertree component is build with Webpack and exposes a prebuild CommonJS
 module (dist/index.js). For custom builds please import 
 "dist/js/components/hypertree/hypertree". 
-```Typescript
+```typescript
 import * as ht from 'd3-hypertree'
 ```
 Add one of the css files to your site. Each css file is a theme.
@@ -31,12 +30,13 @@ Add one of the css files to your site. Each css file is a theme.
  
 and instantiate the Component as shown in [Component Embedding](#component): 
 
-# <a name="component"></a> Component Embedding
+## <a name="component"></a> Component Instantiation
 The Components constructor takes two 
 arguments: Parent element relation, and hypertree component configuration 
-(HypertreeViewModel), see [Hypertree Configuration](#apireference) for details.
+(HypertreeViewModel). This is the minimal example,
+see [Hypertree Configuration](#apireference) for more options.
 ```typescript
-import * as ht from 'd3-hypertree'
+// ht is declared by import or global variable in bundle
 
 new ht.Hypertree(
     {
@@ -50,17 +50,13 @@ new ht.Hypertree(
 ```
 For working examples see [Example Repository](https://github.com/glouwa/d3-hypertree-examples).
 
-## HTML with bundle
-works like the CommonJS minimal
-
-## CommonJS / Webpack
-## Typescrpt
-
 # <a name="apireference"></a> API Reference
-<!-- 
-TODO: describe Hypertree
-api and update table
--->
+The core class of the API is the Hypertree Class. 
+Constructor arguments are used for configuration, see []()
+the 'api' member exposes functonis and Promises for animations and other featrues.
+The initPromise member may be used to call api functinos, 
+like animations after initialisation.
+
 
 The Hypertree Configuration object is passed as second argument to the Hypertree
 contructor. It contains four sections which of only `model` is obligate.
