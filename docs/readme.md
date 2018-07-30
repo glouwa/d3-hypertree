@@ -12,7 +12,7 @@ lines to your html:
 <link  href="(path to module)/d3-hypertree/dist/index-browser-light.css" rel="stylesheet">
 <script src="(path to module)/d3-hypertree/dist/index.js"></script>
 ```
-Use the global variable `hypertree` to access the module. 
+Use the global variable `ht` to access the module. 
 See https://github.com/glouwa/d3-hypertree-examples for minimal working examples.
 
 
@@ -41,18 +41,15 @@ or
 and instantiate (in this case as child of document.body) the Component: 
 
 ```typescript
-import { Hypertree } from 'd3-hypertree'
+import * as ht from 'd3-hypertree'
 
-const hypertree = new Hypertree(
+new ht.Hypertree(
     {
         parent: document.body,
         preserveAspectRatio: "xMidYMid meet",
     },
     {
-        model: HierarchyModel,
-        filter: Filter,
-        geometry: Geometry,
-        interaction: Interaction,
+        model: ht.loaders.fromFile('data/LDA128-ward.d3.json'),,        
     }
 )
 ```
