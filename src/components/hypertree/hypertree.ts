@@ -42,13 +42,14 @@ const bubbleSvgDef_old =
         </radialGradient>
     </defs>` 
 
+const grad = [255,96,36,0]
 const bubbleSvgDef =
     `<defs>
         <radialGradient id="exampleGradient">            
-            <stop offset="58%"  stop-color="rgb(255,255,255)" stop-opacity=".15"/>            
-            <stop offset="92%"  stop-color="rgb( 96, 96, 96)" stop-opacity=".15"/>
-            <stop offset="98%"  stop-color="rgb( 36, 36, 36)" stop-opacity=".15"/>
-            <stop offset="100%" stop-color="rgb(  0,  0,  0)" stop-opacity=".15"/>
+            <stop offset="58%"  stop-color="rgb(${grad[0]},${grad[0]},${grad[0]})" stop-opacity=".15"/>            
+            <stop offset="92%"  stop-color="rgb(${grad[1]},${grad[1]},${grad[1]})" stop-opacity=".15"/>
+            <stop offset="98%"  stop-color="rgb(${grad[2]},${grad[2]},${grad[2]})" stop-opacity=".15"/>
+            <stop offset="100%" stop-color="rgb(${grad[3]},${grad[3]},${grad[3]})" stop-opacity=".15"/>
         </radialGradient>
     </defs>` 
 
