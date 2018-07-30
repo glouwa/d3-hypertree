@@ -3,16 +3,11 @@ import { IUnitDisk }                from '../../components/unitdisk/unitdisk'
 import { dfs2, dfsFlat2, dfsFlat }  from '../transformation/hyperbolic-math'
 import { TransformationCache }      from '../transformation/hyperbolic-transformation'
 import { C, CptoCk, CktoCp, πify }  from '../transformation/hyperbolic-math'
-import { CaddC, CsubC, CmulR }      from '../transformation/hyperbolic-math'
 import { CassignC }                 from '../transformation/hyperbolic-math'
 
 import { doVoronoiStuff }           from './preset-process'
 import { doLabelStuff }             from './preset-process'
 import { doImageStuff }             from './preset-process'
-
-var cullingRadius =   0.98 //
-var labelλExtension = 1.8  // blue cirvle is bit greater than 
-var absMaxLabelR =    0.85 // maximum bule circle radius (node + children)
 
 /*
 class Culler {
@@ -43,7 +38,7 @@ class Culler {
     public abortfilter(n, idx, highway) { // return false to abort
         n.minWeight = highway[0].value / ud.view.hypertree.args.magic * mf
         peocessNodeTransformation(ud, cache, n)
-        peocessNode(ud, cache, n, maxLabelR, n.minWeight)        
+        peocessNode(ud, cache, n, focusR, n.minWeight)        
         return !n.isOut
     }
 }
@@ -72,8 +67,9 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
     // constants 
     const t0 =        performance.now()
     const normλ =     ud.args.transformation.state.λ
-    cache.maxLabelR = Math.min(normλ * labelλExtension, absMaxLabelR)
+    cache.focusR = Math.min(normλ * ud.view.hypertree.args.filter.focusExtension, ud.view.hypertree.args.filter.maxFocusRadius)
 
+    console.assert(cache.focusR < 1 && cache.focusR > 0)    
     adjustMagic(ud, cache)
 
     // select visible nodes
@@ -87,7 +83,7 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
     function abortfilter(n, idx, highway) { // return false to abort
         n.minWeight = highway[0].value / ud.view.hypertree.args.filter.magic / mf
         peocessNodeTransformation(ud, cache, n)
-        peocessNode(ud, cache, n, cache.maxLabelR, n.minWeight)        
+        peocessNode(ud, cache, n, cache.focusR, n.minWeight)        
         return !n.isOut
     }    
 
@@ -98,7 +94,7 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
     // select visible nodes - rootnode extra
     if (ud.args.data) {
         peocessNodeTransformation(ud, cache, ud.args.data)
-        peocessNode(ud, cache, ud.args.data, cache.maxLabelR, 0)
+        peocessNode(ud, cache, ud.args.data, cache.focusR, 0)
         // root ist nicht in uncullednodes! (gut)
     }
     
@@ -125,7 +121,7 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
             // go up and transform
             pathnodes.reverse().forEach(n=> {
                 peocessNodeTransformation(ud, cache, n)
-                peocessNode(ud, cache, n, cache.maxLabelR, 0)
+                peocessNode(ud, cache, n, cache.focusR, 0)
             })
             cache.unculledNodes = cache.unculledNodes.concat(pathnodes)            
         }           
@@ -182,7 +178,7 @@ function pathToLastVisible(ud:IUnitDisk, cache:TransformationCache) {
         while (true) {
             peocessNodeTransformation(ud, cache, startNode) 
 
-            if (startNode.cachep.r >= cullingRadius) {                         
+            if (startNode.cachep.r >= ud.view.hypertree.args.filter.cullingRadius) {
                 path = path.slice(0, -1)
                 break
             }
@@ -204,13 +200,13 @@ function peocessNodeTransformation(ud:IUnitDisk, cache:TransformationCache, n:N)
     n.cachep = CktoCp(n.cache)   
 }
 
-function peocessNode(ud:IUnitDisk, cache:TransformationCache, n:N, maxLabelR, minWeight) {    
+function peocessNode(ud:IUnitDisk, cache:TransformationCache, n:N, focusR, minWeight) {    
     n.strCache =                   `${n.cache.re} ${n.cache.im}`    
     n.transformStrCache =          ` translate(${n.strCache})`
     n.transformStrCacheZ =         ` translate(${n.layout.zStrCache})`
     
-    n.isOutλ =                     n.cachep.r >= maxLabelR
-    n.isOut99 =                    n.cachep.r >= cullingRadius
+    n.isOutλ =                     n.cachep.r >= focusR
+    n.isOut99 =                    n.cachep.r >= ud.view.hypertree.args.filter.cullingRadius
     n.isOutWeight =                n.value <= minWeight
     n.distScale =                  ud.args.transformation.transformDist(n.cache)
     n.dampedDistScale =            n.distScale * (.5 / n.distScale + .5)
