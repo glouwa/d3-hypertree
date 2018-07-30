@@ -21,3 +21,4 @@ new ht.Hypertree(
 );
 ```
 ![Screen shot](docs/img/screenshot-light.png?raw=true)
+<iframe width="560" height="315" src="https://glouwa.github.io/" frameborder="0" allowfullscreen></iframe>
