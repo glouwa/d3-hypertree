@@ -16,7 +16,7 @@ Use the global variable `hypertree` to access the module.
 See https://github.com/glouwa/d3-hypertree-examples for minimal working examples.
 
 
-## With NPN
+## With NPM
 ```bash
 npm install d3-hypertree --save
 ```
@@ -56,6 +56,11 @@ const hypertree = new Hypertree(
     }
 )
 ```
+# <a name="default"></a> Examples
+## Repository
+## HTML with bundle
+## CommonJS minimal
+## Typescrpt minimal
 
 # <a name="apireference"></a> API Reference
 <!-- 
@@ -173,7 +178,7 @@ export interface Interaction
 | onNodeSelect | `(n:N)=>void` | `()=>{}` | Will be called when the user selects or deselects a node given by parameter `n` |
 
 
-# <a name="default"></a> Examples
+## Full Default Configration
 
 ```typescript
 import { Hypertree } from 'd3-hypertree'
@@ -219,7 +224,7 @@ const hypertree = new Hypertree(
 
 Note that filter, geometry and interaction can be omitted if default configuration should be used.
 
-# <a name="layers"></a> Available Layers
+## <a name="layers"></a> Available Layers
 
 | Name            | Visibility (default) | Description                       |   
 |-----------------|---------|------------------------------------------------|
