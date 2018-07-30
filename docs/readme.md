@@ -2,7 +2,7 @@
 
 A Scalable Intercative Web Component for Hyperbolic Tree Visualisations
 
-![Screen shot](/d3-hypertree/img/screenshot-dark.png?raw=true)
+![Screen shot](/d3-hypertree/img/screenshot-light.png?raw=true)
 
 ## Contents
 - [Installing](#installing)
