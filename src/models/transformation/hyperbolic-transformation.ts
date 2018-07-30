@@ -97,7 +97,7 @@ export class NegTransformation implements Transformation<N>
 export class TransformationCache
 {
     N:              number    
-    maxLabelR:      number
+    focusR:      number
     centerNode:     N
     unculledNodes:  N[]
     links:          N[]
@@ -108,11 +108,8 @@ export class TransformationCache
     labels:         N[]
     emojis:         N[]
     images:         N[]
-    
-    wikiR:          number
-    
-    voronoiDiagram: d3.VoronoiDiagram<N>
-    
+        
+    voronoiDiagram: d3.VoronoiDiagram<N>    
     cells:          d3.VoronoiPolygon<N>[]
 }
 

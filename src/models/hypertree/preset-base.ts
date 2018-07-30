@@ -24,27 +24,12 @@ const isLeaf =    n=> !n.children || !n.children.length
 const isRoot =    n=> !n.parent 
 const hasCircle = n=> hasLazy(n) || isRoot(n) || isLeaf(n)
 
-var nodeInitR = (c:number)=> (ud:UnitDisk, d:N)=>
-    c
-    * ((d.children && d.parent) ? innerNodeScale(d) : 1)
-     
-var nodeInitRNoInner = (c:number)=> (ud:UnitDisk, d:N)=>
-    c
-
-var nodeScale = d=>
-    d.distScale
-    * (hasLazy(d) ? .8 : 1)    
-
-var nodeScaleNoInner = d=>
-    d.distScale
-    
-var innerNodeScale = d=>
-    d.precalc.weightScale
-
-var arcWidth = d=>
-    .025
-    * d.distScale
-    * d.precalc.weightScale
+var nodeInitR =        (c:number)=> (ud:UnitDisk, d:N)=> c * ((d.children && d.parent) ? innerNodeScale(d) : 1)     
+var nodeInitRNoInner = (c:number)=> (ud:UnitDisk, d:N)=> c
+var nodeScale =        d=> d.distScale * (hasLazy(d) ? .8 : 1)    
+var nodeScaleNoInner = d=> d.distScale    
+var innerNodeScale =   d=> d.precalc.weightScale
+var arcWidth =         d=> .025 * d.distScale * d.precalc.weightScale
 
 const modelBase : ()=> HypertreeArgs = ()=>
 ({
@@ -70,15 +55,16 @@ const modelBase : ()=> HypertreeArgs = ()=>
     },    
     filter: {        
         type:           'magic',
-        cullingRadius:  .98,
+        cullingRadius:  .99,
         magic:          160,
         alpha:          1.05,
         weight:         (n)=> ((!n.children || !n.children.length)?1:0),
         magicRange:     { min:2,   max:500 },                    
         cullingWeight:  { min:200, max:400 },                    
-        labelRadiusFactor: 1.8,
-        maxlabelRadius: .85,
+        focusExtension: 1.6,
+        maxFocusRadius: .85,
         maxlabels:      25,
+        wikiRadius:     .85,
     },        
     geometry: {
         decorator:      UnitDisk,

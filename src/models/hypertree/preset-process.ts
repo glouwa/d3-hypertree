@@ -34,10 +34,7 @@ cache.emojis = hasicon
 cache.labels = haslabel + inpath - hasicon
 cache.wikis  = haslabel + inpath - labels - wikis
 */
-const wikiR = .9
 export function doLabelStuff(ud:IUnitDisk, cache:TransformationCache) {    
-    
-    ud.cache.wikiR = wikiR
     var labels = cache.unculledNodes
         .filter((e:N)=> e.precalc.label || e.precalc.icon)
 
@@ -47,14 +44,14 @@ export function doLabelStuff(ud:IUnitDisk, cache:TransformationCache) {
     var stdlabels = labels
     //    .filter(e=> pathLabels.indexOf(e) === -1)        
         .filter(e=>                         
-               (e.cachep.r <= wikiR  && e.precalc.label.startsWith('𝐖'))
+               (e.cachep.r <= ud.view.hypertree.args.filter.wikiRadius  && e.precalc.label.startsWith('𝐖'))
             || !e.parent                
             || !e.isOutλ)
         //.sort((a, b)=> a.label.length - b.label.length)
         //.slice(0, 15)        
         
     let damping = 1
-    while (stdlabels.length > 25) {
+    while (stdlabels.length > ud.view.hypertree.args.filter.maxlabels) {
         stdlabels = stdlabels.filter(n=> 
                (n.value > (n.minWeight * damping) )
             || !n.parent

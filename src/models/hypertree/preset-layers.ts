@@ -16,11 +16,6 @@ import { ImageLayer }               from '../../components/layers/image-layer'
 import { FocusLayer }               from '../../components/layers/focus-layer'
 import { bboxOffset }               from '../../d3-hypertree'
 
-var cullingRadius =   0.98
-var labelλExtension = 1.1
-var minLabelR =       0.85 
-var animateUpR =      0.99
-
 var nodeRadiusOffset = (ls:UnitDisk)=> (d:N)=>
     CptoCk({ θ:d.cachep.θ, r:ls.args.nodeRadius(ls, d)*2 })
  
@@ -40,7 +35,7 @@ export const layerSrc = [
         invisible:  false,
         hideOnDrag: false,
         name:       'culling-r',
-        r:          ()=> cullingRadius,
+        r:          ()=> ud.view.hypertree.args.filter.cullingRadius,
         center:     ()=> '0 0'
     }),
     (v, ud:UnitDisk)=> new FocusLayer(v, {
@@ -53,15 +48,15 @@ export const layerSrc = [
     (v, ud:UnitDisk)=> new FocusLayer(v, {
         invisible:  false,
         hideOnDrag: false,
-        name:       'labels-r',
-        r:          ()=> ud.cache.maxLabelR,
+        name:       'focus-r',
+        r:          ()=> ud.cache.focusR,
         center:     ()=> `${(ud.pinchcenter||{re:0}).re} ${(ud.pinchcenter||{im:0}).im}`
     }),    
     (v, ud:UnitDisk)=> new FocusLayer(v, {        
         invisible:  false,
         hideOnDrag: false,
         name:       'labels-r-𝐖',
-        r:          ()=> ud.cache.wikiR,
+        r:          ()=> ud.view.hypertree.args.filter.wikiRadius,
         center:     ()=> '0 0'
     }),    
     (v, ud:UnitDisk)=> new FocusLayer(v, {

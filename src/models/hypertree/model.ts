@@ -37,11 +37,12 @@ export interface HypertreeArgs
         magic:           number
         alpha:           number
         weight:          (n)=> number
-        magicRange:      { min:number,   max:number }
+        magicRange:      { min:number, max:number }
         cullingWeight:   { min:number, max:number }
-        labelRadiusFactor: number
-        maxlabelRadius: number
-        maxlabels:      number
+        focusExtension:  number        
+        maxFocusRadius:  number
+        maxlabels:       number
+        wikiRadius:      number
     }    
     geometry:            UnitDiskArgs    
     interaction: {
