@@ -35,7 +35,6 @@ and instantiate the Component as shown in [Component Embedding](#component):
 The Components constructor takes two 
 arguments: Parent element relation, and hypertree component configuration 
 (HypertreeViewModel), see [Hypertree Configuration](#apireference) for details.
-
 ```typescript
 import * as ht from 'd3-hypertree'
 
