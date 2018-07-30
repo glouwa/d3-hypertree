@@ -1,7 +1,8 @@
 # Hypertree
 
 A Scalable Intercative Web Component for Hyperbolic Tree Visualisations.
-See [Project page](https://glouwa.github.io/d3-hypertree/) for details and prebuild bundle.
+See [Project page](https://glouwa.github.io/d3-hypertree/) for live demo,
+prebuild bundle, and API docs.
 
 ```bash
 npm install d3-hypertree --save
@@ -21,4 +22,5 @@ new ht.Hypertree(
 );
 ```
 ![Screen shot](docs/img/screenshot-light.png?raw=true)
+
 <iframe width="560" height="315" src="https://glouwa.github.io/" frameborder="0" allowfullscreen></iframe>
