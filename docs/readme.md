@@ -2,7 +2,7 @@ A Scalable Intercative Web Component for Hyperbolic Tree Visualisations
 
 ![Screen shot](/d3-hypertree/img/screenshot-light.png?raw=true)
 
-# Embedding
+# Build Integration
 
 ## As Bundle 
 If no packaging tool is used, the imports can be replaced by adding the following 
