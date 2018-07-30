@@ -1,29 +1,26 @@
-# Hypertree
-
 A Scalable Intercative Web Component for Hyperbolic Tree Visualisations
 
 ![Screen shot](/d3-hypertree/img/screenshot-light.png?raw=true)
 
-## Contents
-- [Installing](#installing)
-- [Embedding](#embedding)
-- [API Reference](#apireference)
-    - [Model](#hierarchymodel)
-    - [Filter](#filter)
-    - [Geometry](#geometry)
-    - [Interaction](#interaction)
-- [Available Layers](#layers)        
-- [Example Configuration](#default)
+# Embedding
 
-## Installing
+## As Bundle 
+If no packaging tool is used, the imports can be replaced by adding the following 
+lines to your html:
 
+```html
+<link  href="(path to module)/d3-hypertree/dist/index-browser-light.css" rel="stylesheet">
+<script src="(path to module)/d3-hypertree/dist/index.js"></script>
+```
+Use the global variable `hypertree` to access the module. 
+See https://github.com/glouwa/d3-hypertree-examples for minimal working examples.
+
+
+## With NPN
 ```bash
 npm install d3-hypertree --save
 ```
 
-## Embedding
-
-### CommonJs
 The d3-hypertree component is build with Webpack and exposes a prebuild CommonJS
 module (dist/index.js). For custom builds please import 
 "dist/js/components/hypertree/hypertree". The Components constructor takes two 
@@ -62,17 +59,8 @@ const hypertree = new Hypertree(
 
 ### Plain HTML
 
-If no packaging tool is used, the imports can be replaced by adding the following 
-lines to your html:
 
-```html
-<link  href="(path to module)/d3-hypertree/dist/index-browser-light.css" rel="stylesheet">
-<script src="(path to module)/d3-hypertree/dist/index.js"></script>
-```
-Use the global variable `hypertree` to access the module. 
-See https://github.com/glouwa/d3-hypertree-examples for minimal working examples.
-
-## <a name="apireference"></a> API Reference
+# <a name="apireference"></a> API Reference
 <!-- 
 TODO: describe Hypertree
 api and update table
@@ -100,7 +88,7 @@ export interface HypertreeViewModel
 | geometry        | `{}`            |               | Defines visible layers and geometrical properties like node size, link curvature and others. See section [Geometry](#geometry). |
 | interaction     | `{}`            |               | Used for user defined interaction events. See section [Interaction](#interaction). |
 
-### <a name="hierarchymodel"></a> Model
+## <a name="hierarchymodel"></a> Model
 
 ```typescript
 export interface HierarchyModel
@@ -123,7 +111,7 @@ export interface HierarchyModel
 | objects.pathes  | `{s:N,e:N}[]`   | `[]`          | This array specifys highlighted pathes within the tree. The used nodes must be references to nodes within data. |
 | objects.selections | `N[]`        | `[]`          | This array specifys highlighted nodes within the tree. The used nodes must be references to nodes within data. |
 
-###  <a name="filter"></a> Filter
+##  <a name="filter"></a> Filter
 
 ```typescript
 export interface Filter
@@ -150,7 +138,7 @@ export interface Filter
 | transformation.λ | `number`       | `undefined`     | Defines the initial link lenght. Valid values are  in intervall (0,1). This parameter is not used if geometry.animateUpRadius is defined. |
 
 
-###  <a name="geometry"></a> Geometry
+##  <a name="geometry"></a> Geometry
 
 ```typescript
 export interface Geometry
@@ -174,7 +162,7 @@ export interface Geometry
 | labelRadius     | `number`        | `.005`        | Distance between label center and node center. Not applied on force dirceted label layout. |
 | animateUpRadius | `number or undefined` | `.8`       | If specified, transformation.λ will be set to a value such that the initial tree will fit within a circle with radius `animateUpRadius`. This circle is centered at transformation.P. |
 
-### <a name="interaction"></a> Interaction
+## <a name="interaction"></a> Interaction
 
 ```typescript
 export interface Interaction
@@ -187,7 +175,7 @@ export interface Interaction
 |-----------------|-----------------|---------------|------------------------|
 | onNodeSelect | `(n:N)=>void` | `()=>{}` | Will be called when the user selects or deselects a node given by parameter `n` |
 
-### <a name="layers"></a> Available Layers
+# <a name="layers"></a> Available Layers
 
 | Name            | Visibility (default) | Description                       |   
 |-----------------|---------|------------------------------------------------|
@@ -204,7 +192,7 @@ export interface Interaction
 | labels-force    | ✓       | Avoids label overlapping by a force directed layout. |
 | traces          |         | Shows touch interaction by rendering a polyline for each touch  |
 
-## <a name="default"></a> Example Configuration (Default Configuration)
+# <a name="default"></a> Example Configuration (Default Configuration)
 
 ```typescript
 import { Hypertree } from 'd3-hypertree'
@@ -250,6 +238,7 @@ const hypertree = new Hypertree(
 
 Note that filter, geometry and interaction can be omitted if default configuration should be used.
 
+<!--
 ## Ignore it
 
 ```typescript
@@ -270,3 +259,4 @@ Youtube:
   Henry Segerman
 - What Is The Shape of Space? (ft. PhD Comics)
   minutephysics
+-->
