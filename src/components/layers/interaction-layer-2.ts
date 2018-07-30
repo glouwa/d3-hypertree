@@ -10,14 +10,14 @@ import { CaddC, CsubC, CmulR }    from '../../models/transformation/hyperbolic-m
 import { πify, sigmoid }          from '../../models/transformation/hyperbolic-math'
 import { compose, shift }         from '../../models/transformation/hyperbolic-math'
 
+const π = Math.PI
+
 export interface InteractionLayer2Args extends ILayerArgs
 {
     nohover: boolean,
     mouseRadius,
     onClick
 }
-
-const π = Math.PI
 
 export class InteractionLayer2 implements ILayer
 {
@@ -60,9 +60,7 @@ export class InteractionLayer2 implements ILayer
                 .on('touchcancel',  e=> this.fireTouchEvent('onPointerEnd'))
     }
 
-    //-----------------------------------------------------------------------------------------
-
-    // there is a mouse AND a touch fsm
+    // just to keep the list above clear
 
     private fireMouseDown() {
         this.mousedown = true
@@ -93,9 +91,37 @@ export class InteractionLayer2 implements ILayer
         requestAnimationFrame(()=> {
             this[eventName]('mouse', m)
             this.view.hypertree.update.transformation()
-        })        
+        })
     }
 
+    private fireMouseWheelEvent()
+    {
+        d3.event.stopPropagation()
+        d3.event.preventDefault()
+        
+        const mΔ = d3.event.deltaY
+        const oldλp = this.view.unitdisk.args.transformation.state.λ
+        const Δsens = this.view.hypertree.args.interaction.wheelFactor
+        const newλp = (mΔ>=0 ? oldλp/Δsens : oldλp*Δsens) //- λΔ
+        
+        if (newλp > this.view.hypertree.args.interaction.λbounds[0] &&
+            newλp < this.view.hypertree.args.interaction.λbounds[1]) 
+        {            
+            const m = this.currMousePosAsArr()
+            
+            requestAnimationFrame(()=> {
+                const t = this.view.unitdisk.args.transformation            
+                const preservingNode = this.findUnculledNodeByCell(ArrtoC(m))
+                t.onDragλ(newλp)
+                this.view.hypertree.updateLayout_(preservingNode) // only path to center
+                t.state.P = compose(t.state, shift(t.state, { re:0, im:0 }, preservingNode.cache)).P
+                
+                this.view.hypertree.update.layout()
+            })
+            //this.view.layerstack.layers['labels-force'].update.force()   
+        }
+    }
+    
     private fireTouchEvent(eventName:string) {
         d3.event.stopPropagation()
         d3.event.preventDefault()
@@ -116,43 +142,7 @@ export class InteractionLayer2 implements ILayer
                 this.view.hypertree.update.transformation()
         })
     }
-    /*
-    onDragλ = (l:number)=> this.state.λ = l
-    onDragP = (s:C, e:C)=> 
-        CassignC(this.state.P, compose(this.dST, shift(this.dST, s, maxR(e, this.maxMouseR))).P)
-        this.state.P = compose(this.dST, shift(this.dST, s, maxR(e, this.maxMouseR))).P
-    */
-
-    private minλ = .01 
-    private maxλ = .8
-    private fireMouseWheelEvent()
-    {
-        d3.event.stopPropagation()
-        d3.event.preventDefault()
-        
-        const mΔ = d3.event.deltaY
-        const λΔ = mΔ / 100 / 8
-        const oldλp = this.view.unitdisk.args.transformation.state.λ
-        const Δsens = 1.175
-        const newλp = (mΔ>=0 ? oldλp/Δsens : oldλp*Δsens) //- λΔ
-        
-        if (newλp < this.maxλ && newλp > this.minλ) 
-        {
-            const t = this.view.unitdisk.args.transformation
-            //const preservingNode = t.cache.centerNode
-            const preservingNode = this.findUnculledNodeByCell(ArrtoC(this.currMousePosAsArr()))
-
-            t.onDragλ(newλp)
-            this.view.hypertree.updateLayout_(preservingNode) // only path to center
-            t.state.P = compose(t.state, shift(t.state, { re:0, im:0 }, preservingNode.cache)).P
-
-            requestAnimationFrame(()=> {
-                this.view.hypertree.update.layout()
-            })
-            //this.view.layerstack.layers['labels-force'].update.force()   
-        }
-    }
-
+  
     //-----------------------------------------------------------------------------------------
     
     //StaticState 
@@ -209,7 +199,8 @@ export class InteractionLayer2 implements ILayer
             const f = dist / this.pinchInitDist
             const newλp = this.pinchInitλp * f
             
-            if (newλp < this.maxλ && newλp > this.minλ) 
+            if (newλp > this.view.hypertree.args.interaction.λbounds[0] &&
+                newλp < this.view.hypertree.args.interaction.λbounds[1] ) 
             {
                 //console.log('pinch ok', f, this.pinchInitλp, newλp)
                 const t = this.view.unitdisk.args.transformation
