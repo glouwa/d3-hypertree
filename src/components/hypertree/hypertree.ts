@@ -218,7 +218,7 @@ export class Hypertree
         this.unitdisk = new this.args.geometry.decorator({
             parent:         udparent,
             className:      'unitDisc',
-            position:       'translate(500,520) scale(470)',
+            position:       'translate(500,500) scale(480)',
             hypertree:      this,
         },
         {

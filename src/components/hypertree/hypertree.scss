@@ -67,7 +67,8 @@
         width: 100px;
         height: 100px;
         position: relative;
-        margin: calc(50vh + 1.3%) 50%;
+        top: 50%;
+        margin: 0 50%;
     }
       
     .double-bounce1, .double-bounce2 {

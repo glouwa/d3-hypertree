@@ -67,7 +67,7 @@ const hypertreehtml =
             ${btn('btn-path-center', 'add_circle', /*, '#b5b5b5'*/)}
         </div> 
         
-        <svg width="calc(100% - 3em)" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">
+        <svg width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">
             ${bubbleSvgDef}
         </svg>
         <div class="preloader"></div>
@@ -203,7 +203,7 @@ export class HypertreeEx extends Hypertree
         this.view_.btnNav.onclick      = ()=> this.api['toggleNav']()        
         this.view_.btnSize.onclick     = ()=> {            
             const view = [
-                'translate(500,520) scale(470)', // small
+                'translate(500,500) scale(480)', // small
                 'translate(500,520) scale(490)', // big
                 'translate(500,520) scale(620, 490)', // oval 
                 'translate(500,520) scale(720, 590)', // overlap
