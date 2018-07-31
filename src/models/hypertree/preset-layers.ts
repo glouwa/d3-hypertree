@@ -211,7 +211,7 @@ export const layerSrc = [
     }),
     (v, ud:UnitDisk)=> new LabelLayer(v, {                            
         invisible:  true,
-        hideOnDrag: true,                            
+        hideOnDrag: true,
         name:       'labels',
         className:  'caption',
         data:       ()=> ud.cache.labels,

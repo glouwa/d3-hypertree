@@ -45,7 +45,7 @@ export const navBackgroundLayers = [
     (v, ud:UnitDisk)=> new ArcLayer(v, {                                        
         name:       'link-arcs',
         className:  'arc',
-        curvature:  '-',
+        curvature:  ud.view.hypertree.args.geometry.linkCurvature,
         data:       ()=> ud.cache.links,  
         nodePos:    (n:N)=> (n.layoutReference || n.layout).z,
         nodePosStr: (n:N)=> (n.layoutReference || n.layout).zStrCache,
@@ -55,7 +55,7 @@ export const navBackgroundLayers = [
     (v, ud:UnitDisk)=> new ArcLayer(v, {                                        
         name:       'link-arcs-focus',                            
         className:  'arc-focus',
-        curvature:  '-',
+        curvature:  ud.view.hypertree.args.geometry.linkCurvature,
         data:       ()=> ud.cache.links.filter(n=> n.parent.cachep.r < .6),        
         nodePos:    (n:N)=> (n.layoutReference || n.layout).z,
         nodePosStr: (n:N)=> (n.layoutReference || n.layout).zStrCache,
@@ -65,7 +65,7 @@ export const navBackgroundLayers = [
     (v, ud:UnitDisk)=> new ArcLayer(v, {                                        
         name:       'path-arcs',                
         className:  'arc',
-        curvature:  '-',
+        curvature:  ud.view.hypertree.args.geometry.linkCurvature,
         data:       ()=> ud.cache.paths,       
         nodePos:    (n:N)=> (n.layoutReference || n.layout).z,
         nodePosStr: (n:N)=> (n.layoutReference || n.layout).zStrCache,        

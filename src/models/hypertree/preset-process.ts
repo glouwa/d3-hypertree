@@ -43,12 +43,13 @@ export function doLabelStuff(ud:IUnitDisk, cache:TransformationCache) {
         
     var stdlabels = labels
     //    .filter(e=> pathLabels.indexOf(e) === -1)        
-        .filter(e=>                         
-               (e.cachep.r <= ud.view.hypertree.args.filter.wikiRadius  && e.precalc.label.startsWith('𝐖'))
-            || !e.parent                
-            || !e.isOutλ)
+        .filter(e=> {                         
+            return (e.cachep.r <= ud.view.hypertree.args.filter.wikiRadius  && e.precalc.label.startsWith('𝐖'))
+                || !e.parent                
+                || !e.isOutλ
+        })
         //.sort((a, b)=> a.label.length - b.label.length)
-        //.slice(0, 15)        
+        //.slice(0, 15)
         
     let damping = 1
     while (stdlabels.length > ud.view.hypertree.args.filter.maxlabels) {

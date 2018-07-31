@@ -79,7 +79,7 @@ const modelBase : ()=> HypertreeArgs = ()=>
         nodeScale:      nodeScale,
         nodeFilter:     hasCircle,
         linkWidth:      arcWidth,        
-        linkCurvature:  '-',
+        linkCurvature:  '+',
         transformation: new HyperbolicTransformation({
             P:          { re: 0, im:.5 },
             θ:          { re: 1, im:0 },
@@ -154,19 +154,24 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
         const model = presets.otolModel()   
         model.geometry.nodeRadius = nodeInitRNoInner(.0001)
         model.geometry.nodeScale = nodeScaleNoInner
+        model.filter.focusExtension = 2.5
         model.geometry.nodeFilter = n=> true
         model.layout.initMaxλ = .6
         model.interaction.onNodeSelect = s=> { console.log('###########', s) }        
         model.caption = (ht:Hypertree, n:N)=> {
-            const id = ( n.data && n.data.name) ? n.data.name : ''
-            const i  = ht.args.iconmap.emojimap[id]
+            const id = ( n.data && n.data.name) ? n.data.name : ''            
+            n.precalc.clickable = n.parent
+                && id !== 'Open-Tree-of-Life'
+                && id !== 'Generators'
+                && id !== 'Example-files'
 
+            if (!n.precalc.clickable)
+                return undefined
+
+            const i  = ht.args.iconmap.emojimap[id]
             n.precalc.icon = i            
-            n.precalc.txt = i || id            
-            n.precalc.clickable = (n.parent 
-                &&  n.parent.data 
-                && (n.parent.data.name === 'Open-Tree-of-Life'))
-            n.precalc.txt2 = n.precalc.clickable ? id : ''
+            n.precalc.txt = i || id       
+            n.precalc.txt2 = id
             
             if (n.precalc.txt) 
                 return n.precalc.txt 

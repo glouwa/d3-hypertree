@@ -30,6 +30,8 @@ export interface UnitDiskArgs
     nodeFilter:        (n:N)=> boolean,
     linkWidth:         (n:N)=> number,
     linkCurvature:     ArcCurvature,
+    offsetEmojie:      (d, i, v)=> C,
+    offsetLabels:      (d, i, v)=> C,
     layers:            ((v, ls:IUnitDisk)=> ILayer)[],
     clipRadius?:       number
 }

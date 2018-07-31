@@ -34,7 +34,7 @@ const bubbleSvgDef_old =
     </defs>` 
 
 const grad = [255,96,36,0]
-const bubbleSvgDef =
+const bubbleSvgDef = 
     `<defs>
         <radialGradient id="exampleGradient">            
             <stop offset="58%"  stop-color="rgb(${grad[0]},${grad[0]},${grad[0]})" stop-opacity=".15"/>            
@@ -46,7 +46,7 @@ const bubbleSvgDef =
 
 const hypertreehtml =
     `<div class="unitdisk-nav">        
-        <svg width="calc(100% - 3em)" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">
+        <svg width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">
             ${bubbleSvgDef}
         </svg>
         <div class="preloader"></div>
