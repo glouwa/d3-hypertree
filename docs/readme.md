@@ -1,4 +1,4 @@
-<iframe width="580" height="580" src="https://glouwa.github.io/" frameborder="0" allowfullscreen></iframe>
+<iframe width="590" height="590" src="https://glouwa.github.io/" frameborder="0" allowfullscreen></iframe>
 A Scalable Intercative Web Component for Hyperbolic Tree Visualisations
 
 # Embedding
@@ -100,7 +100,7 @@ export interface HierarchyModel
 |-----------------|-----------------|---------------|------------------------|
 | data            | `N`             | -             | `N` is derived from d3-hierarchy node. See [D3 documentation](https://github.com/d3/d3-hierarchy/blob/master/README.md#hierarchy). It requirres an additional member id, which is used as key in iconmap and langmap to identify a node. d3.hierarchy and d3.stratify can be used if their input data contains such a member. |
 | langmap         | `{}`            | `{}`          | If data files should be language independant this translatino map may be used to translate node labels. |
-| iconmap         | `{}`            | `{}`          | Supports only unicode emojies |
+| iconmap         | `{}`            | `{}`          | Supports only unicode emojis |
 | objects.pathes  | `{s:N,e:N}[]`   | `[]`          | This array specifys highlighted pathes within the tree. The used nodes must be references to nodes within data. |
 | objects.selections | `N[]`        | `[]`          | This array specifys highlighted nodes within the tree. The used nodes must be references to nodes within data. |
 
@@ -227,7 +227,7 @@ Note that filter, geometry and interaction can be omitted if default configurati
 | link-lines      |         | Straight line links                            |
 | nodes           | ✓       | Circle nodes                                   |
 | images          |         | Renders a image for each node with a imgref member. Imgref must be a valid image url. The image is centered at the node position |
-| emojis          | ✓       | Renders a emojie for each node occurring in iconmap |
+| emojis          | ✓       | Renders a emoji for each node occurring in iconmap |
 | labels          |         | Renders labels nex to node                     |
 | labels-force    | ✓       | Avoids label overlapping by a force directed layout. |
 | traces          |         | Shows touch interaction by rendering a polyline for each touch  |

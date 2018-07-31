@@ -32,7 +32,7 @@ const hypertreehtml =
         <div id="meta"></div>        
 
         <div class="tool-bar">
-            <div id="path" class="absolute-center">...</div>
+            <div id="path">...</div>
             <!--
             ${btn('btnundo', 'undo')}
             ${btn('btncommit', 'check')}

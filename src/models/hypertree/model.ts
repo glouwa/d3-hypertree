@@ -46,7 +46,7 @@ export interface HypertreeArgs
         maxlabels:       number
         wikiRadius:      number
     }    
-    geometry:            UnitDiskArgs    
+    geometry:            UnitDiskArgs                      // x    
     interaction: {
         mouseRadius:     number,
         onNodeSelect:    (n:N)=> void
