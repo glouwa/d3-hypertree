@@ -33,7 +33,7 @@
     svg {
         top:0;
         bottom:0;
-        left:3em;
+        left:0;
         right:0;
         position: absolute;   
     }
@@ -47,8 +47,53 @@
         bottom:0;
         > .preloader-wrapper {
             position: absolute;
-            left: calc(50% - .6em);
-            top: calc(50% - 1em);
+            /*left: calc(50% - 1.5em);
+            top: calc(50% - 1.5em);*/
+            left: calc(50% - 3em);
+            top: calc(50% - .4em);
+            width: 3em;
+            height: 3em;
+        }
+    }
+    .spinner {
+        width: 4em;
+        height: 4em;
+        left: calc(50% - 3.5em);
+        top: calc(50% - 1em);      
+        position: relative;        
+    }
+      
+    .double-bounce1, .double-bounce2 {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background-color: #333;
+        opacity: 0.6;
+        position: absolute;
+        top: 0;
+        left: 0;
+        
+        -webkit-animation: sk-bounce 1.0s infinite ease-in-out;
+        animation: sk-bounce 1.0s infinite ease-in-out;
+    }
+      
+    .double-bounce2 {
+        -webkit-animation-delay: -.5s;
+        animation-delay: -.5s;
+    }
+      
+    @-webkit-keyframes sk-bounce {
+        0%, 100% { -webkit-transform: scale(0.0) }
+        50% { -webkit-transform: scale(1.0) }
+    }
+      
+    @keyframes sk-bounce {
+        0%, 100% { 
+          transform: scale(0.0);
+          -webkit-transform: scale(0.0);
+        } 50% { 
+          transform: scale(1.0);
+          -webkit-transform: scale(1.0);
         }
     }
 

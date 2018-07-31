@@ -17,6 +17,7 @@ export interface HypertreeArgs
     iconmap:             any
     caption:             (hypertree:Hypertree, n:N)=> string
     captionBackground:   'all' | 'center' | 'none'        // x 
+    captionFont:         string
 
     objects: {
         pathes:          Path[]

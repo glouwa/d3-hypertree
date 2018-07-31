@@ -40,6 +40,8 @@ const modelBase : ()=> HypertreeArgs = ()=>
     langmap:            null,
     caption:            (ht:Hypertree, n:N)=> undefined,    
     captionBackground:  'all',
+    captionFont:        '6.5px Roboto',
+
     objects: {
         selections:     [],
         pathes:         [],
@@ -77,7 +79,7 @@ const modelBase : ()=> HypertreeArgs = ()=>
         nodeScale:      nodeScale,
         nodeFilter:     hasCircle,
         linkWidth:      arcWidth,        
-        linkCurvature:  '+',
+        linkCurvature:  '-',
         transformation: new HyperbolicTransformation({
             P:          { re: 0, im:.5 },
             θ:          { re: 1, im:0 },

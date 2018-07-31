@@ -18,18 +18,9 @@ let globelhtid = 0
  
 const π = Math.PI
 const htmlpreloader = `
-    <div class="preloader-wrapper big active">
-        <div class="spinner-layer spinner-red-only">
-            <div class="circle-clipper left">
-                <div class="circle"></div>
-            </div>
-            <div class="gap-patch">
-                <div class="circle"></div>
-            </div>
-            <div class="circle-clipper right">
-                <div class="circle"></div>
-            </div>
-        </div>
+    <div class="spinner">
+        <div class="double-bounce1"></div>
+        <div class="double-bounce2"></div>
     </div>`
 
 const bubbleSvgDef_old =
@@ -231,7 +222,7 @@ export class Hypertree
             hypertree:      this,
         },
         {
-            data:           null, //this.data,     
+            data:           null, //this.data,
             decorator:      null,       
             transformation: this.args.geometry.transformation,
             transform:      (n:N)=> this.unitdisk.args.transformation.transformPoint(n.layout.z),
@@ -486,7 +477,7 @@ export class Hypertree
             || (this.virtualCanvas = document.createElement("canvas"))
         var context = this.virtualCanvasContext 
             || (this.virtualCanvasContext = canvas.getContext("2d"))
-        context.font = ".002em Roboto"
+        context.font = this.args.captionFont
 
         for (var n of dfsFlat(this.data, n=>true)) {
             if (n.precalc.txt2) {
