@@ -39,6 +39,7 @@ const modelBase : ()=> HypertreeArgs = ()=>
     data:               null,
     langmap:            null,
     caption:            (ht:Hypertree, n:N)=> undefined,    
+    captionBackground:  'all',
     objects: {
         selections:     [],
         pathes:         [],
@@ -76,6 +77,7 @@ const modelBase : ()=> HypertreeArgs = ()=>
         nodeScale:      nodeScale,
         nodeFilter:     hasCircle,
         linkWidth:      arcWidth,        
+        linkCurvature:  '+',
         transformation: new HyperbolicTransformation({
             P:          { re: 0, im:.5 },
             θ:          { re: 1, im:0 },

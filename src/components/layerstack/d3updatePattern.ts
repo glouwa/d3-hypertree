@@ -90,8 +90,13 @@ export class D3UpdatePattern
             .call(this.args.updateColor)
         
 // extrashit
-        //if (this.args.name === 'labels-force')
-        //    this.addTextBackgroundRects()
+        if (this.args.name === 'labels-force' &&
+            true)
+            this.addTextBackgroundRects()
+
+        if (this.args.name === 'labels' &&
+            true)
+            this.addTextBackgroundRects()
     }
 
     private addTextBackgroundRects()

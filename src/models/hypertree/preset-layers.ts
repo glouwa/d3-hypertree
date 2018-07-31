@@ -19,8 +19,6 @@ import { bboxOffset }               from '../../d3-hypertree'
 var nodeRadiusOffset = (ls:UnitDisk)=> (d:N)=>
     CptoCk({ θ:d.cachep.θ, r:ls.args.nodeRadius(ls, d)*2 })
  
-const curvature = '-' // + - 0 l
-
 export const layerSrc = [    
     // nodes
     // nodes-leafs
@@ -32,29 +30,29 @@ export const layerSrc = [
     // interaction-hammer
     (v, ud:UnitDisk)=> new BackgroundLayer(v, {}),    
     (v, ud:UnitDisk)=> new FocusLayer(v, {        
-        invisible:  false,
-        hideOnDrag: false,
-        name:       'culling-r',
+        invisible:  true,
+        hideOnDrag: true,
+        name:       'culling-r',        
         r:          ()=> ud.view.hypertree.args.filter.cullingRadius,
         center:     ()=> '0 0'
     }),
     (v, ud:UnitDisk)=> new FocusLayer(v, {
-        invisible:  false,
-        hideOnDrag: false,
+        invisible:  true,
+        hideOnDrag: true,
         name:       'mouse-r',
         r:          ()=> ud.view.hypertree.args.interaction.mouseRadius,
         center:     ()=> '0 0'
     }),
     (v, ud:UnitDisk)=> new FocusLayer(v, {
-        invisible:  false,
-        hideOnDrag: false,
+        invisible:  true,
+        hideOnDrag: true,
         name:       'focus-r',
         r:          ()=> ud.cache.focusR,
         center:     ()=> `${(ud.pinchcenter||{re:0}).re} ${(ud.pinchcenter||{im:0}).im}`
     }),    
     (v, ud:UnitDisk)=> new FocusLayer(v, {        
-        invisible:  false,
-        hideOnDrag: false,
+        invisible:  true,
+        hideOnDrag: true,
         name:       'labels-r-𝐖',
         r:          ()=> ud.view.hypertree.args.filter.wikiRadius,
         center:     ()=> '0 0'
@@ -68,6 +66,7 @@ export const layerSrc = [
     }),
     (v, ud:UnitDisk)=> new FocusLayer(v, {        
         invisible:  false,
+        className:  'zerozero-circle',
         name:       '(0,0)',
         r:          ()=> .004,
         center:     ()=> '0 0'
@@ -114,7 +113,7 @@ export const layerSrc = [
         hideOnDrag: false,
         name:       'path-arcs',
         className:  'arc',
-        curvature:  curvature, // + - 0 l        
+        curvature:  ud.view.hypertree.args.geometry.linkCurvature, // + - 0 l        
         data:       ()=> ud.cache.paths,                            
         nodePos:    n=> n.cache,
         nodePosStr: n=> n.strCache,
@@ -128,7 +127,7 @@ export const layerSrc = [
         hideOnDrag: true,
         name:       'path-lines',                            
         className:  'arc',
-        curvature:  curvature, // + - 0 l
+        curvature:  ud.view.hypertree.args.geometry.linkCurvature, // + - 0 l
         data:       ()=> ud.cache.paths,                            
         nodePos:    n=> n.cache,
         nodePosStr: n=> n.strCache,
@@ -142,7 +141,7 @@ export const layerSrc = [
         hideOnDrag: false,
         name:       'link-arcs',                            
         className:  'arc',
-        curvature:  curvature, // + - 0 l
+        curvature:  ud.view.hypertree.args.geometry.linkCurvature, // + - 0 l
         clip:       '#circle-clip' + ud.args.clipRadius,
         data:       ()=> ud.cache.links,                            
         nodePos:    n=> n.cache,
@@ -159,7 +158,7 @@ export const layerSrc = [
         hideOnDrag: true,
         name:       'link-lines',                            
         className:  'arc',
-        curvature:  curvature, 
+        curvature:  ud.view.hypertree.args.geometry.linkCurvature, 
         clip:       '#circle-clip' + ud.args.clipRadius,
         data:       ()=> ud.cache.links,                            
         nodePos:    n=> n.cache,

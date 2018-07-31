@@ -2,13 +2,13 @@ import { ILayer }          from '../layerstack/layer'
 import { ILayerView }      from '../layerstack/layer'
 import { ILayerArgs }      from '../layerstack/layer'
 import { D3UpdatePattern } from '../layerstack/d3updatePattern'
-import { C }               from '../../models/transformation/hyperbolic-math'
 
 export interface FocusLayerArgs extends ILayerArgs
 {
-    name:   string,    
-    r:      ()=> number,
-    center: ()=> string,
+    name:       string,    
+    className?: string,
+    r:          ()=> number,
+    center:     ()=> string,
 }
 
 export class FocusLayer implements ILayer
@@ -37,7 +37,7 @@ export class FocusLayer implements ILayer
             layer:             this,
             data:              [1],
             name:              this.name,
-            className:         'focus-circle',
+            className:         this.args.className || 'focus-circle',
             elementType:       'circle',
             create:            s=> s.attr('r', 1),
             updateColor:       s=> {},

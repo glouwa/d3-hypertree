@@ -160,6 +160,7 @@ export class UnitDiskNav implements IUnitDisk
             nodeScale:          args.nodeScale,
             nodeFilter:         args.nodeFilter,
             linkWidth:          args.linkWidth,
+            linkCurvature:      args.linkCurvature,
             layers:             navBackgroundLayers,
             clipRadius:         1
         })
@@ -206,6 +207,7 @@ export class UnitDiskNav implements IUnitDisk
             nodeScale:          ()=> 1,
             nodeFilter:         ()=> true,
             linkWidth:          args.linkWidth,
+            linkCurvature:      args.linkCurvature,
             clipRadius:         1.7
         })
     }

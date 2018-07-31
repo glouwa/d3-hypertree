@@ -6,6 +6,7 @@ import { N }                       from '../n/n'
 import { C }                       from '../transformation/hyperbolic-math'
 import { Transformation }          from '../transformation/hyperbolic-transformation'
 import { TransformationCache }     from '../transformation/hyperbolic-transformation'
+import { ArcCurvature }            from '../../components/layers/link-layer';
 
 export interface UnitDiskView
 {
@@ -28,6 +29,7 @@ export interface UnitDiskArgs
     nodeScale,
     nodeFilter:        (n:N)=> boolean,
     linkWidth:         (n:N)=> number,
+    linkCurvature:     ArcCurvature,
     layers:            ((v, ls:IUnitDisk)=> ILayer)[],
     clipRadius?:       number
 }

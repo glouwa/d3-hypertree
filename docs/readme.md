@@ -1,5 +1,5 @@
-A Scalable Intercative Web Component for Hyperbolic Tree Visualisations
 <iframe width="580" height="580" src="https://glouwa.github.io/" frameborder="0" allowfullscreen></iframe>
+A Scalable Intercative Web Component for Hyperbolic Tree Visualisations
 
 # Embedding
 
@@ -28,7 +28,8 @@ Add one of the css files to your site. Each css file is a theme.
 - node_modules/d3-hypertree/dist/index-browser-light.css
 - node_modules/d3-hypertree/dist/index-browser-dark.css 
  
-and instantiate the Component as shown in [Component Embedding](#component): 
+and instantiate the Component as shown in [Component Embedding](#component). 
+For working examples see [Example Repository]
 
 ## <a name="component"></a> Component Instantiation
 The Components constructor takes two 
@@ -47,9 +48,10 @@ new ht.Hypertree(
     }
 );
 ```
+
 For working examples see [Example Repository](https://github.com/glouwa/d3-hypertree-examples).
 
-# <a name="apireference"></a> Constructor API
+# <a name="apireference"></a> Constructor Arguments
 The core class of the API is the Hypertree Class. 
 Constructor arguments are used for configuration, see []()
 the 'api' member exposes functonis and Promises for animations and other featrues.

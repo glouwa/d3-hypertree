@@ -16,6 +16,7 @@ export interface HypertreeArgs
     langloader:          (lang)=> (ok)=> void
     iconmap:             any
     caption:             (hypertree:Hypertree, n:N)=> string
+    captionBackground:   'all' | 'center' | 'none'        // x 
 
     objects: {
         pathes:          Path[]
@@ -24,21 +25,21 @@ export interface HypertreeArgs
     }
     layout: {
         type:            LayoutFunction
-        weight:          (n:N)=> number
+        weight:          (n:N)=> number                   // x 
         initMaxλ:        number
-        rootWedge?: {
-            orientation: number
-            angle:       number
-        }        
+        rootWedge: {                                      // x 
+            orientation: number                           // x 
+            angle:       number                           // x 
+        }
     }
     filter: {
         type:            string
         cullingRadius:   number
-        magic:           number
-        alpha:           number
-        weight:          (n)=> number
-        magicRange:      { min:number, max:number }
-        cullingWeight:   { min:number, max:number }
+        magic:           number                           // ? 
+        alpha:           number                           // ? 
+        weight:          (n)=> number                     // x 
+        magicRange:      { min:number, max:number }       // x 
+        cullingWeight:   { min:number, max:number }       // x 
         focusExtension:  number        
         maxFocusRadius:  number
         maxlabels:       number
@@ -48,8 +49,8 @@ export interface HypertreeArgs
     interaction: {
         mouseRadius:     number,
         onNodeSelect:    (n:N)=> void
-        onNodeHold:      ()=>void
-        onNodeHover:     ()=>void
+        onNodeHold:      ()=>void                          // x 
+        onNodeHover:     ()=>void                          // x 
         λbounds:         [ number, number ]
         wheelFactor:     number
     }

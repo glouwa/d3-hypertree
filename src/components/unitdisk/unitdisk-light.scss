@@ -24,7 +24,7 @@ $nodeStroke:    #90caf9;
             stroke-width: 0.0013;
         }
         .arc {
-            stroke: #aaa;
+            stroke: #999;
             //stroke: #bf875f; // #b77d68; //#8d6e63;
             fill: none;            
         }
@@ -52,8 +52,9 @@ $nodeStroke:    #90caf9;
         }
 
         .label-link {
-            stroke: #2196F3;            
-            stroke-width: .00075;
+            /*stroke: #2196F3;            */
+            stroke: #999;
+            stroke-width: .001;
             stroke-dasharray: .01, .01;
             //stroke-dasharray: .006, .0075;
 
@@ -107,6 +108,11 @@ $nodeStroke:    #90caf9;
             fill:none;
             stroke: darken($nodeStroke, 25%);
             stroke-width: .0005;
+        }
+        .zerozero-circle {        
+            fill:none;
+            stroke: #555;
+            stroke-width: .1;
         }
 
         .nav-parameter-disc {
