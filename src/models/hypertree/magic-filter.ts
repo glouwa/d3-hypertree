@@ -44,12 +44,13 @@ class Culler {
 }
 */
 function adjustMagic(ud:IUnitDisk, cache:TransformationCache) {
-    const rangeNodes = { min:300, max:700 }
-    const rangeMagic = { min:4,   max:500 }
-    const alpha      = 1.05
+    const rangeNodes = ud.view.hypertree.args.filter.rangeNodes  //{ min:300, max:700 }
+    const rangeMagic = ud.view.hypertree.args.filter.rangeCullingWeight  //{ min:4,   max:500 }
+    const alpha      = ud.view.hypertree.args.filter.alpha 
     //stopUp
     //stopDown
     if (cache.unculledNodes) {
+
         if (cache.unculledNodes.length > rangeNodes.max) {
             if (ud.view.hypertree.args.filter.magic > rangeMagic.min) { // ???
                 ud.view.hypertree.args.filter.magic /= alpha

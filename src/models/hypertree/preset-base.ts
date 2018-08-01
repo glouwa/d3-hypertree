@@ -18,11 +18,11 @@ import { Hypertree }                from '../../components/hypertree/hypertree'
 import { layerSrc }                 from './preset-layers'
 import { cacheUpdate }              from './magic-filter'
 
-const π =         Math.PI
-const hasLazy =   n=> (n.hasOutChildren && n.isOutλ)
-const isLeaf =    n=> !n.children || !n.children.length
-const isRoot =    n=> !n.parent 
-const hasCircle = n=> hasLazy(n) || isRoot(n) || isLeaf(n)
+const π =              Math.PI
+const hasLazy =        n=> (n.hasOutChildren && n.isOutλ)
+const isLeaf =         n=> !n.children || !n.children.length
+const isRoot =         n=> !n.parent 
+const hasCircle =      n=> hasLazy(n) || isRoot(n) || isLeaf(n)
 
 var nodeInitR =        (c:number)=> (ud:UnitDisk, d:N)=> c * ((d.children && d.parent) ? innerNodeScale(d) : 1)     
 var nodeInitRNoInner = (c:number)=> (ud:UnitDisk, d:N)=> c
@@ -62,8 +62,8 @@ const modelBase : ()=> HypertreeArgs = ()=>
         magic:          160,
         alpha:          1.05,
         weight:         (n)=> (isLeaf(n)?1:0),
-        magicRange:     { min:2,   max:500 },                    
-        cullingWeight:  { min:200, max:400 },                    
+        rangeCullingWeight:     { min:4,   max:500 },                    
+        rangeNodes:     { min:300, max:700 },                    
         focusExtension: 1.6,
         maxFocusRadius: .85,
         maxlabels:      25,
@@ -80,6 +80,8 @@ const modelBase : ()=> HypertreeArgs = ()=>
         nodeFilter:     hasCircle,
         linkWidth:      arcWidth,        
         linkCurvature:  '+',
+        offsetEmoji:    null,
+        offsetLabels:   null,
         transformation: new HyperbolicTransformation({
             P:          { re: 0, im:.5 },
             θ:          { re: 1, im:0 },
@@ -126,7 +128,11 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
     },
     generatorModel: ()=> 
     {
-        const model = modelBase()        
+        const model = modelBase()    
+        model.layout.rootWedge = {
+            orientation: 0, //2*π,
+            angle:       1.999999*π, //2*π
+        }   
         return model
     },    
     generatorSpiralModel: ()=> 

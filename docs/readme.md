@@ -1,7 +1,7 @@
 <iframe width="590" height="590" src="https://glouwa.github.io/" frameborder="0" allowfullscreen></iframe>
 A Scalable Intercative Web Component for Hyperbolic Tree Visualisations
 
-# Embedding
+# Build Integration
 
 ## as Bundle 
 If no packaging tool is used, the imports can be replaced by adding the following 
@@ -233,7 +233,7 @@ Note that filter, geometry and interaction can be omitted if default configurati
 | labels-force    |    ✓    | Avoids label overlapping by a force directed layout. |
 | traces          |         | Shows touch interaction by rendering a polyline for each touch  |
 
-# Modification API
+# Component Controle
 
 Modification operations like animations or navigating to nodes are implemented as Promises, 
 zu simplify concatenation of such operations. 

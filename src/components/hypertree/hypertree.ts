@@ -234,7 +234,9 @@ export class Hypertree
             nodeScale:      this.args.geometry.nodeScale,            
             nodeFilter:     this.args.geometry.nodeFilter,
             linkWidth:      this.args.geometry.linkWidth,
-            linkCurvature:  this.args.geometry.linkCurvature
+            linkCurvature:  this.args.geometry.linkCurvature,
+            offsetEmoji:    this.args.geometry.offsetLabels,
+            offsetLabels:   this.args.geometry.offsetLabels,
         })
     }
 
@@ -288,8 +290,8 @@ export class Hypertree
             })
             //.sum(this.args.weight) // this.updateWeights()
 
-        const startAngle    = 3 * π/2
-        const defAngleWidth = 3 * π/2 //1.5 * π //* 1.999999999999        
+        const startAngle    = this.args.layout.rootWedge.orientation
+        const defAngleWidth = this.args.layout.rootWedge.angle
         this.data.layout = {
             wedge: {
                 α: πify(startAngle - defAngleWidth/2),

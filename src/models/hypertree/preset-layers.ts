@@ -18,7 +18,14 @@ import { bboxOffset }               from '../../d3-hypertree'
 
 var nodeRadiusOffset = (ls:UnitDisk)=> (d:N)=>
     CptoCk({ θ:d.cachep.θ, r:ls.args.nodeRadius(ls, d)*2 })
- 
+
+var centerOffset = (ud)=> (d, i, v)=> CmulR(        
+        bboxOffset(d)(v[i]), 1/2)
+
+var labeloffset = (ud)=> (d, i, v)=> CaddC(
+        nodeRadiusOffset(ud)(d),
+        bboxOffset(d)(v[i]))
+
 export const layerSrc = [    
     // nodes
     // nodes-leafs
@@ -202,9 +209,7 @@ export const layerSrc = [
         className:  'caption',                          
         data:       ()=> ud.cache.emojis,
         text:       (d)=> d.precalc.icon,
-        delta:      (d, i, v)=> ({ re:0, im:0 }), //bboxOffset(d)(v[i]) /*CaddC(
-                        //nodeRadiusOffset(ud)(d), 
-                        //bboxOffset(d)(v[i]))*/,
+        delta:      centerOffset(ud), //(d, i, v)=> ({ re:0, im:0 }),
         transform:  (d, delta)=> 
                         ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` 
                         + `scale(${d.dampedDistScale*2})`
@@ -216,9 +221,7 @@ export const layerSrc = [
         className:  'caption',
         data:       ()=> ud.cache.labels,
         text:       (d)=> d.precalc.txt2,
-        delta:      (d, i, v)=> CaddC(
-                        nodeRadiusOffset(ud)(d),
-                        bboxOffset(d)(v[i])), 
+        delta:      labeloffset(ud),
         transform:  (d, delta)=> 
                         ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` 
                         + d.scaleStrText                            
@@ -229,10 +232,7 @@ export const layerSrc = [
         name:       'labels-force',
         className:  'caption caption-label',
         data:       ()=> ud.cache.labels,
-        text:       (d)=> d.precalc.txt2,
-        delta:      (d, i, v)=> CaddC(
-                        nodeRadiusOffset(ud)(d),
-                        bboxOffset(d)(v[i])), 
+        text:       (d)=> d.precalc.txt2,        
         transform:  (d, delta)=> 
                         ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` 
                         + d.scaleStrText                            

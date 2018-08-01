@@ -162,6 +162,8 @@ export class UnitDiskNav implements IUnitDisk
             linkWidth:          args.linkWidth,
             linkCurvature:      args.linkCurvature,
             layers:             navBackgroundLayers,
+            offsetEmoji:        args.offsetLabels,
+            offsetLabels:       args.offsetLabels,
             clipRadius:         1
         })
 
@@ -208,6 +210,8 @@ export class UnitDiskNav implements IUnitDisk
             nodeFilter:         ()=> true,
             linkWidth:          args.linkWidth,
             linkCurvature:      args.linkCurvature,
+            offsetEmoji:        args.offsetLabels,
+            offsetLabels:       args.offsetLabels,
             clipRadius:         1.7
         })
     }

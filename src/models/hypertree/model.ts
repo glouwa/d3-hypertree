@@ -10,50 +10,50 @@ import { IUnitDisk }           from '../../components/unitdisk/unitdisk'
 
 export interface HypertreeArgs
 {
-    data:                N,
-    langmap:             {},
-    dataloader:          LoaderFunction
-    langloader:          (lang)=> (ok)=> void
-    iconmap:             any
-    caption:             (hypertree:Hypertree, n:N)=> string
-    captionBackground:   'all' | 'center' | 'none'        // x 
-    captionFont:         string
+    data:                   N,
+    langmap:                {},
+    dataloader:             LoaderFunction
+    langloader:             (lang)=> (ok)=> void
+    iconmap:                any
+    caption:                (hypertree:Hypertree, n:N)=> string
+    captionBackground:      'all' | 'center' | 'none'        // x 
+    captionFont:            string
 
-    objects: {
-        pathes:          Path[]
-        selections:      N[]
-        traces:          Trace[]
-    }
+    objects: {  
+        pathes:             Path[]
+        selections:         N[]
+        traces:             Trace[]
+    }   
     layout: {
-        type:            LayoutFunction
-        weight:          (n:N)=> number                   // x 
-        initMaxλ:        number
-        rootWedge: {                                      // x 
-            orientation: number                           // x 
-            angle:       number                           // x 
-        }
-    }
-    filter: {
-        type:            string
-        cullingRadius:   number
-        magic:           number                           // ? 
-        alpha:           number                           // ? 
-        weight:          (n)=> number                     // x 
-        magicRange:      { min:number, max:number }       // x 
-        cullingWeight:   { min:number, max:number }       // x 
-        focusExtension:  number        
-        maxFocusRadius:  number
-        maxlabels:       number
-        wikiRadius:      number
-    }    
-    geometry:            UnitDiskArgs                      // x    
-    interaction: {
-        mouseRadius:     number,
-        onNodeSelect:    (n:N)=> void
-        onNodeHold:      ()=>void                          // x 
-        onNodeHover:     ()=>void                          // x 
-        λbounds:         [ number, number ]
-        wheelFactor:     number
+        type:               LayoutFunction
+        weight:             (n:N)=> number                   // x 
+        initMaxλ:           number
+        rootWedge: {    
+            orientation:    number
+            angle:          number
+        }   
+    }   
+    filter: {   
+        type:               string
+        cullingRadius:      number
+        magic:              number                           // auto by init up
+        alpha:              number
+        weight:             (n)=> number                     // x 
+        rangeCullingWeight: { min:number, max:number }
+        rangeNodes:         { min:number, max:number }
+        focusExtension:     number        
+        maxFocusRadius:     number
+        maxlabels:          number
+        wikiRadius:         number
+    }       
+    geometry:               UnitDiskArgs                      // layer -+
+    interaction: {  
+        mouseRadius:        number,
+        onNodeSelect:       (n:N)=> void
+        onNodeHold:         ()=>void                          // x 
+        onNodeHover:        ()=>void                          // x 
+        λbounds:            [ number, number ]
+        wheelFactor:        number
     }
 }
 

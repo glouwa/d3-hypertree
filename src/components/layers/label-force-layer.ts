@@ -16,7 +16,6 @@ export interface LabelForceLayerArgs extends ILayerArgs
     invisible?:  boolean,
     hideOnDrag?: boolean,
     data:        ()=> any,    
-    delta,
     transform,
     text,
     clip?:       string,
