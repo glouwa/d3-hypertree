@@ -49,8 +49,10 @@ new ht.Hypertree(
 
 See [API Reference](https://glouwa.github.io/d3-hypertree/) for additional options.
 
-<p align="justify">
+<center>
+
 ![Screen shot](docs/img/screenshot-light-github.png?raw=true)
-</p>
+
+</center>
 
 
