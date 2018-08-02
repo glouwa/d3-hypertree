@@ -1,12 +1,25 @@
 # Hypertree
 
 A Scalable Intercative Web Component for Hyperbolic Tree Visualisations.
-See [Project page](https://glouwa.github.io/d3-hypertree/) for live demo,
-prebuild bundle, and API docs.
+
+- Scalable up to 1000 nodes
+- Scalable up to 100k nodes with weight culling and primeter culling
+- Configurable mouse and touch interaction
+- Configurable layers, visualisation presets
+- File loaders for csv, json, skos, treeml
+
+# Resources
+- [API Reference](https://glouwa.github.io/d3-hypertree/)
+- [Live Demos](https://glouwa.github.io/d3-hypertree-examples/)
+- [Examples](https://github.com/glouwa/d3-hypertree-examples/)
+
+# Installation
 
 ```bash
 npm install d3-hypertree --save
 ```
+
+# Usage
 
 ```typescript
 import * as ht from 'd3-hypertree'
