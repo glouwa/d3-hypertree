@@ -3,7 +3,7 @@
 A Scalable Intercative Web Component for Hyperbolic Tree Visualisations.
 
 - Scalable up to 1000 nodes
-- Scalable up to 100k nodes with weight culling and primeter culling
+- Scalable up to 50k nodes with weight culling and primeter culling
 - Configurable mouse and touch interaction
 - Configurable layers, visualisation presets
 - File loaders for csv, json, skos, treeml
@@ -32,7 +32,6 @@ so a import as in the example below is not necessary.
 
 # Usage
 
-See [API Reference](https://glouwa.github.io/d3-hypertree/) for details.
 
 ```typescript
 import * as ht from 'd3-hypertree'
@@ -47,4 +46,6 @@ new ht.Hypertree(
     }
 );
 ```
+
+See [API Reference](https://glouwa.github.io/d3-hypertree/) for details.
 ![Screen shot](docs/img/screenshot-light.png?raw=true)
