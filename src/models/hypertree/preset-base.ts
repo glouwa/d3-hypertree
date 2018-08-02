@@ -98,7 +98,7 @@ const modelBase : ()=> HypertreeArgs = ()=>
         onNodeHold:         ()=> {},                    
         onNodeHover:        ()=> {},
         λbounds:            [1/40, .4],
-        wheelFactor:        1.175,                    
+        wheelFactor:        1.175,
     }
 })
 

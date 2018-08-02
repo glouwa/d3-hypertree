@@ -1,7 +1,7 @@
 <iframe width="590" height="590" src="https://glouwa.github.io/" frameborder="0" allowfullscreen></iframe>
 A Scalable Intercative Web Component for Hyperbolic Tree Visualisations
 
-# Build Integration
+# Installation
 
 ## as Bundle 
 If no packaging tool is used, the imports can be replaced by adding the following 
@@ -32,13 +32,21 @@ and instantiate the Component as shown in [Component Embedding](#component).
 For working examples see [Example Repository]
 
 # <a name="component"></a> Component Instantiation
-The Components constructor takes two 
-arguments: Parent element relation, and hypertree component configuration 
-(HypertreeViewModel). This is the minimal example,
-see [Hypertree Configuration](#apireference) for more options.
+The core class of the API is the Hypertree Class. 
+Constructor arguments are used for configuration, see []()
+the 'api' member exposes functonis and Promises for animations and other featrues.
+The initPromise member may be used to call api functinos, 
+like animations after initialisation.
+
+The Hypertree component constructor takes two arguments: 
+Parent element, and hypertree [component configuration](HypertreeViewModel). 
+The Hypertree Component will attach to `parent` and overwrite all previous children.
+
+See [Hypertree Configuration](#apireference) for more options.
+
 ```typescript
 // hyt is declared by import or global variable in bundle
-new hyt.Hypertree(
+const component = new hyt.Hypertree(
     {
         parent: document.body,
         preserveAspectRatio: "xMidYMid meet"
@@ -49,15 +57,9 @@ new hyt.Hypertree(
 );
 ```
 
-For working examples see [Example Repository](https://github.com/glouwa/d3-hypertree-examples).
+For more examples see [Example Repository](https://github.com/glouwa/d3-hypertree-examples).
 
 ## <a name="apireference"></a> Constructor Arguments
-The core class of the API is the Hypertree Class. 
-Constructor arguments are used for configuration, see []()
-the 'api' member exposes functonis and Promises for animations and other featrues.
-The initPromise member may be used to call api functinos, 
-like animations after initialisation.
-
 
 The Hypertree Configuration object is passed as second argument to the Hypertree
 contructor. It contains four sections which of only `model` is obligate.
@@ -81,7 +83,7 @@ export interface HypertreeViewModel
 | geometry        |               | Defines visible layers and geometrical properties like node size, link curvature and others. See section [Geometry](#geometry). |
 | interaction     |               | Used for user defined interaction events. See section [Interaction](#interaction). |
 
-## <a name="hierarchymodel"></a> model
+## <a name="hierarchymodel"></a> Datamodel
 
 ```typescript
 export interface HierarchyModel
@@ -104,7 +106,7 @@ export interface HierarchyModel
 | objects.pathes  | `[]`          | This array specifys highlighted pathes within the tree. The used nodes must be references to nodes within data. |
 | objects.selections | `[]`          | This array specifys highlighted nodes within the tree. The used nodes must be references to nodes within data. |
 
-###  <a name="filter"></a> filter
+###  <a name="filter"></a> Filter options
 
 ```typescript
 export interface Filter
@@ -131,7 +133,7 @@ export interface Filter
 | transformation.λ | `undefined`     | Defines the initial link lenght. Valid values are  in intervall (0,1). This parameter is not used if geometry.animateUpRadius is defined. |
 
 
-###  <a name="geometry"></a> geometry
+###  <a name="geometry"></a> Geometry and Layer Options
 
 ```typescript
 export interface Geometry
@@ -156,7 +158,7 @@ export interface Geometry
 | labelRadius     | `.005`        | Distance between label center and node center. Not applied on force dirceted label layout. |
 | animateUpRadius | `.8`       | If specified, transformation.λ will be set to a value such that the initial tree will fit within a circle with radius `animateUpRadius`. This circle is centered at transformation.P. |
 
-### <a name="interaction"></a> interaction
+### <a name="interaction"></a> Interaction Options
 
 ```typescript
 export interface Interaction
@@ -170,7 +172,7 @@ export interface Interaction
 | onNodeSelect    | Will be called when the user selects or deselects a node given by parameter `n` |
 
 
-## Full Default Configration
+## Default Configration
 
 ```typescript
 import { Hypertree } from 'd3-hypertree'
