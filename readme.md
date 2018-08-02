@@ -1,4 +1,4 @@
-# Hypertree
+# D3-Hypertree
 
 A Scalable Intercative Web Component for Hyperbolic Tree Visualisations.
 
@@ -8,19 +8,19 @@ A Scalable Intercative Web Component for Hyperbolic Tree Visualisations.
 - Configurable layers, visualisation presets
 - File loaders for csv, json, skos, treeml
 
-# Resources
+## Resources
 - [API Reference](https://glouwa.github.io/d3-hypertree/)
 - [Live Demos](https://glouwa.github.io/d3-hypertree-examples/)
 - [Examples](https://github.com/glouwa/d3-hypertree-examples/)
 
-# Installation
+## Installation
 
 ```bash
 npm install d3-hypertree --save
 ```
 
 <b>Or</b> download the [latest release](https://glouwa.github.io/d3-hypertree/)
-if no module bundeler is used, and add the following lines to your page:
+if no module bundler is used, and add the following lines to your page:
 
 ```html
 <link  href="index-browser-light.css" rel="stylesheet">
@@ -30,7 +30,7 @@ if no module bundeler is used, and add the following lines to your page:
 The prebuild bundle declares the global variable ht, 
 so a import as in the example below is not necessary.
 
-# Usage
+## Usage
 
 
 ```typescript
@@ -50,11 +50,9 @@ new ht.Hypertree(
 See [API Reference](https://glouwa.github.io/d3-hypertree/) for additional options.
 
 <p align="justify">
-
 <p align="center">
   <img src="docs/img/screenshot-light-github.png?raw=true">
 </p>
-
 </p>
 
 
