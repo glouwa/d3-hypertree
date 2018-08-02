@@ -46,8 +46,11 @@ new ht.Hypertree(
     }
 );
 ```
-<center>
-See [API Reference](https://glouwa.github.io/d3-hypertree/) for additional options.
-</center>
 
+See [API Reference](https://glouwa.github.io/d3-hypertree/) for additional options.
+
+<p align="justify">
 ![Screen shot](docs/img/screenshot-light-github.png?raw=true)
+</p>
+
+
