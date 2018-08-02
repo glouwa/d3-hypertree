@@ -53,7 +53,9 @@ See [API Reference](https://glouwa.github.io/d3-hypertree/) for additional optio
 
 ![Screen shot](docs/img/screenshot-light-github.png?raw=true)
 
-<img style="display: block; margin: auto;" alt="photo" src="docs/img/screenshot-light-github.png?raw=true">
+<p align="center">
+  <img src="docs/img/screenshot-light-github.png?raw=true">
+</p>
 
 </p>
 
