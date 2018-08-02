@@ -5,7 +5,7 @@
   "version": "1.0.5",
   "description": "Hyperbolictree",
   "author": "Michael Glatzhofer",
-  "license": "???",
+  "license": "MIT",
   "homepage": "https://github.com/glouwa/d3-hypertree#readme",
   "repository": {
     "type": "git",

@@ -11,6 +11,9 @@ var webpack     = require('webpack-stream')
 
 // commonjs lib (hypertree)
 var projectname = 'd3-hypertree'
+libname = 'hyt' 
+watchdep = {}
+cssimport = {}
 
 var paths = {
     src: './src/',
@@ -22,10 +25,6 @@ var files = {
     lightcss: projectname+`-light.css`,
     mainjs:   projectname+`.js`
 }
-
-libname = 'hyt' 
-watchdep = {}
-cssimport = {}
 
 // ---------------------------------------------------------------------------------------------
 

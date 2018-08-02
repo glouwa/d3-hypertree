@@ -10,7 +10,7 @@ lines to your html:
 <link  href="index-browser-light.css" rel="stylesheet">
 <script src="d3-hypertree.js"></script>
 ```
-Adding the bundle exposes the global vaiable 'ht'.
+Adding the bundle exposes the global vaiable 'hyt'.
 Use it to access the module, as shown in [Component Embedding](#component).
 For working examples (full HTML) see [Example Repository](https://github.com/glouwa/d3-hypertree-examples).
 
@@ -22,7 +22,7 @@ The d3-hypertree component is build with Webpack and exposes a prebuild CommonJS
 module (dist/index.js). For custom builds please import 
 "dist/js/components/hypertree/hypertree". 
 ```typescript
-import * as ht from 'd3-hypertree'
+import * as hyt from 'd3-hypertree'
 ```
 Add one of the css files to your site. Each css file is a theme.
 - node_modules/d3-hypertree/dist/index-browser-light.css
@@ -37,14 +37,14 @@ arguments: Parent element relation, and hypertree component configuration
 (HypertreeViewModel). This is the minimal example,
 see [Hypertree Configuration](#apireference) for more options.
 ```typescript
-// ht is declared by import or global variable in bundle
-new ht.Hypertree(
+// hyt is declared by import or global variable in bundle
+new hyt.Hypertree(
     {
         parent: document.body,
         preserveAspectRatio: "xMidYMid meet"
     },
     {
-        model: ht.loaders.fromFile('data/LDA128-ward.d3.json')
+        model: hyt.loaders.fromFile('data/LDA128-ward.d3.json')
     }
 );
 ```

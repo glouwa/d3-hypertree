@@ -27,22 +27,22 @@ if no module bundler is used, and add the following lines to your page:
 <script src="d3-hypertree.js"></script>
 ```
 
-The prebuild bundle declares the global variable ht, 
+The prebuild bundle declares the global variable `hyt`, 
 so a import as in the example below is not necessary.
 
 ## Usage
 
 
 ```typescript
-import * as ht from 'd3-hypertree'
+import * as hyt from 'd3-hypertree'
 
-new ht.Hypertree(
+new hyt.Hypertree(
     {
         parent: document.body,
         preserveAspectRatio: "xMidYMid meet",
     },
     {
-        model: ht.loaders.fromFile('data/LDA128-ward.d3.json'),
+        model: hyt.loaders.fromFile('data/LDA128-ward.d3.json'),
     }
 );
 ```

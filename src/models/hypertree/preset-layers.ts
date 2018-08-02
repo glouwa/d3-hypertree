@@ -212,7 +212,7 @@ export const layerSrc = [
                         ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` 
                         + `scale(${d.dampedDistScale*2})`
     }),
-    (v, ud:UnitDisk)=> new LabelLayer(v, {                            
+    (v, ud:UnitDisk)=> new LabelLayer(v, {
         invisible:  true,
         hideOnDrag: true,
         name:       'labels',
