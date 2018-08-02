@@ -15,7 +15,7 @@ import { UnitDiskNav }              from '../../components/unitdisk/unitdisk'
 
 import { Hypertree }                from '../../components/hypertree/hypertree'
 
-import { layerSrc }                 from './preset-layers'
+import { layerSrc, labeloffsets }   from './preset-layers'
 import { cacheUpdate }              from './magic-filter'
 
 const π =              Math.PI
@@ -47,7 +47,7 @@ const modelBase : ()=> HypertreeArgs = ()=>
         pathes:             [],
         traces:             [],
     },  
-    layout: {   
+    layout: {
         type:               layoutBergé,
         weight:             (n:N)=> (isLeaf(n)?1:0),
         initMaxλ:           .97,
@@ -71,17 +71,21 @@ const modelBase : ()=> HypertreeArgs = ()=>
     },          
     geometry: { 
         decorator:          UnitDisk,
-        cacheUpdate:        cacheUpdate,
-        layerBase:          'default',
+        cacheUpdate:        cacheUpdate,        
         layers:             layerSrc,
+        layerMask: {
+            stem:           [0, 0], 
+            centerNode:     0,
+            cells:          1,
+        },
         clipRadius:         1,
-        nodeRadius:         nodeInitR(.01),   
+        nodeRadius:         nodeInitR(.01),
         nodeScale:          nodeScale,
         nodeFilter:         hasCircle,
+        offsetEmoji:        labeloffsets['labeloffset'], //outwards,
+        offsetLabels:       labeloffsets['labeloffset'], //outwardsPlusNodeRadius,
         linkWidth:          arcWidth,        
         linkCurvature:      '+',
-        offsetEmoji:        null,
-        offsetLabels:       null,
         transformation:     new HyperbolicTransformation({
             P:              { re: 0, im:.5 },
             θ:              { re: 1, im:0 },
@@ -90,7 +94,7 @@ const modelBase : ()=> HypertreeArgs = ()=>
     },  
     interaction: {  
         mouseRadius:        .9,
-        onNodeSelect:       ()=>{},
+        onNodeSelect:       ()=> {},
         onNodeHold:         ()=> {},                    
         onNodeHover:        ()=> {},
         λbounds:            [1/40, .4],

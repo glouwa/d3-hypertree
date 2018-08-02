@@ -23,6 +23,10 @@ var files = {
     mainjs:   projectname+`.js`
 }
 
+libname = 'hyt' 
+watchdep = {}
+cssimport = {}
+
 // ---------------------------------------------------------------------------------------------
 
 gulp.task('clean', () => del(['dist/**/*']))
@@ -52,7 +56,7 @@ gulp.task('webpack', ['tsc'], () =>
         .pipe(webpack({
             output: { 
                 filename: files.mainjs,
-                library: 'hypertree'                  // use hypertree... in browser
+                library: libname                  // use hypertree... in browser
             },
             devtool: 'source-map',            
         }))
