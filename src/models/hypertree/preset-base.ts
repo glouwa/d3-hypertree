@@ -33,68 +33,68 @@ var arcWidth =         d=> .025 * d.distScale * d.precalc.weightScale
 
 const modelBase : ()=> HypertreeArgs = ()=>
 ({
-    iconmap:            null,
-    dataloader:         null,
-    langloader:         null,
-    data:               null,
-    langmap:            null,
-    caption:            (ht:Hypertree, n:N)=> undefined,    
-    captionBackground:  'all',
-    captionFont:        '6.5px Roboto',
+    iconmap:                null,
+    dataloader:             null,
+    langloader:             null,
+    data:                   null,
+    langmap:                null,
+    caption:                (ht:Hypertree, n:N)=> undefined,    
+    captionBackground:      'all',
+    captionFont:            '6.5px Roboto',
 
-    objects: {
-        selections:     [],
-        pathes:         [],
-        traces:         [],
-    },
-    layout: {
-        type:           layoutBergé,
-        weight:         (n:N)=> (isLeaf(n)?1:0),
-        initMaxλ:       .97,
-        rootWedge: {
-            orientation: 3*π/2,
-            angle:       3*π/2
-        }
-    },    
-    filter: {        
-        type:           'magic',
-        cullingRadius:  .99,
-        magic:          160,
-        alpha:          1.05,
-        weight:         (n)=> (isLeaf(n)?1:0),
-        rangeCullingWeight:     { min:4,   max:500 },                    
-        rangeNodes:     { min:300, max:700 },                    
-        focusExtension: 1.6,
-        maxFocusRadius: .85,
-        maxlabels:      25,
-        wikiRadius:     .85,
-    },        
-    geometry: {
-        decorator:      UnitDisk,
-        cacheUpdate:    cacheUpdate,
-        layerBase:      'default',
-        layers:         layerSrc,
-        clipRadius:     1,
-        nodeRadius:     nodeInitR(.01),   
-        nodeScale:      nodeScale,
-        nodeFilter:     hasCircle,
-        linkWidth:      arcWidth,        
-        linkCurvature:  '+',
-        offsetEmoji:    null,
-        offsetLabels:   null,
-        transformation: new HyperbolicTransformation({
-            P:          { re: 0, im:.5 },
-            θ:          { re: 1, im:0 },
-            λ:          .1
-        })
-    },
-    interaction: {
-        mouseRadius:    .9,
-        onNodeSelect:   ()=>{},
-        onNodeHold:     ()=> {},                    
-        onNodeHover:    ()=> {},
-        λbounds:        [1/40, .4],
-        wheelFactor:    1.175,                    
+    objects: {  
+        selections:         [],
+        pathes:             [],
+        traces:             [],
+    },  
+    layout: {   
+        type:               layoutBergé,
+        weight:             (n:N)=> (isLeaf(n)?1:0),
+        initMaxλ:           .97,
+        rootWedge: {    
+            orientation:     3*π/2,
+            angle:           3*π/2
+        }   
+    },      
+    filter: {           
+        type:               'magic',
+        cullingRadius:      .99,
+        magic:              160,
+        alpha:              1.05,
+        weight:             (n)=> (isLeaf(n)?1:0),
+        rangeCullingWeight: { min:4,   max:500 },                    
+        rangeNodes:         { min:300, max:700 },                    
+        focusExtension:     1.6,
+        maxFocusRadius:     .85,
+        maxlabels:          25,
+        wikiRadius:         .85,
+    },          
+    geometry: { 
+        decorator:          UnitDisk,
+        cacheUpdate:        cacheUpdate,
+        layerBase:          'default',
+        layers:             layerSrc,
+        clipRadius:         1,
+        nodeRadius:         nodeInitR(.01),   
+        nodeScale:          nodeScale,
+        nodeFilter:         hasCircle,
+        linkWidth:          arcWidth,        
+        linkCurvature:      '+',
+        offsetEmoji:        null,
+        offsetLabels:       null,
+        transformation:     new HyperbolicTransformation({
+            P:              { re: 0, im:.5 },
+            θ:              { re: 1, im:0 },
+            λ:              .1
+        })  
+    },  
+    interaction: {  
+        mouseRadius:        .9,
+        onNodeSelect:       ()=>{},
+        onNodeHold:         ()=> {},                    
+        onNodeHover:        ()=> {},
+        λbounds:            [1/40, .4],
+        wheelFactor:        1.175,                    
     }
 })
 
@@ -112,8 +112,8 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
             const l = ht.langMap && ht.langMap[id] ? '𝐖 ' + ht.langMap[id] : ''                        
             const i  = ht.args.iconmap ? ht.args.iconmap.emojimap[id] : ''
 
-            n.precalc.icon = i                     
-            n.precalc.wiki = l   
+            n.precalc.icon = i
+            n.precalc.wiki = l
             n.precalc.txt = i || l || id
             n.precalc.txt2 = l || id
             
@@ -130,8 +130,8 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
     {
         const model = modelBase()    
         model.layout.rootWedge = {
-            orientation: 0, //2*π,
-            angle:       1.999999*π, //2*π
+            orientation: π/4,
+            angle:       1.99999*π,
         }   
         return model
     },    

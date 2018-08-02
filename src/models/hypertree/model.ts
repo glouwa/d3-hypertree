@@ -23,7 +23,7 @@ export interface HypertreeArgs
         pathes:             Path[]
         selections:         N[]
         traces:             Trace[]
-    }   
+    }
     layout: {
         type:               LayoutFunction
         weight:             (n:N)=> number                   // x 
@@ -37,10 +37,10 @@ export interface HypertreeArgs
         type:               string
         cullingRadius:      number
         magic:              number                           // auto by init up
-        alpha:              number
         weight:             (n)=> number                     // x 
         rangeCullingWeight: { min:number, max:number }
         rangeNodes:         { min:number, max:number }
+        alpha:              number
         focusExtension:     number        
         maxFocusRadius:     number
         maxlabels:          number
