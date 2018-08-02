@@ -19,15 +19,15 @@ A Scalable Intercative Web Component for Hyperbolic Tree Visualisations.
 npm install d3-hypertree --save
 ```
 
-Or download the [latest release](https://glouwa.github.io/d3-hypertree/)
-if no bundel tool is used and add the following lines to your page:
+<b>Or</b> download the [latest release](https://glouwa.github.io/d3-hypertree/)
+if no module bundeler is used, and add the following lines to your page:
 
 ```html
 <link  href="index-browser-light.css" rel="stylesheet">
 <script src="d3-hypertree.js"></script>
 ```
 
-The bprebuild bundle declares the global variable ht, 
+The prebuild bundle declares the global variable ht, 
 so a import as in the example below is not necessary.
 
 # Usage
@@ -47,5 +47,5 @@ new ht.Hypertree(
 );
 ```
 
-See [API Reference](https://glouwa.github.io/d3-hypertree/) for details.
-![Screen shot](docs/img/screenshot-light.png?raw=true)
+See [API Reference](https://glouwa.github.io/d3-hypertree/) for additional options.
+![Screen shot](docs/img/screenshot-light-github.png?raw=true)
