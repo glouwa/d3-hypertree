@@ -19,52 +19,63 @@ const bubbleSvgDef =
             <stop offset="98%"  stop-color="rgb( 36, 36, 36)" stop-opacity=".08"/>
             <stop offset="100%" stop-color="rgb(  0,  0,  0)" stop-opacity=".08"/>
         </radialGradient>
-    </defs>` 
+    </defs>`
 
 const btn = (name, icon, classes='', iconColor=undefined)=>
     `<button id="${name}" class="btn btn-small waves-effect waves-orange pn ${classes}">        
         <i class="material-icons" ${iconColor?'style="color:'+iconColor+';"':''}>${icon}</i>
     </button>`
 
-const hypertreehtml =
-    `<div class="unitdisk-nav">      
+const maintoobarHTML = `
+    <!--
+    ${btn('btnundo', 'undo')}
+    ${btn('btncommit', 'check')}
+    -->            
+    <!--
+    ${btn('btndownload', 'file_download', 'tool-seperator disabled')}
+    ${btn('btnupload', 'cloud_upload', 'disabled')}            
+    -->
 
+    ${btn('btnhome', 'home', 'disabled tool-seperator')}
+    ${btn('btnsearch', 'search')}
+    
+    <!--
+    ,530, 470
+    ${btn('btncut', 'content_cut')}
+    ${btn('btncopy', 'content_copy')}
+    ${btn('btnpaste', 'content_paste')}
+    ${btn('btnbrowse', 'open_with', 'tool-seperator tool-active')}
+    ${btn('btnadd', 'add')}
+    ${btn('btnedit', 'border_color')}
+    ${btn('btndelte', 'delete')}
+
+    swap
+    open
+    search from here
+    -->`
+
+const pathtoobarHTML = `
+    ${btn('btnnav', 'explore')}
+    ${btn('btnsize', 'all_out')}
+    ${btn('btnmeta', 'layers')}
+    <!--
+    ${btn('btn-path-home', 'grade', 'tool-seperator'/*, '#ffee55'*/)}
+    -->
+    ${btn('btn-path-center', 'add_circle', 'disabled tool-seperator'/*, '#b5b5b5'*/)}`
+
+const hypertreehtml =
+    `<div class="unitdisk-nav">
         <div id="meta"></div>        
 
-        <div class="tool-bar">
-            <div id="path">...</div>
-            <!--
-            ${btn('btnundo', 'undo')}
-            ${btn('btncommit', 'check')}
-            -->
-            ${btn('btnnav', 'explore', 'tool-seperator')}
-            ${btn('btnsize', 'all_out')}
-            ${btn('btnmeta', 'layers')}            
+        <div id="path">
+        </div>
 
-            ${btn('btndownload', 'file_download', 'tool-seperator disabled')}
-            ${btn('btnupload', 'cloud_upload', 'disabled')}            
-            ${btn('btnhome', 'home', 'disabled')}
-            ${btn('btnsearch', 'search')}
-            
-            <!--
-            ,530, 470
-            ${btn('btncut', 'content_cut')}
-            ${btn('btncopy', 'content_copy')}
-            ${btn('btnpaste', 'content_paste')}
-            ${btn('btnbrowse', 'open_with', 'tool-seperator tool-active')}
-            ${btn('btnadd', 'add')}
-            ${btn('btnedit', 'border_color')}
-            ${btn('btndelte', 'delete')}
-
-            swap
-            open
-            search from here
-            -->
+        <div id="main-toolbar" class="tool-bar">            
+            ${maintoobarHTML}
         </div> 
 
         <div id="path-toolbar" class="tool-bar path-bar">            
-            ${btn('btn-path-home', 'grade', 'tool-seperator'/*, '#ffee55'*/)}
-            ${btn('btn-path-center', 'add_circle', /*, '#b5b5b5'*/)}
+            ${pathtoobarHTML}
         </div> 
         
         <svg width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">
@@ -72,6 +83,7 @@ const hypertreehtml =
         </svg>
         <div class="preloader"></div>
     </div>`
+
 
 export class HypertreeEx extends Hypertree
 {
@@ -81,15 +93,14 @@ export class HypertreeEx extends Hypertree
         unitdisk?      : IUnitDisk,
         
         path?          : HTMLElement,
+        pathesToolbar? : HTMLElement,
+        mainToolbar?   : HTMLElement,
 
         btnHome?       : HTMLElement,
         btnMeta?       : HTMLElement,
         btnNav?        : HTMLElement,
         btnSize?       : HTMLElement,
-
-        pathesToolbar? : HTMLElement,
-        btnPathHome?   : HTMLElement,
-        
+                
         hypertreeMeta? : HypertreeMeta,        
     }
  
@@ -167,11 +178,11 @@ export class HypertreeEx extends Hypertree
 
                             if (centerNode === this.data && !this.view_.btnHome.classList.contains('disabled')) {
                                 this.view_.btnHome.classList.add('disabled')
-                                this.view_.btnPathHome.classList.add('disabled')
+                                //this.view_.btnPathHome.classList.add('disabled')
                             }
                             if (centerNode !== this.data && this.view_.btnHome.classList.contains('disabled')) {
                                 this.view_.btnHome.classList.remove('disabled')
-                                this.view_.btnPathHome.classList.remove('disabled')
+                                //this.view_.btnPathHome.classList.remove('disabled')
                             }
                         }
     }
@@ -187,41 +198,11 @@ export class HypertreeEx extends Hypertree
         this.view_.parent.innerHTML = '' // actually just remove this.view if present ... do less
         this.view_.html = HTML.parse<HTMLElement>(hypertreehtml)()
         this.view_.parent.appendChild(this.view_.html)
-        this.noHypertreeMeta   = new NoHypertreeMeta()
+        this.noHypertreeMeta     = new NoHypertreeMeta()
 
-        this.view_.btnMeta     = <HTMLButtonElement>this.view_.html.querySelector('#btnmeta')
-        this.view_.btnNav      = <HTMLButtonElement>this.view_.html.querySelector('#btnnav')
-        this.view_.btnHome     = <HTMLButtonElement>this.view_.html.querySelector('#btnhome')
-        this.view_.btnSize     = <HTMLButtonElement>this.view_.html.querySelector('#btnsize')
-
+        this.view_.path          = <HTMLElement>this.view_.html.querySelector('#path')
         this.view_.pathesToolbar = <HTMLButtonElement>this.view_.html.querySelector('#path-toolbar')        
-        this.view_.btnPathHome   = <HTMLButtonElement>this.view_.html.querySelector('#btn-path-home')
-                
-        this.view_.btnHome.onclick     = ()=> this.api.gotoHome()
-        this.view_.btnPathHome.onclick = ()=> this.api.gotoHome()
-        this.view_.btnMeta.onclick     = ()=> this.api['toggleMeta']()
-        this.view_.btnNav.onclick      = ()=> this.api['toggleNav']()        
-        this.view_.btnSize.onclick     = ()=> {            
-            const view = [
-                'translate(500,500) scale(480)', // small
-                'translate(500,520) scale(490)', // big
-                'translate(500,520) scale(620, 490)', // oval 
-                'translate(500,520) scale(720, 590)', // overlap
-                'translate(480,620) scale(800, 800)', // mobile (vertical)
-            ]
-            const nav = [
-                'translate(95,95) scale(70)',
-                'translate(95,95) scale(70)',
-                'translate(-150,105) scale(70)',
-                'translate(-160,95) scale(70)',
-                'translate(-150,105) scale(70)'
-            ]
-            sizeidx = ++sizeidx % 5
-            this.unitdisk.api.setTransform(view[sizeidx], nav[sizeidx])
-        }
-        let sizeidx = 0
-
-        this.view_.path = <HTMLElement>this.view_.html.querySelector('#path')
+        this.view_.mainToolbar   = <HTMLButtonElement>this.view_.html.querySelector('#main-toolbar')        
 
         this.updateUnitdiskView()
         this.updateMetaView()
@@ -247,12 +228,36 @@ export class HypertreeEx extends Hypertree
         super.resetData()
 
         this.view_.path.innerText = ''
-        this.view_.pathesToolbar.innerHTML = 
-            btn('btn-path-home', 'grade', 'tool-seperator', '#e2d773') //'#ffee55'
-          + btn('btn-path-center', 'add_circle', 'disabled'/*, '#b5b5b5'*/)
-        this.view_.pathesToolbar
-            .querySelector<HTMLButtonElement>('#btn-path-home')
-            .onclick = ()=> this.api.gotoHome()
+        this.view_.pathesToolbar.innerHTML = pathtoobarHTML
+        this.view_.mainToolbar.innerHTML = maintoobarHTML
+
+        this.view_.btnMeta     = <HTMLButtonElement>this.view_.html.querySelector('#btnmeta')
+        this.view_.btnNav      = <HTMLButtonElement>this.view_.html.querySelector('#btnnav')
+        this.view_.btnHome     = <HTMLButtonElement>this.view_.html.querySelector('#btnhome')
+        this.view_.btnSize     = <HTMLButtonElement>this.view_.html.querySelector('#btnsize')
+        
+        this.view_.btnHome.onclick     = ()=> this.api.gotoHome()
+        this.view_.btnMeta.onclick     = ()=> this.api['toggleMeta']()
+        this.view_.btnNav.onclick      = ()=> this.api['toggleNav']()        
+        this.view_.btnSize.onclick     = ()=> {            
+            const view = [
+                'translate(500,500) scale(480)', // small
+                'translate(500,520) scale(490)', // big
+                'translate(500,520) scale(620, 490)', // oval 
+                'translate(500,520) scale(720, 590)', // overlap
+                'translate(480,620) scale(800, 800)', // mobile (vertical)
+            ]
+            const nav = [
+                'translate(95,95) scale(70)',
+                'translate(95,95) scale(70)',
+                'translate(-150,105) scale(70)',
+                'translate(-160,95) scale(70)',
+                'translate(-150,105) scale(70)'
+            ]
+            sizeidx = ++sizeidx % 5
+            this.unitdisk.api.setTransform(view[sizeidx], nav[sizeidx])
+        }
+        let sizeidx = 0
     }
 
     //########################################################################################################
@@ -275,7 +280,12 @@ export class HypertreeEx extends Hypertree
             newpath.color))()        
         btnElem.onclick = ()=> this.api.gotoNode(n)
         btnElem.title = `${n.precalc.txt}`
-        this.view_.pathesToolbar.insertBefore(btnElem, pathType==='HoverPath' ? null : this.view_.pathesToolbar.firstChild)        
+        if (pathType === 'HoverPath') {
+            this.view_.pathesToolbar.insertBefore(btnElem, null)
+        }
+        else {
+            this.view_.mainToolbar.appendChild(btnElem)        
+        }
         return newpath
     }
 
@@ -283,8 +293,15 @@ export class HypertreeEx extends Hypertree
         super.removePath(pathType, n)
         
         const pathId = this.btnPathId(pathType, n)
-        const btnElem = this.view_.pathesToolbar.querySelector(`#${pathId}`)
-        this.view_.pathesToolbar.removeChild(btnElem)
+        
+        if (pathType==='HoverPath') {
+            const btnElem = this.view_.pathesToolbar.querySelector(`#${pathId}`)
+            this.view_.pathesToolbar.removeChild(btnElem)
+        }        
+        else {
+            const btnElem = this.view_.mainToolbar.querySelector(`#${pathId}`)
+            this.view_.mainToolbar.removeChild(btnElem)
+        }
     }
 }
 
