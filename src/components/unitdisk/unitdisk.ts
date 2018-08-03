@@ -99,8 +99,10 @@ export class UnitDisk implements IUnitDisk
                 .attr('r', this.args.clipRadius)       
 
         this.voronoiLayout = d3.voronoi<N>()
-            .x(d=> d.cache.re)
-            .y(d=> d.cache.im)
+            .x(d=> { console.assert(typeof d.cache.re === 'number'); return d.cache.re})
+            .y(d=> { console.assert(typeof d.cache.re === 'number'); return d.cache.im})
+            //.x(d=> d.cache.re)
+            //.y(d=> d.cache.im)
             .extent([[-2,-2], [2,2]])
         
         if (this.args.cacheUpdate)

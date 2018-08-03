@@ -289,8 +289,10 @@ export class InteractionLayer2 implements ILayer
 
     private findUnculledNodeByCell = (m:C)=> {   
         const voronoiLayout = d3.voronoi<N>()
-            .x(d=> d.cache.re)
-            .y(d=> d.cache.im)
+            .x(d=> { console.assert(typeof d.cache.re === 'number'); return d.cache.re})
+            .y(d=> { console.assert(typeof d.cache.re === 'number'); return d.cache.im})
+            //.x(d=> d.cache.re)
+            //.y(d=> d.cache.im)
             .extent([[-2,-2], [2,2]])             
         const voronoiDiagram = voronoiLayout(this.view.unitdisk.cache.unculledNodes)
         const find = voronoiDiagram.find(m.re, m.im)

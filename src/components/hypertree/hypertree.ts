@@ -325,7 +325,7 @@ export class Hypertree
         {
             const progress01 = i/50            
             const λ = .02 + sigmoid(progress01) * .75
-            console.log('#'+progress01, λ)
+            //console.log('#'+progress01, λ)
             this.args.geometry.transformation.state.λ = λ
             this.updateLayout_()                
             this.unitdisk.args.cacheUpdate(this.unitdisk, this.unitdisk.cache)
@@ -671,13 +671,13 @@ class Animation extends Transition
             return            
         }
         
-        console.groupCollapsed('Transition: ' + args.name)
+        console.group('Transition: ' + args.name)
         args.hypertree.transition = this
         this.hypertree.log.push(this.hypertree.transition)
         
         const frame = ()=> 
         {
-            console.groupCollapsed("Frame")            
+            //console.group("Frame")            
             
             this.currentframe = new Frame(0)
             this.frames.push(this.currentframe)
@@ -703,7 +703,8 @@ class Animation extends Transition
             }
                              
             this.currentframe = undefined
-            console.groupEnd()
+            //console.groupEnd()
+            console.debug('frame end', )
         }
 
         requestAnimationFrame(()=> frame())

@@ -156,7 +156,7 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
             n.precalc.txt = ( n.data && n.data.name) ? n.data.name : ''
             n.precalc.clickable = true
             return n.precalc.txt + tosub(w) 
-        }        
+        }
         return model
     },
     mainModel: ()=> 
@@ -165,13 +165,14 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
         model.geometry.nodeRadius = nodeInitRNoInner(.0001)
         model.geometry.nodeScale = nodeScaleNoInner
         model.filter.focusExtension = 2.5
+        model.filter.maxlabels = 25
         model.geometry.nodeFilter = n=> true
-        model.layout.initMaxλ = .6
+        model.layout.initMaxλ = .7
         model.interaction.onNodeSelect = s=> { console.log('###########', s) }        
         model.caption = (ht:Hypertree, n:N)=> {
             
             const id = ( n.data && n.data.name) ? n.data.name : ''            
-            console.log('node:', id, n.idx, n) 
+            //console.log('node:', id, n) 
             n.precalc.clickable = n.parent
                 && id !== 'Open-Tree-of-Life'
                 && id !== 'Generators'
