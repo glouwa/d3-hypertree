@@ -54,9 +54,9 @@ const modelBase : ()=> HypertreeArgs = ()=>
         rootWedge: {    
             orientation:     3*π/2,
             angle:           3*π/2
-        }   
+        }
     },      
-    filter: {           
+    filter: {
         type:               'magic',
         cullingRadius:      .99,
         magic:              160,
@@ -141,14 +141,14 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
     },    
     generatorSpiralModel: ()=> 
     {
-        const model = modelBase()     
+        const model = presets.generatorModel()             
         model.layout.type = layoutSpiral  
         return model
     },
     fsModel: ()=> 
     {
         const model = modelBase()   
-        model.geometry.nodeRadius = nodeInitRNoInner(.038)
+        model.geometry.nodeRadius = ()=> 0 //nodeInitRNoInner(.038)
         model.geometry.nodeScale = nodeScaleNoInner
         model.geometry.nodeFilter = n=> true
         model.caption = (ht:Hypertree, n:N)=> {            
@@ -169,7 +169,9 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
         model.layout.initMaxλ = .6
         model.interaction.onNodeSelect = s=> { console.log('###########', s) }        
         model.caption = (ht:Hypertree, n:N)=> {
+            
             const id = ( n.data && n.data.name) ? n.data.name : ''            
+            console.log('node:', id, n.idx, n) 
             n.precalc.clickable = n.parent
                 && id !== 'Open-Tree-of-Life'
                 && id !== 'Generators'

@@ -56,7 +56,7 @@ const maintoobarHTML = `
 
 const pathtoobarHTML = `
     ${btn('btnnav', 'explore')}
-    ${btn('btnsize', 'all_out')}
+    <!--${btn('btnsize', 'all_out')}-->
     ${btn('btnmeta', 'layers')}
     <!--
     ${btn('btn-path-home', 'grade', 'tool-seperator'/*, '#ffee55'*/)}
@@ -234,12 +234,12 @@ export class HypertreeEx extends Hypertree
         this.view_.btnMeta     = <HTMLButtonElement>this.view_.html.querySelector('#btnmeta')
         this.view_.btnNav      = <HTMLButtonElement>this.view_.html.querySelector('#btnnav')
         this.view_.btnHome     = <HTMLButtonElement>this.view_.html.querySelector('#btnhome')
-        this.view_.btnSize     = <HTMLButtonElement>this.view_.html.querySelector('#btnsize')
+        //this.view_.btnSize     = <HTMLButtonElement>this.view_.html.querySelector('#btnsize')
         
         this.view_.btnHome.onclick     = ()=> this.api.gotoHome()
         this.view_.btnMeta.onclick     = ()=> this.api['toggleMeta']()
         this.view_.btnNav.onclick      = ()=> this.api['toggleNav']()        
-        this.view_.btnSize.onclick     = ()=> {            
+        /*this.view_.btnSize.onclick     = ()=> {            
             const view = [
                 'translate(500,500) scale(480)', // small
                 'translate(500,520) scale(490)', // big
@@ -258,6 +258,7 @@ export class HypertreeEx extends Hypertree
             this.unitdisk.api.setTransform(view[sizeidx], nav[sizeidx])
         }
         let sizeidx = 0
+        */
     }
 
     //########################################################################################################
