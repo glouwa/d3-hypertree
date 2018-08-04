@@ -11,7 +11,7 @@ import { IUnitDisk }           from '../../components/unitdisk/unitdisk'
 export interface HypertreeArgs
 {
     data:                   N,
-    langmap:                {},
+    langmap:                {} | null
     dataloader:             LoaderFunction
     langloader:             (lang)=> (ok)=> void    
     iconmap:                any

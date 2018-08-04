@@ -74,8 +74,8 @@ function loadFromFile(ok, file) {
         })
 }
 
-export var path_ =        n=> ok=> path(ok, n)
-export var star_ =        n=> ok=> star(ok, n)
+export var path_ =        len=> ok=> path(ok, len)
+export var star_ =        degree=> ok=> star(ok, degree)
 export var fromFile =     f=> ok=> loadFromFile(ok, f)
 export var fromLangFile = f=> ok=> loadFromLangFile(ok, f)
 
@@ -189,9 +189,9 @@ export namespace generators
 //    export var star5 = star_(5)
 //    export var star51 = star_(50)
     export var star120 = deepStar
-    export var star501 = star_(250)
+    export var star501 = function degree(ok) { return star(ok, 250) }
 //    export var path50 = path_(50)
-    export var path500 = path_(10)
+    export var path500 = function spiral(ok) { return path(ok, 10) }
 //    export var path5000 = path_(5000)
     export var nT1 = nTree
     export var nT2 = nTreeAtFirst

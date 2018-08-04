@@ -38,6 +38,7 @@ const modelBase : ()=> HypertreeArgs = ()=>
     langloader:             null,
     data:                   null,
     langmap:                null,
+    childorder:             (children:N[])=> children,
     caption:                (ht:Hypertree, n:N)=> undefined,    
     captionBackground:      'all',
     captionFont:            '6.5px Roboto',
@@ -133,6 +134,7 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
     generatorModel: ()=> 
     {
         const model = modelBase()    
+        model.interaction.λbounds = [1/10, .6]
         model.layout.rootWedge = {
             orientation: π/4,
             angle:       1.99999*π,
@@ -145,16 +147,24 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
         model.layout.type = layoutSpiral  
         return model
     },
+    acmflareModel: ()=> 
+    {
+        const model = modelBase()       
+        model.interaction.λbounds = [1/7, .8]
+        return model
+    },
     fsModel: ()=> 
     {
         const model = modelBase()   
         model.geometry.nodeRadius = ()=> 0 //nodeInitRNoInner(.038)
         model.geometry.nodeScale = nodeScaleNoInner
         model.geometry.nodeFilter = n=> true
+        model.interaction.λbounds = [1/7, .7]
         model.caption = (ht:Hypertree, n:N)=> {            
             const w  = (!n.value || n.value==1) ? '' : n.value + ' '
             n.precalc.txt = ( n.data && n.data.name) ? n.data.name : ''
             n.precalc.clickable = true
+            n.precalc.txt2 = n.precalc.txt
             return n.precalc.txt + tosub(w) 
         }
         return model
@@ -167,8 +177,9 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
         model.filter.focusExtension = 2.5
         model.filter.maxlabels = 25
         model.geometry.nodeFilter = n=> true
-        model.layout.initMaxλ = .7
+        model.layout.initMaxλ = .85
         model.interaction.onNodeSelect = s=> { console.log('###########', s) }        
+        model.interaction.λbounds = [1/5, .5]
         model.caption = (ht:Hypertree, n:N)=> {
             
             const id = (n.data && n.data.name) ? n.data.name : ''            
