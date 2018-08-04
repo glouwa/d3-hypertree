@@ -13,9 +13,10 @@ export interface HypertreeArgs
     data:                   N,
     langmap:                {},
     dataloader:             LoaderFunction
-    langloader:             (lang)=> (ok)=> void
+    langloader:             (lang)=> (ok)=> void    
     iconmap:                any
-    caption:                (hypertree:Hypertree, n:N)=> string
+    childorder:             (children:N[])=> N[]             // x
+    caption:                (ht:Hypertree, n:N)=> string
     captionBackground:      'all' | 'center' | 'none'        // x 
     captionFont:            string
 
@@ -62,6 +63,7 @@ export interface HypertreeArgs_Soll
     model: {
         data:            N
         langmap:         {}
+        childorder:      (children:N[])=> N[]
         dataloader:      (ok: (root:N, t0:number, dl:number)=>void)=> void
         langloader:      (lang)=> (ok)=> void
         caption:         (hypertree:Hypertree, n:N)=> string

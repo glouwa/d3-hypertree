@@ -171,7 +171,7 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
         model.interaction.onNodeSelect = s=> { console.log('###########', s) }        
         model.caption = (ht:Hypertree, n:N)=> {
             
-            const id = ( n.data && n.data.name) ? n.data.name : ''            
+            const id = (n.data && n.data.name) ? n.data.name : ''            
             //console.log('node:', id, n) 
             n.precalc.clickable = n.parent
                 && id !== 'Open-Tree-of-Life'
