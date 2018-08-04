@@ -99,7 +99,7 @@ export class Hypertree
     */    
     public api = {
         setModel: (model: HypertreeArgs)=> new Promise<void>((ok, err)=> {        
-            console.group("set model")
+            console.group("set model", model)
             this.args = model        
             this.update.view.parent()
             this.api.setDataloader(ok, err, this.args.dataloader)

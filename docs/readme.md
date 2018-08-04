@@ -3,7 +3,7 @@ A Scalable Intercative Web Component for Hyperbolic Tree Visualisations
 
 # Installation
 
-## as Bundle 
+## Downlaod
 If no packaging tool is used, the imports can be replaced by adding the following 
 lines to your html:
 ```html
@@ -14,7 +14,9 @@ Adding the bundle exposes the global vaiable 'hyt'.
 Use it to access the module, as shown in [Component Embedding](#component).
 For working examples (full HTML) see [Example Repository](https://github.com/glouwa/d3-hypertree-examples).
 
-## with NPM / Webpack
+## Embedding in HTML
+
+## Embedding in HTML with Typescript/Webpack 
 ```bash
 npm install d3-hypertree --save
 ```
@@ -83,7 +85,7 @@ export interface HypertreeViewModel
 | geometry        |               | Defines visible layers and geometrical properties like node size, link curvature and others. See section [Geometry](#geometry). |
 | interaction     |               | Used for user defined interaction events. See section [Interaction](#interaction). |
 
-## <a name="hierarchymodel"></a> Datamodel
+## <a name="hierarchymodel"></a> Data Model
 
 ```typescript
 export interface HierarchyModel
@@ -106,7 +108,7 @@ export interface HierarchyModel
 | objects.pathes  | `[]`          | This array specifys highlighted pathes within the tree. The used nodes must be references to nodes within data. |
 | objects.selections | `[]`          | This array specifys highlighted nodes within the tree. The used nodes must be references to nodes within data. |
 
-###  <a name="filter"></a> Filter options
+###  <a name="filter"></a> Filter Options
 
 ```typescript
 export interface Filter
@@ -235,7 +237,7 @@ Note that filter, geometry and interaction can be omitted if default configurati
 | labels-force    |    ✓    | Avoids label overlapping by a force directed layout. |
 | traces          |         | Shows touch interaction by rendering a polyline for each touch  |
 
-# Component Controle
+# Component Modification 
 
 Modification operations like animations or navigating to nodes are implemented as Promises, 
 zu simplify concatenation of such operations. 

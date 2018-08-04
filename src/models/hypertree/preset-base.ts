@@ -103,10 +103,41 @@ const modelBase : ()=> HypertreeArgs = ()=>
     }
 })
 
+const isPrimitive = item=> typeof item !== 'object' // function, string, number, boolean, undefined, symbol
+const isObject    = item=> typeof item === 'object' && !Array.isArray(item)
+const isArray     = item=> typeof item === 'object' &&  Array.isArray(item)
+const mergeDeep_ = (target, source)=> {
+    console.assert(
+        (isObject(target) && isObject(source)) ||
+        (isArray(target)  && isArray(source))
+    )
+    for (const key in source) 
+    {
+        if (isObject(source[key])) 
+        {
+            console.debug('merging Object: ', key)
+            target[key] = mergeDeep_(target[key] || {}, source[key])
+        }
+        else if (isArray(source[key])) 
+        {
+            console.debug('merging Array: ', key)
+            target[key] = mergeDeep_(target[key] || [], source[key])        
+        }
+        else if (isPrimitive(source[key])) 
+        {
+            console.debug('merging Primitive: ', key)
+            target[key] = source[key]
+        }
+        else console.assert(false)
+    }
+    return target 
+}
+
 export const presets : { [key: string]:()=> HypertreeArgs } = 
 {
     otolModel: ()=> 
     {
+        /*
         const model = modelBase()
         model.geometry.nodeRadius = nodeInitR(.0075)
         model.caption = (ht:Hypertree, n:N)=> {
@@ -128,8 +159,39 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
                 return n.precalc.txt + tosub(w) 
             else 
                 return undefined
-        }        
-        return model
+        }
+        return model*/
+        
+        const model = modelBase()
+        const diff = {            
+            //model: {
+                caption: (ht:Hypertree, n:N)=> {
+                    // better: set of initial node actions [label, imghref, scalef, ...]
+                    const w  = (!n.value || n.value==1) ? '' : n.value + ' '
+                    const id = ( n.data && n.data.name) ? n.data.name : ''
+                    
+                    const l = ht.langMap && ht.langMap[id] ? '𝐖 ' + ht.langMap[id] : ''                        
+                    const i  = ht.args.iconmap ? ht.args.iconmap.emojimap[id] : ''
+
+                    n.precalc.icon = i
+                    n.precalc.wiki = l
+                    n.precalc.txt = i || l || id
+                    n.precalc.txt2 = l || id
+                    
+                    n.precalc.clickable = Boolean(l)
+
+                    if (n.precalc.txt) 
+                        return n.precalc.txt + tosub(w) 
+                    else 
+                        return undefined                    
+                },
+            //},            
+            geometry: {
+                nodeRadius: nodeInitR(.0075)
+            }
+        }
+        console.log('######### deepmerge')
+        return mergeDeep_(model, diff)
     },
     generatorModel: ()=> 
     {
