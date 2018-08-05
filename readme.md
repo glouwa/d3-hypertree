@@ -2,6 +2,7 @@
 <p align="center">
 <a href="https://glouwa.github.io/d3-hypertree/">
   <img src="docs/img/screenshot-light-github.png?raw=true">
+</a>
 </p>
 </p>
 
