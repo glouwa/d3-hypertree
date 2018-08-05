@@ -14,13 +14,13 @@ A Scalable Intercative Web Component for Hyperbolic Tree Visualisations.
 - Scalable up to 50k nodes with weight culling and primeter culling
 - Configurable mouse and touch interaction
 - Configurable layers, visualisation presets
-- Same data format as for [d3.hierarchy()](https://github.com/d3/d3-hierarchy#hierarchy) os used 
+- Uses same data format as [d3.hierarchy()](https://github.com/d3/d3-hierarchy#hierarchy) 
 - Alternatively file loaders for csv, json, skos, treeml can be used
 
 ## Resources
 - [API Reference](https://glouwa.github.io/d3-hypertree/)
 - [Live Demos](https://glouwa.github.io/d3-hypertree-examples/)
-- [HTML/Webpack/Python Examples](https://github.com/glouwa/d3-hypertree-examples/)
+- [HTML / Webpack / Python Examples](https://github.com/glouwa/d3-hypertree-examples/)
 
 ## Installation
 
@@ -58,5 +58,71 @@ new hyt.Hypertree(
 
 See [API Reference](https://glouwa.github.io/d3-hypertree/) for additional options.
 
+## Cheat Sheet
 
+```typescript
+export interface HypertreeArgs
+{
+    data:                   N,
+    langmap:                {} | null
+    dataloader:             LoaderFunction
+    langloader:             (lang)=> (ok)=> void    
+    iconmap:                any
+    childorder:             (children:N[])=> N[]             // x
+    caption:                (ht:Hypertree, n:N)=> string
+    nodeInit:               (ht:Hypertree, n:N)=> void,
+    captionBackground:      'all' | 'center' | 'none'        // x 
+    captionFont:            string
+
+    objects: {
+        pathes:             Path[]
+        selections:         N[]
+        traces:             Trace[]
+    }
+    layout: {
+        type:               LayoutFunction
+        weight:             (n:N)=> number                   // x 
+        initMaxλ:           number
+        rootWedge: {    
+            orientation:    number
+            angle:          number
+        }
+    }
+    filter: {
+        type:               string
+        cullingRadius:      number
+        magic:              number                           // auto by init up
+        weight:             (n)=> number                     // x 
+        rangeCullingWeight: { min:number, max:number }
+        rangeNodes:         { min:number, max:number }
+        alpha:              number
+        focusExtension:     number        
+        maxFocusRadius:     number
+        maxlabels:          number
+        wikiRadius:         number
+    }
+    geometry: {
+        decorator:          { new(view:UnitDiskView, args:UnitDiskArgs) : IUnitDisk }
+        transformation:     Transformation<N>
+        cacheUpdate:        (ud:IUnitDisk, cache:TransformationCache)=> void
+        nodeRadius:         (ud:IUnitDisk, n:N)=> number
+        nodeScale, 
+        nodeFilter:         (n:N)=> boolean
+        linkWidth:          (n:N)=> number
+        linkCurvature:      ArcCurvature
+        offsetEmoji:        (d, i, v)=> C
+        offsetLabels:       (d, i, v)=> C
+        layers:             ((v, ls:IUnitDisk)=> ILayer)[]
+        clipRadius?:        number
+    }
+    interaction: {  
+        mouseRadius:        number
+        onNodeSelect:       (n:N)=> void
+        onNodeHold:         ()=>void                          // x 
+        onNodeHover:        ()=>void                          // x 
+        λbounds:            [ number, number ]
+        wheelFactor:        number
+    }
+}
+```
 
