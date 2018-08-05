@@ -1,3 +1,10 @@
+<p align="justify">
+<p align="center">
+<a href="https://glouwa.github.io/d3-hypertree/">
+  <img src="docs/img/screenshot-light-github.png?raw=true">
+</p>
+</p>
+
 # D3-Hypertree
 
 A Scalable Intercative Web Component for Hyperbolic Tree Visualisations.
@@ -49,10 +56,5 @@ new hyt.Hypertree(
 
 See [API Reference](https://glouwa.github.io/d3-hypertree/) for additional options.
 
-<p align="justify">
-<p align="center">
-  <img src="docs/img/screenshot-light-github.png?raw=true">
-</p>
-</p>
 
 
