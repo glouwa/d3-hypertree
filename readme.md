@@ -58,7 +58,7 @@ new hyt.Hypertree(
 
 See [API Reference](https://glouwa.github.io/d3-hypertree/) for additional options.
 
-## Cheat Sheet
+## Options Cheat Sheet
 
 ```typescript
 export interface HypertreeArgs
@@ -67,8 +67,7 @@ export interface HypertreeArgs
     langmap:                {} | null
     dataloader:             LoaderFunction
     langloader:             (lang)=> (ok)=> void    
-    iconmap:                any
-    childorder:             (children:N[])=> N[]             // x
+    iconmap:                any    
     caption:                (ht:Hypertree, n:N)=> string
     nodeInit:               (ht:Hypertree, n:N)=> void,
     captionBackground:      'all' | 'center' | 'none'        // x 

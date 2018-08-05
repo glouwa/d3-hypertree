@@ -34,6 +34,22 @@ and instantiate the Component as shown in [Component Embedding](#component).
 For working examples see [Example Repository]
 
 # <a name="component"></a> Component Instantiation
+
+list of used classes
+- Hypertree
+- loaders
+- layouts
+- transformations
+- layers
+- interactionmodel
+- labeloffsets
+- precalctools
+
+- json config construcktor
+- promise modificatins
+- d3 for layers
+- layout part of transformations
+
 The core class of the API is the Hypertree Class. 
 Constructor arguments are used for configuration, see []()
 the 'api' member exposes functonis and Promises for animations and other featrues.
