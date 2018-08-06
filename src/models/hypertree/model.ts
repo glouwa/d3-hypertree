@@ -14,13 +14,19 @@ export interface HypertreeArgs
     langmap:                {} | null
     dataloader:             LoaderFunction
     langloader:             (lang)=> (ok)=> void    
-    iconmap:                any
-    childorder:             (children:N[])=> N[]             // x
+    iconmap:                any    
     caption:                (ht:Hypertree, n:N)=> string
+    nodeInit:               (ht:Hypertree, n:N)=> void
+        // weights: layout, filter, arcwidtrh, arclength
+        // text -> textlen
+        // hascell
+        // interaction click
+        // emoji
+        // imghref
+        // 
     captionBackground:      'all' | 'center' | 'none'        // x 
     captionFont:            string
-
-    objects: {  
+    objects: {
         pathes:             Path[]
         selections:         N[]
         traces:             Trace[]
@@ -32,9 +38,9 @@ export interface HypertreeArgs
         rootWedge: {    
             orientation:    number
             angle:          number
-        }   
-    }   
-    filter: {   
+        }
+    }
+    filter: {
         type:               string
         cullingRadius:      number
         magic:              number                           // auto by init up

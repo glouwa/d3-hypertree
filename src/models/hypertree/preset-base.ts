@@ -33,11 +33,15 @@ var arcWidth =         d=> .025 * d.distScale * d.precalc.weightScale
 
 const modelBase : ()=> HypertreeArgs = ()=>
 ({
-    iconmap:                null,
-    dataloader:             null,
+    iconmap: {
+                            fileName2IconUrl: ()=>null,
+                            emojimap: {}
+    },
+    /*dataloader:             null,
     langloader:             null,
     data:                   null,
     langmap:                null,
+    */
     childorder:             (children:N[])=> children,
     caption:                (ht:Hypertree, n:N)=> undefined,    
     captionBackground:      'all',
@@ -69,8 +73,8 @@ const modelBase : ()=> HypertreeArgs = ()=>
         maxFocusRadius:     .85,
         maxlabels:          25,
         wikiRadius:         .85,
-    },          
-    geometry: { 
+    },
+    geometry: {
         decorator:          UnitDisk,
         cacheUpdate:        cacheUpdate,        
         layers:             layerSrc,
@@ -88,11 +92,11 @@ const modelBase : ()=> HypertreeArgs = ()=>
         linkWidth:          arcWidth,        
         linkCurvature:      '+',
         transformation:     new HyperbolicTransformation({
-            P:              { re: 0, im:.5 },
+            P:              { re: 0, im:0 },
             θ:              { re: 1, im:0 },
             λ:              .1
-        })  
-    },  
+        })
+    },
     interaction: {  
         mouseRadius:        .9,
         onNodeSelect:       ()=> {},
@@ -135,35 +139,10 @@ const mergeDeep_ = (target, source)=> {
 
 export const presets : { [key: string]:()=> HypertreeArgs } = 
 {
+    modelBase: ()=> modelBase(),
     otolModel: ()=> 
     {
-        /*
-        const model = modelBase()
-        model.geometry.nodeRadius = nodeInitR(.0075)
-        model.caption = (ht:Hypertree, n:N)=> {
-            // better: set of initial node actions [label, imghref, scalef, ...]
-            const w  = (!n.value || n.value==1) ? '' : n.value + ' '
-            const id = ( n.data && n.data.name) ? n.data.name : ''
-            
-            const l = ht.langMap && ht.langMap[id] ? '𝐖 ' + ht.langMap[id] : ''                        
-            const i  = ht.args.iconmap ? ht.args.iconmap.emojimap[id] : ''
-
-            n.precalc.icon = i
-            n.precalc.wiki = l
-            n.precalc.txt = i || l || id
-            n.precalc.txt2 = l || id
-            
-            n.precalc.clickable = Boolean(l)
-
-            if (n.precalc.txt) 
-                return n.precalc.txt + tosub(w) 
-            else 
-                return undefined
-        }
-        return model*/
-        
-        const model = modelBase()
-        const diff = {            
+        return {
             //model: {
                 caption: (ht:Hypertree, n:N)=> {
                     // better: set of initial node actions [label, imghref, scalef, ...]
@@ -180,7 +159,7 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
                     
                     n.precalc.clickable = Boolean(l)
 
-                    if (n.precalc.txt) 
+                    if (n.precalc.txt)
                         return n.precalc.txt + tosub(w) 
                     else 
                         return undefined                    
@@ -190,80 +169,104 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
                 nodeRadius: nodeInitR(.0075)
             }
         }
-        console.log('######### deepmerge')
-        return mergeDeep_(model, diff)
     },
     generatorModel: ()=> 
     {
-        const model = modelBase()    
-        model.interaction.λbounds = [1/10, .6]
-        model.layout.rootWedge = {
-            orientation: π/4,
-            angle:       1.99999*π,
-        }   
-        return model
+        return {                        
+            interaction: {
+                λbounds: [1/10, .6],
+            },
+            layout: {
+                rootWedge: {
+                    orientation: π/4,
+                    angle:       1.99999*π,
+                }
+            }
+        }
     },    
     generatorSpiralModel: ()=> 
-    {
-        const model = presets.generatorModel()             
-        model.layout.type = layoutSpiral  
-        return model
+    {        
+        const diff = {                        
+            layout: {
+                type: layoutSpiral  
+            }
+        }
     },
     acmflareModel: ()=> 
     {
-        const model = modelBase()       
-        model.interaction.λbounds = [1/7, .8]
-        return model
+        const model = presets.otolModel()
+        const diff = {                        
+            interaction: {
+                λbounds: [1/7, .8]
+            }
+        }
+        console.log('merging acmflare to main model')
+        return mergeDeep_(model, diff)
     },
     fsModel: ()=> 
-    {
-        const model = modelBase()   
-        model.geometry.nodeRadius = ()=> 0 //nodeInitRNoInner(.038)
-        model.geometry.nodeScale = nodeScaleNoInner
-        model.geometry.nodeFilter = n=> true
-        model.interaction.λbounds = [1/7, .7]
-        model.caption = (ht:Hypertree, n:N)=> {            
-            const w  = (!n.value || n.value==1) ? '' : n.value + ' '
-            n.precalc.txt = ( n.data && n.data.name) ? n.data.name : ''
-            n.precalc.clickable = true
-            n.precalc.txt2 = n.precalc.txt
-            return n.precalc.txt + tosub(w) 
+    {        
+        return {                        
+            geometry: {
+                nodeRadius: ()=> 0, //nodeInitRNoInner(.038)
+                nodeScale: nodeScaleNoInner,
+                nodeFilter: n=> true,
+            },
+            interaction: {
+                λbounds: [1/7, .7]
+            },
+            caption: (ht:Hypertree, n:N)=> {            
+                const w  = (!n.value || n.value==1) ? '' : n.value + ' '
+                n.precalc.txt = ( n.data && n.data.name) ? n.data.name : ''
+                n.precalc.clickable = true
+                n.precalc.txt2 = n.precalc.txt
+                return n.precalc.txt + tosub(w) 
+            }
         }
-        return model
     },
     mainModel: ()=> 
     {
-        const model = presets.otolModel()   
-        model.geometry.nodeRadius = nodeInitRNoInner(.0001)
-        model.geometry.nodeScale = nodeScaleNoInner
-        model.filter.focusExtension = 2.5
-        model.filter.maxlabels = 25
-        model.geometry.nodeFilter = n=> true
-        model.layout.initMaxλ = .85
-        model.interaction.onNodeSelect = s=> { console.log('###########', s) }        
-        model.interaction.λbounds = [1/5, .5]
-        model.caption = (ht:Hypertree, n:N)=> {
-            
-            const id = (n.data && n.data.name) ? n.data.name : ''            
-            //console.log('node:', id, n) 
-            n.precalc.clickable = n.parent
-                && id !== 'Open-Tree-of-Life'
-                && id !== 'Generators'
-                && id !== 'Example-files'
+        const model = presets.otolModel()
+        const diff = {             
+            filter: {
+                focusExtension: 2.5,
+                maxlabels: 25,
+            },            
+            layout: {
+                initMaxλ: .85
+            },            
+            geometry: {
+                nodeRadius: nodeInitRNoInner(.0001),
+                nodeScale: nodeScaleNoInner,
+                nodeFilter: n=> true,
+            },            
+            interaction: {
+                //onNodeSelect: s=> { console.log('###########', s) },
+                λbounds: [1/5, .5],
+            },
+            caption: (ht:Hypertree, n:N)=> {
+                
+                const id = (n.data && n.data.name) ? n.data.name : ''            
+                //console.log('node:', id, n) 
+                n.precalc.clickable = n.parent
+                    && id !== 'Open-Tree-of-Life'
+                    && id !== 'Generators'
+                    && id !== 'Example-files'
 
-            if (!n.precalc.clickable)
-                return undefined
+                if (!n.precalc.clickable)
+                    return undefined
 
-            const i  = ht.args.iconmap.emojimap[id]
-            n.precalc.icon = i            
-            n.precalc.txt = i || id       
-            n.precalc.txt2 = id
-            
-            if (n.precalc.txt) 
-                return n.precalc.txt 
-            else 
-                return undefined
-        }  
-        return model
+                const i  = ht.args.iconmap.emojimap[id]
+                n.precalc.icon = i            
+                n.precalc.txt = i || id       
+                n.precalc.txt2 = id
+                
+                if (n.precalc.txt) 
+                    return n.precalc.txt 
+                else 
+                    return undefined
+            }
+        }
+        console.log('merging otol to main model')
+        return mergeDeep_(model, diff)
     }    
 }

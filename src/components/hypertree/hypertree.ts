@@ -12,7 +12,7 @@ import { CassignC }            from '../../models/transformation/hyperbolic-math
 import { CaddC, CsubC, CmulR } from '../../models/transformation/hyperbolic-math'
 import { sigmoid }             from '../../models/transformation/hyperbolic-math'
 import { IUnitDisk }           from '../unitdisk/unitdisk'
-import { ok } from 'assert';
+import { presets }             from '../../models/hypertree/preset-base'
 
 let globelhtid = 0
  
@@ -62,6 +62,36 @@ function shuffleArray(array, n) {
     }
 }
 
+const isPrimitive = item=> typeof item !== 'object' // function, string, number, boolean, undefined, symbol
+const isObject    = item=> typeof item === 'object' && !Array.isArray(item)
+const isArray     = item=> typeof item === 'object' &&  Array.isArray(item)
+const mergeDeep_ = (target, source)=> {
+    console.assert(
+        (isObject(target) && isObject(source)) ||
+        (isArray(target)  && isArray(source))
+    )
+    for (const key in source) 
+    {
+        if (isObject(source[key])) 
+        {
+            console.debug('merging Object: ', key)
+            target[key] = mergeDeep_(target[key] || Object.create(Object.getPrototypeOf(source[key])) , source[key])            
+        }
+        else if (isArray(source[key])) 
+        {
+            console.debug('merging Array: ', key)
+            target[key] = mergeDeep_(target[key] || [], source[key])        
+        }
+        else if (isPrimitive(source[key])) 
+        {
+            console.debug('merging Primitive: ', key)
+            target[key] = source[key]
+        }
+        else console.assert(false)
+    }
+    return target 
+}
+
 export class Hypertree
 {
     args           : HypertreeArgs    
@@ -88,6 +118,9 @@ export class Hypertree
     constructor(view:{ parent:HTMLElement }, args:HypertreeArgs) {
         console.group("hypertree constructor")        
        
+        // merge default config with hypertree args
+        // or base -> args.base -> argsargs  
+
         this.view_ = view        
         this.initPromise = this.api.setModel(args)
         console.groupEnd()
@@ -98,11 +131,18 @@ export class Hypertree
     * and call the according update function(s)
     */    
     public api = {
-        setModel: (model: HypertreeArgs)=> new Promise<void>((ok, err)=> {        
-            console.group("set model", model)
-            this.args = model        
+        setModel: (model: HypertreeArgs)=> new Promise<void>((ok, err)=> {            
+            //model = mergeDeep_(presets[model.baseCfg], model)
+            const base = presets.modelBase()
+            console.group("set model: merging ", model, ' into ', base)
+
+            //this.args = mergeDeep_(model, base)
+            this.args = mergeDeep_(base, model)
+            console.log('merge result: ', this.args)
+
+            // wenn parent updatedated hat wraum ist da nich eine alte transformations in der disk
             this.update.view.parent()
-            this.api.setDataloader(ok, err, this.args.dataloader)
+            this.api.setDataloader(ok, err, this.args.dataloader) // resetData is hier drin 🤔 
             this.api.setLangloader(ok, err, this.args.langloader)
             console.groupEnd()
         }),
@@ -117,8 +157,10 @@ export class Hypertree
                 this.update.langloader()
                 console.groupEnd()
                 
-                if (this.data)
+                if (this.data) {
+                    console.warn('resolving promise')
                     ok()
+                }
             })
             console.groupEnd()
         },
@@ -133,8 +175,10 @@ export class Hypertree
                 this.data = this.initData(d3h, t0, t1, dl)                                
                 console.groupEnd()
 
-                if (this.langMap)
-                    ok()
+                if (this.langMap) {
+                    console.warn('resolving promise')
+                    ok()                    
+                }
             })            
             console.groupEnd()
         },       
@@ -345,6 +389,90 @@ export class Hypertree
 
     //########################################################################################################
     //##
+    //## internal functions, calles by ...?
+    //##
+    //########################################################################################################
+
+    protected updateLang_(dl=0) : void {
+        console.log("_updateLang")
+        const t0 = performance.now()
+        for (var n of dfsFlat(this.data, n=>true)) {
+            n.precalc.txt = null            
+            n.precalc.label = this.args.caption(this, n)
+            n.precalc.labellen = undefined
+        }
+        if (dl || !this.langMeta)
+            this.langMeta = {
+                Δ: [performance.now()-t0], 
+                map:this.langMap, 
+                filesize:dl 
+            }
+
+        this.updateLabelLen_()
+    }
+
+    private virtualCanvas = undefined
+    private virtualCanvasContext = undefined
+    protected updateLabelLen_() : void {
+        console.log("_updateLabelLen")
+        var canvas = this.virtualCanvas 
+            || (this.virtualCanvas = document.createElement("canvas"))
+        var context = this.virtualCanvasContext 
+            || (this.virtualCanvasContext = canvas.getContext("2d"))
+        context.font = this.args.captionFont
+        //context.textBaseLine = 'middle'
+        //context.textAlign = 'center'
+
+        for (var n of dfsFlat(this.data, n=>true)) {
+            if (n.precalc.txt2) {
+                const metrics = context.measureText(n.precalc.txt2)
+                n.precalc.labellen = metrics.width/200/window.devicePixelRatio
+            }
+            else
+                n.precalc.labellen = 0 
+        }
+    }
+
+    protected updateImgHref_() : void {
+        console.log("_updateImgHref", this.args.iconmap)        
+        if (this.args.iconmap)
+            for (var n of dfsFlat(this.data, n=>true))
+                n.precalc.imageHref = this.args.iconmap.fileName2IconUrl(n.data.name, n.data.type)                
+    }
+
+    protected updateWeights_() : void {
+        console.log("_updateWeights")
+        this.data.sum(this.args.layout.weight) // äää besser...
+        for (var n of dfsFlat(this.data, n=>true)) 
+            // ...hier selber machen
+            n.precalc.weightScale = (Math.log2(n.value) || 1) 
+                / (Math.log2(this.data.value || this.data.children.length) || 1)        
+    }
+
+    public updateLayout_(preservingnode?:N) : void {
+        console.log("_updateLayout", this.args.geometry.transformation.state.λ)
+        
+        const t0 = performance.now()        
+        const t = this.args.geometry.transformation
+        preservingnode = preservingnode || t.cache.centerNode
+
+        if (preservingnode)
+            preservingnode.ancestors().reverse().forEach(n=> {
+                this.args.layout.type(n, this.args.geometry.transformation.state.λ, true)    
+            })
+        else
+            this.args.layout.type(this.data, this.args.geometry.transformation.state.λ)
+               
+        if (preservingnode) 
+            t.state.P = CmulR(preservingnode.layout.z, -1) 
+        else
+            console.warn('no layout compensation')
+            
+        this.layoutMeta = { Δ: performance.now()-t0 }
+    }
+
+    //########################################################################################################
+    //##
     //## Path
     //##
     //########################################################################################################
@@ -445,88 +573,6 @@ export class Hypertree
             const nodeFlagName = `isPartOfAny${pathType}`         
             pn.pathes[nodeFlagName] = pn.pathes.partof.some(e=> e.type === pathType)
         })
-    }
-
-    //########################################################################################################
-    //##
-    //## internal functions, calles by ...?
-    //##
-    //########################################################################################################
-
-    protected updateLang_(dl=0) : void {
-        console.log("_updateLang")
-        const t0 = performance.now()
-        for (var n of dfsFlat(this.data, n=>true)) {
-            n.precalc.txt = null            
-            n.precalc.label = this.args.caption(this, n)
-            n.precalc.labellen = undefined
-        }
-        if (dl || !this.langMeta)
-            this.langMeta = {
-                Δ: [performance.now()-t0], 
-                map:this.langMap, 
-                filesize:dl 
-            }
-
-        this.updateLabelLen_()
-    }
-
-    private virtualCanvas = undefined
-    private virtualCanvasContext = undefined
-    protected updateLabelLen_() : void {
-        console.log("_updateLabelLen")
-        var canvas = this.virtualCanvas 
-            || (this.virtualCanvas = document.createElement("canvas"))
-        var context = this.virtualCanvasContext 
-            || (this.virtualCanvasContext = canvas.getContext("2d"))
-        context.font = this.args.captionFont
-
-        for (var n of dfsFlat(this.data, n=>true)) {
-            if (n.precalc.txt2) {
-                const metrics = context.measureText(n.precalc.txt2)
-                n.precalc.labellen = metrics.width/200/window.devicePixelRatio
-            }
-            else
-                n.precalc.labellen = 0 
-        }
-    }
-
-    protected updateImgHref_() : void {
-        console.log("_updateImgHref")
-        if (this.args.iconmap)
-            for (var n of dfsFlat(this.data, n=>true))             
-                n.precalc.imageHref = this.args.iconmap.fileName2IconUrl(n.data.name, n.data.type)                    
-    }
-
-    protected updateWeights_() : void {
-        console.log("_updateWeights")
-        this.data.sum(this.args.layout.weight) // äää besser...
-        for (var n of dfsFlat(this.data, n=>true)) 
-            // ...hier selber machen
-            n.precalc.weightScale = (Math.log2(n.value) || 1) 
-                / (Math.log2(this.data.value || this.data.children.length) || 1)        
-    }
-
-    public updateLayout_(preservingnode?:N) : void {
-        console.log("_updateLayout", this.args.geometry.transformation.state.λ)
-        
-        const t0 = performance.now()        
-        const t = this.args.geometry.transformation
-        preservingnode = preservingnode || t.cache.centerNode
-
-        if (preservingnode)
-            preservingnode.ancestors().reverse().forEach(n=> {
-                this.args.layout.type(n, this.args.geometry.transformation.state.λ, true)    
-            })
-        else
-            this.args.layout.type(this.data, this.args.geometry.transformation.state.λ)
-               
-        if (preservingnode) 
-            t.state.P = CmulR(preservingnode.layout.z, -1) 
-        else
-            console.warn('no layout compensation')
-            
-        this.layoutMeta = { Δ: performance.now()-t0 }
     }
 
     //########################################################################################################
