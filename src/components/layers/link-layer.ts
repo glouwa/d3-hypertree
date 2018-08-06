@@ -59,7 +59,7 @@ export class ArcLayer implements ILayer
             data:              this.args.data,
             name:              this.name,
             className:         this.args.className,
-            elementType:       this.args.curvature == 'l' ? 'line' : 'path',
+            elementType:       this.args.curvature === 'l' ? 'line' : 'path',
             create:            s=> {},
             updateColor:       s=> this.args.classed(s, this.args.width),
             updateTransform:   s=> {                
@@ -76,7 +76,7 @@ export class ArcLayer implements ILayer
                      .attr("stroke-linecap", d=> "round")
             },
         })        
-        const straincurvature = 'l' //this.args.curvature
+        const straincurvature : string = '-' // this.args.curvature
         this.d3updatePattern2 = new D3UpdatePattern({
             parent:            this.view.parent,
             layer:             this,
@@ -86,11 +86,11 @@ export class ArcLayer implements ILayer
                 : [],
             name:              'strain',
             className:         this.args.className,
-            elementType:       straincurvature ? 'line' : 'path',
+            elementType:       straincurvature === 'l' ? 'line' : 'path',
             create:            s=> {},
             updateColor:       s=> this.args.classed(s, this.args.width),
             updateTransform:   s=> {                
-                if (straincurvature == 'l')
+                if (straincurvature === 'l')
                     s.attr('x1',             d=> this.args.nodePos(d).re)
                      .attr('y1',             d=> this.args.nodePos(d).im)
                      .attr('x2',             d=> this.args.nodePos(d).re)

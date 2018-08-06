@@ -65,25 +65,15 @@ const pathtoobarHTML = `
 
 const hypertreehtml =
     `<div class="unitdisk-nav">
-        <div id="meta"></div>        
-
-        <div id="path">
-        </div>
-
-        <div id="main-toolbar" class="tool-bar">            
-            ${maintoobarHTML}
-        </div> 
-
-        <div id="path-toolbar" class="tool-bar path-bar">            
-            ${pathtoobarHTML}
-        </div> 
-        
+        <div id="path"></div>
+        <div id="main-toolbar" class="tool-bar">${maintoobarHTML}</div> 
+        <div id="path-toolbar" class="tool-bar path-bar">${pathtoobarHTML}</div>        
         <svg width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">
             ${bubbleSvgDef}
         </svg>
+        <div id="meta"></div>        
         <div class="preloader"></div>
     </div>`
-
 
 export class HypertreeEx extends Hypertree
 {
@@ -238,7 +228,7 @@ export class HypertreeEx extends Hypertree
         
         this.view_.btnHome.onclick     = ()=> this.api.gotoHome()
         this.view_.btnMeta.onclick     = ()=> this.api['toggleMeta']()
-        this.view_.btnNav.onclick      = ()=> this.api['toggleNav']()        
+        this.view_.btnNav.onclick      = ()=> this.api['toggleNav']()
         /*this.view_.btnSize.onclick     = ()=> {            
             const view = [
                 'translate(500,500) scale(480)', // small

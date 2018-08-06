@@ -60,13 +60,14 @@
 
         .caption-background {
             pointer-events: none;
+            animation: fade-in 750ms ease-in-out;
         }
 
         .label-link {
             stroke-width:.02;
             stroke-dasharray: .001;
             stroke-linecap: round;
-            
+            animation: fade-in 750ms ease-in-out;
         }
 
         .background-circle {

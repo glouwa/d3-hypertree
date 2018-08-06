@@ -37,7 +37,7 @@ const modelBase : ()=> HypertreeArgs = ()=>
     iconmap: {
                             fileName2IconUrl: ()=>null,
                             emojimap: {}
-    },    
+    },
     caption:                (ht:Hypertree, n:N)=> undefined,
     nodeInit:               (ht:Hypertree, n:N)=> {    
         /*    

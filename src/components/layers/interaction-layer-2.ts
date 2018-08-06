@@ -48,7 +48,7 @@ export class InteractionLayer2 implements ILayer
         if (!this.args.nohover) 
             this.view.parent.append('circle')
                 .attr('class',      'mouse-circle')
-                .attr('r',          this.args.mouseRadius)                
+                .attr('r',          1.5)                
                 .on('wheel',        e=> this.fireMouseWheelEvent())
                 .on('mousedown',    e=> this.fireMouseDown())
                 .on('mousemove',    e=> this.fireMouseMove())
