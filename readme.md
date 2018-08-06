@@ -6,7 +6,7 @@
 </p>
 </p>
 
-<iframe width="590" height="590" src="https://glouwa.github.io/" frameborder="0" allowfullscreen></iframe>
+<iframe width="590" height="590" src="https://glouwa.github.io/" frameborder="0" allowfullscreen="allowfullscreen"></iframe>
 
 # D3-Hypertree
 
