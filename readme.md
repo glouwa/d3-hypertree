@@ -4,9 +4,10 @@
   <img src="docs/img/screenshot-light-github.png?raw=true">
 </a>
 </p>
+<iframe width="590" height="590" src="https://glouwa.github.io/" frameborder="0" allowfullscreen="allowfullscreen"></iframe>
 </p>
 
-<iframe width="590" height="590" src="https://glouwa.github.io/" frameborder="0" allowfullscreen="allowfullscreen"></iframe>
+
 
 # D3-Hypertree
 
