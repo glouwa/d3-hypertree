@@ -218,7 +218,7 @@ export const layerSrc = [
         name:       'labels',
         className:  'caption',
         data:       ()=> ud.cache.labels,
-        text:       (d)=> d.precalc.txt2,
+        text:       (d)=> d.precalc.label,
         delta:      labeloffsets.labeloffset(ud),
         transform:  (d, delta)=> 
                         ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` 
@@ -230,7 +230,7 @@ export const layerSrc = [
         name:       'labels-force',
         className:  'caption caption-label',
         data:       ()=> ud.cache.labels,
-        text:       (d)=> d.precalc.txt2,        
+        text:       (d)=> d.precalc.label,        
         transform:  (d, delta)=> 
                         ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` 
                         + d.scaleStrText                            

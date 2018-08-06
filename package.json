@@ -22,13 +22,13 @@
   "dependencies": {
     "d3": "^4.13.0",
     "d3-force-gravity": "^1.0.2",
-    "ducd": "^1.0.5",
+    "ducd": "^1.0.8",
     "xml2js": "^0.4.17"
   },
   "devDependencies": {
     "@types/d3": "^4.13.0",
-    "@types/node": "^7.0.65",
-    "browser-sync": "^2.24.4",
+    "@types/node": "^7.0.68",
+    "browser-sync": "^2.24.6",
     "del": "^3.0.0",
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.1",
@@ -38,7 +38,7 @@
     "gulp-typescript": "^3.2.4",
     "gulp-util": "^3.0.8",
     "merge2": "^1.2.2",
-    "typescript": "^2.8.3",
+    "typescript": "^2.9.2",
     "webpack": "^3.12.0",
     "webpack-stream": "^4.0.3",
     "yargs": "^8.0.2"

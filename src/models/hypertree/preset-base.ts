@@ -17,6 +17,7 @@ import { Hypertree }                from '../../components/hypertree/hypertree'
 
 import { layerSrc, labeloffsets }   from './preset-layers'
 import { cacheUpdate }              from './magic-filter'
+import { mergeDeep }                from 'ducd'
 
 const π =              Math.PI
 const hasLazy =        n=> (n.hasOutChildren && n.isOutλ)
@@ -38,12 +39,14 @@ const modelBase : ()=> HypertreeArgs = ()=>
                             emojimap: {}
     },    
     caption:                (ht:Hypertree, n:N)=> undefined,
-    nodeInit:               (ht:Hypertree, n:N)=> {        
+    nodeInit:               (ht:Hypertree, n:N)=> {    
+        /*    
         n.precalc.layoutWeight = 0
         n.precalc.cullingWeight = 0
         n.precalc.arcwidthWeight = 0
         n.precalc.arclengthWeight = 0
         //n.precalc.weightScale = 
+        */
         n.precalc.imageHref = undefined
         n.precalc.label = undefined
         n.precalc.icon = undefined
@@ -114,60 +117,21 @@ const modelBase : ()=> HypertreeArgs = ()=>
     }
 })
 
-const isPrimitive = item=> typeof item !== 'object' // function, string, number, boolean, undefined, symbol
-const isObject    = item=> typeof item === 'object' && !Array.isArray(item)
-const isArray     = item=> typeof item === 'object' &&  Array.isArray(item)
-const mergeDeep_ = (target, source)=> {
-    console.assert(
-        (isObject(target) && isObject(source)) ||
-        (isArray(target)  && isArray(source))
-    )
-    for (const key in source) 
-    {
-        if (isObject(source[key])) 
-        {
-            console.debug('merging Object: ', key)
-            target[key] = mergeDeep_(target[key] || {}, source[key])
-        }
-        else if (isArray(source[key])) 
-        {
-            console.debug('merging Array: ', key)
-            target[key] = mergeDeep_(target[key] || [], source[key])        
-        }
-        else if (isPrimitive(source[key])) 
-        {
-            console.debug('merging Primitive: ', key)
-            target[key] = source[key]
-        }
-        else console.assert(false)
-    }
-    return target 
-}
-
 export const presets : { [key: string]:()=> HypertreeArgs } = 
 {
     modelBase: ()=> modelBase(),
     otolModel: ()=> ({
         //model: {
             caption: (ht:Hypertree, n:N)=> {
-                // better: set of initial node actions [label, imghref, scalef, ...]
-                const w  = (!n.value || n.value==1) ? '' : n.value + ' '
-                const id = ( n.data && n.data.name) ? n.data.name : ''
-                
+                // better: set of initial node actions [label, imghref, scalef, ...]                
+                const id = n.data && n.data.name
                 const l = ht.langMap && ht.langMap[id] ? '𝐖 ' + ht.langMap[id] : ''                        
                 const i  = ht.args.iconmap ? ht.args.iconmap.emojimap[id] : ''
 
                 n.precalc.icon = i
-                n.precalc.wiki = l
-                n.precalc.txt = i || l || id
-                n.precalc.txt2 = l || id
-                
+                n.precalc.wiki = l                
+                n.precalc.label = l || id                
                 n.precalc.clickable = Boolean(l)
-
-                if (n.precalc.txt)
-                    return n.precalc.txt + tosub(w) 
-                else 
-                    return undefined                    
             },
         //},            
         geometry: {
@@ -185,7 +149,7 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
             }
         }        
     }),    
-    generatorSpiralModel: ()=> ({                        
+    generatorSpiralModel: ()=> ({          
         layout: {
             type: layoutSpiral  
         }        
@@ -199,7 +163,7 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
             }
         }
         console.log('merging acmflare to main model')
-        return mergeDeep_(model, diff)
+        return mergeDeep(model, diff)
     },
     fsModel: ()=> ({                        
         geometry: {
@@ -211,11 +175,9 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
             λbounds: [1/7, .7]
         },
         caption: (ht:Hypertree, n:N)=> {            
-            const w  = (!n.value || n.value==1) ? '' : n.value + ' '
-            n.precalc.txt = ( n.data && n.data.name) ? n.data.name : ''
-            n.precalc.clickable = true
-            n.precalc.txt2 = n.precalc.txt
-            return n.precalc.txt + tosub(w) 
+            const id = n.data && n.data.name
+            n.precalc.label = id
+            n.precalc.clickable = true            
         }        
     }),
     mainModel: ()=> 
@@ -225,7 +187,7 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
             filter: {
                 focusExtension: 2.5,
                 maxlabels: 25,
-            },            
+            },
             layout: {
                 initMaxλ: .85
             },            
@@ -238,30 +200,23 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
                 //onNodeSelect: s=> { console.log('###########', s) },
                 λbounds: [1/5, .5],
             },
-            caption: (ht:Hypertree, n:N)=> {
-                
-                const id = (n.data && n.data.name) ? n.data.name : ''            
-                //console.log('node:', id, n) 
+            caption: (ht:Hypertree, n:N)=> {                
+                const id = n.data && n.data.name
                 n.precalc.clickable = n.parent
                     && id !== 'Open-Tree-of-Life'
                     && id !== 'Generators'
                     && id !== 'Example-files'
+                    && id !== 'stackoverflow'
 
                 if (!n.precalc.clickable)
                     return undefined
 
                 const i  = ht.args.iconmap.emojimap[id]
                 n.precalc.icon = i            
-                n.precalc.txt = i || id       
-                n.precalc.txt2 = id
-                
-                if (n.precalc.txt) 
-                    return n.precalc.txt 
-                else 
-                    return undefined
+                n.precalc.label = id                
             }
         }
         console.log('merging otol to main model')
-        return mergeDeep_(model, diff)
+        return mergeDeep(model, diff)
     }    
 }

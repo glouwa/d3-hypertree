@@ -172,7 +172,7 @@ export class HypertreeEx extends Hypertree
         centernode:     (centerNode)=> {
                             const pathStr = centerNode
                                 .ancestors()
-                                .reduce((a, e)=> `${e.precalc.txt?("  "+e.precalc.txt+"  "):''}${a?"›":""}${a}`, '') 
+                                .reduce((a, e)=> `${e.precalc.label?("  "+e.precalc.label+"  "):''}${a?"›":""}${a}`, '') 
         
                             this.view_.path.innerText = pathStr // todo: html m frame?
 
@@ -280,7 +280,7 @@ export class HypertreeEx extends Hypertree
             pathType === 'HoverPath' ? 'disabled' : '', 
             newpath.color))()        
         btnElem.onclick = ()=> this.api.gotoNode(n)
-        btnElem.title = `${n.precalc.txt}`
+        btnElem.title = `${n.precalc.label}`
         if (pathType === 'HoverPath') {
             this.view_.pathesToolbar.insertBefore(btnElem, null)
         }

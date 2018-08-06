@@ -90,7 +90,7 @@ export const navBackgroundLayers = [
         name:       'labels',
         className:  'caption label-big', 
         data:       ()=> ud.view.hypertree.args.objects.selections,
-        text:       (d:N)=> d.precalc.txt,
+        text:       (d:N)=> d.precalc.label,
         delta:      labelDelta(ud),
         transform:  (d:N, delta:C)=> 
             ` translate(${CtoStr(CaddC((d.layoutReference||d.layout).z, delta))})`

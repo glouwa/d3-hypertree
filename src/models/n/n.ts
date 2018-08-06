@@ -4,14 +4,12 @@ import { Path } from '../path/path';
 
 export interface NodePrecalulations {
     weight:             number
-    weightScale:        number
-    icon:               string
-    txt:                string
+    weightScale:        number    
     label:              string
     labellen:           number
-    imageHref:          string
-
-    txt2:               string
+    
+    icon:               string  
+    imageHref:          string    
     wiki:               string
     clickable:          boolean
     cell:               boolean

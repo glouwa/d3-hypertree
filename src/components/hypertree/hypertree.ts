@@ -13,6 +13,8 @@ import { CaddC, CsubC, CmulR } from '../../models/transformation/hyperbolic-math
 import { sigmoid }             from '../../models/transformation/hyperbolic-math'
 import { IUnitDisk }           from '../unitdisk/unitdisk'
 import { presets }             from '../../models/hypertree/preset-base'
+import { mergeDeep }           from 'ducd'
+import { shuffleArray }        from 'ducd'
 
 let globelhtid = 0
  
@@ -51,46 +53,6 @@ const hypertreehtml =
         </svg>
         <div class="preloader"></div>
     </div>`
-
-function shuffleArray(array, n) {        
-    if (array)
-    for (let i = array.length - 1; i > 0; i--) {
-        let r = (i * i + n.height) % array.length 
-        //let r = Math.random()
-        let j = Math.floor(r);
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-}
-
-const isPrimitive = item=> typeof item !== 'object' // function, string, number, boolean, undefined, symbol
-const isObject    = item=> typeof item === 'object' && !Array.isArray(item)
-const isArray     = item=> typeof item === 'object' &&  Array.isArray(item)
-const mergeDeep_ = (target, source)=> {
-    console.assert(
-        (isObject(target) && isObject(source)) ||
-        (isArray(target)  && isArray(source))
-    )
-    for (const key in source) 
-    {
-        if (isObject(source[key])) 
-        {
-            console.debug('merging Object: ', key)
-            target[key] = mergeDeep_(target[key] || Object.create(Object.getPrototypeOf(source[key])) , source[key])            
-        }
-        else if (isArray(source[key])) 
-        {
-            console.debug('merging Array: ', key)
-            target[key] = mergeDeep_(target[key] || [], source[key])        
-        }
-        else if (isPrimitive(source[key])) 
-        {
-            console.debug('merging Primitive: ', key)
-            target[key] = source[key]
-        }
-        else console.assert(false)
-    }
-    return target 
-}
 
 export class Hypertree
 {
@@ -133,7 +95,7 @@ export class Hypertree
             console.group("set model: merging ", model, ' into ', base)
 
             //this.args = mergeDeep_(model, base)
-            this.args = mergeDeep_(base, model)
+            this.args = mergeDeep(base, model)
             console.log('merge result: ', this.args)
 
             // wenn parent updatedated hat wraum ist da nich eine alte transformations in der disk
@@ -393,9 +355,8 @@ export class Hypertree
     protected updateLang_(dl=0) : void {
         console.log("_updateLang")
         const t0 = performance.now()
-        for (var n of dfsFlat(this.data, n=>true)) {
-            n.precalc.txt = null            
-            n.precalc.label = this.args.caption(this, n)
+        for (var n of dfsFlat(this.data, n=>true)) {            
+            this.args.caption(this, n)
             n.precalc.labellen = undefined
         }
         if (dl || !this.langMeta)
@@ -421,8 +382,8 @@ export class Hypertree
         //context.textAlign = 'center'
 
         for (var n of dfsFlat(this.data, n=>true)) {
-            if (n.precalc.txt2) {
-                const metrics = context.measureText(n.precalc.txt2)
+            if (n.precalc.label) {
+                const metrics = context.measureText(n.precalc.label)
                 n.precalc.labellen = metrics.width/200/window.devicePixelRatio
             }
             else
@@ -511,7 +472,7 @@ export class Hypertree
     }
 
     protected addPath(pathType:string, n:N) {
-        const plidx = stringhash(n.precalc.txt)
+        const plidx = stringhash(n.precalc.label)
         const color = ({
             'HoverPath':'none', 
             'Query':googlePalette(1) 
