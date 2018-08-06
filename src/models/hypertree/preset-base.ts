@@ -37,7 +37,7 @@ const modelBase : ()=> HypertreeArgs = ()=>
     iconmap: {
                             fileName2IconUrl: ()=>null,
                             emojimap: {}
-    },
+    },    
     caption:                (ht:Hypertree, n:N)=> undefined,
     nodeInit:               (ht:Hypertree, n:N)=> {    
         /*    
@@ -65,7 +65,7 @@ const modelBase : ()=> HypertreeArgs = ()=>
     layout: {
         type:               layoutBergé,
         weight:             (n:N)=> (isLeaf(n)?1:0),
-        initMaxλ:           .97,
+        initSize:           .97,
         rootWedge: {    
             orientation:     3*π/2,
             angle:           3*π/2
@@ -122,11 +122,10 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
     modelBase: ()=> modelBase(),
     otolModel: ()=> ({
         //model: {
-            caption: (ht:Hypertree, n:N)=> {
-                // better: set of initial node actions [label, imghref, scalef, ...]                
+            caption: (ht:Hypertree, n:N)=> {                
                 const id = n.data && n.data.name
-                const l = ht.langMap && ht.langMap[id] ? '𝐖 ' + ht.langMap[id] : ''                        
-                const i  = ht.args.iconmap ? ht.args.iconmap.emojimap[id] : ''
+                const l  = ht.langMap && ht.langMap[id] && '𝐖 ' + ht.langMap[id] 
+                const i  = ht.args.iconmap && ht.args.iconmap.emojimap[id] 
 
                 n.precalc.icon = i
                 n.precalc.wiki = l                
@@ -189,7 +188,7 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
                 maxlabels: 25,
             },
             layout: {
-                initMaxλ: .85
+                initSize: .85
             },            
             geometry: {
                 nodeRadius: nodeInitRNoInner(.0001),
@@ -208,12 +207,10 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
                     && id !== 'Example-files'
                     && id !== 'stackoverflow'
 
-                if (!n.precalc.clickable)
-                    return undefined
-
-                const i  = ht.args.iconmap.emojimap[id]
-                n.precalc.icon = i            
-                n.precalc.label = id                
+                if (n.precalc.clickable) {                
+                    n.precalc.icon = ht.args.iconmap.emojimap[id]
+                    n.precalc.label = id       
+                }         
             }
         }
         console.log('merging otol to main model')

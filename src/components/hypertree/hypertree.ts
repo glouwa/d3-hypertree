@@ -335,7 +335,7 @@ export class Hypertree
             const unculledNodes = this.args.geometry.transformation.cache.unculledNodes
             const maxR = unculledNodes.reduce((max, n)=> Math.max(max, n.layout.zp.r), 0)           
                 
-            if (maxR > (this.args.layout.initMaxλ || .95)) {
+            if (maxR > (this.args.layout.initSize || .95)) {
                 console.info('MaxR at abort', maxR)
                 break
             }

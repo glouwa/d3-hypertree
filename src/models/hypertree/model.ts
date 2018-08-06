@@ -10,11 +10,11 @@ import { IUnitDisk }           from '../../components/unitdisk/unitdisk'
 
 export interface HypertreeArgs
 {
-    data:                   N,
-    langmap:                {} | null
-    dataloader:             LoaderFunction
-    langloader:             (lang)=> (ok)=> void    
-    iconmap:                any    
+    data?:                  N,
+    langmap?:               {} | null
+    dataloader?:            LoaderFunction
+    langloader?:            (lang)=> (ok)=> void    
+    iconmap:                any
     caption:                (ht:Hypertree, n:N)=> string
     nodeInit:               (ht:Hypertree, n:N)=> void
         // weights: layout, filter, arcwidtrh, arclength
@@ -34,7 +34,7 @@ export interface HypertreeArgs
     layout: {
         type:               LayoutFunction
         weight:             (n:N)=> number                   // x 
-        initMaxλ:           number
+        initSize:           number
         rootWedge: {    
             orientation:    number
             angle:          number
