@@ -36,14 +36,21 @@ const modelBase : ()=> HypertreeArgs = ()=>
     iconmap: {
                             fileName2IconUrl: ()=>null,
                             emojimap: {}
-    },
-    /*dataloader:             null,
-    langloader:             null,
-    data:                   null,
-    langmap:                null,
-    */
-    childorder:             (children:N[])=> children,
-    caption:                (ht:Hypertree, n:N)=> undefined,    
+    },    
+    caption:                (ht:Hypertree, n:N)=> undefined,
+    nodeInit:               (ht:Hypertree, n:N)=> {        
+        n.precalc.layoutWeight = 0
+        n.precalc.cullingWeight = 0
+        n.precalc.arcwidthWeight = 0
+        n.precalc.arclengthWeight = 0
+        //n.precalc.weightScale = 
+        n.precalc.imageHref = undefined
+        n.precalc.label = undefined
+        n.precalc.icon = undefined
+        n.precalc.wiki = undefined
+        n.precalc.clickable = false
+        n.precalc.cell = true        
+    },    
     captionBackground:      'all',
     captionFont:            '6.5px Roboto',
 
@@ -140,58 +147,49 @@ const mergeDeep_ = (target, source)=> {
 export const presets : { [key: string]:()=> HypertreeArgs } = 
 {
     modelBase: ()=> modelBase(),
-    otolModel: ()=> 
-    {
-        return {
-            //model: {
-                caption: (ht:Hypertree, n:N)=> {
-                    // better: set of initial node actions [label, imghref, scalef, ...]
-                    const w  = (!n.value || n.value==1) ? '' : n.value + ' '
-                    const id = ( n.data && n.data.name) ? n.data.name : ''
-                    
-                    const l = ht.langMap && ht.langMap[id] ? '𝐖 ' + ht.langMap[id] : ''                        
-                    const i  = ht.args.iconmap ? ht.args.iconmap.emojimap[id] : ''
+    otolModel: ()=> ({
+        //model: {
+            caption: (ht:Hypertree, n:N)=> {
+                // better: set of initial node actions [label, imghref, scalef, ...]
+                const w  = (!n.value || n.value==1) ? '' : n.value + ' '
+                const id = ( n.data && n.data.name) ? n.data.name : ''
+                
+                const l = ht.langMap && ht.langMap[id] ? '𝐖 ' + ht.langMap[id] : ''                        
+                const i  = ht.args.iconmap ? ht.args.iconmap.emojimap[id] : ''
 
-                    n.precalc.icon = i
-                    n.precalc.wiki = l
-                    n.precalc.txt = i || l || id
-                    n.precalc.txt2 = l || id
-                    
-                    n.precalc.clickable = Boolean(l)
+                n.precalc.icon = i
+                n.precalc.wiki = l
+                n.precalc.txt = i || l || id
+                n.precalc.txt2 = l || id
+                
+                n.precalc.clickable = Boolean(l)
 
-                    if (n.precalc.txt)
-                        return n.precalc.txt + tosub(w) 
-                    else 
-                        return undefined                    
-                },
-            //},            
-            geometry: {
-                nodeRadius: nodeInitR(.0075)
-            }
-        }
-    },
-    generatorModel: ()=> 
-    {
-        return {                        
-            interaction: {
-                λbounds: [1/10, .6],
+                if (n.precalc.txt)
+                    return n.precalc.txt + tosub(w) 
+                else 
+                    return undefined                    
             },
-            layout: {
-                rootWedge: {
-                    orientation: π/4,
-                    angle:       1.99999*π,
-                }
+        //},            
+        geometry: {
+            nodeRadius: nodeInitR(.0075)
+        }        
+    }),
+    generatorModel: ()=> ({                        
+        interaction: {
+            λbounds: [1/10, .6],
+        },
+        layout: {
+            rootWedge: {
+                orientation: π/4,
+                angle:       1.99999*π,
             }
-        }
-    },    
-    generatorSpiralModel: ()=> 
-    {        
-        const diff = {                        
-            layout: {
-                type: layoutSpiral  
-            }
-        }
-    },
+        }        
+    }),    
+    generatorSpiralModel: ()=> ({                        
+        layout: {
+            type: layoutSpiral  
+        }        
+    }),
     acmflareModel: ()=> 
     {
         const model = presets.otolModel()
@@ -203,26 +201,23 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
         console.log('merging acmflare to main model')
         return mergeDeep_(model, diff)
     },
-    fsModel: ()=> 
-    {        
-        return {                        
-            geometry: {
-                nodeRadius: ()=> 0, //nodeInitRNoInner(.038)
-                nodeScale: nodeScaleNoInner,
-                nodeFilter: n=> true,
-            },
-            interaction: {
-                λbounds: [1/7, .7]
-            },
-            caption: (ht:Hypertree, n:N)=> {            
-                const w  = (!n.value || n.value==1) ? '' : n.value + ' '
-                n.precalc.txt = ( n.data && n.data.name) ? n.data.name : ''
-                n.precalc.clickable = true
-                n.precalc.txt2 = n.precalc.txt
-                return n.precalc.txt + tosub(w) 
-            }
-        }
-    },
+    fsModel: ()=> ({                        
+        geometry: {
+            nodeRadius: ()=> 0, //nodeInitRNoInner(.038)
+            nodeScale: nodeScaleNoInner,
+            nodeFilter: n=> true,
+        },
+        interaction: {
+            λbounds: [1/7, .7]
+        },
+        caption: (ht:Hypertree, n:N)=> {            
+            const w  = (!n.value || n.value==1) ? '' : n.value + ' '
+            n.precalc.txt = ( n.data && n.data.name) ? n.data.name : ''
+            n.precalc.clickable = true
+            n.precalc.txt2 = n.precalc.txt
+            return n.precalc.txt + tosub(w) 
+        }        
+    }),
     mainModel: ()=> 
     {
         const model = presets.otolModel()

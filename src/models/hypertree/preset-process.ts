@@ -4,7 +4,7 @@ import { TransformationCache }      from "../transformation/hyperbolic-transform
 
 export function doVoronoiStuff(ud:IUnitDisk, cache:TransformationCache) {    
     //voro muss mindestens clickable enthalten für mousetonode bei click
-        
+
     cache.voronoiDiagram = ud.voronoiLayout(
         cache.unculledNodes.filter((n:N)=> n.precalc.clickable || n.data.idx)
         //cache.labels

@@ -116,11 +116,7 @@ export class Hypertree
     initPromisHandler : { resolve, reject }
     
     constructor(view:{ parent:HTMLElement }, args:HypertreeArgs) {
-        console.group("hypertree constructor")        
-       
-        // merge default config with hypertree args
-        // or base -> args.base -> argsargs  
-
+        console.group("hypertree constructor")
         this.view_ = view        
         this.initPromise = this.api.setModel(args)
         console.groupEnd()
@@ -344,10 +340,11 @@ export class Hypertree
         }
         setZ(this.data, { re:0, im:0 })
 
-        var t3 = performance.now()        
+        var t3 = performance.now()
         this.unitdisk.args.data = this.data
         this.args.geometry.transformation.cache.N = this.data.descendants().length
         this.updateWeights_()
+        this.data.each(n=> this.args.nodeInit(this, n)) 
         this.updateLang_()
         this.updateImgHref_()        
         this.findInitλ_()
