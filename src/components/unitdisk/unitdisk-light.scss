@@ -56,9 +56,11 @@ $nodeStroke:    #90caf9;
 
         .label-link {
             /*stroke: #2196F3;            */
-            stroke: #999;
+            stroke: #0f0;
+            opacity: .6;
             stroke-width: .001;
-            stroke-dasharray: .01, .01;
+            //stroke-dasharray: .015, .015;
+            stroke-dasharray: .018, .015;
             //stroke-dasharray: .006, .0075;
 
         }
