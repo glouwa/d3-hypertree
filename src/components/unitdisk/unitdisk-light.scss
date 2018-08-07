@@ -47,8 +47,11 @@ $nodeStroke:    #90caf9;
             font-weight: 300;
         }        
         .caption-background {
-            fill: #e7e7e7;
-            opacity: .7;         
+            /*
+            fill: #fff;
+            opacity: .76;         
+            */
+            fill: rgba(#fff, .76);
         }
 
         .label-link {

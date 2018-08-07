@@ -76,9 +76,9 @@ const modelBase : ()=> HypertreeArgs = ()=>
         cullingRadius:      .99,
         magic:              160,
         alpha:              1.05,
-        weight:             (n)=> (isLeaf(n)?1:0),
+        weight:             n=> (isLeaf(n)?1:0),
         rangeCullingWeight: { min:4,   max:500 },                    
-        rangeNodes:         { min:300, max:700 },                    
+        rangeNodes:         { min:300, max:700 },
         focusExtension:     1.6,
         maxFocusRadius:     .85,
         maxlabels:          25,
@@ -182,14 +182,14 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
     mainModel: ()=> 
     {
         const model = presets.otolModel()
-        const diff = {             
+        const diff = {
             filter: {
                 focusExtension: 2.5,
                 maxlabels: 25,
             },
             layout: {
                 initSize: .85
-            },            
+            },
             geometry: {
                 nodeRadius: nodeInitRNoInner(.0001),
                 nodeScale: nodeScaleNoInner,
@@ -209,7 +209,7 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
 
                 if (n.precalc.clickable) {                
                     n.precalc.icon = ht.args.iconmap.emojimap[id]
-                    n.precalc.label = id       
+                    n.precalc.label = id
                 }         
             }
         }
