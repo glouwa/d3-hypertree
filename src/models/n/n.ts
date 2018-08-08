@@ -5,6 +5,7 @@ import { Path } from '../path/path';
 export interface NodePrecalulations {
     layoutWeight:       number
     cullingWeight:      number
+    visWeight:          number
     
     weight:             number
     weightScale:        number    

@@ -38,22 +38,16 @@ const modelBase : ()=> HypertreeArgs = ()=>
                             fileName2IconUrl: ()=>null,
                             emojimap: {}
     },    
-    caption:                (ht:Hypertree, n:N)=> undefined,
-    nodeInit:               (ht:Hypertree, n:N)=> {    
-        /*    
-        n.precalc.layoutWeight = 0
-        n.precalc.cullingWeight = 0
-        n.precalc.arcwidthWeight = 0
-        n.precalc.arclengthWeight = 0
-        //n.precalc.weightScale = 
-        */
-        n.precalc.imageHref = undefined
-        n.precalc.label = undefined
-        n.precalc.icon = undefined
-        n.precalc.wiki = undefined
+    nodeDataInitDFS:        (ht:Hypertree, n:N)=> {        
+        n.precalc.imageHref = undefined        
+        n.precalc.icon = undefined        
         n.precalc.clickable = true
         n.precalc.cell = true        
     },    
+    nodeLangInitBFS:        (ht:Hypertree, n:N)=> {
+        n.precalc.label = undefined
+        n.precalc.wiki = undefined
+    },
     captionBackground:      'all',
     captionFont:            '6.5px Roboto',
 
@@ -123,7 +117,7 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
 
     otolModel: ()=> ({
         //model: {
-            caption: (ht:Hypertree, n:N)=> {                
+            nodeLangInitBFS: (ht:Hypertree, n:N)=> {                
                 const id = n.data && n.data.name
                 const l  = ht.langMap && ht.langMap[id] && '𝐖 ' + ht.langMap[id] 
                 const i  = ht.args.iconmap && ht.args.iconmap.emojimap[id] 
@@ -157,7 +151,7 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
     }),
 
     acmflareModel: ()=> ({
-        caption: (ht:Hypertree, n:N)=> {            
+        nodeLangInitBFS: (ht:Hypertree, n:N)=> {            
             n.precalc.label = n.data && n.data.name          
             n.precalc.clickable = true
         },
@@ -178,12 +172,12 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
         interaction: {
             λbounds: [1/7, .7]
         },
-        caption: (ht:Hypertree, n:N)=> {
+        nodeLangInitBFS: (ht:Hypertree, n:N)=> {
             n.precalc.label = n.data && n.data.name
             n.precalc.clickable = true
         }        
     }),
-    
+
     mainModel: ()=> 
     {
         const model = presets.otolModel()
@@ -204,7 +198,7 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
                 //onNodeSelect: s=> { console.log('###########', s) },
                 λbounds: [1/5, .5],
             },
-            caption: (ht:Hypertree, n:N)=> {                
+            nodeLangInitBFS: (ht:Hypertree, n:N)=> {                
                 const id = n.data && n.data.name
                 n.precalc.clickable = n.parent
                     && id !== 'Open-Tree-of-Life'

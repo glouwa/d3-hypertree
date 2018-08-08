@@ -15,8 +15,8 @@ export interface HypertreeArgs
     dataloader?:            LoaderFunction
     langloader?:            (lang)=> (ok)=> void    
     iconmap:                any
-    caption:                (ht:Hypertree, n:N)=> string
-    nodeInit:               (ht:Hypertree, n:N)=> void
+    nodeLangInitBFS:        (ht:Hypertree, n:N)=> string
+    nodeDataInitDFS:        (ht:Hypertree, n:N)=> void
         // weights: layout, filter, arcwidtrh, arclength
         // text -> textlen
         // hascell
@@ -72,7 +72,7 @@ export interface HypertreeArgs_Soll
         childorder:      (children:N[])=> N[]
         dataloader:      (ok: (root:N, t0:number, dl:number)=>void)=> void
         langloader:      (lang)=> (ok)=> void
-        caption:         (hypertree:Hypertree, n:N)=> string
+        nodeLangInitBFS: (hypertree:Hypertree, n:N)=> string
         iconmap:         any
     }
     objects: {

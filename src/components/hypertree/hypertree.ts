@@ -229,8 +229,7 @@ export class Hypertree
             transformation: this.args.geometry.transformation,
             transform:      (n:N)=> this.unitdisk.args.transformation.transformPoint(n.layout.z),
             layers:         this.args.geometry.layers,
-            cacheUpdate:    this.args.geometry.cacheUpdate,
-            //caption:        (n:N)=> this.args.caption(this, n),
+            cacheUpdate:    this.args.geometry.cacheUpdate,            
             clipRadius:     this.args.geometry.clipRadius,
             nodeRadius:     this.args.geometry.nodeRadius,
             nodeScale:      this.args.geometry.nodeScale,            
@@ -304,21 +303,15 @@ export class Hypertree
         setZ(this.data, { re:0, im:0 })
 
         // PRECALC:
-        var t3 = performance.now()       
-
-        // alles weights berechen
-        // - sum dinger
-        //      - layout, filter, linkwidth, linklength, linkNodePropX
-        // - node dinger        
-        // icons
+        var t3 = performance.now()
         this.updateWeights_()
 
-        // cells können true initialisert werden
+        // cells können true initialisert werden        
+        this.data.each(n=> n.precalc.clickable = true) 
         // nodeDataInitBFS:
         // - emoji*
         // - img*
-        this.data.each(n=> n.precalc.clickable = true) 
-        this.data.each(n=> this.args.nodeInit(this, n))        
+        this.data.each(n=> this.args.nodeDataInitDFS(this, n))
         if (this.args.iconmap)
             this.data.each(n=> n.precalc.imageHref = this.args.iconmap.fileName2IconUrl(n.data.name, n.data.type))
         
@@ -345,13 +338,14 @@ export class Hypertree
     }
 
     protected updateWeights_() : void {
-        console.log("_updateWeights")
-        this.sum(this.data, this.args.layout.weight, 'value')
+        console.log("_updateWeights")        
+        // sum dinger
         this.sum(this.data, this.args.layout.weight, 'layoutWeight')
         this.sum(this.data, this.args.filter.weight, 'cullingWeight')
         this.sum(this.data, this.args.layout.weight, 'visWeight')
         //this.sum(this.data, this.args.geometry.weight[0], (n, s)=> n.visprop[0] = s)
 
+        // node dinger
         // for arc width and node radius in some cases, not flexible enough
         this.data.each(n=> n.precalc.weightScale = (Math.log2(n.precalc.visWeight) || 1) 
             / (Math.log2(this.data.precalc.visWeight || this.data.children.length) || 1))
@@ -372,7 +366,7 @@ export class Hypertree
         const t0 = performance.now()
 
         if (this.data) {
-            this.data.each(n=> this.args.caption(this, n))
+            this.data.each(n=> this.args.nodeLangInitBFS(this, n))
             this.updateLabelLen_()
         }
 
