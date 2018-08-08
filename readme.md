@@ -1,3 +1,4 @@
+<!--
 <p align="justify">
 <p align="center">
 <a href="https://glouwa.github.io/d3-hypertree/">
@@ -5,6 +6,7 @@
 </a>
 </p>
 </p>
+-->
 
 <!--
 <iframe width="590" height="590" src="https://glouwa.github.io/" frameborder="0" allowfullscreen="allowfullscreen"></iframe>
@@ -12,15 +14,17 @@
 <iframe width="560" height="315" src="http://www.youtube.com/embed/t6kxOXOJj8E" frameborder="0" allowfullscreen="allowfullscreen"></iframe>
 -->
 
-
-
 # D3-Hypertree
-
+<!--
+<p align="justify">
+<p align="center">
 A Scalable Intercative Web Component for Hyperbolic Tree Visualisations.
+</p>
+</p>
+-->
 
-<a href="https://glouwa.github.io/d3-hypertree/"><img src="docs/img/screenshot-light-github.png?raw=true" width="200" align="left" hspace="10" vspace="6"></a>
-
-
+<a href="https://glouwa.github.io/d3-hypertree/"><img 
+src="docs/img/screenshot-light-github.png?raw=true" width="200" align="left" hspace="10" vspace="16"></a>
 
 - Scalable up to 1000 nodes
 - Scalable up to 50k nodes with weight culling and primeter culling
