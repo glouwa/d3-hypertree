@@ -81,7 +81,7 @@ new hyt.Hypertree(
 );
 ```
 
-See [API Reference](https://glouwa.github.io/d3-hypertree/) for additional options.
+See [API Reference](https://glouwa.github.io/d3-hypertree/) or cheat sheet below for additional options.
 
 ## Options Cheat Sheet
 
@@ -158,3 +158,4 @@ export interface HypertreeArgs
 }
 ```
 
+See [API Reference](https://glouwa.github.io/d3-hypertree/) for descriptions and more info.
