@@ -16,6 +16,8 @@
 
 # D3-Hypertree
 
+<a href="https://glouwa.github.io/d3-hypertree/"><img src="docs/img/screenshot-light-github.png?raw=true" width="300" align="left" hspace="10" vspace="6"></a>
+
 A Scalable Intercative Web Component for Hyperbolic Tree Visualisations.
 
 - Scalable up to 1000 nodes
@@ -37,7 +39,7 @@ npm install d3-hypertree --save
 ```
 
 <b>Or</b> download the [latest release](https://glouwa.github.io/d3-hypertree/)
-if no module bundler is used, and add the following lines to your page:
+if npm is not used, and add the following lines to your page:
 
 ```html
 <link  href="index-browser-light.css" rel="stylesheet">
@@ -45,14 +47,23 @@ if no module bundler is used, and add the following lines to your page:
 ```
 
 The prebuild bundle declares the global variable `hyt`, 
-so a import as in the example below is not necessary.
+so a import as in the usage example below is not necessary.
+You can find the bundle also in the npm package, 
+but when using a bundler you will not need it. 
+Instead use:
+
+The following examples will assume an import like this, 
+
+```typescript
+import * as hyt from 'd3-hypertree'
+```
+
+so the examples are independent of you choices so far.
 
 ## Usage
 
 
 ```typescript
-import * as hyt from 'd3-hypertree'
-
 new hyt.Hypertree(
     {
         parent: document.body,
