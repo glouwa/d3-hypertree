@@ -24,7 +24,7 @@ A Scalable Intercative Web Component for Hyperbolic Tree Visualisations.
 -->
 
 <a href="https://glouwa.github.io/d3-hypertree/"><img 
-src="docs/img/screenshot-light-github.png?raw=true" width="200" align="left" hspace="10" vspace="16"></a>
+src="docs/img/screenshot-light-github.png?raw=true" width="150" align="left" hspace="10" vspace="16"></a>
 
 - Scalable up to 1000 nodes
 - Scalable up to 50k nodes with weight culling and primeter culling
@@ -32,6 +32,7 @@ src="docs/img/screenshot-light-github.png?raw=true" width="200" align="left" hsp
 - Configurable layers, visualisation presets
 - Uses same data format as [d3.hierarchy()](https://github.com/d3/d3-hierarchy#hierarchy) 
 - Alternatively file loaders for csv, json, skos, treeml can be used
+<br>
 
 ## Resources
 - [API Reference](https://glouwa.github.io/d3-hypertree/)
