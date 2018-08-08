@@ -13,8 +13,8 @@ export interface HypertreeArgs
     langmap?:               {} | null
     dataloader?:            LoaderFunction
     langloader?:            (lang)=> (ok)=> void    
-    nodeDataInitBFS:        (ht:Hypertree, n:N)=> void       // emoji, imghref
-    nodeLangInitBFS:        (ht:Hypertree, n:N)=> void       // text, wiki, clickable, cell, :  auto--> textlen
+    dataInitBFS:            (ht:Hypertree, n:N)=> void       // emoji, imghref
+    langInitBFS:            (ht:Hypertree, n:N)=> void       // text, wiki, clickable, cell, :  auto--> textlen
     
     objects: {
         roots:              N[]
@@ -72,7 +72,7 @@ export interface HypertreeArgs_Soll
         childorder:      (children:N[])=> N[]
         dataloader:      (ok: (root:N, t0:number, dl:number)=>void)=> void
         langloader:      (lang)=> (ok)=> void
-        nodeLangInitBFS: (hypertree:Hypertree, n:N)=> string       
+        langInitBFS: (hypertree:Hypertree, n:N)=> string       
     }
     objects: {
         root:            N

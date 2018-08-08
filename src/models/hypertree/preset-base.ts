@@ -18,6 +18,7 @@ import { Hypertree }                from '../../components/hypertree/hypertree'
 import { layerSrc, labeloffsets }   from './preset-layers'
 import { cacheUpdate }              from './magic-filter'
 import { mergeDeep }                from 'ducd'
+import { shuffleArray }             from 'ducd'
 
 const π =              Math.PI
 const hasLazy =        n=> (n.hasOutChildren && n.isOutλ)
@@ -38,22 +39,22 @@ const modelBase : ()=> HypertreeArgs = ()=>
                             fileName2IconUrl: ()=>null,
                             emojimap: {}
     },    
-    nodeDataInitBFS:        (ht:Hypertree, n:N)=> {        
-        n.precalc.imageHref = undefined        
-        n.precalc.icon = undefined        
+    dataInitBFS:        (ht:Hypertree, n:N)=> {
+        n.precalc.imageHref = undefined
+        n.precalc.icon = undefined
         n.precalc.clickable = true
         n.precalc.cell = true        
     },    
-    nodeLangInitBFS:        (ht:Hypertree, n:N)=> {
+    langInitBFS:        (ht:Hypertree, n:N)=> {
         n.precalc.label = undefined
         n.precalc.wiki = undefined
-    },    
+    },
 
     objects: {  
         selections:         [],
         pathes:             [],
         traces:             [],
-    },  
+    },
     layout: {
         type:               layoutBergé,
         weight:             (n:N)=> (isLeaf(n)?1:0),
@@ -106,7 +107,7 @@ const modelBase : ()=> HypertreeArgs = ()=>
         onNodeSelect:       ()=> {},
         onNodeHold:         ()=> {},                    
         onNodeHover:        ()=> {},
-        λbounds:            [1/40, .4],
+        λbounds:            [ 1/40, .4 ],
         wheelFactor:        1.175,
     }
 })
@@ -117,14 +118,18 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
 
     otolModel: ()=> ({
         //model: {
-            nodeLangInitBFS: (ht:Hypertree, n:N)=> {                
+            dataInitBFS: (ht:Hypertree, n:N)=> {            
+                const id = n.data.name                
+                n.precalc.imageHref = ht.args.iconmap.fileName2IconUrl(id, n.data.type)
+                n.precalc.icon = ht.args.iconmap.emojimap[id] 
+                shuffleArray(n.children, n)
+            },
+            langInitBFS: (ht:Hypertree, n:N)=> {                
                 const id = n.data && n.data.name
                 const l  = ht.langMap && ht.langMap[id] && '𝐖 ' + ht.langMap[id] 
-                const i  = ht.args.iconmap && ht.args.iconmap.emojimap[id] 
-                n.precalc.icon = i
-                n.precalc.wiki = l                
-                n.precalc.label = l || id                
-                n.precalc.clickable = Boolean(l)
+                n.precalc.wiki = l
+                n.precalc.label = l || id         
+                n.precalc.clickable = Boolean(l)              
             },
         //},            
         geometry: {
@@ -142,7 +147,7 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
                 angle:       1.99999*π,
             }
         }        
-    }),    
+    }),
 
     generatorSpiralModel: ()=> ({          
         layout: {
@@ -150,11 +155,15 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
         }        
     }),
 
+    stackoverflowModel: ()=> ({
+        langInitBFS: (ht:Hypertree, n:N)=> n.precalc.label = n.data.name,                 
+        interaction: {
+            λbounds: [1/14, .5],
+        }            
+    }),
+
     acmflareModel: ()=> ({
-        nodeLangInitBFS: (ht:Hypertree, n:N)=> {            
-            n.precalc.label = n.data && n.data.name          
-            n.precalc.clickable = true
-        },
+        langInitBFS: (ht:Hypertree, n:N)=> n.precalc.label = n.data.name,
         geometry: {
             nodeRadius: nodeInitR(.0075)
         },                  
@@ -163,7 +172,10 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
         }
     }),
     
-    fsModel: ()=> ({                        
+    fsModel: ()=> ({
+        dataInitBFS: (ht:Hypertree, n:N)=> {            
+            n.precalc.imageHref = ht.args.iconmap.fileName2IconUrl(n.data.name, n.data.type)
+        },
         geometry: {
             nodeRadius: ()=> 0, //nodeInitRNoInner(.038)
             nodeScale: nodeScaleNoInner,
@@ -172,7 +184,7 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
         interaction: {
             λbounds: [1/7, .7]
         },
-        nodeLangInitBFS: (ht:Hypertree, n:N)=> {
+        langInitBFS: (ht:Hypertree, n:N)=> {
             n.precalc.label = n.data && n.data.name
             n.precalc.clickable = true
         }        
@@ -198,18 +210,21 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
                 //onNodeSelect: s=> { console.log('###########', s) },
                 λbounds: [1/5, .5],
             },
-            nodeLangInitBFS: (ht:Hypertree, n:N)=> {                
-                const id = n.data && n.data.name
+            dataInitBFS: (ht:Hypertree, n:N)=> {            
+                const id = n.data.name                
+                n.precalc.imageHref = ht.args.iconmap.fileName2IconUrl(id, n.data.type)
+                n.precalc.icon = ht.args.iconmap.emojimap[id]
+            },            
+            langInitBFS: (ht:Hypertree, n:N)=> {
+                const id = n.data.name
                 n.precalc.clickable = n.parent
                     && id !== 'Open-Tree-of-Life'
                     && id !== 'Generators'
                     && id !== 'Example-files'
                     && id !== 'stackoverflow'
 
-                if (n.precalc.clickable) {                
-                    n.precalc.icon = ht.args.iconmap.emojimap[id]
+                if (n.precalc.clickable) 
                     n.precalc.label = id
-                }         
             }
         }
         console.log('merging otol to main model')

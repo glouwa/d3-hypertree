@@ -133,6 +133,7 @@ export const layerSrc = [
                          .classed("selected-path", d=> d.pathes && d.pathes.isPartOfAnySelectionPath)
                          .style("stroke",          d=> d.pathes && d.pathes.finalcolor)
     }),
+    /*
     (v, ud:UnitDisk)=> new ArcLayer(v, {
         invisible:  true,
         hideOnDrag: true,
@@ -146,7 +147,7 @@ export const layerSrc = [
         classed:    s=> s.classed("hovered-path",  d=> d.pathes && d.pathes.isPartOfAnyHoverPath)
                          .classed("selected-path", d=> d.pathes && d.pathes.isPartOfAnySelectionPath)
                          .style("stroke",          d=> d.pathes && d.pathes.finalcolor)
-    }),
+    }),*/
     (v, ud:UnitDisk)=> new ArcLayer(v, {
         invisible:  false,
         hideOnDrag: false,
@@ -163,7 +164,7 @@ export const layerSrc = [
                          .classed("selected",  d=> d.pathes && d.pathes.isPartOfAnySelectionPath)                         
                          .style("stroke",      d=> d.pathes && d.pathes.finalcolor)
                          .attr("stroke-width", d=> w(d))
-    }),
+    }),/*
     (v, ud:UnitDisk)=> new ArcLayer(v, {
         invisible:  true,
         hideOnDrag: true,
@@ -179,7 +180,7 @@ export const layerSrc = [
                          .classed("selected",  d=> d.pathes && d.pathes.isPartOfAnySelectionPath)
                          .style("stroke",      d=> d.pathes && d.pathes.finalcolor)
 
-    }),                        
+    }),*/                        
     (v, ud:UnitDisk)=> new NodeLayer(v, {        
         invisible:  false,
         hideOnDrag: true,

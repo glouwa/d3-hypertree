@@ -14,7 +14,6 @@ import { sigmoid }             from '../../models/transformation/hyperbolic-math
 import { IUnitDisk }           from '../unitdisk/unitdisk'
 import { presets }             from '../../models/hypertree/preset-base'
 import { mergeDeep }           from 'ducd'
-import { shuffleArray }        from 'ducd'
 
 let globelhtid = 0
  
@@ -158,7 +157,7 @@ export class Hypertree
                 n.pathes.labelcolor = undefined
                 n.pathes.finalcolor = undefined                
                 n.pathes.isPartOfAnyQuery = false                
-            })            
+            })
             console.log('QUERY:', lq)
             this.args.objects.pathes = []
             this.data.each(n=> {                
@@ -238,6 +237,8 @@ export class Hypertree
             linkCurvature:  this.args.geometry.linkCurvature,
             offsetEmoji:    this.args.geometry.offsetLabels,
             offsetLabels:   this.args.geometry.offsetLabels,
+            captionBackground:   this.args.geometry.captionBackground,
+            captionFont:    this.args.geometry.captionFont,
         })
     }
 
@@ -286,7 +287,7 @@ export class Hypertree
                 n.layoutReference = null
                 n.pathes = {}
                 n.globelhtid = globelhtid
-                shuffleArray(n.children, n) // get index
+                //shuffleArray(n.children, n) // get index
             })
         this.unitdisk.args.data = this.data
         this.args.geometry.transformation.cache.N = this.data.descendants().length
@@ -308,13 +309,14 @@ export class Hypertree
 
         // cells können true initialisert werden        
         this.data.each(n=> n.precalc.clickable = true) 
-        // nodeDataInitBFS:
+        // dataInitBFS:
         // - emoji*
         // - img*
-        this.data.each(n=> this.args.nodeDataInitBFS(this, n))
+        this.data.each(n=> this.args.dataInitBFS(this, n))
+        /*
         if (this.args.iconmap)
             this.data.each(n=> n.precalc.imageHref = this.args.iconmap.fileName2IconUrl(n.data.name, n.data.type))
-        
+        */
         this.modelMeta = { 
             Δ: [t1-t0, t2-t1, t3-t2, performance.now()-t3], 
             filesize: dl,
@@ -322,7 +324,7 @@ export class Hypertree
         }
 
         // von rest trennen, da lang alleine benötigt wird
-        // nodeLangInitBFS:
+        // langInitBFS:
         // - lang
         // - wiki*
         // - labellen automatisch
@@ -366,7 +368,7 @@ export class Hypertree
         const t0 = performance.now()
 
         if (this.data) {
-            this.data.each(n=> this.args.nodeLangInitBFS(this, n))
+            this.data.each(n=> this.args.langInitBFS(this, n))
             this.updateLabelLen_()
         }
 

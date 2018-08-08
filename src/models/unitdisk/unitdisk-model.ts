@@ -19,10 +19,10 @@ export interface UnitDiskView
 export interface UnitDiskArgs
 {
     data?:             N,
+    transform?:        (n:N)=> C,
 
     decorator:         { new(view:UnitDiskView, args:UnitDiskArgs) : IUnitDisk },
-    transformation:    Transformation<N>,
-    transform?:        (n:N)=> C,
+    transformation:    Transformation<N>,    
     cacheUpdate:       (ud:IUnitDisk, cache:TransformationCache)=> void,    
     layers:            ((v, ls:IUnitDisk)=> ILayer)[],
 
@@ -33,7 +33,7 @@ export interface UnitDiskArgs
     linkCurvature:     ArcCurvature,
     offsetEmoji:       (d, i, v)=> C,
     offsetLabels:      (d, i, v)=> C,
-    clipRadius?:       number
+    clipRadius:        number
     captionBackground: 'all' | 'center' | 'none'        // x 
     captionFont:       string
 }
