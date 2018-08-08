@@ -45,7 +45,7 @@ src="docs/img/screenshot-light-github.png?raw=true" width="170" align="left" hsp
 npm install d3-hypertree --save
 ```
 
-<b>Or</b> download the [latest release](https://glouwa.github.io/d3-hypertree/)
+<u><b>OR</b></u> download the [latest release](https://glouwa.github.io/d3-hypertree/)
 of the prebuild bundle if npm is not used, 
 and add the following lines to your page:
 
