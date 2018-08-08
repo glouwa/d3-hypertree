@@ -16,9 +16,11 @@
 
 # D3-Hypertree
 
-<a href="https://glouwa.github.io/d3-hypertree/"><img src="docs/img/screenshot-light-github.png?raw=true" width="300" align="left" hspace="10" vspace="6"></a>
-
 A Scalable Intercative Web Component for Hyperbolic Tree Visualisations.
+
+<a href="https://glouwa.github.io/d3-hypertree/"><img src="docs/img/screenshot-light-github.png?raw=true" width="200" align="left" hspace="10" vspace="6"></a>
+
+
 
 - Scalable up to 1000 nodes
 - Scalable up to 50k nodes with weight culling and primeter culling
@@ -39,7 +41,8 @@ npm install d3-hypertree --save
 ```
 
 <b>Or</b> download the [latest release](https://glouwa.github.io/d3-hypertree/)
-if npm is not used, and add the following lines to your page:
+of the prebuild bundle if npm is not used, 
+and add the following lines to your page:
 
 ```html
 <link  href="index-browser-light.css" rel="stylesheet">
