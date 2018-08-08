@@ -55,18 +55,18 @@ and add the following lines to your page:
 ```
 
 The prebuild bundle declares the global variable `hyt`, 
-so a import as in the usage example below is not necessary.
+therefore a import as in the usage example below is not necessary.
 You can find the prebuild bundle also in the npm package `dist` folder. 
 
-D3-hypertree is tested to be used with webpack. 
+## Webpack
+
+D3-hypertree is tested with webpack. 
 You may use imports in a diffent way,
-but the following usage examples will assume an import like this: 
+but the following usage examples will assume an import like this:  
 
 ```typescript
 import * as hyt from 'd3-hypertree'
 ```
-
-So following examples work for custom as well as prebuild bundles.
 
 ## Usage
 
