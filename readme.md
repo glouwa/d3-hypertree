@@ -24,7 +24,7 @@ A Scalable Intercative Web Component for Hyperbolic Tree Visualisations.
 -->
 
 <a href="https://glouwa.github.io/d3-hypertree/"><img 
-src="docs/img/screenshot-light-github.png?raw=true" width="150" align="left" hspace="10" vspace="16"></a>
+src="docs/img/screenshot-light-github.png?raw=true" width="170" align="left" hspace="10" vspace="16"></a>
 
 - Scalable up to 1000 nodes
 - Scalable up to 50k nodes with weight culling and primeter culling
@@ -56,20 +56,18 @@ and add the following lines to your page:
 
 The prebuild bundle declares the global variable `hyt`, 
 so a import as in the usage example below is not necessary.
-You can find the bundle also in the npm package, 
-but when using a bundler you will not need it. 
-Instead use:
+You can find the prebuild bundle also in the npm package `dist` folder. 
 
-The following examples will assume an import like this, 
+D3-hypertree is tested to be used with webpack. You may use import in a diffent way,
+but the following usage examples will assume an import like this: 
 
 ```typescript
 import * as hyt from 'd3-hypertree'
 ```
 
-so the examples are independent of you choices so far.
+So the following examples are independent of you choices so far.
 
 ## Usage
-
 
 ```typescript
 new hyt.Hypertree(
@@ -90,59 +88,67 @@ See [API Reference](https://glouwa.github.io/d3-hypertree/) for additional optio
 ```typescript
 export interface HypertreeArgs
 {
-    data:                   N,
-    langmap:                {} | null
-    dataloader:             LoaderFunction
-    langloader:             (lang)=> (ok)=> void    
-    iconmap:                any    
-    caption:                (ht:Hypertree, n:N)=> string
-    nodeInit:               (ht:Hypertree, n:N)=> void,
-    captionBackground:      'all' | 'center' | 'none'        // x 
-    captionFont:            string
-
+    dataloader?:            LoaderFunction
+    langloader?:            (lang)=> (ok)=> void    
+    dataInitBFS:            (ht:Hypertree, n:N)=> void       // emoji, imghref
+    langInitBFS:            (ht:Hypertree, n:N)=> void       // text, wiki, clickable, cell,
     objects: {
+        roots:              N[]
         pathes:             Path[]
         selections:         N[]
         traces:             Trace[]
     }
     layout: {
         type:               LayoutFunction
-        weight:             (n:N)=> number                   // x 
-        initMaxλ:           number
-        rootWedge: {    
+        weight:             (n:N)=> number
+        initSize:           number
+        rootWedge: {
             orientation:    number
             angle:          number
         }
     }
     filter: {
-        type:               string
+        type:               'none' | 'const-weight' | 'dynamic-weight'
         cullingRadius:      number
         magic:              number                           // auto by init up
-        weight:             (n)=> number                     // x 
+        weight:             (n)=> number
         rangeCullingWeight: { min:number, max:number }
         rangeNodes:         { min:number, max:number }
         alpha:              number
         focusExtension:     number        
         maxFocusRadius:     number
-        maxlabels:          number
         wikiRadius:         number
-    }
+        maxlabels:          number       
+    }       
     geometry: {
-        decorator:          { new(view:UnitDiskView, args:UnitDiskArgs) : IUnitDisk }
-        transformation:     Transformation<N>
-        cacheUpdate:        (ud:IUnitDisk, cache:TransformationCache)=> void
-        nodeRadius:         (ud:IUnitDisk, n:N)=> number
-        nodeScale, 
-        nodeFilter:         (n:N)=> boolean
-        linkWidth:          (n:N)=> number
-        linkCurvature:      ArcCurvature
-        offsetEmoji:        (d, i, v)=> C
-        offsetLabels:       (d, i, v)=> C
-        layers:             ((v, ls:IUnitDisk)=> ILayer)[]
-        clipRadius?:        number
+        decorator:         Unitdisk | UnitdiskNav
+        transformation:    Transformation<N>,    
+        cacheUpdate:       (ud:IUnitDisk, cache:TransformationCache)=> void
+        
+        layers:            ((v, ls:IUnitDisk)=> ILayer)[]
+        layerOptions:      {
+            cells: {
+                invisible:  false,
+                hideOnDrag: false
+            },
+        }
+        clipRadius:        number
+
+        nodeRadius:        (ud:IUnitDisk, n:N)=> number
+        nodeScale:         (n:N)=> number
+        nodeFilter:        (n:N)=> boolean
+        offsetEmoji:       (d, i, v)=> C
+        offsetLabels:      (d, i, v)=> C
+
+        captionBackground: 'all' | 'center' | 'none'        // x 
+        captionFont:       string
+
+        linkWidth:         (n:N)=> number
+        linkCurvature:     ArcCurvature
     }
-    interaction: {  
-        mouseRadius:        number
+    interaction: {          
+        //type:               'clickonly' | 'selction' | 'multiselection' | 'centernodeselectable'
+        mouseRadius:        number,
         onNodeSelect:       (n:N)=> void
         onNodeHold:         ()=>void                          // x 
         onNodeHover:        ()=>void                          // x 
