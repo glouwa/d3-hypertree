@@ -31,7 +31,7 @@ src="docs/img/screenshot-light-github.png?raw=true" width="170" align="left" hsp
 - Configurable mouse and touch interaction
 - Configurable layers, visualisation presets
 - Uses same data format as [d3.hierarchy()](https://github.com/d3/d3-hierarchy#hierarchy) 
-- Alternatively file loaders for csv, json, skos, treeml can be used
+- Alternatively file loaders for csv, json, skos, treeml are available
 <br>
 
 ## Resources
@@ -58,22 +58,24 @@ The prebuild bundle declares the global variable `hyt`,
 so a import as in the usage example below is not necessary.
 You can find the prebuild bundle also in the npm package `dist` folder. 
 
-D3-hypertree is tested to be used with webpack. You may use import in a diffent way,
+D3-hypertree is tested to be used with webpack. 
+You may use imports in a diffent way,
 but the following usage examples will assume an import like this: 
 
 ```typescript
 import * as hyt from 'd3-hypertree'
 ```
 
-So the following examples are independent of you choices so far.
+So following examples work for custom as well as prebuild bundles.
 
 ## Usage
+
+Parent dom element and data source are the only configuration parameters required:
 
 ```typescript
 new hyt.Hypertree(
     {
-        parent: document.body,
-        preserveAspectRatio: "xMidYMid meet",
+        parent: document.body,        
     },
     {
         model: hyt.loaders.fromFile('data/LDA128-ward.d3.json'),
