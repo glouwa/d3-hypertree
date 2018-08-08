@@ -16,21 +16,27 @@ import { ImageLayer }               from '../../components/layers/image-layer'
 import { FocusLayer }               from '../../components/layers/focus-layer'
 import { bboxOffset }               from '../../d3-hypertree'
 
-
 export const labeloffsets = {
-    nodeRadiusOffset: (ls:UnitDisk)=> (d:N)=>
-    CptoCk({ θ:d.cachep.θ, r:ls.args.nodeRadius(ls, d)*2 }),
-    centerOffset: (ud)=> (d, i, v)=> CmulR(bboxOffset(d)(v[i]), 1/2),
-    labeloffset: (ud)=> (d, i, v)=> CaddC(labeloffsets.nodeRadiusOffset(ud)(d),bboxOffset(d)(v[i])),
+    nodeRadiusOffset:   (ls:UnitDisk)=> (d:N)=> CptoCk({ θ:d.cachep.θ, r:ls.args.nodeRadius(ls, d)*2 }),
+    centerOffset:       (ud)=> (d, i, v)=>      CmulR(bboxOffset(d)(v[i]), 1/2),
+    labeloffset:        (ud)=> (d, i, v)=>      CaddC(
+                                                    labeloffsets.nodeRadiusOffset(ud)(d),
+                                                    bboxOffset(d)(v[i])
+                                                ),
+    outwards:                                   undefined,
+    outwardsPlusNodeRadius:                     undefined
 }
+labeloffsets.outwards = labeloffsets.nodeRadiusOffset
+labeloffsets.outwardsPlusNodeRadius = labeloffsets.labeloffset
 
 export const layerSrc = [    
     // nodes
     // nodes-leafs
-    // nodes-lazy                        
-    // oerlay-path
-    // bounds
-    // interaction-trace
+    // nodes-lazy
+    // bounds (lambda, P)    
+    // wedges
+    // weight circle (radius)
+    // weight cell (color)
     // interaction-d3
     // interaction-hammer
     (v, ud:UnitDisk)=> new BackgroundLayer(v, {}),    
@@ -241,20 +247,20 @@ export const layerSrc = [
         mouseRadius: ud.view.hypertree.args.interaction.mouseRadius,
         nohover:     false,
         onClick:     (n:N, m:C)=> {
-                        var s = n.ancestors().find(e=> true)          // obsolete
+                        var s = n.ancestors().find(e=> true)               // obsolete
                         //ud.args.hypertree.updatePath('SelectionPath', s) // toggle selection 
-                        ud.view.hypertree.api.toggleSelection(s)          // toggle selection 
-                        ud.view.hypertree.args.interaction.onNodeSelect(s)        // focus splitter
+                        ud.view.hypertree.api.toggleSelection(s)           // toggle selection 
+                        ud.view.hypertree.args.interaction.onNodeSelect(s) // focus splitter
         }
     }),
     (v, ud:UnitDisk)=> new InteractionLayer2(v, {                            
         mouseRadius: ud.view.hypertree.args.interaction.mouseRadius,
         nohover:     false,
         onClick:     (n:N, m:C)=> {
-                        var s = n.ancestors().find(e=> true)          // obsolete
+                        var s = n.ancestors().find(e=> true)               // obsolete
                         //ud.args.hypertree.updatePath('SelectionPath', s) // toggle selection 
-                        ud.view.hypertree.api.toggleSelection(s)          // toggle selection 
-                        ud.view.hypertree.args.interaction.onNodeSelect(s)        // focus splitter
+                        ud.view.hypertree.api.toggleSelection(s)           // toggle selection 
+                        ud.view.hypertree.args.interaction.onNodeSelect(s) // focus splitter
         }
     }),
     (v, ud:UnitDisk)=> new TraceLayer(v, {  

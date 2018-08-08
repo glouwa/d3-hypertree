@@ -10,32 +10,23 @@ import { IUnitDisk }           from '../../components/unitdisk/unitdisk'
 
 export interface HypertreeArgs
 {
-    data?:                  N,
     langmap?:               {} | null
     dataloader?:            LoaderFunction
     langloader?:            (lang)=> (ok)=> void    
-    iconmap:                any
-    nodeLangInitBFS:        (ht:Hypertree, n:N)=> string
-    nodeDataInitDFS:        (ht:Hypertree, n:N)=> void
-        // weights: layout, filter, arcwidtrh, arclength
-        // text -> textlen
-        // hascell
-        // interaction click
-        // emoji
-        // imghref
-        // 
-    captionBackground:      'all' | 'center' | 'none'        // x 
-    captionFont:            string
+    nodeDataInitBFS:        (ht:Hypertree, n:N)=> void       // emoji, imghref
+    nodeLangInitBFS:        (ht:Hypertree, n:N)=> void       // text, wiki, clickable, cell, :  auto--> textlen
+    
     objects: {
+        roots:              N[]
         pathes:             Path[]
         selections:         N[]
         traces:             Trace[]
     }
     layout: {
         type:               LayoutFunction
-        weight:             (n:N)=> number                   // x 
+        weight:             (n:N)=> number
         initSize:           number
-        rootWedge: {    
+        rootWedge: {
             orientation:    number
             angle:          number
         }
@@ -44,7 +35,7 @@ export interface HypertreeArgs
         type:               string
         cullingRadius:      number
         magic:              number                           // auto by init up
-        weight:             (n)=> number                     // x 
+        weight:             (n)=> number
         rangeCullingWeight: { min:number, max:number }
         rangeNodes:         { min:number, max:number }
         alpha:              number
@@ -52,9 +43,19 @@ export interface HypertreeArgs
         maxFocusRadius:     number
         maxlabels:          number
         wikiRadius:         number
+        /*labelFilter: {
+            type:               string
+            cullingRadius:      number
+            magic:              number                           // auto by init up
+            weight:             (n)=> number
+            rangeCullingWeight: { min:number, max:number }
+            rangeNodes:         { min:number, max:number }
+            alpha:              number                
+        }*/
     }       
     geometry:               UnitDiskArgs                      // layer -+
-    interaction: {  
+    interaction: {          
+        //type:               'clickonly' | 'selction' | 'multiselection' | 'centernodeselectable'
         mouseRadius:        number,
         onNodeSelect:       (n:N)=> void
         onNodeHold:         ()=>void                          // x 
@@ -66,14 +67,12 @@ export interface HypertreeArgs
 
 export interface HypertreeArgs_Soll
 {    
-    model: {
-        data:            N
+    model: {        
         langmap:         {}
         childorder:      (children:N[])=> N[]
         dataloader:      (ok: (root:N, t0:number, dl:number)=>void)=> void
         langloader:      (lang)=> (ok)=> void
-        nodeLangInitBFS: (hypertree:Hypertree, n:N)=> string
-        iconmap:         any
+        nodeLangInitBFS: (hypertree:Hypertree, n:N)=> string       
     }
     objects: {
         root:            N

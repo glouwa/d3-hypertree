@@ -38,7 +38,7 @@ const modelBase : ()=> HypertreeArgs = ()=>
                             fileName2IconUrl: ()=>null,
                             emojimap: {}
     },    
-    nodeDataInitDFS:        (ht:Hypertree, n:N)=> {        
+    nodeDataInitBFS:        (ht:Hypertree, n:N)=> {        
         n.precalc.imageHref = undefined        
         n.precalc.icon = undefined        
         n.precalc.clickable = true
@@ -47,9 +47,7 @@ const modelBase : ()=> HypertreeArgs = ()=>
     nodeLangInitBFS:        (ht:Hypertree, n:N)=> {
         n.precalc.label = undefined
         n.precalc.wiki = undefined
-    },
-    captionBackground:      'all',
-    captionFont:            '6.5px Roboto',
+    },    
 
     objects: {  
         selections:         [],
@@ -95,6 +93,8 @@ const modelBase : ()=> HypertreeArgs = ()=>
         offsetLabels:       labeloffsets['labeloffset'], //outwardsPlusNodeRadius,
         linkWidth:          arcWidth,        
         linkCurvature:      '+',
+        captionBackground:  'all',
+        captionFont:        '6.5px Roboto',
         transformation:     new HyperbolicTransformation({
             P:              { re: 0, im:0 },
             θ:              { re: 1, im:0 },

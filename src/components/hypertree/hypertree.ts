@@ -311,7 +311,7 @@ export class Hypertree
         // nodeDataInitBFS:
         // - emoji*
         // - img*
-        this.data.each(n=> this.args.nodeDataInitDFS(this, n))
+        this.data.each(n=> this.args.nodeDataInitBFS(this, n))
         if (this.args.iconmap)
             this.data.each(n=> n.precalc.imageHref = this.args.iconmap.fileName2IconUrl(n.data.name, n.data.type))
         
@@ -416,7 +416,7 @@ export class Hypertree
             || (this.virtualCanvas = document.createElement("canvas"))
         var context = this.virtualCanvasContext 
             || (this.virtualCanvasContext = canvas.getContext("2d"))
-        context.font = this.args.captionFont
+        context.font = this.args.geometry.captionFont
         //context.textBaseLine = 'middle'
         //context.textAlign = 'center'
 

@@ -22,8 +22,9 @@ export interface UnitDiskArgs
 
     decorator:         { new(view:UnitDiskView, args:UnitDiskArgs) : IUnitDisk },
     transformation:    Transformation<N>,
-    cacheUpdate:       (ud:IUnitDisk, cache:TransformationCache)=> void,    
     transform?:        (n:N)=> C,
+    cacheUpdate:       (ud:IUnitDisk, cache:TransformationCache)=> void,    
+    layers:            ((v, ls:IUnitDisk)=> ILayer)[],
 
     nodeRadius:        (ud:IUnitDisk, n:N)=> number,
     nodeScale,
@@ -32,6 +33,7 @@ export interface UnitDiskArgs
     linkCurvature:     ArcCurvature,
     offsetEmoji:       (d, i, v)=> C,
     offsetLabels:      (d, i, v)=> C,
-    layers:            ((v, ls:IUnitDisk)=> ILayer)[],
     clipRadius?:       number
+    captionBackground: 'all' | 'center' | 'none'        // x 
+    captionFont:       string
 }
