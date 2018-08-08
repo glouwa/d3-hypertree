@@ -164,9 +164,12 @@ export class UnitDiskNav implements IUnitDisk
             linkWidth:          args.linkWidth,
             linkCurvature:      args.linkCurvature,
             layers:             navBackgroundLayers,
+            layerOptions:       {}, //args.layerOptions,
             offsetEmoji:        args.offsetLabels,
             offsetLabels:       args.offsetLabels,
-            clipRadius:         1
+            clipRadius:         1,
+            captionBackground:  args.captionBackground,
+            captionFont:        args.captionFont, 
         })
 
         var navTransformation =
@@ -184,6 +187,7 @@ export class UnitDiskNav implements IUnitDisk
             data:               navdata(),
             decorator:          null,
             layers:             navParameterLayers,
+            layerOptions:       {}, //args.layerOptions,
             cacheUpdate:        (ud:UnitDisk, cache:TransformationCache)=> {
                 var t0 = performance.now()
                 cache.unculledNodes = dfsFlat(ud.args.data)
@@ -214,7 +218,9 @@ export class UnitDiskNav implements IUnitDisk
             linkCurvature:      args.linkCurvature,
             offsetEmoji:        args.offsetLabels,
             offsetLabels:       args.offsetLabels,
-            clipRadius:         1.7
+            clipRadius:         1.7,
+            captionBackground:  args.captionBackground,
+            captionFont:        args.captionFont,            
         })
     }
     

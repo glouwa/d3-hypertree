@@ -2,6 +2,7 @@ import * as d3       from 'd3'
 import { N }         from '../../models/n/n'
 import { IUnitDisk } from '../unitdisk/unitdisk'
 import { ILayer }    from './layer'
+import { mergeDeep } from 'ducd'
 
 export interface LayerStackArgs
 {
@@ -40,6 +41,8 @@ export class LayerStack
                 hypertree:  this.args.unitdisk.view.hypertree
             }
             const layer = layerfactoryfunc(view, this.args.unitdisk)            
+            if (this.args.unitdisk.args.layerOptions)
+                mergeDeep(layer.args, this.args.unitdisk.args.layerOptions[layer.name] || {})
             this.layers[layer.name] = layer
         }
 
