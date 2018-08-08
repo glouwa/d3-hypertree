@@ -3,6 +3,9 @@ import { HierarchyNode } from 'd3'
 import { Path } from '../path/path';
 
 export interface NodePrecalulations {
+    layoutWeight:       number
+    cullingWeight:      number
+    
     weight:             number
     weightScale:        number    
     label:              string

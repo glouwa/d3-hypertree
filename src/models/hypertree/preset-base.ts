@@ -51,7 +51,7 @@ const modelBase : ()=> HypertreeArgs = ()=>
         n.precalc.label = undefined
         n.precalc.icon = undefined
         n.precalc.wiki = undefined
-        n.precalc.clickable = false
+        n.precalc.clickable = true
         n.precalc.cell = true        
     },    
     captionBackground:      'all',
@@ -120,13 +120,13 @@ const modelBase : ()=> HypertreeArgs = ()=>
 export const presets : { [key: string]:()=> HypertreeArgs } = 
 {
     modelBase: ()=> modelBase(),
+
     otolModel: ()=> ({
         //model: {
             caption: (ht:Hypertree, n:N)=> {                
                 const id = n.data && n.data.name
                 const l  = ht.langMap && ht.langMap[id] && '𝐖 ' + ht.langMap[id] 
                 const i  = ht.args.iconmap && ht.args.iconmap.emojimap[id] 
-
                 n.precalc.icon = i
                 n.precalc.wiki = l                
                 n.precalc.label = l || id                
@@ -137,6 +137,7 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
             nodeRadius: nodeInitR(.0075)
         }        
     }),
+
     generatorModel: ()=> ({                        
         interaction: {
             λbounds: [1/10, .6],
@@ -148,22 +149,26 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
             }
         }        
     }),    
+
     generatorSpiralModel: ()=> ({          
         layout: {
             type: layoutSpiral  
         }        
     }),
-    acmflareModel: ()=> 
-    {
-        const model = presets.otolModel()
-        const diff = {                        
-            interaction: {
-                λbounds: [1/7, .8]
-            }
+
+    acmflareModel: ()=> ({
+        caption: (ht:Hypertree, n:N)=> {            
+            n.precalc.label = n.data && n.data.name          
+            n.precalc.clickable = true
+        },
+        geometry: {
+            nodeRadius: nodeInitR(.0075)
+        },                  
+        interaction: {
+            λbounds: [1/7, .8]
         }
-        console.log('merging acmflare to main model')
-        return mergeDeep(model, diff)
-    },
+    }),
+    
     fsModel: ()=> ({                        
         geometry: {
             nodeRadius: ()=> 0, //nodeInitRNoInner(.038)
@@ -173,12 +178,12 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
         interaction: {
             λbounds: [1/7, .7]
         },
-        caption: (ht:Hypertree, n:N)=> {            
-            const id = n.data && n.data.name
-            n.precalc.label = id
-            n.precalc.clickable = true            
+        caption: (ht:Hypertree, n:N)=> {
+            n.precalc.label = n.data && n.data.name
+            n.precalc.clickable = true
         }        
     }),
+    
     mainModel: ()=> 
     {
         const model = presets.otolModel()
@@ -192,7 +197,7 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
             },
             geometry: {
                 nodeRadius: nodeInitRNoInner(.0001),
-                nodeScale: nodeScaleNoInner,
+                nodeScale:  nodeScaleNoInner,
                 nodeFilter: n=> true,
             },            
             interaction: {

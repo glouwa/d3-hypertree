@@ -94,7 +94,7 @@ export class Hypertree
             const base = presets.modelBase()
             console.group("set model: merging ", model, ' into ', base)
 
-            //this.args = mergeDeep_(model, base)
+            //this.args = mergeDeep(model, base)
             this.args = mergeDeep(base, model)
             console.log('merge result: ', this.args)
 
@@ -130,7 +130,7 @@ export class Hypertree
             
             this.args.dataloader((d3h, t1, dl)=> {
                 console.group("dataloader")
-                this.data = this.initData(d3h, t0, t1, dl)                                
+                this.initData(d3h, t0, t1, dl)                                
                 console.groupEnd()
 
                 if (this.langMap) {
@@ -261,7 +261,7 @@ export class Hypertree
         this.args.geometry.transformation.state.λ = .001
         this.args.geometry.transformation.state.P.re = 0
         this.args.geometry.transformation.state.P.im = 0        
-        this.args.filter.magic = 200
+        this.args.filter.magic = 20
         this.args.geometry.transformation.cache.centerNode = undefined
         //this.args.geometry.transformation.cache.hoverNode = undefined
 
@@ -280,8 +280,7 @@ export class Hypertree
         this.data = <N & d3.HierarchyNode<N>>d3
             .hierarchy(d3h)
             .each((n:any)=> {
-                n.mergeId = ncount++
-                n.value = null
+                n.mergeId = ncount++                
                 n.data = n.data || {}
                 n.precalc = {}
                 n.layout = null
@@ -290,8 +289,10 @@ export class Hypertree
                 n.globelhtid = globelhtid
                 shuffleArray(n.children, n) // get index
             })
-            //.sum(this.args.weight) // this.updateWeights()
+        this.unitdisk.args.data = this.data
+        this.args.geometry.transformation.cache.N = this.data.descendants().length
 
+        // layout initiialisation
         const startAngle    = this.args.layout.rootWedge.orientation
         const defAngleWidth = this.args.layout.rootWedge.angle
         this.data.layout = {
@@ -302,14 +303,24 @@ export class Hypertree
         }
         setZ(this.data, { re:0, im:0 })
 
-        var t3 = performance.now()
-        this.unitdisk.args.data = this.data
-        this.args.geometry.transformation.cache.N = this.data.descendants().length
+        // PRECALC:
+        var t3 = performance.now()       
+
+        // alles weights berechen
+        // - sum dinger
+        //      - layout, filter, linkwidth, linklength, linkNodePropX
+        // - node dinger        
+        // icons
         this.updateWeights_()
-        this.data.each(n=> this.args.nodeInit(this, n)) 
-        this.updateLang_()
-        this.updateImgHref_()        
-        this.findInitλ_()
+
+        // cells können true initialisert werden
+        // nodeDataInitBFS:
+        // - emoji*
+        // - img*
+        this.data.each(n=> n.precalc.clickable = true) 
+        this.data.each(n=> this.args.nodeInit(this, n))        
+        if (this.args.iconmap)
+            this.data.each(n=> n.precalc.imageHref = this.args.iconmap.fileName2IconUrl(n.data.name, n.data.type))
         
         this.modelMeta = { 
             Δ: [t1-t0, t2-t1, t3-t2, performance.now()-t3], 
@@ -317,8 +328,59 @@ export class Hypertree
             nodecount: ncount-1
         }
 
+        // von rest trennen, da lang alleine benötigt wird
+        // nodeLangInitBFS:
+        // - lang
+        // - wiki*
+        // - labellen automatisch
+        // - clickable=selectable*
+        // - cell* default = clickable? oder true?
+        this.updateLang_()
+        
+        // hmm, wird niergens mitgemessen :(
+        this.findInitλ_()
+
         this.view_.html.querySelector('.preloader').innerHTML = ''
         return this.data
+    }
+
+    protected updateWeights_() : void {
+        console.log("_updateWeights")
+        this.sum(this.data, this.args.layout.weight, 'value')
+        this.sum(this.data, this.args.layout.weight, 'layoutWeight')
+        this.sum(this.data, this.args.filter.weight, 'cullingWeight')
+        this.sum(this.data, this.args.layout.weight, 'visWeight')
+        //this.sum(this.data, this.args.geometry.weight[0], (n, s)=> n.visprop[0] = s)
+
+        // for arc width and node radius in some cases, not flexible enough
+        this.data.each(n=> n.precalc.weightScale = (Math.log2(n.precalc.visWeight) || 1) 
+            / (Math.log2(this.data.precalc.visWeight || this.data.children.length) || 1))
+    }
+
+    private sum(data, value, target) {
+        data.eachAfter(node=> {
+            let sum = +value(node.data) || 0
+            const children = node.children
+            var i = children && children.length
+            while (--i >= 0) sum += children[i].precalc[target]
+            node.precalc[target] = sum            
+        })
+    }
+
+    protected updateLang_(dl=0) : void {
+        console.log("_updateLang")
+        const t0 = performance.now()
+
+        if (this.data) {
+            this.data.each(n=> this.args.caption(this, n))
+            this.updateLabelLen_()
+        }
+
+        if (dl || !this.langMeta) this.langMeta = {
+            Δ: [performance.now()-t0], 
+            map:this.langMap, 
+            filesize:dl 
+        }        
     }
 
     protected findInitλ_() : void {
@@ -352,23 +414,6 @@ export class Hypertree
     //##
     //########################################################################################################
 
-    protected updateLang_(dl=0) : void {
-        console.log("_updateLang")
-        const t0 = performance.now()
-        for (var n of dfsFlat(this.data, n=>true)) {            
-            this.args.caption(this, n)
-            n.precalc.labellen = undefined
-        }
-        if (dl || !this.langMeta)
-            this.langMeta = {
-                Δ: [performance.now()-t0], 
-                map:this.langMap, 
-                filesize:dl 
-            }
-
-        this.updateLabelLen_()
-    }
-
     private virtualCanvas = undefined
     private virtualCanvasContext = undefined
     protected updateLabelLen_() : void {
@@ -381,30 +426,14 @@ export class Hypertree
         //context.textBaseLine = 'middle'
         //context.textAlign = 'center'
 
-        for (var n of dfsFlat(this.data, n=>true)) {
+        this.data.each(n=> {
             if (n.precalc.label) {
                 const metrics = context.measureText(n.precalc.label)
                 n.precalc.labellen = metrics.width/200/window.devicePixelRatio
             }
             else
                 n.precalc.labellen = 0 
-        }
-    }
-
-    protected updateImgHref_() : void {
-        console.log("_updateImgHref", this.args.iconmap)        
-        if (this.args.iconmap)
-            for (var n of dfsFlat(this.data, n=>true))
-                n.precalc.imageHref = this.args.iconmap.fileName2IconUrl(n.data.name, n.data.type)                
-    }
-
-    protected updateWeights_() : void {
-        console.log("_updateWeights")
-        this.data.sum(this.args.layout.weight) // äää besser...
-        for (var n of dfsFlat(this.data, n=>true)) 
-            // ...hier selber machen
-            n.precalc.weightScale = (Math.log2(n.value) || 1) 
-                / (Math.log2(this.data.value || this.data.children.length) || 1)        
+        })
     }
 
     public updateLayout_(preservingnode?:N) : void {

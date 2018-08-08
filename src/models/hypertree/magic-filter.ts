@@ -36,7 +36,7 @@ class Culler {
     }
 
     public abortfilter(n, idx, highway) { // return false to abort
-        n.minWeight = highway[0].value / ud.view.hypertree.args.magic * mf
+        n.minWeight = highway[0].precalc.cullingWeight / ud.view.hypertree.args.magic * mf
         peocessNodeTransformation(ud, cache, n)
         peocessNode(ud, cache, n, focusR, n.minWeight)        
         return !n.isOut
@@ -82,7 +82,7 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
   
     const mf = ud.view.hypertree.isAnimationRunning() ? 1:1
     function abortfilter(n, idx, highway) { // return false to abort
-        n.minWeight = highway[0].value / ud.view.hypertree.args.filter.magic / mf
+        n.minWeight = highway[0].precalc.cullingWeight / ud.view.hypertree.args.filter.magic / mf
         peocessNodeTransformation(ud, cache, n)
         peocessNode(ud, cache, n, cache.focusR, n.minWeight)        
         return !n.isOut
@@ -156,7 +156,7 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
     
     // only for meta view
     ud.cacheMeta = {
-        minWeight: path.map(n=> n.value / ud.view.hypertree.args.filter.magic),
+        minWeight: path.map(n=> n.precalc.cullingWeight / ud.view.hypertree.args.filter.magic),
         Δ: [t1-t0, t2-t1, t3-t2, performance.now()-t3]
     }
 
@@ -208,7 +208,7 @@ function peocessNode(ud:IUnitDisk, cache:TransformationCache, n:N, focusR, minWe
     
     n.isOutλ =                     n.cachep.r >= focusR
     n.isOut99 =                    n.cachep.r >= ud.view.hypertree.args.filter.cullingRadius
-    n.isOutWeight =                n.value <= minWeight
+    n.isOutWeight =                n.precalc.cullingWeight <= minWeight
     n.distScale =                  ud.args.transformation.transformDist(n.cache)
     n.dampedDistScale =            n.distScale * (.5 / n.distScale + .5)
     n.scaleStrText =               ` scale(${n.dampedDistScale})`

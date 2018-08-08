@@ -180,8 +180,8 @@ export function layoutBergé(n:N, λ:number, noRecursion=false)
             const cnlen = (cn.children || []).length            
             //const angleWeight = (Math.log10(n.value  || cllen || 1))
             //                  / (Math.log10(cn.value || 1))
-            const angleWeight = (cn.value || 1)
-                              / (n.value  || cllen || 1)            
+            const angleWeight = (cn.precalc.layoutWeight || 1)
+                              / ( n.precalc.layoutWeight || cllen || 1)            
             anglesum += angleWeight
             //const angleWeight = 1 / cllen
             const angleOffset = angleWidth * angleWeight

@@ -54,7 +54,7 @@ export function doLabelStuff(ud:IUnitDisk, cache:TransformationCache) {
     let damping = 1
     while (stdlabels.length > ud.view.hypertree.args.filter.maxlabels) {
         stdlabels = stdlabels.filter(n=> 
-               (n.value > (n.minWeight * damping) )
+               (n.precalc.cullingWeight > (n.minWeight * damping) )
             || !n.parent
             /*|| !n.isOutλ*/)
         damping /= .8
