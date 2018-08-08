@@ -41,8 +41,8 @@ export interface HypertreeArgs
         alpha:              number
         focusExtension:     number        
         maxFocusRadius:     number
-        maxlabels:          number
         wikiRadius:         number
+        maxlabels:          number
         /*labelFilter: {
             type:               string
             cullingRadius:      number
@@ -72,7 +72,7 @@ export interface HypertreeArgs_Soll
         childorder:      (children:N[])=> N[]
         dataloader:      (ok: (root:N, t0:number, dl:number)=>void)=> void
         langloader:      (lang)=> (ok)=> void
-        langInitBFS: (hypertree:Hypertree, n:N)=> string       
+        langInitBFS:     (hypertree:Hypertree, n:N)=> string       
     }
     objects: {
         root:            N
@@ -99,10 +99,10 @@ export interface HypertreeArgs_Soll
     }    
     interaction: {        
         onNodeSelect:    (n:N)=> void,
-        onNodeHold:     ()=> {},                    
-        onNodeHover:    ()=> {},
-        λbounds:        [.1, .8],
-        wheelFactor:    1.175,
+        onNodeHold:      ()=> {},                    
+        onNodeHover:     ()=> {},
+        λbounds:         [.1, .8],
+        wheelFactor:     1.175,
     }
     geometry:            UnitDiskArgs
 }

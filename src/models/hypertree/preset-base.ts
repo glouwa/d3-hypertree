@@ -74,8 +74,8 @@ const modelBase : ()=> HypertreeArgs = ()=>
         rangeNodes:         { min:300, max:700 },
         focusExtension:     1.6,
         maxFocusRadius:     .85,
-        maxlabels:          25,
         wikiRadius:         .85,
+        maxlabels:          25,
     },
     geometry: {
         decorator:          UnitDisk,

@@ -280,14 +280,13 @@ export class Hypertree
         this.data = <N & d3.HierarchyNode<N>>d3
             .hierarchy(d3h)
             .each((n:any)=> {
-                n.mergeId = ncount++                
+                n.globelhtid = globelhtid
+                n.mergeId = ncount++
                 n.data = n.data || {}
                 n.precalc = {}
-                n.layout = null
-                n.layoutReference = null
                 n.pathes = {}
-                n.globelhtid = globelhtid
-                //shuffleArray(n.children, n) // get index
+                n.layout = null
+                n.layoutReference = null                
             })
         this.unitdisk.args.data = this.data
         this.args.geometry.transformation.cache.N = this.data.descendants().length
