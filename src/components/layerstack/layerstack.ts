@@ -73,9 +73,11 @@ export class LayerStack
             this.layers['path-arcs'].update.data()
 
         var t1 = performance.now()
+        // navigation background disk
         if (this.layers['link-arcs-focus']) 
             this.layers['link-arcs-focus'].update.data()
 
+        // navigation params, ok, aber die normale disk?
         var t2 = performance.now()
         if (this.layers['labels']) 
             this.layers['labels'].update.data()

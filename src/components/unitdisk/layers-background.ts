@@ -52,7 +52,7 @@ export const navBackgroundLayers = [
         width:      (n:N)=> arcWidth(n),
         classed:    (s,w)=> {}
     }),
-    (v, ud:UnitDisk)=> new ArcLayer(v, {                                        
+    (v, ud:UnitDisk)=> new ArcLayer(v, {                                            
         name:       'link-arcs-focus',                            
         className:  'arc-focus',
         curvature:  ud.view.hypertree.args.geometry.linkCurvature,

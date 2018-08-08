@@ -3,7 +3,7 @@ import { IUnitDisk }               from '../../components/unitdisk/unitdisk'
 import { Hypertree }               from '../../components/hypertree/hypertree'
 
 import { N }                       from '../n/n'
-import { C }                       from '../transformation/hyperbolic-math'
+import { C, Ck, Cp }               from '../transformation/hyperbolic-math'
 import { Transformation }          from '../transformation/hyperbolic-transformation'
 import { TransformationCache }     from '../transformation/hyperbolic-transformation'
 import { ArcCurvature }            from '../../components/layers/link-layer';
@@ -31,7 +31,7 @@ export interface UnitDiskArgs
     clipRadius:        number
 
     nodeRadius:        (ud:IUnitDisk, n:N)=> number
-    nodeScale,
+    nodeScale:         (n:N)=> number
     nodeFilter:        (n:N)=> boolean
     offsetEmoji:       (d, i, v)=> C
     offsetLabels:      (d, i, v)=> C
