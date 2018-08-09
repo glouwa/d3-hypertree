@@ -87,7 +87,7 @@ See [API Reference](https://glouwa.github.io/d3-hypertree/) or cheat sheet below
 
 ## Options Cheat Sheet
 
-This Example shows most features. For details see 
+This example shows a component instantiation using most features. For detailed descriptions and a complete list of features see 
 [API Reference](https://glouwa.github.io/d3-hypertree/).
 
 ```typescript
