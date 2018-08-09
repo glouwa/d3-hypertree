@@ -70,7 +70,7 @@ import * as hyt from 'd3-hypertree'
 
 ## Usage
 
-Parent dom element and data source are the only configuration parameters required:
+Parent DOM element and data source are the only configuration parameters required.
 
 ```typescript
 new hyt.Hypertree(
@@ -86,6 +86,9 @@ new hyt.Hypertree(
 See [API Reference](https://glouwa.github.io/d3-hypertree/) or cheat sheet below for additional options.
 
 ## Options Cheat Sheet
+
+This Example shows most features. For details see 
+[API Reference](https://glouwa.github.io/d3-hypertree/).
 
 ```typescript
 new hyt.Hypertree(
@@ -158,5 +161,3 @@ new hyt.Hypertree(
     }
 )
 ```
-
-See [API Reference](https://glouwa.github.io/d3-hypertree/) for descriptions and more info.
