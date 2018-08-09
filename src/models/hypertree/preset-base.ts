@@ -67,11 +67,13 @@ const modelBase : ()=> HypertreeArgs = ()=>
     filter: {
         type:               'magic',
         cullingRadius:      .99,
-        magic:              160,
-        alpha:              1.05,
-        weight:             n=> (isLeaf(n)?1:0),
-        rangeCullingWeight: { min:4,   max:500 },                    
-        rangeNodes:         { min:300, max:700 },
+        weightFilter: {
+            magic:              160,
+            alpha:              1.05,
+            weight:             n=> (isLeaf(n) ? 1 : 0),
+            rangeCullingWeight: { min:4,   max:500 },                    
+            rangeNodes:         { min:300, max:700 },
+        },
         focusExtension:     1.6,
         maxFocusRadius:     .85,
         wikiRadius:         .85,
@@ -81,11 +83,7 @@ const modelBase : ()=> HypertreeArgs = ()=>
         decorator:          UnitDisk,
         cacheUpdate:        cacheUpdate,        
         layers:             layerSrc,
-        layerMask: {
-            stem:           [0, 0], 
-            centerNode:     0,
-            cells:          1,
-        },
+        layerOptions:       {},
         clipRadius:         1,
         nodeRadius:         nodeInitR(.01),
         nodeScale:          nodeScale,
@@ -93,7 +91,7 @@ const modelBase : ()=> HypertreeArgs = ()=>
         offsetEmoji:        labeloffsets['labeloffset'], //outwards,
         offsetLabels:       labeloffsets['labeloffset'], //outwardsPlusNodeRadius,
         linkWidth:          arcWidth,        
-        linkCurvature:      '+',
+        linkCurvature:      '-',
         captionBackground:  'all',
         captionFont:        '6.5px Roboto',
         transformation:     new HyperbolicTransformation({
@@ -160,7 +158,10 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
     generatorSpiralModel: ()=> ({          
         layout: {
             type: layoutSpiral  
-        }        
+        },
+        filter: {
+            weightFilter: null
+        }   
     }),
 
     stackoverflowModel: ()=> ({

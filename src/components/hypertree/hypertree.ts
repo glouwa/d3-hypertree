@@ -262,7 +262,7 @@ export class Hypertree
         this.args.geometry.transformation.state.λ = .001
         this.args.geometry.transformation.state.P.re = 0
         this.args.geometry.transformation.state.P.im = 0        
-        this.args.filter.magic = 20
+        this.args.filter.weightFilter.magic = 20
         this.args.geometry.transformation.cache.centerNode = undefined
         //this.args.geometry.transformation.cache.hoverNode = undefined
 
@@ -343,7 +343,7 @@ export class Hypertree
         console.log("_updateWeights")        
         // sum dinger
         this.sum(this.data, this.args.layout.weight, 'layoutWeight')
-        this.sum(this.data, this.args.filter.weight, 'cullingWeight')
+        this.sum(this.data, this.args.filter.weightFilter.weight, 'cullingWeight')
         this.sum(this.data, this.args.layout.weight, 'visWeight')
         //this.sum(this.data, this.args.geometry.weight[0], (n, s)=> n.visprop[0] = s)
 

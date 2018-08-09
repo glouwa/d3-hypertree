@@ -10,12 +10,13 @@ import { IUnitDisk }           from '../../components/unitdisk/unitdisk'
 
 export interface HypertreeArgs
 {
-    langmap?:               {} | null
-    dataloader?:            LoaderFunction
-    langloader?:            (lang)=> (ok)=> void    
-    dataInitBFS:            (ht:Hypertree, n:N)=> void       // emoji, imghref
-    langInitBFS:            (ht:Hypertree, n:N)=> void       // text, wiki, clickable, cell, :  auto--> textlen
-    
+    //datasource: {
+        langmap?:               {} | null
+        dataloader?:            LoaderFunction
+        langloader?:            (lang)=> (ok)=> void    
+        dataInitBFS:            (ht:Hypertree, n:N)=> void       // emoji, imghref
+        langInitBFS:            (ht:Hypertree, n:N)=> void       // text, wiki, clickable, cell, :  auto--> textlen
+    // }
     objects: {
         roots:              N[]
         pathes:             Path[]
@@ -34,11 +35,13 @@ export interface HypertreeArgs
     filter: {
         type:               string
         cullingRadius:      number
-        magic:              number                           // auto by init up
-        weight:             (n)=> number
-        rangeCullingWeight: { min:number, max:number }
-        rangeNodes:         { min:number, max:number }
-        alpha:              number
+        weightFilter: {
+            magic:              number                           // auto by init up
+            weight:             (n)=> number
+            rangeCullingWeight: { min:number, max:number }
+            rangeNodes:         { min:number, max:number }
+            alpha:              number
+        }
         focusExtension:     number        
         maxFocusRadius:     number
         wikiRadius:         number
