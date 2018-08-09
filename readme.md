@@ -45,7 +45,7 @@ src="docs/img/screenshot-light-github.png?raw=true" width="170" align="left" hsp
 npm install d3-hypertree --save
 ```
 
-<b style="text-decoration:underline;">OR</b> download the [latest release](https://glouwa.github.io/d3-hypertree/)
+<b>Or</b> download the [latest release](https://glouwa.github.io/d3-hypertree/)
 of the prebuild bundle if npm is not used, 
 and add the following lines to your page:
 
@@ -80,7 +80,7 @@ new hyt.Hypertree(
     {
         model: hyt.loaders.fromFile('data/LDA128-ward.d3.json'),
     }
-);
+)
 ```
 
 See [API Reference](https://glouwa.github.io/d3-hypertree/) or cheat sheet below for additional options.
@@ -88,76 +88,75 @@ See [API Reference](https://glouwa.github.io/d3-hypertree/) or cheat sheet below
 ## Options Cheat Sheet
 
 ```typescript
-export interface HypertreeArgs
-{
-    dataloader?:            LoaderFunction
-    langloader?:            (lang)=> (ok)=> void    
-    dataInitBFS:            (ht:Hypertree, n:N)=> void       // emoji, imghref
-    langInitBFS:            (ht:Hypertree, n:N)=> void       // text, wiki, clickable, cell,
-    objects: {
-        roots:              N[]
-        pathes:             Path[]
-        selections:         N[]
-        traces:             Trace[]
-    }
-    layout: {
-        type:               LayoutFunction
-        weight:             (n:N)=> number
-        initSize:           number
-        rootWedge: {
-            orientation:    number
-            angle:          number
+new hyt.Hypertree(
+    {
+        id:                     'my-component',
+        classes:                'add-class another-class',
+        parent:                 document.body,        
+        preserveAspectRatio:    'xMidYMid meet'
+    },
+    {
+        dataloader?:            LoaderFunction   
+        dataInitBFS:            (ht:Hypertree, n:N)=> void       // emoji, imghref
+        langInitBFS:            (ht:Hypertree, n:N)=> void       // text, wiki, clickable, cell,
+        objects: {
+            roots:              N[]
+            pathes:             Path[]
+            selections:         N[]    
+        }
+        layout: {
+            type:               LayoutFunction
+            weight:             (n:N)=> number
+            initSize:           number
+            rootWedge: {
+                orientation:    number
+                angle:          number
+            }
+        }
+        filter: {
+            cullingRadius:      number
+            weightFilter:       null | number | {            
+                weight:         (n)=> number
+                rangeWeight:    { min:number, max:number }
+                rangeNodes:     { min:number, max:number }
+                alpha:          number
+            }
+            focusExtension:     number        
+            maxFocusRadius:     number
+            wikiRadius:         number
+            maxlabels:          number       
+        }       
+        geometry: {        
+            layers:            ((v, ls:IUnitDisk)=> ILayer)[]
+            layerOptions:      {
+                cells: {
+                    invisible:  false,
+                    hideOnDrag: false
+                },
+            }
+            nodeRadius:        (ud:IUnitDisk, n:N)=> number
+            nodeScale:         (n:N)=> number
+            nodeFilter:        (n:N)=> boolean
+            offsetEmoji:       (d, i, v)=> C
+            offsetLabels:      (d, i, v)=> C
+
+            captionBackground: 'all' | 'center' | 'root' | 'none' // x 
+            captionFont:       string
+
+            linkWidth:         (n:N)=> number
+            linkCurvature:     ArcCurvature
+        }
+        interaction: {          
+            //type:               'clickonly' | 'selction' | 'multiselection' | centernodeselectable'
+            mouseRadius:        number,
+            onNodeSelect:       (n:N)=> void
+            onNodeHold:         ()=>void                          // x 
+            onNodeHover:        ()=>void                          // x 
+            λbounds:            [ number, number ]
+            wheelSensitivity:   number
         }
     }
-    filter: {
-        type:               'none' | 'const-weight' | 'dynamic-weight'
-        cullingRadius:      number
-        magic:              number                           // auto by init up
-        weight:             (n)=> number
-        rangeCullingWeight: { min:number, max:number }
-        rangeNodes:         { min:number, max:number }
-        alpha:              number
-        focusExtension:     number        
-        maxFocusRadius:     number
-        wikiRadius:         number
-        maxlabels:          number       
-    }       
-    geometry: {
-        decorator:         Unitdisk | UnitdiskNav
-        transformation:    Transformation<N>,    
-        cacheUpdate:       (ud:IUnitDisk, cache:TransformationCache)=> void
-        
-        layers:            ((v, ls:IUnitDisk)=> ILayer)[]
-        layerOptions:      {
-            cells: {
-                invisible:  false,
-                hideOnDrag: false
-            },
-        }
-        clipRadius:        number
-
-        nodeRadius:        (ud:IUnitDisk, n:N)=> number
-        nodeScale:         (n:N)=> number
-        nodeFilter:        (n:N)=> boolean
-        offsetEmoji:       (d, i, v)=> C
-        offsetLabels:      (d, i, v)=> C
-
-        captionBackground: 'all' | 'center' | 'none'        // x 
-        captionFont:       string
-
-        linkWidth:         (n:N)=> number
-        linkCurvature:     ArcCurvature
-    }
-    interaction: {          
-        //type:               'clickonly' | 'selction' | 'multiselection' | 'centernodeselectable'
-        mouseRadius:        number,
-        onNodeSelect:       (n:N)=> void
-        onNodeHold:         ()=>void                          // x 
-        onNodeHover:        ()=>void                          // x 
-        λbounds:            [ number, number ]
-        wheelFactor:        number
-    }
-}
+)
 ```
 
 See [API Reference](https://glouwa.github.io/d3-hypertree/) for descriptions and more info.
