@@ -26,7 +26,9 @@ export interface UnitDiskArgs
     cacheUpdate:       (ud:IUnitDisk, cache:TransformationCache)=> void
     
     layers:            ((v, ls:IUnitDisk)=> ILayer)[]
-    layerOptions:      {}
+    layerOptions:      {
+        ///[string]: LayerType1 | Layertype 2 ...
+    }
 
     clipRadius:        number
 

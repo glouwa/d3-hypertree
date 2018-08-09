@@ -14,6 +14,7 @@ import { InteractionLayer2 }        from '../../components/layers/interaction-la
 import { TraceLayer }               from '../../components/layers/trace-layer'
 import { ImageLayer }               from '../../components/layers/image-layer'
 import { FocusLayer }               from '../../components/layers/focus-layer'
+import { StemLayer }                from '../../components/layers/stem-layer'
 import { bboxOffset }               from '../../d3-hypertree'
 
 export const labeloffsets = {
@@ -82,6 +83,9 @@ export const layerSrc = [
         r:          ()=> .004,
         center:     ()=> '0 0'
     }),
+
+    // CIRCLE STUFF END
+
     (v, ud:UnitDisk)=> new CellLayer(v, {
         invisible:  false,
         hideOnDrag: true,
@@ -133,21 +137,6 @@ export const layerSrc = [
                          .classed("selected-path", d=> d.pathes && d.pathes.isPartOfAnySelectionPath)
                          .style("stroke",          d=> d.pathes && d.pathes.finalcolor)
     }),
-    /*
-    (v, ud:UnitDisk)=> new ArcLayer(v, {
-        invisible:  true,
-        hideOnDrag: true,
-        name:       'path-lines',                            
-        className:  'arc',
-        curvature:  ud.view.hypertree.args.geometry.linkCurvature, // + - 0 l
-        data:       ()=> ud.cache.paths,                            
-        nodePos:    n=> n.cache,
-        nodePosStr: n=> n.strCache,
-        width:      d=> ud.args.linkWidth(d) + (.013 * d.dampedDistScale),
-        classed:    s=> s.classed("hovered-path",  d=> d.pathes && d.pathes.isPartOfAnyHoverPath)
-                         .classed("selected-path", d=> d.pathes && d.pathes.isPartOfAnySelectionPath)
-                         .style("stroke",          d=> d.pathes && d.pathes.finalcolor)
-    }),*/
     (v, ud:UnitDisk)=> new ArcLayer(v, {
         invisible:  false,
         hideOnDrag: false,
@@ -164,23 +153,24 @@ export const layerSrc = [
                          .classed("selected",  d=> d.pathes && d.pathes.isPartOfAnySelectionPath)                         
                          .style("stroke",      d=> d.pathes && d.pathes.finalcolor)
                          .attr("stroke-width", d=> w(d))
-    }),/*
-    (v, ud:UnitDisk)=> new ArcLayer(v, {
-        invisible:  true,
-        hideOnDrag: true,
-        name:       'link-lines',                            
+    }),
+    (v, ud:UnitDisk)=> new StemLayer(v, {
+        invisible:  false,
+        hideOnDrag: false,
+        name:       'stem-arc',                            
         className:  'arc',
-        curvature:  ud.view.hypertree.args.geometry.linkCurvature, 
+        curvature:  '+',
         clip:       '#circle-clip' + ud.args.clipRadius,
-        data:       ()=> ud.cache.links,                            
+        data:       ()=> [],
         nodePos:    n=> n.cache,
         nodePosStr: n=> n.strCache,
         width:      d=> ud.args.linkWidth(d),
-        classed:    s=> s.classed("hovered",   d=> d.pathes && d.pathes.isPartOfAnyHoverPath)
-                         .classed("selected",  d=> d.pathes && d.pathes.isPartOfAnySelectionPath)
+        classed:    (s, w)=> s
+                         .classed("hovered",   d=> d.pathes && d.pathes.isPartOfAnyHoverPath)
+                         .classed("selected",  d=> d.pathes && d.pathes.isPartOfAnySelectionPath)                         
                          .style("stroke",      d=> d.pathes && d.pathes.finalcolor)
-
-    }),*/                        
+                         .attr("stroke-width", d=> w(d))
+    }),
     (v, ud:UnitDisk)=> new NodeLayer(v, {        
         invisible:  false,
         hideOnDrag: true,
@@ -190,7 +180,10 @@ export const layerSrc = [
         r:          d=> ud.args.nodeRadius(ud, d),        
         transform:  d=> d.transformStrCache                            
                         + ` scale(${ud.args.nodeScale(d)})`,
-    }),                        
+    }),             
+    
+    // IMAGE LABLE SYMBOL EMOJI
+
     (v, ud:UnitDisk)=> new SymbolLayer(v, {
         invisible:  true,
         hideOnDrag: true,

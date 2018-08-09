@@ -26,7 +26,6 @@ export class ArcLayer implements ILayer
     view:            ILayerView 
     args:            ArcLayerArgs
     d3updatePattern: D3UpdatePattern
-    d3updatePattern2: D3UpdatePattern
     name:            string
   
     constructor(view:ILayerView, args:ArcLayerArgs) {
@@ -37,18 +36,9 @@ export class ArcLayer implements ILayer
 
     update = {
         parent:         ()=> this.attach(),      
-        data:           ()=> { 
-            this.d3updatePattern.update.data() 
-            this.d3updatePattern2.update.data() 
-        },
-        transformation: ()=> { 
-            this.d3updatePattern.update.transformation() 
-            this.d3updatePattern2.update.transformation() 
-        },
-        style:          ()=> { 
-            this.d3updatePattern.update.style() 
-            this.d3updatePattern2.update.style() 
-        }
+        data:           ()=> this.d3updatePattern.update.data(),
+        transformation: ()=> this.d3updatePattern.update.transformation(),
+        style:          ()=> this.d3updatePattern.update.style() 
     }
 
     private attach() {
@@ -62,7 +52,9 @@ export class ArcLayer implements ILayer
             elementType:       this.args.curvature === 'l' ? 'line' : 'path',
             create:            s=> {},
             updateColor:       s=> this.args.classed(s, this.args.width),
-            updateTransform:   s=> {                
+            updateTransform:   s=> {
+                //const c = d=> d.height===0 ? '+' : '-'                 
+                const c = d=> this.args.curvature
                 if (this.args.curvature == 'l')
                     s.attr('x1',             d=> this.args.nodePos(d).re)
                      .attr('y1',             d=> this.args.nodePos(d).im)
@@ -71,46 +63,11 @@ export class ArcLayer implements ILayer
                      .attr("stroke-width",   d=> this.args.width(d))
                      .attr("stroke-linecap", d=> "round") 
                 else
-                    s.attr("d",              d=> this.arcOptions[this.args.curvature](d))
+                    s.attr("d",              d=> this.arcOptions[c(d)](d))
                      .attr("stroke-width",   d=> this.args.width(d))
                      .attr("stroke-linecap", d=> "round")
             },
-        })        
-        const straincurvature : string = '-' // this.args.curvature
-        this.d3updatePattern2 = new D3UpdatePattern({
-            parent:            this.view.parent,
-            layer:             this,
-            clip:              this.args.clip,
-            data:              ()=> (this.view.hypertree.data && this.name.startsWith('link')) 
-                ? [this.view.hypertree.data] 
-                : [],
-            name:              'strain',
-            className:         this.args.className,
-            elementType:       straincurvature === 'l' ? 'line' : 'path',
-            create:            s=> {},
-            updateColor:       s=> this.args.classed(s, this.args.width),
-            updateTransform:   s=> {                
-                if (straincurvature === 'l')
-                    s.attr('x1',             d=> this.args.nodePos(d).re)
-                     .attr('y1',             d=> this.args.nodePos(d).im)
-                     .attr('x2',             d=> this.args.nodePos(d).re)
-                     .attr('y2',             d=> 1)
-                     .attr("stroke-width",   d=> this.args.width(d)+.01)
-                     .attr("stroke-linecap", d=> "round")
-                else 
-                    s.attr("d",              d=> this.arcOptions[this.args.curvature](d))
-                     .attr("stroke-width",   d=> this.args.width(d)+.01)
-                     .attr("stroke-linecap", d=> "round")
-            },
         })
-    }
-
-    private curvature() {
-        return this.args.curvature
-    }
-
-    private width(d:N) {
-        return this.arcOptions[this.args.curvature](d)
     }
 
     private arcOptions = {

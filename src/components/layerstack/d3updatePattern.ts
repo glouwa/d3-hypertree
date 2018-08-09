@@ -40,8 +40,10 @@ export class D3UpdatePattern
 
     private updateParent() {
         this.mainSvgGroup = this.args.parent.append('g')
+            .attr('id', this.args.name)
             .attr('clip-path', (this.args.clip ? `url(${this.args.clip})` : undefined))
-            .style('transform', 'translateZ(0)')  
+            .style('transform', 'translateZ(0)')
+            
             // rotateZ(360deg)
             // scale(1, 1)
             // translateZ(0)
