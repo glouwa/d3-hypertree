@@ -141,8 +141,12 @@
 }
 
 #path {    
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: calc(100% - 33em);
+
     font-size: .75em;    
-    max-width: 80%;
     word-spacing: .3em;
     position: absolute;
     top: -1.6em;

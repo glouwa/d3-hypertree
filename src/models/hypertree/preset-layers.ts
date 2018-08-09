@@ -41,6 +41,12 @@ export const layerSrc = [
     // interaction-d3
     // interaction-hammer
     (v, ud:UnitDisk)=> new BackgroundLayer(v, {}),    
+    (v, ud:UnitDisk)=> new CellLayer(v, {
+        invisible:  false,
+        hideOnDrag: true,
+        clip:       '#circle-clip' + ud.args.clipRadius,
+        data:       ()=> ud.cache.cells,                            
+    }),
     (v, ud:UnitDisk)=> new FocusLayer(v, {        
         invisible:  true,
         hideOnDrag: true,
@@ -86,12 +92,6 @@ export const layerSrc = [
 
     // CIRCLE STUFF END
 
-    (v, ud:UnitDisk)=> new CellLayer(v, {
-        invisible:  false,
-        hideOnDrag: true,
-        clip:       '#circle-clip' + ud.args.clipRadius,
-        data:       ()=> ud.cache.cells,                            
-    }),
     (v, ud:UnitDisk)=> new NodeLayer(v, {
         invisible:  true,
         hideOnDrag: true,

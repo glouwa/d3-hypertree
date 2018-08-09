@@ -107,7 +107,7 @@ const modelBase : ()=> HypertreeArgs = ()=>
         onNodeSelect:       ()=> {},
         onNodeHold:         ()=> {},                    
         onNodeHover:        ()=> {},
-        λbounds:            [ 1/40, .4 ],
+        λbounds:            [ 1/40, .45 ],
         wheelFactor:        1.175,
     }
 })
@@ -146,7 +146,15 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
                 orientation: π/4,
                 angle:       1.99999*π,
             }
-        }        
+        },
+        geometry: {
+            layerOptions: {
+                'stem-arc': {
+                    invisible: true,
+                    hideOnDrag: true
+                }
+            }
+        }
     }),
 
     generatorSpiralModel: ()=> ({          
