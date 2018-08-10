@@ -150,13 +150,22 @@ export class InteractionLayer2 implements ILayer
     //StaticState 
     //PanState 
     //PinchState
-
+    private dragState: {
+        panStart:            C
+    }
+    private pinchState : {        
+        pinchInitDist:       number,
+        pinchInitλp:         number,
+        pinchcenter:         C,
+        pinchPreservingNode: N
+    }
     private panStart:C           = null
     private pinchInitDist:number = null
     private pinchInitλp:number   = null
     private nopinch:boolean      = null
     private pinchcenter:C        = null
     private pinchPreservingNode  = null
+
     private onPointerStart(pid, m) 
     {
         this.view.hypertree.args.objects.traces.push({
@@ -168,17 +177,18 @@ export class InteractionLayer2 implements ILayer
             this.view.unitdisk.args.transformation.onDragStart(m)
             this.panStart = m
             this.nopinch = true
-            //console.log('still --> pan')
+            //console.log(still » pan || pinch » pan)
         }
         else if (this.view.hypertree.args.objects.traces.length === 2) {
             const t0 = this.view.hypertree.args.objects.traces[0]
             const t0e = t0.points[t0.points.length-1]
+            this.pinchcenter = CmulR(CaddC(t0e, m), .5)
+            this.view.unitdisk.pinchcenter = this.pinchcenter
+            this.pinchPreservingNode = this.findUnculledNodeByCell(this.pinchcenter)            
             this.pinchInitDist = this.dist(t0e, m)
             this.pinchInitλp = this.view.unitdisk.args.transformation.state.λ
             this.nopinch = false
-            this.pinchcenter = CmulR(CaddC(t0e, m), .5)
-            this.pinchPreservingNode = this.findUnculledNodeByCell(this.pinchcenter)            
-            //console.log('pan --> pinch')
+            //console.log('pan »  pinch')
         }
         else {
         }
@@ -230,9 +240,9 @@ export class InteractionLayer2 implements ILayer
         this.view.hypertree.args.objects.traces 
             = this.view.hypertree.args.objects.traces.filter(e=> e.id !== pid)
         
-        this.pinchcenter = undefined
-        this.pinchPreservingNode = undefined
+        this.pinchcenter = undefined        
         this.view.unitdisk.pinchcenter = this.pinchcenter
+        this.pinchPreservingNode = undefined
 
         if (this.view.hypertree.args.objects.traces.length === 0) 
         {

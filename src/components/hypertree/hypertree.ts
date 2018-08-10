@@ -108,7 +108,7 @@ export class Hypertree
             this.args.langloader = ll
 
             this.args.langloader((langMap, t1, dl)=> {
-                console.group("langloader")
+                console.group("langloader", langMap && langMap.length)
                 this.langMap = langMap || {}
                 this.updateLang_(dl)                
                 this.update.data()
@@ -135,6 +135,11 @@ export class Hypertree
         },
         toggleSelection: (n:N)=> {
             this.toggleSelection(n)
+            if (this.args.objects.pathes.length > 10+1) {
+                const toremove = this.args.objects.selections[0]
+                this.args.objects.selections = this.args.objects.selections.filter(e=> e !== toremove)
+                this.removePath('SelectionPath', toremove)
+            }
             this.update.pathes()
         },
         //addPath: (pathid, node:N)=> { this.addPath(pathid, node) },
@@ -267,7 +272,7 @@ export class Hypertree
         console.log("_initData")
         var t2 = performance.now()
         var ncount = 1
-        globelhtid++        
+        globelhtid++
         this.data = <N & d3.HierarchyNode<N>>d3
             .hierarchy(d3h)
             .each((n:any)=> {
@@ -277,7 +282,7 @@ export class Hypertree
                 n.precalc = {}
                 n.pathes = {}
                 n.layout = null
-                n.layoutReference = null                
+                n.layoutReference = null
             })        
         this.unitdisk.args.data = this.data
         this.args.geometry.transformation.cache.N = this.data.descendants().length
@@ -323,7 +328,6 @@ export class Hypertree
         
         // hmm, wird niergens mitgemessen :(
         this.findInitλ_()
-        this.data.isInitialized = true
         
         this.view_.html.querySelector('.preloader').innerHTML = ''        
     }

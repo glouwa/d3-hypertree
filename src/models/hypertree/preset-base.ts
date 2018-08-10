@@ -33,6 +33,8 @@ var nodeScaleNoInner = d=> d.distScale
 var innerNodeScale =   d=> d.precalc.weightScale
 var arcWidth =         d=> .025 * d.distScale * d.precalc.weightScale
 
+const capitalize = s=> s.charAt(0).toUpperCase() + s.slice(1)
+
 const modelBase : ()=> HypertreeArgs = ()=>
 ({
     iconmap: {
@@ -222,7 +224,7 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
             dataInitBFS: (ht:Hypertree, n:N)=> {            
                 const id = n.data.name                
                 n.precalc.imageHref = ht.args.iconmap.fileName2IconUrl(id, n.data.type)
-                n.precalc.icon = ht.args.iconmap.emojimap[id]
+                n.precalc.icon = ht.args.iconmap.emojimap[id]                
             },            
             langInitBFS: (ht:Hypertree, n:N)=> {
                 const id = n.data.name
@@ -232,8 +234,11 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
                     && id !== 'Example-files'
                     && id !== 'stackoverflow'
 
-                if (n.precalc.clickable) 
-                    n.precalc.label = id
+                if (n.precalc.clickable) {
+                    const lid = capitalize(id)
+                    const l = ht.langMap && ht.langMap[lid] && ht.langMap[lid] 
+                    n.precalc.label = l || lid
+                }                
             }
         }
         console.log('merging otol to main model')

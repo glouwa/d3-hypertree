@@ -180,7 +180,7 @@ function UnitdiskMeta_({ parent, ud, className })
         fromView: (slider)=> {            
             ud.args.transformation.state.λ = 1-slider.value
             ud.view.hypertree.updateLayoutPath_(ud.args.transformation.cache.centerNode)
-            ud.view.hypertree.update.layout()
+            ud.view.hypertree.update.transformation()
         }
     }
 

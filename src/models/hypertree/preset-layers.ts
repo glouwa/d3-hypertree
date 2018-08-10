@@ -66,7 +66,7 @@ export const layerSrc = [
         hideOnDrag: true,
         name:       'focus-r',
         r:          ()=> ud.cache.focusR,
-        center:     ()=> `${(ud.pinchcenter||{re:0}).re} ${(ud.pinchcenter||{im:0}).im}`
+        center:     ()=> '0 0'
     }),    
     (v, ud:UnitDisk)=> new FocusLayer(v, {        
         invisible:  true,
@@ -80,7 +80,7 @@ export const layerSrc = [
         hideOnDrag: false,
         name:       'λ',
         r:          ()=> ud.args.transformation.state.λ,
-        center:     ()=> '0 0'
+        center:     ()=> `${(ud.pinchcenter  || {re:0}).re} ${(ud.pinchcenter || {im:0}).im}`
     }),
     (v, ud:UnitDisk)=> new FocusLayer(v, {        
         invisible:  false,
