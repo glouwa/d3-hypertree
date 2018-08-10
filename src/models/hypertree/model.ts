@@ -8,6 +8,30 @@ import { UnitDiskView }        from '../unitdisk/unitdisk-model'
 import { Hypertree }           from '../../components/hypertree/hypertree'
 import { IUnitDisk }           from '../../components/unitdisk/unitdisk'
 
+type Partial<T> = {
+    [P in keyof T]?: T[P];
+}
+
+/*
+    //  github page
+    header {
+        background: #363636f0;
+    }
+    #banner {
+        background: hsla(48, 95%, 54%, 1);
+    }
+    body {    
+        background: #ecebe1;
+    }
+    header h1 {    
+        text-shadow: 0px 2px 0px rgba(179, 179, 179, 0.28);
+    }
+    #banner .button {
+        border: 0px solid #dba500; 
+        background-color: hsla(48, 100%, 74%, 1);
+    }
+*/
+
 export interface HypertreeArgs
 {
     //datasource: {

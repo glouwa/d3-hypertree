@@ -61,16 +61,19 @@ export function layoutUnitLines(root:N, λ:number, noRecursion=false) {
     return root
 }
 
-export function layoutSpiral(root) {
+export function layoutSpiral(root) 
+{
     const flatNodes = dfsFlat(root)
     const nrN = flatNodes.length
     const nrRounds = Math.floor(nrN/24)
-    for (let i=0; i < nrN; i++) {
+
+    for (let i=0; i < nrN; i++) 
+    {
         const a = i/nrN * 2*Math.PI * (nrRounds+1)
         const r = Math.pow(2, i/nrN)-1
         setZ(flatNodes[i], { 
-            re:r*Math.cos(a), 
-            im:r*Math.sin(a) 
+            re: r*Math.cos(a), 
+            im: r*Math.sin(a) 
         })
     }
     return root

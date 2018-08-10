@@ -114,10 +114,7 @@ export class Hypertree
                 this.update.langloader()
                 console.groupEnd()
                 
-                if (this.data) {
-                    console.warn('resolving promise')
-                    ok()
-                }
+                if (this.data) ok()
             })
             console.groupEnd()
         },
@@ -132,10 +129,7 @@ export class Hypertree
                 this.initData(d3h, t0, t1, dl)                                
                 console.groupEnd()
 
-                if (this.langMap) {
-                    console.warn('resolving promise')
-                    ok()                    
-                }
+                if (this.langMap) ok()
             })            
             console.groupEnd()
         },       
@@ -255,9 +249,6 @@ export class Hypertree
         this.unitdisk.args.data = undefined
         this.data = undefined 
         this.langMap = undefined
-        //if (this.view_.unitdisk && this.view_.unitdisk.cache)
-        //    this.view_.unitdisk.cache.centerNode = undefined
-        // alias clearcache...
 
         this.args.geometry.transformation.state.λ = .001
         this.args.geometry.transformation.state.P.re = 0
@@ -335,8 +326,7 @@ export class Hypertree
         // hmm, wird niergens mitgemessen :(
         this.findInitλ_()
 
-        this.view_.html.querySelector('.preloader').innerHTML = ''
-        return this.data
+        this.view_.html.querySelector('.preloader').innerHTML = ''        
     }
 
     protected updateWeights_() : void {
@@ -432,6 +422,23 @@ export class Hypertree
         })
     }
 
+    public updateLayoutFull_() : void {
+        const t = this.args.geometry.transformation
+        console.log("_updateLayoutFull_", t.state.λ)        
+        const t0 = performance.now()        
+        this.args.layout.type(this.data, t.state.λ)            
+        this.layoutMeta = { Δ: performance.now()-t0 }
+    }
+
+    public updateLayoutPath_(preservingnode?:N) : void {
+        const t = this.args.geometry.transformation
+        console.log("_updateLayoutPath_", t.state.λ)        
+        const t0 = performance.now()        
+        preservingnode.ancestors().reverse().forEach(n=> this.args.layout.type(n, t.state.λ, true))
+        t.state.P = CmulR(preservingnode.layout.z, -1) // set preserving node back to .... zero? no, orig pos?
+        this.layoutMeta = { Δ: performance.now()-t0 }
+    }    
+
     public updateLayout_(preservingnode?:N) : void {
         console.log("_updateLayout", this.args.geometry.transformation.state.λ)
         
@@ -453,7 +460,28 @@ export class Hypertree
             
         this.layoutMeta = { Δ: performance.now()-t0 }
     }
+    /*
+    public updateLayout_(preservingnode?:N) : void {
+        const t = this.args.geometry.transformation
+        console.log("_updateLayout", t.state.λ)        
+        const t0 = performance.now()        
+        
+        preservingnode = preservingnode || t.cache.centerNode
 
+        if (preservingnode) {
+            preservingnode.ancestors().reverse().forEach(n=> {
+                this.args.layout.type(n, t.state.λ, true)    
+            })
+            t.state.P = CmulR(preservingnode.layout.z, -1) 
+        }
+        else {
+            this.args.layout.type(this.data, t.state.λ)
+            console.warn('no layout compensation')
+        }
+            
+        this.layoutMeta = { Δ: performance.now()-t0 }
+    }
+*/
     //########################################################################################################
     //##
     //## Path

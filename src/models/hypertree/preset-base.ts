@@ -39,13 +39,13 @@ const modelBase : ()=> HypertreeArgs = ()=>
                             fileName2IconUrl: ()=>null,
                             emojimap: {}
     },    
-    dataInitBFS:        (ht:Hypertree, n:N)=> {
+    dataInitBFS: (ht:Hypertree, n:N)=> {
         n.precalc.imageHref = undefined
         n.precalc.icon = undefined
         n.precalc.clickable = true
         n.precalc.cell = true        
     },    
-    langInitBFS:        (ht:Hypertree, n:N)=> {
+    langInitBFS: (ht:Hypertree, n:N)=> {
         n.precalc.label = undefined
         n.precalc.wiki = undefined
     },
@@ -160,7 +160,7 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
             type: layoutSpiral  
         },
         filter: {
-            weightFilter: null
+            //weightFilter: null
         }   
     }),
 

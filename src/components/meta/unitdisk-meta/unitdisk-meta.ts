@@ -186,10 +186,10 @@ function UnitdiskMeta_({ parent, ud, className })
 
     const sliderBindingω = {
         toView: (slider)=> {
-            slider.value = ud.view.hypertree.args.filter.magic            
+            slider.value = ud.view.hypertree.args.filter.weightFilter.magic            
         },
         fromView: (slider)=> {
-            ud.view.hypertree.args.filter.magic = slider.value
+            ud.view.hypertree.args.filter.weightFilter.magic = slider.value
             ud.view.hypertree.update.transformation()
         }
     }
@@ -229,7 +229,7 @@ function UnitdiskMeta_({ parent, ud, className })
     ui.updateλω = ()=> {
         var π = Math.PI
         rows.lambda.slider.querySelector('input').value = 1-ud.args.transformation.state.λ
-        rows.cullmaxw.slider.querySelector('input').value = ud.view.hypertree.args.filter.magic
+        rows.cullmaxw.slider.querySelector('input').value = ud.view.hypertree.args.filter.weightFilter.magic
     }
 
     ui.updateSvgInfo = ()=> {

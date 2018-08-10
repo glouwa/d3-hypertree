@@ -203,8 +203,7 @@ export class InteractionLayer2 implements ILayer
                 newλp < this.view.hypertree.args.interaction.λbounds[1] ) 
             {
                 //console.log('pinch ok', f, this.pinchInitλp, newλp)
-                const t = this.view.unitdisk.args.transformation
-                //const preservingNode = t.cache.centerNode
+                const t = this.view.unitdisk.args.transformation                
                 const preservingNode = this.findUnculledNodeByCell(this.pinchcenter)            
                 
                 const pinchcenter2 = CmulR(CaddC(t0e, t1e), .5)
