@@ -18,9 +18,9 @@ export class LayerStack
     d3meta
     
     public update = {
-        parent:         ()=> this.updateLayers(),
-        transformation: ()=> this.updateTransformation(),
-        pathes:         ()=> this.updatePath()
+        parent: ()=> this.updateLayers(),
+        data:   ()=> this.updateData(),
+        pathes: ()=> this.updatePath()
     }
 
     constructor(args: LayerStackArgs)
@@ -52,7 +52,7 @@ export class LayerStack
             this.layers[l].update.parent()
     }
 
-    private updateTransformation() {
+    private updateData() {
         const timings = []
         const names = []
 
@@ -70,7 +70,13 @@ export class LayerStack
 
     private updatePath() {
         var t0 = performance.now()
-        if (this.layers['path-arcs']) 
+        if (this.layers['link-arcs']) 
+            this.layers['link-arcs'].update.style()
+
+        if (this.layers['stem-arc']) 
+            this.layers['stem-arc'].update.style()
+
+        if (this.layers['path-arcs'])
             this.layers['path-arcs'].update.data()
 
         var t1 = performance.now()

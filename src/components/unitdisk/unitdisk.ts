@@ -72,15 +72,15 @@ export class UnitDisk implements IUnitDisk
 
     public update = {
         parent: ()=> this.updateParent(),
-        cache: ()=> this.args.cacheUpdate(this, this.cache), // gehört nicht hier her
-        data: ()=> this.update.layout(),
+        cache:  ()=> this.args.cacheUpdate(this, this.cache), // gehört nicht hier her
+        data:   ()=> this.update.layout(),
         layout: ()=> { 
             this.args.cacheUpdate(this, this.cache)
-            this.layerStack.update.transformation()  
+            this.layerStack.update.data()  
         },
         transformation: ()=> {
             this.args.cacheUpdate(this, this.cache)
-            this.layerStack.update.transformation()  
+            this.layerStack.update.data()  
         },
         pathes: ()=> {
             this.args.cacheUpdate(this, this.cache)
@@ -106,14 +106,7 @@ export class UnitDisk implements IUnitDisk
             //.x(d=> d.cache.re)
             //.y(d=> d.cache.im)
             .extent([[-2,-2], [2,2]])
-        
-            /*
-        if (this.args.cacheUpdate)
-            this.update.cache()
-        else
-            console.log('this.args.cacheUpdate is null, and called')
-            */
-
+       
         this.layerStack = new LayerStack({ 
             parent: this.mainsvg,
             unitdisk: this
@@ -251,23 +244,23 @@ export class UnitDiskNav implements IUnitDisk
             this.mainView.update.cache()
             this.navParameter.update.cache()
 
-            this.navBackground.layerStack.update.transformation() 
-            this.mainView.layerStack.update.transformation()
-            this.navParameter.layerStack.update.transformation()        
+            this.navBackground.layerStack.update.data() 
+            this.mainView.layerStack.update.data()
+            this.navParameter.layerStack.update.data()        
         },
         transformation: ()=> {
             this.mainView.update.cache()
             this.navParameter.update.cache()
 
-            this.mainView.layerStack.update.transformation()        
-            this.navParameter.layerStack.update.transformation()        
+            this.mainView.layerStack.update.data()        
+            this.navParameter.layerStack.update.data()        
             this.navBackground.layerStack.update.pathes()
         },
         pathes: ()=> {
             this.mainView.update.cache()
-            this.mainView.layerStack.update.transformation()
+            this.mainView.layerStack.update.data()
             this.navBackground.layerStack.update.pathes()
-            this.navParameter.layerStack.update.transformation() // wegen node hover
+            this.navParameter.layerStack.update.data() // wegen node hover
         }
     }
 }

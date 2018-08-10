@@ -31,7 +31,7 @@ export class LayerStackMeta
             parent: this.view.parent,            
             className: this.view.className,
             //onCheckChange: ()=> this.model.layerStack.updateLayers()
-            onCheckChange: ()=> this.model.layerStack.update.transformation()
+            onCheckChange: ()=> this.model.layerStack.update.data()
         })
 
         Object.keys(this.model.layerStack.layers).reverse().forEach(e=> 

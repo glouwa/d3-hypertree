@@ -136,29 +136,21 @@ export class HypertreeEx extends Hypertree
             unitdisk:       ()=> { this.updateUnitdiskView(); this.updateMetaView(); },
             meta:           ()=> this.updateMetaView(),
         },        
-        data:           ()=> this.requestAnimationFrameDummy(()=> {                            
+        data:           ()=> {
                             this.unitdisk.update.data()
                             this.hypertreeMeta.update.transformation()
                             this.hypertreeMeta.update.layout()
                             this.hypertreeMeta.update.model()
-                        }),        
-        langloader:     ()=> this.requestAnimationFrameDummy(()=> {                            
-                            this.hypertreeMeta.update.lang()
-                            this.update.data()
-                        }),        
-        layout:         ()=> this.requestAnimationFrameDummy(()=> {
+                        },        
+        transformation: ()=> {
                             this.unitdisk.update.transformation() 
                             this.hypertreeMeta.update.layout()
-                            this.hypertreeMeta.update.transformation()           
-                        }),
-        transformation: ()=> this.requestAnimationFrameDummy(()=> {
-                            this.unitdisk.update.transformation() 
                             this.hypertreeMeta.update.transformation()     
-                        }),
-        pathes:         ()=> this.requestAnimationFrameDummy(()=> {
+                        },
+        pathes:         ()=> {
                             this.unitdisk.update.pathes()
                             this.hypertreeMeta.update.transformation()     
-                        }),
+                        },
         centernode:     (centerNode)=> {
                             const pathStr = centerNode
                                 .ancestors()

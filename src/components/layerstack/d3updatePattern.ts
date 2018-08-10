@@ -36,48 +36,18 @@ export class D3UpdatePattern
         this.updateParent()
     }
 
-    private mayEval = d=> typeof d === 'function' ? d() : d
-
     private updateParent() {
         this.mainSvgGroup = this.args.parent.append('g')
             .attr('id', this.args.name)
             .attr('clip-path', (this.args.clip ? `url(${this.args.clip})` : undefined))
             .style('transform', 'translateZ(0)')
-            
-            // rotateZ(360deg)
-            // scale(1, 1)
-            // translateZ(0)
-            // translate3d(0,0,0)           
-            // -webkit-font-smoothing: antialiased;
 
-        /*
-        this.data = this.mayEval(this.args.data)
-        if (!this.data) 
-        {
-            this.elements =
-                this.mainSvgGroup
-                    .selectAll(this.args.elementType)    
-            return
-        }*/
-        this.elements =
-            this.mainSvgGroup
-                .selectAll(this.args.elementType)    
-                return
-        /*
         this.elements =
             this.mainSvgGroup
                 .selectAll(this.args.elementType)
-                    .data(this.data, (d:any)=> d.mergeId)
-                        .enter().append(this.args.elementType)
-
-        this.elements
-            .attr("class", this.args.className)
-            .call(this.args.create)            
-            .call(this.args.updateTransform)
-            .call(this.args.updateColor)
-        */
     }
     
+    private mayEval = d=> typeof d === 'function' ? d() : d
     private updateData() {
         this.data = []
         var isAnimating = this.args.layer.view.hypertree.isAnimationRunning()
@@ -109,7 +79,7 @@ export class D3UpdatePattern
         
 // extrashit
         if (this.args.name === 'labels-force' && true) this.addTextBackgroundRects()
-        if (this.args.name === 'labels' && true) this.addTextBackgroundRects()
+        if (this.args.name === 'labels' && true)       this.addTextBackgroundRects()
     }
 
     private addTextBackgroundRects()

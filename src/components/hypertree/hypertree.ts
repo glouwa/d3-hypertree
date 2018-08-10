@@ -97,7 +97,7 @@ export class Hypertree
             this.args = mergeDeep(base, model)
             console.log('merge result: ', this.args)
 
-            // wenn parent updatedated hat wraum ist da nich eine alte transformations in der disk
+            // wenn parent updatedated hat wraum ist da nich eine alte transformations in der disk            
             this.update.view.parent()
             this.api.setDataloader(ok, err, this.args.dataloader) // resetData is hier drin 🤔 
             this.api.setLangloader(ok, err, this.args.langloader)
@@ -110,8 +110,8 @@ export class Hypertree
             this.args.langloader((langMap, t1, dl)=> {
                 console.group("langloader")
                 this.langMap = langMap || {}
-                this.updateLang_(dl)
-                this.update.langloader()
+                this.updateLang_(dl)                
+                this.update.data()
                 console.groupEnd()
                 
                 if (this.data) ok()
@@ -140,8 +140,10 @@ export class Hypertree
         //addPath: (pathid, node:N)=> { this.addPath(pathid, node) },
         //removePath: (pathid, node:N)=> { this.removePath(pathid, node) },
         setPathHead: (pathType:Path, n:N)=> {
-            this.setPathHead(pathType, n)
-            this.update.pathes()
+            if (!this.isAnimationRunning()) {
+                this.setPathHead(pathType, n)
+                this.update.pathes()
+            }
         },
         selectQuery: (query:string, prop:string)=> {
             const lq = query ? query.toLowerCase() : null
@@ -162,7 +164,7 @@ export class Hypertree
                         if (n.precalc.label.toLowerCase().includes(lq))
                         this.addPath('Query', n)
                 }
-            })            
+            })
             this.update.pathes()
         },
         gotoHome: ()=>     this.animateTo(()=>{}, ()=>{}, { re:0, im:0 }, null), 
@@ -174,18 +176,15 @@ export class Hypertree
     /*
     * this functions assume the model/view (this class internal state)
     * has changes, and call the according ui updates (animatin frames)
-    */
-    requestAnimationFrameDummy = f=>f()
+    */    
     public update = {
         view: {
-            parent:         ()=> this.updateParent(),
-            unitdisk:       ()=> this.updateUnitdiskView(),
+            parent:     ()=> this.updateParent(),
+            unitdisk:   ()=> this.updateUnitdiskView(),
         },        
-        data:           ()=> this.requestAnimationFrameDummy(()=> this.unitdisk.update.data()),        
-        langloader:     ()=> this.requestAnimationFrameDummy(()=> this.update.data()),        
-        layout:         ()=> this.requestAnimationFrameDummy(()=> this.unitdisk.update.transformation()),
-        transformation: ()=> this.requestAnimationFrameDummy(()=> this.unitdisk.update.transformation()),
-        pathes:         ()=> this.requestAnimationFrameDummy(()=> this.unitdisk.update.pathes()),
+        data:           ()=> this.unitdisk.update.data(),        
+        transformation: ()=> this.unitdisk.update.transformation(),
+        pathes:         ()=> this.unitdisk.update.pathes(),
         centernode:     (centerNode)=> {}
     }
 
@@ -249,7 +248,7 @@ export class Hypertree
         this.unitdisk.args.data = undefined
         this.data = undefined 
         this.langMap = undefined
-
+        
         this.args.geometry.transformation.state.λ = .001
         this.args.geometry.transformation.state.P.re = 0
         this.args.geometry.transformation.state.P.im = 0        
@@ -268,7 +267,7 @@ export class Hypertree
         console.log("_initData")
         var t2 = performance.now()
         var ncount = 1
-        globelhtid++
+        globelhtid++        
         this.data = <N & d3.HierarchyNode<N>>d3
             .hierarchy(d3h)
             .each((n:any)=> {
@@ -279,7 +278,7 @@ export class Hypertree
                 n.pathes = {}
                 n.layout = null
                 n.layoutReference = null                
-            })
+            })        
         this.unitdisk.args.data = this.data
         this.args.geometry.transformation.cache.N = this.data.descendants().length
 
@@ -308,6 +307,7 @@ export class Hypertree
         if (this.args.iconmap)
             this.data.each(n=> n.precalc.imageHref = this.args.iconmap.fileName2IconUrl(n.data.name, n.data.type))
         */
+        
         this.modelMeta = { 
             Δ: [t1-t0, t2-t1, t3-t2, performance.now()-t3], 
             filesize: dl,
@@ -325,7 +325,7 @@ export class Hypertree
         
         // hmm, wird niergens mitgemessen :(
         this.findInitλ_()
-
+        
         this.view_.html.querySelector('.preloader').innerHTML = ''        
     }
 
@@ -389,9 +389,9 @@ export class Hypertree
             }
         }
         this.data.each((n:N)=> n.layoutReference = clone(n.layout))                
-
+        
         console.groupEnd()
-        console.info('auto λ = ', this.args.geometry.transformation.state.λ)        
+        console.info('auto λ = ', this.args.geometry.transformation.state.λ)
     }
 
     //########################################################################################################
@@ -422,20 +422,10 @@ export class Hypertree
         })
     }
 
-    /*
-    public updateLayoutFull_() : void {
-        const t = this.args.geometry.transformation
-        console.log("_updateLayoutFull_", t.state.λ)        
-        const t0 = performance.now()        
-
-        this.args.layout.type(this.data, t.state.λ)            
-
-        this.layoutMeta = { Δ: performance.now()-t0 }
-    }*/    
-
-    public updateLayoutPath_(preservingnode?:N) : void {
+    public updateLayoutPath_(preservingnode:N) : void {
         const t = this.args.geometry.transformation
         console.log("_updateLayoutPath_", t.state.λ)        
+        console.assert(preservingnode)
         const t0 = performance.now()        
 
         preservingnode.ancestors().reverse().forEach(n=> this.args.layout.type(n, t.state.λ, true))
@@ -444,50 +434,6 @@ export class Hypertree
         this.layoutMeta = { Δ: performance.now()-t0 }
     }    
 
-    /*
-    public updateLayout_(preservingnode?:N) : void {
-        console.log("_updateLayout", this.args.geometry.transformation.state.λ)
-        
-        const t0 = performance.now()        
-        const t = this.args.geometry.transformation
-        //preservingnode = preservingnode || t.cache.centerNode
-
-        if (preservingnode) {
-            preservingnode.ancestors().reverse().forEach(n=> {
-                this.args.layout.type(n, this.args.geometry.transformation.state.λ, true)    
-            })
-            t.state.P = CmulR(preservingnode.layout.z, -1) 
-        }
-        else {
-            this.args.layout.type(this.data, this.args.geometry.transformation.state.λ)
-            console.warn('no layout compensation')
-        }
-    
-        this.layoutMeta = { Δ: performance.now()-t0 }
-    }
-    */
-    /*
-    public updateLayout_(preservingnode?:N) : void {
-        const t = this.args.geometry.transformation
-        console.log("_updateLayout", t.state.λ)        
-        const t0 = performance.now()        
-        
-        preservingnode = preservingnode || t.cache.centerNode
-
-        if (preservingnode) {
-            preservingnode.ancestors().reverse().forEach(n=> {
-                this.args.layout.type(n, t.state.λ, true)    
-            })
-            t.state.P = CmulR(preservingnode.layout.z, -1) 
-        }
-        else {
-            this.args.layout.type(this.data, t.state.λ)
-            console.warn('no layout compensation')
-        }
-            
-        this.layoutMeta = { Δ: performance.now()-t0 }
-    }
-*/
     //########################################################################################################
     //##
     //## Path
@@ -533,8 +479,8 @@ export class Hypertree
     protected addPath(pathType:string, n:N) {
         const plidx = stringhash(n.precalc.label)
         const color = ({
-            'HoverPath':'none', 
-            'Query':googlePalette(1) 
+            'HoverPath': 'none', 
+            'Query': googlePalette(1) 
         })[pathType] || googlePalette(plidx) || 'red'
 
         const newpath:Path = {
@@ -625,7 +571,7 @@ export class Hypertree
                 const λ = newλ + waydone
                 this.args.geometry.transformation.state.λ = λ
                 this.updateLayoutPath_(this.args.geometry.transformation.cache.centerNode)              
-                this.update.layout()
+                this.update.transformation()
             }            
         })
     }

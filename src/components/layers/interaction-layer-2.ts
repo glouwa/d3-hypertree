@@ -116,7 +116,7 @@ export class InteractionLayer2 implements ILayer
                 this.view.hypertree.updateLayoutPath_(preservingNode) // only path to center
                 t.state.P = compose(t.state, shift(t.state, { re:0, im:0 }, preservingNode.cache)).P
                 
-                this.view.hypertree.update.layout()
+                this.view.hypertree.update.transformation()
             })
             //this.view.layerstack.layers['labels-force'].update.force()   
         }
@@ -137,7 +137,7 @@ export class InteractionLayer2 implements ILayer
         }
         requestAnimationFrame(()=> {
             if (changedTouches.length === 2)
-                this.view.hypertree.update.layout()
+                this.view.hypertree.update.transformation()
             else
                 this.view.hypertree.update.transformation()
         })
