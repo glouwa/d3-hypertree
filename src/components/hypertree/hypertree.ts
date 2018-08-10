@@ -378,7 +378,7 @@ export class Hypertree
             const λ = .02 + sigmoid(progress01) * .75
             //console.log('#'+progress01, λ)
             this.args.geometry.transformation.state.λ = λ
-            this.updateLayout_()                
+            this.updateLayoutPath_(this.data)
             this.unitdisk.args.cacheUpdate(this.unitdisk, this.unitdisk.cache)
             const unculledNodes = this.args.geometry.transformation.cache.unculledNodes
             const maxR = unculledNodes.reduce((max, n)=> Math.max(max, n.layout.zp.r), 0)           
@@ -422,44 +422,50 @@ export class Hypertree
         })
     }
 
+    /*
     public updateLayoutFull_() : void {
         const t = this.args.geometry.transformation
         console.log("_updateLayoutFull_", t.state.λ)        
         const t0 = performance.now()        
+
         this.args.layout.type(this.data, t.state.λ)            
+
         this.layoutMeta = { Δ: performance.now()-t0 }
-    }
+    }*/    
 
     public updateLayoutPath_(preservingnode?:N) : void {
         const t = this.args.geometry.transformation
         console.log("_updateLayoutPath_", t.state.λ)        
         const t0 = performance.now()        
+
         preservingnode.ancestors().reverse().forEach(n=> this.args.layout.type(n, t.state.λ, true))
         t.state.P = CmulR(preservingnode.layout.z, -1) // set preserving node back to .... zero? no, orig pos?
+
         this.layoutMeta = { Δ: performance.now()-t0 }
     }    
 
+    /*
     public updateLayout_(preservingnode?:N) : void {
         console.log("_updateLayout", this.args.geometry.transformation.state.λ)
         
         const t0 = performance.now()        
         const t = this.args.geometry.transformation
-        preservingnode = preservingnode || t.cache.centerNode
+        //preservingnode = preservingnode || t.cache.centerNode
 
-        if (preservingnode)
+        if (preservingnode) {
             preservingnode.ancestors().reverse().forEach(n=> {
                 this.args.layout.type(n, this.args.geometry.transformation.state.λ, true)    
             })
-        else
-            this.args.layout.type(this.data, this.args.geometry.transformation.state.λ)
-               
-        if (preservingnode) 
             t.state.P = CmulR(preservingnode.layout.z, -1) 
-        else
+        }
+        else {
+            this.args.layout.type(this.data, this.args.geometry.transformation.state.λ)
             console.warn('no layout compensation')
-            
+        }
+    
         this.layoutMeta = { Δ: performance.now()-t0 }
     }
+    */
     /*
     public updateLayout_(preservingnode?:N) : void {
         const t = this.args.geometry.transformation
@@ -618,7 +624,7 @@ export class Hypertree
                 const waydone = way * waydone01
                 const λ = newλ + waydone
                 this.args.geometry.transformation.state.λ = λ
-                this.updateLayout_()                
+                this.updateLayoutPath_(this.args.geometry.transformation.cache.centerNode)              
                 this.update.layout()
             }            
         })

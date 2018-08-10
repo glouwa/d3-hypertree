@@ -82,6 +82,7 @@ function collectNodesByWeight(ud:IUnitDisk, cache:TransformationCache, path:N[])
     cache.unculledNodes = []    
     cache.spezialNodes =  [ud.args.data, startNode].filter(e=> e)
     cache.emojis =        []
+    cache.cells =         []
   
     const mf = ud.view.hypertree.isAnimationRunning() ? 1:1
     function abortfilter(n, idx, highway) { // return false to abort
@@ -104,6 +105,8 @@ function collectNodesByWeight(ud:IUnitDisk, cache:TransformationCache, path:N[])
         // root ist nicht in uncullednodes! (gut)
     }
     
+    // centernode will be set at this point
+
     // select visible nodes - alle anderen (von startnode bis abortfilter)
     dfs2({
         node:        startNode,
@@ -137,7 +140,7 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
     // constants 
     const t0 =   performance.now()   
     const path = pathToLastVisible(ud, cache)
-    const t1 =   collectNodesByWeight(ud, cache, path)
+    const t1 =   collectNodesByWeight(ud, cache, path) // also updates centernode
     const t2 =   performance.now()
 
     // add pathes to unculled nodes    
@@ -169,6 +172,9 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
     if (!ud.view.hypertree.isAnimationRunning())
         doImageStuff(ud, cache)
     
+    if (cache.centerNode)         
+        ud.view.hypertree.update.centernode(cache.centerNode)   
+
     // only for meta view
     ud.cacheMeta = {
         minWeight: path.map(n=> n.precalc.cullingWeight / ud.view.hypertree.args.filter.weightFilter.magic),

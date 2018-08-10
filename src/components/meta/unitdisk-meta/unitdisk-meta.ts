@@ -165,7 +165,7 @@ function hypertreeMeta2_({ parent, ud, className })
 }
 */
 
-var π = Math.PI     
+var π = Math.PI
 
 function UnitdiskMeta_({ parent, ud, className })
 {
@@ -179,7 +179,7 @@ function UnitdiskMeta_({ parent, ud, className })
         },
         fromView: (slider)=> {            
             ud.args.transformation.state.λ = 1-slider.value
-            ud.view.hypertree.updateLayout_() // evr called? 
+            ud.view.hypertree.updateLayoutPath_(ud.args.transformation.cache.centerNode)
             ud.view.hypertree.update.layout()
         }
     }

@@ -47,11 +47,23 @@ export class D3UpdatePattern
             // rotateZ(360deg)
             // scale(1, 1)
             // translateZ(0)
-            // translate3d(0,0,0)
+            // translate3d(0,0,0)           
             // -webkit-font-smoothing: antialiased;
 
+        /*
         this.data = this.mayEval(this.args.data)
-        console.assert(this.data)
+        if (!this.data) 
+        {
+            this.elements =
+                this.mainSvgGroup
+                    .selectAll(this.args.elementType)    
+            return
+        }*/
+        this.elements =
+            this.mainSvgGroup
+                .selectAll(this.args.elementType)    
+                return
+        /*
         this.elements =
             this.mainSvgGroup
                 .selectAll(this.args.elementType)
@@ -63,48 +75,46 @@ export class D3UpdatePattern
             .call(this.args.create)            
             .call(this.args.updateTransform)
             .call(this.args.updateColor)
+        */
     }
     
     private updateData() {
         this.data = []
         var isAnimating = this.args.layer.view.hypertree.isAnimationRunning()
-        if (!isAnimating && !this.args.layer.args.invisible)
+        if ((!isAnimating && !this.args.layer.args.invisible) ||
+             (isAnimating && !this.args.layer.args.hideOnDrag)) 
+        {
             this.data = this.mayEval(this.args.data)
-        if (isAnimating && !this.args.layer.args.hideOnDrag)
-            this.data = this.mayEval(this.args.data)
+        }
+        
+        this.elements = this.elements.data(this.data, d=> d && d.mergeId)
+        const removedElements = this.elements
+            .exit()
+                /*.transition()
+                .duration(1000)
+                .attr("fill-opacity", 0)
+                .attr("stroke-opacity", 0)*/            
+                .remove()
 
-        this.elements = this.elements.data(this.data, d=> d.mergeId)
-
-        this.elements.exit()
-            /*.transition()
-            .duration(1000)
-            .attr("fill-opacity", 0)
-            .attr("stroke-opacity", 0)*/
-            .remove()
-        var newElements = this.elements.enter().append(this.args.elementType)
+        const newElements = this.elements
+            .enter().append(this.args.elementType)
                 .attr("class", this.args.className)
                 .call(this.args.create)
 
-        this.elements = this.elements.merge(newElements)
-        this.elements
-            //.call(this.all)
-            .call(this.args.updateTransform)
-            .call(this.args.updateColor)
+        this.elements = this.elements
+            .merge(newElements)
+                //.call(this.all)
+                .call(this.args.updateTransform)
+                .call(this.args.updateColor)
         
 // extrashit
-        if (this.args.name === 'labels-force' &&
-            true)
-            this.addTextBackgroundRects()
-
-        if (this.args.name === 'labels' &&
-            true)
-            this.addTextBackgroundRects()
+        if (this.args.name === 'labels-force' && true) this.addTextBackgroundRects()
+        if (this.args.name === 'labels' && true) this.addTextBackgroundRects()
     }
 
     private addTextBackgroundRects()
     { 
         this.mainSvgGroup.selectAll('rect').remove()
-
         var svgRootHere = this.mainSvgGroup
         var T = this
         

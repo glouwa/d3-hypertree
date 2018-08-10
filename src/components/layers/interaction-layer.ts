@@ -185,7 +185,7 @@ export class InteractionLayer implements ILayer
 
     private onDragλ = (l:number)=> {
         this.view.unitdisk.args.transformation.onDragλ(l)
-        this.view.hypertree.updateLayout_() // hmmm?
+        this.view.hypertree.updateLayoutPath_(this.view.unitdisk.args.transformation.cache.centerNode) // hmmm?
         this.view.hypertree.update.layout()
     }
 

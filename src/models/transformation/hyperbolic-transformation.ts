@@ -98,7 +98,7 @@ export class NegTransformation implements Transformation<N>
 export class TransformationCache
 {
     N:              number    
-    focusR:      number
+    focusR:         number
     centerNode:     N
     unculledNodes:  N[]
     links:          N[]
@@ -111,6 +111,6 @@ export class TransformationCache
     images:         N[]
         
     voronoiDiagram: d3.VoronoiDiagram<N>    
-    cells:          d3.VoronoiPolygon<N>[]
+    cells:          d3.VoronoiPolygon<N>[] = []
 }
 

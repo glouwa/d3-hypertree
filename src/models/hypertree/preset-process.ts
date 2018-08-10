@@ -20,13 +20,12 @@ export function doVoronoiStuff(ud:IUnitDisk, cache:TransformationCache) {
                 || e.data.isPartOfAnySelectionPath*/
         //    )
 
-    updateCenterNodeStuff(ud, cache)
-}
+    //updateCenterNodeStuff(ud, cache)
 
-export function updateCenterNodeStuff(ud:IUnitDisk, cache:TransformationCache) 
-{
-    if (cache.centerNode)         
-        ud.view.hypertree.update.centernode(cache.centerNode)    
+    if (cache.cells.length)
+        console.log('UPDATEING VORO')
+    else
+        console.log('RESEETING VORO')
 }
 
 /*

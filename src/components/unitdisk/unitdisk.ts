@@ -85,10 +85,12 @@ export class UnitDisk implements IUnitDisk
         pathes: ()=> {
             this.args.cacheUpdate(this, this.cache)
             this.layerStack.update.pathes()  
+            //this.layerStack.update.transformation()            
         }
     }
 
-    private updateParent() {        
+    private updateParent() {      
+        console.log('UPDATEING UNITDISK PARENT')  
         this.mainsvg = d3.select(this.view.parent).append('g')
             .attr('class', this.view.className)
             .attr('transform', this.view.position)
@@ -105,10 +107,12 @@ export class UnitDisk implements IUnitDisk
             //.y(d=> d.cache.im)
             .extent([[-2,-2], [2,2]])
         
+            /*
         if (this.args.cacheUpdate)
             this.update.cache()
         else
             console.log('this.args.cacheUpdate is null, and called')
+            */
 
         this.layerStack = new LayerStack({ 
             parent: this.mainsvg,

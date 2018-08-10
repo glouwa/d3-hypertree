@@ -32,6 +32,7 @@ export class LayerStack
 
     private updateLayers() : void
     {
+        console.log('UPATEING LAYERSTACK')
         this.layers = {}
         for (var layerfactoryfunc of this.args.unitdisk.args.layers) {
             const view = {
