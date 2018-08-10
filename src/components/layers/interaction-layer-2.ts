@@ -50,10 +50,12 @@ export class InteractionLayer2 implements ILayer
                 .attr('class',      'mouse-circle')
                 .attr('r',          1.5)                
                 .on('wheel',        e=> this.fireMouseWheelEvent())
+
                 .on('mousedown',    e=> this.fireMouseDown())
                 .on('mousemove',    e=> this.fireMouseMove())
                 .on('mouseup',      e=> this.fireMouseUp())
                 .on('mouseout',     e=> this.htapi.setPathHead(this.hoverpath, undefined))                
+                
                 .on('touchstart',   e=> this.fireTouchEvent('onPointerStart'))
                 .on('touchmove',    e=> this.fireTouchEvent('onPointerMove'))
                 .on('touchend',     e=> this.fireTouchEvent('onPointerEnd'))
@@ -154,6 +156,7 @@ export class InteractionLayer2 implements ILayer
     private pinchInitλp:number   = null
     private nopinch:boolean      = null
     private pinchcenter:C        = null
+    private pinchPreservingNode  = null
     private onPointerStart(pid, m) 
     {
         this.view.hypertree.args.objects.traces.push({
@@ -174,6 +177,7 @@ export class InteractionLayer2 implements ILayer
             this.pinchInitλp = this.view.unitdisk.args.transformation.state.λ
             this.nopinch = false
             this.pinchcenter = CmulR(CaddC(t0e, m), .5)
+            this.pinchPreservingNode = this.findUnculledNodeByCell(this.pinchcenter)            
             //console.log('pan --> pinch')
         }
         else {
@@ -202,15 +206,12 @@ export class InteractionLayer2 implements ILayer
             if (newλp > this.view.hypertree.args.interaction.λbounds[0] &&
                 newλp < this.view.hypertree.args.interaction.λbounds[1] ) 
             {
-                //console.log('pinch ok', f, this.pinchInitλp, newλp)
-                const t = this.view.unitdisk.args.transformation                
-                const preservingNode = this.findUnculledNodeByCell(this.pinchcenter)            
-                
                 const pinchcenter2 = CmulR(CaddC(t0e, t1e), .5)
 
+                const t = this.view.unitdisk.args.transformation                
                 t.onDragλ(newλp)
-                this.view.hypertree.updateLayoutPath_(preservingNode) // only path to center
-                t.state.P = compose(t.state, shift(t.state, { re:0, im:0 }, preservingNode.cache )).P
+                this.view.hypertree.updateLayoutPath_(this.pinchPreservingNode) // only path to center
+                t.state.P = compose(t.state, shift(t.state, { re:0, im:0 }, this.pinchPreservingNode.cache )).P
                 t.state.P = compose(t.state, shift(t.state, this.pinchcenter, pinchcenter2)).P
 
                 this.pinchcenter = CmulR(CaddC(this.pinchcenter, pinchcenter2), .5)
@@ -230,6 +231,7 @@ export class InteractionLayer2 implements ILayer
             = this.view.hypertree.args.objects.traces.filter(e=> e.id !== pid)
         
         this.pinchcenter = undefined
+        this.pinchPreservingNode = undefined
         this.view.unitdisk.pinchcenter = this.pinchcenter
 
         if (this.view.hypertree.args.objects.traces.length === 0) 

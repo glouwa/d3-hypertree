@@ -4,24 +4,11 @@ import { TransformationCache }      from "../transformation/hyperbolic-transform
 
 export function doVoronoiStuff(ud:IUnitDisk, cache:TransformationCache) {    
     //voro muss mindestens clickable enthalten für mousetonode bei click
-
     cache.voronoiDiagram = ud.voronoiLayout(
-        cache.unculledNodes.filter((n:N)=> n.precalc.clickable || n.data.idx)
-        //cache.labels
-        /*.filter(n=> 
-            (n.cachep.r <= ud.cache.wikiR && n.precalc.label.startsWith('𝐖')) ||
-            (n.data && n.data.name == 'carnivora') 
-        )*/
-    )
-    //cache.voronoiDiagram = ud.voronoiLayout(cache.unculledNodes)
+        cache.unculledNodes.filter((n:N)=> n.precalc.clickable)      
+    )    
     cache.cells = cache.voronoiDiagram.polygons()
-        //.filter(e=> ud.args.nodeFilter(e.data)
-                /*|| e.data.isPartOfAnyHoverPath 
-                || e.data.isPartOfAnySelectionPath*/
-        //    )
-
-    //updateCenterNodeStuff(ud, cache)
-
+    
     if (cache.cells.length)
         console.log('UPDATEING VORO')
     else

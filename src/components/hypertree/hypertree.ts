@@ -82,7 +82,7 @@ export class Hypertree
         this.initPromise = this.api.setModel(args)
         console.groupEnd()
     }
-
+ 
     /*
     * this functions modyfy model/view (this class internal state)
     * and call the according update function(s)
@@ -130,9 +130,9 @@ export class Hypertree
                 console.groupEnd()
 
                 if (this.langMap) ok()
-            })            
+            })
             console.groupEnd()
-        },       
+        },
         toggleSelection: (n:N)=> {
             this.toggleSelection(n)
             this.update.pathes()
@@ -306,14 +306,12 @@ export class Hypertree
         /*
         if (this.args.iconmap)
             this.data.each(n=> n.precalc.imageHref = this.args.iconmap.fileName2IconUrl(n.data.name, n.data.type))
-        */
-        
+        */        
         this.modelMeta = { 
             Δ: [t1-t0, t2-t1, t3-t2, performance.now()-t3], 
             filesize: dl,
             nodecount: ncount-1
         }
-
         // von rest trennen, da lang alleine benötigt wird
         // langInitBFS:
         // - lang
@@ -325,6 +323,7 @@ export class Hypertree
         
         // hmm, wird niergens mitgemessen :(
         this.findInitλ_()
+        this.data.isInitialized = true
         
         this.view_.html.querySelector('.preloader').innerHTML = ''        
     }
