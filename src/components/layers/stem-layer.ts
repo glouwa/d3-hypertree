@@ -17,6 +17,7 @@ export interface StemLayerArgs extends ILayerArgs
     nodePos:    (n:N)=> C,
     nodePosStr: (n:N)=> string,
     classed:    (s,w)=> void,
+    classed2:   (s,w)=> void,
     width,
     clip?:      string,
 }
@@ -82,11 +83,11 @@ export class StemLayer implements ILayer
             layer:             this,
             clip:              this.args.clip,
             data:              ()=> this.view.hypertree.data?[this.view.hypertree.data]:[],
-            name:              'stem-path',
+            name:              'stem-path hovered-path',
             className:         this.args.className,
             elementType:       straincurvature === 'l' ? 'line' : 'path',
             create:            s=> {},
-            updateColor:       s=> this.args.classed(s, this.args.width),
+            updateColor:       s=> this.args.classed2(s, this.args.width),
             updateTransform:   s=> {                
                 if (straincurvature === 'l')
                     s.attr('x1',             d=> this.args.nodePos(d).re)

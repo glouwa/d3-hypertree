@@ -152,7 +152,7 @@ export const layerSrc = [
                          .classed("hovered",   d=> d.pathes && d.pathes.isPartOfAnyHoverPath)
                          .classed("selected",  d=> d.pathes && d.pathes.isPartOfAnySelectionPath)                         
                          .style("stroke",      d=> d.pathes && d.pathes.finalcolor)
-                         .attr("stroke-width", d=> w(d))
+                         //.attr("stroke-width", d=> w(d))
     }),
     (v, ud:UnitDisk)=> new StemLayer(v, {
         invisible:  false,
@@ -164,12 +164,19 @@ export const layerSrc = [
         data:       ()=> [],
         nodePos:    n=> n.cache,
         nodePosStr: n=> n.strCache,
-        width:      d=> ud.args.linkWidth(d),
+        width:      d=> ud.args.linkWidth(d) + .001,
         classed:    (s, w)=> s
                          .classed("hovered",   d=> d.pathes && d.pathes.isPartOfAnyHoverPath)
-                         .classed("selected",  d=> d.pathes && d.pathes.isPartOfAnySelectionPath)                         
+                         .classed("selected",  d=> d.pathes && d.pathes.isPartOfAnySelectionPath)
                          .style("stroke",      d=> d.pathes && d.pathes.finalcolor)
-                         .attr("stroke-width", d=> w(d))
+                         .attr("stroke-width", d=> w(d)), 
+        classed2:   (s, w)=> s
+                         .classed("hovered-path",  d=> d.pathes && d.pathes.isPartOfAnyHoverPath)
+                         .classed("selected-path", d=> d.pathes && d.pathes.isPartOfAnySelectionPath)
+                         .style("stroke",          d=> d.pathes && d.pathes.finalcolor)
+                         .attr("stroke-width", d=> w(d) + 
+                            (((d.pathes && d.pathes.isPartOfAnySelectionPath) || 
+                              (d.pathes && d.pathes.isPartOfAnyHoverPath)) ? .015 : 0)), 
     }),
     (v, ud:UnitDisk)=> new NodeLayer(v, {        
         invisible:  false,
