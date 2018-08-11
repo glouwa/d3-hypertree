@@ -48,7 +48,7 @@ export class InteractionLayer2 implements ILayer
         if (!this.args.nohover) 
             this.view.parent.append('circle')
                 .attr('class',      'mouse-circle')
-                .attr('r',          1.5)                
+                .attr('r',          5)                
                 .on('wheel',        e=> this.fireMouseWheelEvent())
 
                 .on('mousedown',    e=> this.fireMouseDown())
@@ -166,8 +166,11 @@ export class InteractionLayer2 implements ILayer
     private pinchcenter:C        = null
     private pinchPreservingNode  = null
 
-    private onPointerStart(pid, m) 
-    {
+    private onPointerStart(pid, m:C) 
+    {   
+        if (CktoCp(m).r > this.view.hypertree.args.interaction.mouseRadius)
+            return
+
         this.view.hypertree.args.objects.traces.push({
             id: pid,
             points: [m]

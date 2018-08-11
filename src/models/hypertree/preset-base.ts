@@ -219,7 +219,7 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
             },            
             interaction: {
                 //onNodeSelect: s=> { console.log('###########', s) },
-                λbounds: [1/5, .5],
+                λbounds: [1/5, .75],
             },
             dataInitBFS: (ht:Hypertree, n:N)=> {            
                 const id = n.data.name                
