@@ -98,10 +98,7 @@ $nodeStroke:    #90caf9;
             stroke: #fff;
             stroke-width: .005;
             opacity: .125;            
-        }
-        .mouse-circle {
-            fill: none;
-        }
+        }        
         .focus-circle {        
             fill:none;
             stroke: darken($nodeStroke, 25%);
@@ -142,11 +139,7 @@ $nodeStroke:    #90caf9;
             .background-circle {                
                 fill: none;
                 stroke: none;
-            }
-            .mouse-circle {
-                fill: none;
-                stroke: none; //$nodeStroke;                
-            }
+            }            
         }
 
         .nav-background-disc {

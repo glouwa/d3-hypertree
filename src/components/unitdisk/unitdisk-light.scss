@@ -106,9 +106,6 @@ $nodeStroke:    #90caf9;
         .background-circle {
             fill-opacity: .5;
         }
-        .mouse-circle {
-            fill: none;
-        }
         .focus-circle {        
             fill:none;
             stroke: darken($nodeStroke, 25%);
@@ -147,10 +144,6 @@ $nodeStroke:    #90caf9;
             .background-circle {                
                 fill: none;
                 stroke: none;
-            }
-            .mouse-circle {
-                fill: none;
-                stroke: none; //$nodeStroke;                
             }
         }
 

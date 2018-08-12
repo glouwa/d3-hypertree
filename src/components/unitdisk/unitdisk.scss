@@ -74,8 +74,13 @@
             pointer-events: none;
         }
         .mouse-circle {
-            pointer-events:visibleFill;            
-            //touch-action:  pan-x pan-y pinch-zoom;
+            pointer-events: visibleFill;
+            fill: none;
+            //cursor: crosshair;
+        }
+        .mouse-circle-cursor {
+            pointer-events: visibleFill;
+            fill: none;
             cursor: crosshair;
         }
         .focus-circle {        
@@ -86,11 +91,11 @@
             pointer-events:none;            
         }
         .trace-polyline {              
-            opacity: .8;            
+            opacity: .8;
             stroke: orange; //#8d6e63;            
             stroke-width: .03;
             stroke-linecap: round;
-            stroke-linejoin: round;            
+            stroke-linejoin: round;
             fill:none;
             pointer-events:none;
         }

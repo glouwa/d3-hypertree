@@ -110,7 +110,7 @@ export class Hypertree
             this.args.langloader((langMap, t1, dl)=> {
                 console.group("langloader", langMap && langMap.length)
                 this.langMap = langMap || {}
-                this.updateLang_(dl)                
+                this.updateLang_(dl)
                 this.update.data()
                 console.groupEnd()
                 

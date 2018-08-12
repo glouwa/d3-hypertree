@@ -4,7 +4,7 @@ import { ILayerView }             from '../layerstack/layer'
 import { ILayerArgs }             from '../layerstack/layer'
 import { LayerStack }             from '../layerstack/layerstack'
 import { N }                      from '../../models/n/n'
-import { C, Cp }                  from '../../models/transformation/hyperbolic-math'
+import { C, Cp, maxR }            from '../../models/transformation/hyperbolic-math'
 import { CptoCk, CktoCp, ArrtoC } from '../../models/transformation/hyperbolic-math'
 import { CaddC, CsubC, CmulR }    from '../../models/transformation/hyperbolic-math'
 import { πify, sigmoid }          from '../../models/transformation/hyperbolic-math'
@@ -43,10 +43,9 @@ export class InteractionLayer2 implements ILayer
         style:          ()=> {}
     }
     
-    private updateParent() {            
-        this.view.parent.append('circle')
-            .attr('class',      'mouse-circle')
-            .attr('r',          5)                
+    private updateParent() {     
+        
+        const mousehandlers = de=> de
             .on('wheel',        e=> this.fireMouseWheelEvent())
 
             .on('mousedown',    e=> this.fireMouseDown())
@@ -58,6 +57,18 @@ export class InteractionLayer2 implements ILayer
             .on('touchmove',    e=> this.fireTouchEvent('onPointerMove'))
             .on('touchend',     e=> this.fireTouchEvent('onPointerEnd'))
             .on('touchcancel',  e=> this.fireTouchEvent('onPointerEnd'))
+        
+        this.view.parent
+            .append('circle')
+                .attr('class',      'mouse-circle')
+                .attr('r',          5)
+                .call(              mousehandlers)
+        
+        this.view.parent
+            .append('circle')
+                .attr('class',      'mouse-circle-cursor')
+                .attr('r',          this.args.mouseRadius)
+                .call(              mousehandlers)
     }
 
     // just to keep the list above clear
@@ -67,13 +78,11 @@ export class InteractionLayer2 implements ILayer
         this.fireMouseEvent('onPointerStart')
     }
     
-    private fireMouseMove() {
-        
+    private fireMouseMove() {        
         if (this.mousedown)
             this.fireMouseEvent('onPointerMove')                    
-        else {
-            this.htapi.setPathHead(this.hoverpath, this.findNodeByCell())
-        }
+        else 
+            this.htapi.setPathHead(this.hoverpath, this.findNodeByCell())        
     }
 
     private fireMouseUp() {
@@ -106,7 +115,7 @@ export class InteractionLayer2 implements ILayer
         
         if (newλp > this.view.hypertree.args.interaction.λbounds[0] &&
             newλp < this.view.hypertree.args.interaction.λbounds[1]) 
-        {            
+        {
             const m = this.currMousePosAsArr()
             
             requestAnimationFrame(()=> {
@@ -150,12 +159,18 @@ export class InteractionLayer2 implements ILayer
     //PinchState
     private dragState: {
         panStart:            C
+        onPointerStart,
+        onPointerMove,
+        onPointerEnd
     }
-    private pinchState : {        
+    private pinchState : {
         pinchInitDist:       number,
         pinchInitλp:         number,
         pinchcenter:         C,
         pinchPreservingNode: N
+        onPointerStart,
+        onPointerMove,
+        onPointerEnd
     }
     private panStart:C           = null
     private pinchInitDist:number = null
@@ -165,8 +180,8 @@ export class InteractionLayer2 implements ILayer
     private pinchPreservingNode  = null
 
     private onPointerStart(pid, m:C) 
-    {   
-        if (CktoCp(m).r > this.view.hypertree.args.interaction.mouseRadius)
+    {
+        if (CktoCp(m).r >= 1)
             return
 
         this.view.hypertree.args.objects.traces.push({
@@ -174,13 +189,13 @@ export class InteractionLayer2 implements ILayer
             points: [m]
         })
 
-        if (this.view.hypertree.args.objects.traces.length === 1) {
+        if (this.view.hypertree.args.objects.traces.length === 1) {            
             this.view.unitdisk.args.transformation.onDragStart(m)
             this.panStart = m
             this.nopinch = true
             //console.log(still » pan || pinch » pan)
         }
-        else if (this.view.hypertree.args.objects.traces.length === 2) {
+        else if (this.view.hypertree.args.objects.traces.length === 2) {       
             const t0 = this.view.hypertree.args.objects.traces[0]
             const t0e = t0.points[t0.points.length-1]
             this.pinchcenter = CmulR(CaddC(t0e, m), .5)
@@ -189,10 +204,9 @@ export class InteractionLayer2 implements ILayer
             this.pinchInitDist = this.dist(t0e, m)
             this.pinchInitλp = this.view.unitdisk.args.transformation.state.λ
             this.nopinch = false
-            //console.log('pan »  pinch')
+            //console.log('pan » pinch')
         }
-        else {
-        }
+        else {}
     }
 
     private onPointerMove(pid, m)
@@ -217,8 +231,8 @@ export class InteractionLayer2 implements ILayer
             if (newλp > this.view.hypertree.args.interaction.λbounds[0] &&
                 newλp < this.view.hypertree.args.interaction.λbounds[1] ) 
             {
-                const pinchcenter2 = CmulR(CaddC(t0e, t1e), .5)
-
+                const pinchcenter2 = maxR(CmulR(CaddC(t0e, t1e), .5), this.args.mouseRadius)
+                
                 const t = this.view.unitdisk.args.transformation                
                 t.onDragλ(newλp)
                 this.view.hypertree.updateLayoutPath_(this.pinchPreservingNode) // only path to center
@@ -231,9 +245,7 @@ export class InteractionLayer2 implements ILayer
                 //t.state.P = compose(t.state, shift(t.state, this.pinchcenter, pinchcenter2)).P                
             }
         }
-        else 
-        {
-        }
+        else {}
     }
 
     private onPointerEnd(pid, m)
@@ -248,13 +260,9 @@ export class InteractionLayer2 implements ILayer
         if (this.view.hypertree.args.objects.traces.length === 0) 
         {
             this.view.unitdisk.args.transformation.onDragEnd(m)
-
-            if (this.dist(this.panStart, m) < .006 && this.nopinch) {
-                this.click(m)
-            }
-            else {
-                //console.log('pan --> still')
-            }
+            if (this.dist(this.panStart, m) < .006 && this.nopinch)
+                if (CktoCp(m).r < 1)
+                    this.click(m)
         }
         else if (this.view.hypertree.args.objects.traces.length === 1) 
         {
@@ -263,9 +271,7 @@ export class InteractionLayer2 implements ILayer
             this.panStart = otherPoints[otherPoints.length-1] //others.lastpoint
             //console.log('pinch --> pan')
         }
-        else 
-        {
-        }     
+        else {}
         //this.view.layerstack.layers['labels-force'].update.force()   
     }
 
@@ -301,8 +307,8 @@ export class InteractionLayer2 implements ILayer
 
     private findUnculledNodeByCell = (m:C)=> {   
         const voronoiLayout = d3.voronoi<N>()
-            .x(d=> { console.assert(typeof d.cache.re === 'number'); return d.cache.re})
-            .y(d=> { console.assert(typeof d.cache.re === 'number'); return d.cache.im})
+            .x(d=> { console.assert(typeof d.cache.re === 'number'); return d.cache.re; })
+            .y(d=> { console.assert(typeof d.cache.re === 'number'); return d.cache.im; })
             //.x(d=> d.cache.re)
             //.y(d=> d.cache.im)
             .extent([[-2,-2], [2,2]])             

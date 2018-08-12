@@ -130,43 +130,43 @@ export class HypertreeEx extends Hypertree
     * has changes, and call the according ui updates (animatin frames)
     */
    requestAnimationFrameDummyDummy = f=>f()
-    public update = {        
+    public update = {
         view: {
             parent:         ()=> this.updateParent(),
             unitdisk:       ()=> { this.updateUnitdiskView(); this.updateMetaView(); },
             meta:           ()=> this.updateMetaView(),
+        },
+        data: ()=> {
+            this.unitdisk.update.data()
+            this.hypertreeMeta.update.transformation()
+            this.hypertreeMeta.update.layout()
+            this.hypertreeMeta.update.model()
         },        
-        data:           ()=> {
-                            this.unitdisk.update.data()
-                            this.hypertreeMeta.update.transformation()
-                            this.hypertreeMeta.update.layout()
-                            this.hypertreeMeta.update.model()
-                        },        
         transformation: ()=> {
-                            this.unitdisk.update.transformation() 
-                            this.hypertreeMeta.update.layout()
-                            this.hypertreeMeta.update.transformation()     
-                        },
-        pathes:         ()=> {
-                            this.unitdisk.update.pathes()
-                            this.hypertreeMeta.update.transformation()     
-                        },
-        centernode:     (centerNode)=> {
-                            const pathStr = centerNode
-                                .ancestors()
-                                .reduce((a, e)=> `${e.precalc.label?("  "+e.precalc.label+"  "):''}${a?"›":""}${a}`, '') 
-        
-                            this.view_.path.innerText = pathStr // todo: html m frame?
+            this.unitdisk.update.transformation() 
+            this.hypertreeMeta.update.layout()
+            this.hypertreeMeta.update.transformation()     
+        },
+        pathes: ()=> {
+            this.unitdisk.update.pathes()
+            this.hypertreeMeta.update.transformation()     
+        },
+        centernode: (centerNode)=> {
+            const pathStr = centerNode
+                .ancestors()
+                .reduce((a, e)=> `${e.precalc.label?("  "+e.precalc.label+"  "):''}${a?"›":""}${a}`, '') 
 
-                            if (centerNode === this.data && !this.view_.btnHome.classList.contains('disabled')) {
-                                this.view_.btnHome.classList.add('disabled')
-                                //this.view_.btnPathHome.classList.add('disabled')
-                            }
-                            if (centerNode !== this.data && this.view_.btnHome.classList.contains('disabled')) {
-                                this.view_.btnHome.classList.remove('disabled')
-                                //this.view_.btnPathHome.classList.remove('disabled')
-                            }
-                        }
+            this.view_.path.innerText = pathStr // todo: html m frame?
+
+            if (centerNode === this.data && !this.view_.btnHome.classList.contains('disabled')) {
+                this.view_.btnHome.classList.add('disabled')
+                //this.view_.btnPathHome.classList.add('disabled')
+            }
+            if (centerNode !== this.data && this.view_.btnHome.classList.contains('disabled')) {
+                this.view_.btnHome.classList.remove('disabled')
+                //this.view_.btnPathHome.classList.remove('disabled')
+            }
+        }
     }
 
     //########################################################################################################
@@ -261,7 +261,10 @@ export class HypertreeEx extends Hypertree
             newpath.icon, 
             pathType === 'HoverPath' ? 'disabled' : '', 
             newpath.color))()        
-        btnElem.onclick = ()=> this.api.gotoNode(n)
+        btnElem.onclick = ()=> {
+            this.api.gotoNode(n)
+            this.args.interaction.onNodeSelect(n)
+        }
         btnElem.title = `${n.precalc.label}`
         if (pathType === 'HoverPath') {
             this.view_.pathesToolbar.insertBefore(btnElem, null)

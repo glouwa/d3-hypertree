@@ -62,7 +62,7 @@ export class UnitDisk implements IUnitDisk
     constructor(view:UnitDiskView, args : UnitDiskArgs) {
         this.view = view
         this.args = args
-        this.cache = args.transformation.cache                        
+        this.cache = args.transformation.cache
         this.update.parent()
     }
     
@@ -126,7 +126,7 @@ export class UnitDiskNav implements IUnitDisk
     get voronoiLayout() : d3.VoronoiLayout<N> {
         return this.mainView.voronoiLayout;
     }
-      
+
     public mainView      : UnitDisk // public wegen hypertreemeta
     public navBackground : UnitDisk // public wegen hypertreemeta
     public navParameter  : UnitDisk // public wegen hypertreemeta

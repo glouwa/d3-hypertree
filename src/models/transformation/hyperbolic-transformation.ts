@@ -8,7 +8,7 @@ import {dfs, clone, πify, setR, maxR }           from './hyperbolic-math'
 
 export interface Transformation<OT>
 {    
-    state:          T, // state: T,
+    state:          T,
     isMoving:       ()=> boolean,
     cache:          TransformationCache,
 
@@ -93,7 +93,7 @@ export class NegTransformation implements Transformation<N>
     onDragP =        (s:C, e:C)=> this.decorated.onDragP(CmulR(s,-1), CmulR(e,-1))
     onDragθ =        (s:C, e:C)=> this.decorated.onDragθ(CmulR(s,-1), CmulR(e,-1))
     onDragλ =        (l:number)=> this.decorated.onDragλ(l)
-} 
+}
 
 export class TransformationCache
 {

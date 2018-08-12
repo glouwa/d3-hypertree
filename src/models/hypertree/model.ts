@@ -81,7 +81,7 @@ export interface HypertreeArgs
         }*/
     }       
     geometry:               UnitDiskArgs                      // layer -+
-    interaction: {          
+    interaction: {
         //type:               'clickonly' | 'selction' | 'multiselection' | 'centernodeselectable'
         mouseRadius:        number,
         onNodeSelect:       (n:N)=> void
