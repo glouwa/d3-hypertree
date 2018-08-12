@@ -9,8 +9,7 @@ import { ArrtoC, CsubC, CmulR } from '../../models/transformation/hyperbolic-mat
 import { πify, sigmoid }        from '../../models/transformation/hyperbolic-math'
 
 export interface InteractionLayerArgs extends ILayerArgs
-{    
-    nohover: boolean,
+{ 
     mouseRadius,
     onClick
 }
@@ -144,23 +143,16 @@ export class InteractionLayer implements ILayer
         //const hoverpath = this.view.hypertree.args.objects.pathes.firstornull(e=> type==='HoverPath')[0]
         const hoverpath = this.view.hypertree.args.objects.pathes[0]
 
-        if (this.args.nohover) //.args.className === 'nav-parameter-disc')
-            this.view.parent.append('circle')
-                .attr("class", "mouse-circle")
-                .attr("r", this.args.mouseRadius)                
-                .call(zoom)
-                .on("dblclick.zoom", null)
-        else
-            this.view.parent.append('circle')
-                .attr("class", "mouse-circle")
-                .attr("r", this.args.mouseRadius)
-                .on("dblclick",  d=> this.onDblClick(this.findNodeByCell()))
-                //.on("click",     d=> this.onClick(findNodeByCell()))
-                .on("mousemove", d=> htapi.setPathHead(hoverpath, this.findNodeByCell()))
-                .on("mouseout",  d=> htapi.setPathHead(hoverpath, undefined))
-                //.call(drag)
-                .call(zoom)
-                .on("dblclick.zoom", null)
+        this.view.parent.append('circle')
+            .attr("class", "mouse-circle")
+            .attr("r", this.args.mouseRadius)
+            .on("dblclick",  d=> this.onDblClick(this.findNodeByCell()))
+            //.on("click",     d=> this.onClick(findNodeByCell()))
+            .on("mousemove", d=> htapi.setPathHead(hoverpath, this.findNodeByCell()))
+            .on("mouseout",  d=> htapi.setPathHead(hoverpath, undefined))
+            //.call(drag)
+            .call(zoom)
+            .on("dblclick.zoom", null)
     }
 
     //-----------------------------------------------------------------------------------------

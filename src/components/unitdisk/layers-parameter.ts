@@ -58,8 +58,7 @@ export const navParameterLayers = [
             ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` 
             + rotate(d)
     }),
-    (v, ud:UnitDisk)=> new InteractionLayer(v, {        
-        nohover:     true,
+    (v, ud:UnitDisk)=> new InteractionLayer(v, {       
         mouseRadius: 1.5,
         onClick:     (n:N, m:C)=> {}
     })

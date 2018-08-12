@@ -13,8 +13,7 @@ import { compose, shift }         from '../../models/transformation/hyperbolic-m
 const π = Math.PI
 
 export interface InteractionLayer2Args extends ILayerArgs
-{
-    nohover: boolean,
+{  
     mouseRadius,
     onClick
 }
@@ -32,7 +31,7 @@ export class InteractionLayer2 implements ILayer
     constructor(view:ILayerView, args:InteractionLayer2Args) {        
         this.view = view
         this.args = args 
-        this.htapi = this.view.hypertree.api        
+        this.htapi = this.view.hypertree.api
         this.hoverpath = this.view.hypertree.args.objects.pathes[0]
         this.mousedown = false
     }
@@ -44,22 +43,21 @@ export class InteractionLayer2 implements ILayer
         style:          ()=> {}
     }
     
-    private updateParent() {
-        if (!this.args.nohover) 
-            this.view.parent.append('circle')
-                .attr('class',      'mouse-circle')
-                .attr('r',          5)                
-                .on('wheel',        e=> this.fireMouseWheelEvent())
+    private updateParent() {            
+        this.view.parent.append('circle')
+            .attr('class',      'mouse-circle')
+            .attr('r',          5)                
+            .on('wheel',        e=> this.fireMouseWheelEvent())
 
-                .on('mousedown',    e=> this.fireMouseDown())
-                .on('mousemove',    e=> this.fireMouseMove())
-                .on('mouseup',      e=> this.fireMouseUp())
-                .on('mouseout',     e=> this.htapi.setPathHead(this.hoverpath, undefined))                
-                
-                .on('touchstart',   e=> this.fireTouchEvent('onPointerStart'))
-                .on('touchmove',    e=> this.fireTouchEvent('onPointerMove'))
-                .on('touchend',     e=> this.fireTouchEvent('onPointerEnd'))
-                .on('touchcancel',  e=> this.fireTouchEvent('onPointerEnd'))
+            .on('mousedown',    e=> this.fireMouseDown())
+            .on('mousemove',    e=> this.fireMouseMove())
+            .on('mouseup',      e=> this.fireMouseUp())
+            .on('mouseout',     e=> this.htapi.setPathHead(this.hoverpath, undefined))                
+            
+            .on('touchstart',   e=> this.fireTouchEvent('onPointerStart'))
+            .on('touchmove',    e=> this.fireTouchEvent('onPointerMove'))
+            .on('touchend',     e=> this.fireTouchEvent('onPointerEnd'))
+            .on('touchcancel',  e=> this.fireTouchEvent('onPointerEnd'))
     }
 
     // just to keep the list above clear

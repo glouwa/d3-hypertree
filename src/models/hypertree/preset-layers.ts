@@ -245,8 +245,7 @@ export const layerSrc = [
     (v, ud:UnitDisk)=> new InteractionLayer(v, {    
         invisible:  true,
         hideOnDrag: true,                        
-        mouseRadius: ud.view.hypertree.args.interaction.mouseRadius,
-        nohover:     false,
+        mouseRadius: ud.view.hypertree.args.interaction.mouseRadius,       
         onClick:     (n:N, m:C)=> {
                         var s = n.ancestors().find(e=> true)               // obsolete
                         //ud.args.hypertree.updatePath('SelectionPath', s) // toggle selection 
@@ -255,8 +254,7 @@ export const layerSrc = [
         }
     }),
     (v, ud:UnitDisk)=> new InteractionLayer2(v, {                            
-        mouseRadius: ud.view.hypertree.args.interaction.mouseRadius,
-        nohover:     false,
+        mouseRadius: ud.view.hypertree.args.interaction.mouseRadius,        
         onClick:     (n:N, m:C)=> {
                         var s = n.ancestors().find(e=> true)               // obsolete
                         //ud.args.hypertree.updatePath('SelectionPath', s) // toggle selection 
