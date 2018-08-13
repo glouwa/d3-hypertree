@@ -262,8 +262,9 @@ export class HypertreeEx extends Hypertree
             pathType === 'HoverPath' ? 'disabled' : '', 
             newpath.color))()        
         btnElem.onclick = ()=> {
-            this.api.gotoNode(n)
             this.args.interaction.onNodeSelect(n)
+            this.api.goto(CmulR({ re:n.layout.z.re, im:n.layout.z.im }, -1), null)
+                .then(()=> this.drawDetailFrame())
         }
         btnElem.title = `${n.precalc.label}`
         if (pathType === 'HoverPath') {

@@ -83,6 +83,26 @@
             fill: none;
             cursor: crosshair;
         }
+
+        .ripple-circle {
+            opacity: 0;
+            animation: ripple 1500ms ease-out;
+        }
+        @keyframes ripple {
+            0% {
+                transform: scale(0);
+                opacity: .8;
+            }
+            10% {
+                transform: scale(.15);
+                opacity: .8;
+            }
+            100% {
+                opacity: 0;
+                transform: scale(3);
+            }
+        }
+
         .focus-circle {        
             pointer-events:none;
         }

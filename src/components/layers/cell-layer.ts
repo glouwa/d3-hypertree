@@ -36,7 +36,8 @@ export class CellLayer implements ILayer
             name:              this.name,
             className:         'cell',
             elementType:       'polygon',
-            create:            s=> s.classed("leaf", false)/*s.classed("root",      d=> !d.data.parent)   */
+            create:            s=> s.attr('id', d=> 'cell-' + d.data.mergeId)
+                                    .classed("leaf", false)/*s.classed("root",      d=> !d.data.parent)   */
                                     .classed("lazy", true),/*
                                     .classed("lazy",      d=> d.data.hasOutChildren)                                 
                                     .classed("leaf",      d=> !d.data.children),*/

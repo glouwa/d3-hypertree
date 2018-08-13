@@ -116,6 +116,9 @@ $nodeStroke:    #90caf9;
             stroke: #555;
             stroke-width: .1;
         }
+        .ripple-circle {
+            fill: rgba($hovercolor, .6);         
+        }
 
         .nav-parameter-disc {
             .node {

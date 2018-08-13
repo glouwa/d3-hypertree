@@ -23,14 +23,14 @@ export class InteractionLayer2 implements ILayer
     view:       ILayerView
     args:       InteractionLayer2Args    
     name =      'interaction-2'
-   
+
     mousedown:  boolean
     htapi 
     hoverpath
 
     constructor(view:ILayerView, args:InteractionLayer2Args) {        
         this.view = view
-        this.args = args 
+        this.args = args
         this.htapi = this.view.hypertree.api
         this.hoverpath = this.view.hypertree.args.objects.pathes[0]
         this.mousedown = false
@@ -43,8 +43,7 @@ export class InteractionLayer2 implements ILayer
         style:          ()=> {}
     }
     
-    private updateParent() {     
-        
+    private updateParent() {
         const mousehandlers = de=> de
             .on('wheel',        e=> this.fireMouseWheelEvent())
 
@@ -277,9 +276,36 @@ export class InteractionLayer2 implements ILayer
 
     //-----------------------------------------------------------------------------------------
  
-    private click(m:C) {
-        const q = this.view.unitdisk.cache.voronoiDiagram.find(m.re, m.im)
+    private ripple(m:C, n:N) {
+        // find according cell
+        // add clippath
+        // set clippath to ripple
+        // animate r && opacity
+        const rippleClip = this.view.parent
+            .append('clipPath')
+            .attr('id', `cell-clip-${n.mergeId}`)
+            .html(`<use xlink:href="#cell-${n.mergeId}">`)
+            
+        const rippleCircle = this.view.parent
+            .append('g')
+            .attr('class', 'ripple-world')
+            .attr('clip-path', `url(#cell-clip-${n.mergeId})`)
+                .append('circle')
+                    .attr('class', 'ripple-circle')
+                    .attr('r', .1)
+                    .attr('cx', m.re)
+                    .attr('cy', m.im)            
+                    .attr('transform-origin', `${m.re}  ${m.im}`)                    
+                    .on('animationend', ()=> { 
+                        rippleCircle.remove() 
+                        rippleClip.remove() 
+                    })
+    }
+
+    private click(m:C) {        
+        const q = this.view.unitdisk.cache.voronoiDiagram.find(m.re, m.im)        
         const n = q ? q.data : undefined
+        this.ripple(m, n)
         console.log('click', this.dist(this.panStart, m), n, 
             this.view.unitdisk.args.transformation.cache.centerNode)
 
