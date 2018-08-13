@@ -39,7 +39,9 @@ export class HyperbolicTransformation implements Transformation<N>
     onDragStart =    (m:C)=> this.dST = clone(this.state)
     onDragEnd =      (m:C)=> this.dST = undefined
     isMoving=        ()=>    this.dST !== undefined
-    onDragP =        (s:C, e:C)=> this.state.P = compose(this.dST, shift(this.dST, s, maxR(e, this.maxMouseR))).P
+    onDragP =        (s:C, e:C)=> {
+        this.state.P = compose(this.dST, shift(this.dST, s, maxR(e, this.maxMouseR))).P
+    }
     onDragθ =        (s:C, e:C)=> {}
     onDragλ =        (l:number)=> this.state.λ = l
 }

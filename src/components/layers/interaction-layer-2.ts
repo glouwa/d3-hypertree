@@ -7,7 +7,7 @@ import { N }                      from '../../models/n/n'
 import { C, Cp, maxR }            from '../../models/transformation/hyperbolic-math'
 import { CptoCk, CktoCp, ArrtoC } from '../../models/transformation/hyperbolic-math'
 import { CaddC, CsubC, CmulR }    from '../../models/transformation/hyperbolic-math'
-import { πify, sigmoid }          from '../../models/transformation/hyperbolic-math'
+import { clone }                  from '../../models/transformation/hyperbolic-math'
 import { compose, shift }         from '../../models/transformation/hyperbolic-math'
 
 const π = Math.PI
@@ -98,7 +98,8 @@ export class InteractionLayer2 implements ILayer
         const m = this.currMousePosAsC()         
         requestAnimationFrame(()=> {
             this[eventName]('mouse', m)
-            this.view.hypertree.update.transformation()
+            if (eventName !== 'onPointerStart')
+                this.view.hypertree.update.transformation()
         })
     }
 
@@ -153,9 +154,10 @@ export class InteractionLayer2 implements ILayer
   
     //-----------------------------------------------------------------------------------------
     
-    //StaticState 
-    //PanState 
-    //PinchState
+    // NoInteractionState extends Dragstate
+    // MouseDownState extends Dragstate
+    // PanState extends Dragstate
+    // PinchState extends Dragstate
     private dragState: {
         panStart:            C
         onPointerStart,
@@ -189,10 +191,12 @@ export class InteractionLayer2 implements ILayer
         })
 
         if (this.view.hypertree.args.objects.traces.length === 1) {            
-            this.view.unitdisk.args.transformation.onDragStart(m)
+            //this.view.unitdisk.args.transformation.onDragStart(m)
+            this.dST = clone(this.view.unitdisk.args.transformation.state)
+            this.view.unitdisk.args.transformation.dST = this.dST
+            //console.log(still » pan || pinch » pan)
             this.panStart = m
             this.nopinch = true
-            //console.log(still » pan || pinch » pan)
         }
         else if (this.view.hypertree.args.objects.traces.length === 2) {       
             const t0 = this.view.hypertree.args.objects.traces[0]
@@ -215,7 +219,9 @@ export class InteractionLayer2 implements ILayer
 
         if (this.view.hypertree.args.objects.traces.length === 1) 
         {
-            this.view.unitdisk.args.transformation.onDragP(this.panStart, m)
+            //this.view.unitdisk.args.transformation.onDragP(this.panStart, m)
+            const t = this.view.unitdisk.args.transformation
+            t.state.P = compose(this.dST, shift(this.dST, this.panStart, maxR(m, .9))).P
         }
         else if (this.view.hypertree.args.objects.traces.length === 2)
         {
@@ -232,16 +238,14 @@ export class InteractionLayer2 implements ILayer
             {
                 const pinchcenter2 = maxR(CmulR(CaddC(t0e, t1e), .5), this.args.mouseRadius)
                 
-                const t = this.view.unitdisk.args.transformation                
+                const t = this.view.unitdisk.args.transformation
                 t.onDragλ(newλp)
                 this.view.hypertree.updateLayoutPath_(this.pinchPreservingNode) // only path to center
                 t.state.P = compose(t.state, shift(t.state, { re:0, im:0 }, this.pinchPreservingNode.cache )).P
                 t.state.P = compose(t.state, shift(t.state, this.pinchcenter, pinchcenter2)).P
 
                 this.pinchcenter = CmulR(CaddC(this.pinchcenter, pinchcenter2), .5)
-                this.view.unitdisk.pinchcenter = this.pinchcenter
-                //this.view.unitdisk.args.transformation.onDragP(this.pinchcenter, pinchcenter2)
-                //t.state.P = compose(t.state, shift(t.state, this.pinchcenter, pinchcenter2)).P                
+                this.view.unitdisk.pinchcenter = this.pinchcenter                
             }
         }
         else {}
@@ -258,7 +262,10 @@ export class InteractionLayer2 implements ILayer
 
         if (this.view.hypertree.args.objects.traces.length === 0) 
         {
-            this.view.unitdisk.args.transformation.onDragEnd(m)
+            //this.view.unitdisk.args.transformation.onDragEnd(m)
+            this.dST = undefined
+            this.view.unitdisk.args.transformation.dST = undefined
+
             if (this.dist(this.panStart, m) < .006 && this.nopinch)
                 if (CktoCp(m).r < 1)
                     this.click(m)
@@ -282,12 +289,12 @@ export class InteractionLayer2 implements ILayer
         // set clippath to ripple
         // animate r && opacity
         const rippleClip = this.view.parent
-            .append('clipPath')
+            .append('clipPath')            
             .attr('id', `cell-clip-${n.mergeId}`)
             .html(`<use xlink:href="#cell-${n.mergeId}">`)
             
         const rippleCircle = this.view.parent
-            .append('g')
+            .insert('g', ':first-child')
             .attr('class', 'ripple-world')
             .attr('clip-path', `url(#cell-clip-${n.mergeId})`)
                 .append('circle')
