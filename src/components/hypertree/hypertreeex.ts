@@ -11,12 +11,23 @@ import { Hypertree }           from './hypertree'
 import { HypertreeMeta }       from '../meta/hypertree-meta/hypertree-meta'
 import { NoHypertreeMeta }     from '../meta/hypertree-meta/hypertree-meta'
 
+/*
+k(.58) = 0.8146164741766521  208
+k(.92) = 0.39191835884530846 100
+k(.98) = 0.1989974874213242  51
+k(1)   = 0
+*/
+
 const bubbleSvgDef =
     `<defs>
         <radialGradient id="exampleGradient">            
-            <stop offset="58%"  stop-color="rgb(255,255,255)" stop-opacity=".08"/>            
-            <stop offset="92%"  stop-color="rgb( 96, 96, 96)" stop-opacity=".08"/>
-            <stop offset="98%"  stop-color="rgb( 36, 36, 36)" stop-opacity=".08"/>
+            <stop offset="0%"   stop-color="rgb(255,255,255)" stop-opacity=".08"/>
+            <stop offset="30%"  stop-color="rgb(243,243,243)" stop-opacity=".08"/>
+            <stop offset="48%"  stop-color="rgb(224,224,224)" stop-opacity=".08"/>
+            <stop offset="58%"  stop-color="rgb(208,208,208)" stop-opacity=".08"/>
+            <stop offset="82%"  stop-color="rgb(146,146,146)" stop-opacity=".08"/>
+            <stop offset="92%"  stop-color="rgb(100,100,100)" stop-opacity=".08"/>
+            <stop offset="98%"  stop-color="rgb( 51, 51, 51)" stop-opacity=".08"/>
             <stop offset="100%" stop-color="rgb(  0,  0,  0)" stop-opacity=".08"/>
         </radialGradient>
     </defs>`
