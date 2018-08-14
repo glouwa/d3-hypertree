@@ -483,8 +483,8 @@ export class Hypertree
         const plidx = stringhash(n.precalc.label)
         const color = ({
             'HoverPath': 'none', 
-            'Query': googlePalette(1) 
-        })[pathType] || googlePalette(plidx) || 'red'
+            'Query': googlePalette(15) 
+        })[pathType] || googlePalette(plidx) || googlePalette(1) 
 
         const newpath:Path = {
             type:      pathType,
@@ -493,7 +493,7 @@ export class Hypertree
             head:      n,
             headName:  n.precalc.label,
             ancestors: n.ancestors(),            
-            color:     color,            
+            color:     color,
         }
 
         // model mod
@@ -599,7 +599,7 @@ export class Hypertree
         })
     }
 
-    public isAnimationRunning() : boolean {        
+    public isAnimationRunning() : boolean {
         var view = this.unitdisk 
             && this.unitdisk.args.transformation.isMoving()
 

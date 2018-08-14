@@ -77,13 +77,13 @@ export class StemLayer implements ILayer
                      .attr("stroke-width",   d=> this.args.width(d)+.015)
                      .attr("stroke-linecap", d=> "round")
             },
-        })        
+        })
         this.d3updatePattern2 = new D3UpdatePattern({
             parent:            this.view.parent,
             layer:             this,
             clip:              this.args.clip,
             data:              ()=> this.view.hypertree.data?[this.view.hypertree.data]:[],
-            name:              'stem-path hovered-path',
+            name:              'stem-path',
             className:         this.args.className,
             elementType:       straincurvature === 'l' ? 'line' : 'path',
             create:            s=> {},
