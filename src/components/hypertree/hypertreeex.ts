@@ -37,7 +37,7 @@ const maintoobarHTML = `
     -->
 
     ${btn('btnhome', 'home', 'disabled tool-seperator')}
-    ${btn('btnsearch', 'search')}
+    ${btn('btnquery', 'search')}
     
     <!--
     ,530, 470
@@ -71,6 +71,9 @@ const hypertreehtml =
         <svg width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">
             ${bubbleSvgDef}
         </svg>
+        <div id="query-input">
+            <input id="query" type="text" class="browser-default">
+        </div>
         <div id="meta"></div>        
         <div class="preloader"></div>
     </div>`
@@ -90,6 +93,10 @@ export class HypertreeEx extends Hypertree
         btnMeta?       : HTMLElement,
         btnNav?        : HTMLElement,
         btnSize?       : HTMLElement,
+
+        btnQuery       : HTMLElement,
+        queryDiv       : HTMLElement,
+        inputQuery     : HTMLInputElement
                 
         hypertreeMeta? : HypertreeMeta,        
     }
@@ -216,11 +223,31 @@ export class HypertreeEx extends Hypertree
         this.view_.btnMeta     = <HTMLButtonElement>this.view_.html.querySelector('#btnmeta')
         this.view_.btnNav      = <HTMLButtonElement>this.view_.html.querySelector('#btnnav')
         this.view_.btnHome     = <HTMLButtonElement>this.view_.html.querySelector('#btnhome')
+        this.view_.btnQuery    = <HTMLButtonElement>this.view_.html.querySelector('#btnquery')
+        this.view_.queryDiv    = <HTMLElement>this.view_.html.querySelector('#query-input')
+        this.view_.inputQuery  = <HTMLInputElement>this.view_.html.querySelector('#query-input > input')
+                
         //this.view_.btnSize     = <HTMLButtonElement>this.view_.html.querySelector('#btnsize')
         
         this.view_.btnHome.onclick     = ()=> this.api.gotoHome()
         this.view_.btnMeta.onclick     = ()=> this.api['toggleMeta']()
         this.view_.btnNav.onclick      = ()=> this.api['toggleNav']()
+        this.view_.btnQuery.onclick    = ()=> {
+            this.view_.queryDiv.style.visibility = this.view_.queryDiv.style.visibility === 'visible'
+                ? 'hidden'
+                : 'visible'
+
+            if (this.view_.queryDiv.style.visibility === 'visible')
+                this.view_.inputQuery.focus()
+        }
+        this.view_.queryDiv  = <HTMLInputElement>this.view_.html.querySelector('#query-input')
+        this.view_.queryDiv.onkeyup = e=> {
+            event.preventDefault()
+            if (e.keyCode === 13) {
+                this.api.selectQuery(this.view_.inputQuery.value, undefined)
+                this.view_.queryDiv.style.visibility = 'hidden'
+            }
+        }
         /*this.view_.btnSize.onclick     = ()=> {            
             const view = [
                 'translate(500,500) scale(480)', // small

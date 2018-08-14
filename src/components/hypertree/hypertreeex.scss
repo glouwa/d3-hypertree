@@ -1,0 +1,19 @@
+#query-input {
+    visibility: hidden;
+    pointer-events: all;
+    position: absolute;
+    top: calc(50% - 2em);
+    left: calc(50% - 8em);
+    width: 16.65em;    
+    border-radius: .3em;
+    box-shadow: 0.1em 0.1em 1em #000000;
+}
+
+#query-input > input {
+    width: 16em;
+    height: 2.5em;
+    border-radius: .2em;
+    text-indent: .5em;
+    outline: none;
+    border: none;
+}

@@ -158,12 +158,13 @@ export class InteractionLayer2 implements ILayer
     // MouseDownState extends Dragstate
     // PanState extends Dragstate
     // PinchState extends Dragstate
-    private dragState: {
-        panStart:            C
-        onPointerStart,
-        onPointerMove,
-        onPointerEnd
+    /*
+    interface DragState: {    
+        onPointerStart: (pid:number, m:C)=> void,
+        onPointerMove:  (pid:number, m:C)=> void,
+        onPointerEnd:  (pid:number, m:C)=> void,
     }
+    */
     private pinchState : {
         pinchInitDist:       number,
         pinchInitλp:         number,
