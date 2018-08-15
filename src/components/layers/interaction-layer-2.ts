@@ -154,10 +154,6 @@ export class InteractionLayer2 implements ILayer
   
     //-----------------------------------------------------------------------------------------
     
-    // NoInteractionState extends Dragstate
-    // MouseDownState extends Dragstate
-    // PanState extends Dragstate
-    // PinchState extends Dragstate
     /*
     interface DragState: {    
         onPointerStart: (pid:number, m:C)=> void,
@@ -165,6 +161,10 @@ export class InteractionLayer2 implements ILayer
         onPointerEnd:  (pid:number, m:C)=> void,
     }
     */
+    // NoInteractionState extends Dragstate
+    // MouseDownState extends Dragstate
+    // PanState extends Dragstate
+    // PinchState extends Dragstate
     private pinchState : {
         pinchInitDist:       number,
         pinchInitλp:         number,
@@ -257,7 +257,7 @@ export class InteractionLayer2 implements ILayer
         this.view.hypertree.args.objects.traces 
             = this.view.hypertree.args.objects.traces.filter(e=> e.id !== pid)
         
-        this.pinchcenter = undefined        
+        this.pinchcenter = undefined
         this.view.unitdisk.pinchcenter = this.pinchcenter
         this.pinchPreservingNode = undefined
 
@@ -357,3 +357,73 @@ export class InteractionLayer2 implements ILayer
     }
 }
 
+interface DragState {    
+    onPointerStart(pid:number, m:C): void
+    onPointerMove(pid:number, m:C): void
+    onPointerEnd(pid:number, m:C): void
+}
+
+class NoInteractionState implements DragState {    
+    constructor() {
+
+    }
+    public onPointerStart(pid:number, m:C) {
+
+    }
+    public onPointerMove(pid:number, m:C) {
+
+    }
+    public onPointerEnd(pid:number, m:C) {
+
+    }
+}
+
+class MouseDownState implements DragState {    
+    constructor() {
+
+    }
+    public onPointerStart(pid:number, m:C) {
+
+    }
+    public onPointerMove(pid:number, m:C) {
+
+    }
+    public onPointerEnd(pid:number, m:C) {
+
+    }
+}
+
+class PanState implements DragState {    
+    private panStart:C    
+    constructor() {
+
+    }
+    public onPointerStart(pid:number, m:C) {
+
+    }
+    public onPointerMove(pid:number, m:C) {
+
+    }
+    public onPointerEnd(pid:number, m:C) {
+
+    }
+}
+
+class PinchState implements DragState {    
+    pinchInitDist:       number
+    pinchInitλp:         number
+    pinchcenter:         C
+    pinchPreservingNode: N
+    constructor() {
+
+    }
+    public onPointerStart(pid:number, m:C) {
+
+    }
+    public onPointerMove(pid:number, m:C) {
+
+    }
+    public onPointerEnd(pid:number, m:C) {
+
+    }
+}
