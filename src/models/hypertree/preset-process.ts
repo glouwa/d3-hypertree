@@ -8,11 +8,12 @@ export function doVoronoiStuff(ud:IUnitDisk, cache:TransformationCache) {
         cache.unculledNodes.filter((n:N)=> n.precalc.clickable)      
     )    
     cache.cells = cache.voronoiDiagram.polygons()
-    
+    /*
     if (cache.cells.length)
         console.log('UPDATEING VORO')
     else
         console.log('RESEETING VORO')
+        */
 }
 
 /*

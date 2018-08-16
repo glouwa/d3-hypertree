@@ -427,7 +427,7 @@ export class Hypertree
 
     public updateLayoutPath_(preservingnode:N) : void {
         const t = this.args.geometry.transformation
-        console.log("_updateLayoutPath_", t.state.λ)        
+        //console.log("_updateLayoutPath_", t.state.λ)        
         console.assert(preservingnode)
         const t0 = performance.now()        
 
@@ -600,13 +600,8 @@ export class Hypertree
     }
 
     public isAnimationRunning() : boolean {
-        var view = this.unitdisk 
-            && this.unitdisk.args.transformation.isMoving()
-
-        var nav = this.unitdisk
-            && this.unitdisk.navParameter 
-            && this.unitdisk.navParameter.args.transformation.isMoving()
-
+        var view = this.unitdisk && this.unitdisk.isDraging
+        var nav = this.unitdisk && this.unitdisk.isDraging
         const lowdetail = this.transition?this.transition.lowdetail:false
         return view || nav || lowdetail
     }  
