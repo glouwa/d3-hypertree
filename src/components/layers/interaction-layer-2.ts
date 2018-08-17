@@ -25,6 +25,7 @@ export class InteractionLayer2 implements ILayer
     name =      'interaction-2'
 
     mousedown:  boolean
+    dST
     htapi 
     hoverpath
 

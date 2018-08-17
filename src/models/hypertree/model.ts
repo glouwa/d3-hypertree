@@ -42,7 +42,7 @@ export interface HypertreeArgs
         langInitBFS:            (ht:Hypertree, n:N)=> void       // text, wiki, clickable, cell, :  auto--> textlen
     // }
     objects: {
-        roots:              N[]
+        //roots:              N[]
         pathes:             Path[]
         selections:         N[]
         traces:             Trace[]

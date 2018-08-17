@@ -40,7 +40,7 @@ const modelBase : ()=> HypertreeArgs = ()=>
     iconmap: {
                             fileName2IconUrl: ()=>null,
                             emojimap: {}
-    },    
+    },
     dataInitBFS: (ht:Hypertree, n:N)=> {
         n.precalc.imageHref = undefined
         n.precalc.icon = undefined
@@ -198,7 +198,7 @@ export const presets : { [key: string]:()=> HypertreeArgs } =
         langInitBFS: (ht:Hypertree, n:N)=> {
             n.precalc.label = n.data && n.data.name
             n.precalc.clickable = true
-        }        
+        }
     }),
 
     mainModel: ()=> 

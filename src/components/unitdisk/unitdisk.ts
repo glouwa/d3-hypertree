@@ -29,6 +29,7 @@ export interface IUnitDisk
     layerStack:         LayerStack
     HypertreeMetaType
     navParameter?:      UnitDisk,
+    isDraging?:         boolean
 
     api: {
         setTransform: (t:string, tn:string)=> void
@@ -52,10 +53,11 @@ export class UnitDisk implements IUnitDisk
     public cache         : TransformationCache // zeigt auf transformation.cache
     public voronoiLayout : d3.VoronoiLayout<N>
     
-    public layerStack    : LayerStack
+    public layerStack    : LayerStack    
+    public pinchcenter   : C
+    public isDraging     : boolean
     public HypertreeMetaType = HypertreeMeta
     public cacheMeta
-    public pinchcenter
 
     private mainsvg // d3 select          
         

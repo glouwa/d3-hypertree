@@ -307,11 +307,7 @@ export class Hypertree
         // dataInitBFS:
         // - emoji*
         // - img*
-        this.data.each(n=> this.args.dataInitBFS(this, n))
-        /*
-        if (this.args.iconmap)
-            this.data.each(n=> n.precalc.imageHref = this.args.iconmap.fileName2IconUrl(n.data.name, n.data.type))
-        */        
+        this.data.each(n=> this.args.dataInitBFS(this, n))        
         this.modelMeta = { 
             Δ: [t1-t0, t2-t1, t3-t2, performance.now()-t3], 
             filesize: dl,
