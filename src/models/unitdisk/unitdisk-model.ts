@@ -7,6 +7,7 @@ import { C, Ck, Cp }               from '../transformation/hyperbolic-math'
 import { Transformation }          from '../transformation/hyperbolic-transformation'
 import { TransformationCache }     from '../transformation/hyperbolic-transformation'
 import { ArcCurvature }            from '../../components/layers/link-layer';
+import { UnitDisk }                from '../../components/unitdisk/unitdisk';
 
 export interface UnitDiskView
 {
@@ -35,8 +36,8 @@ export interface UnitDiskArgs
     nodeRadius:        (ud:IUnitDisk, n:N)=> number
     nodeScale:         (n:N)=> number
     nodeFilter:        (n:N)=> boolean
-    offsetEmoji:       (d, i, v)=> C
-    offsetLabels:      (d, i, v)=> C
+    offsetEmoji:       (ls:UnitDisk)=> (d, i, v)=> C
+    offsetLabels:      (ls:UnitDisk)=> (d, i, v)=> C
 
     captionBackground: 'all' | 'center' | 'none'        // x 
     captionFont:       string

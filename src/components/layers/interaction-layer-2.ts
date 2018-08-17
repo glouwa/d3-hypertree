@@ -78,7 +78,7 @@ export class InteractionLayer2 implements ILayer
         this.fireMouseEvent('onPointerStart')
     }
     
-    private fireMouseMove() {        
+    private fireMouseMove() {
         if (this.mousedown)
             this.fireMouseEvent('onPointerMove')                    
         else 
