@@ -8,6 +8,9 @@ var debug       = require('gulp-debug')
 var merge       = require('merge2')
 var del         = require('del')
 var webpack     = require('webpack-stream')
+var uglifyjs    = require('gulp-uglifyes')
+var uglifycss   = require('gulp-uglifycss')
+var rename      = require('gulp-rename')
 
 // commonjs lib (hypertree)
 var projectname = 'd3-hypertree'
@@ -26,9 +29,15 @@ var files = {
     mainjs:   projectname+`.js`
 }
 
+var minfiles = {
+    darkcss:  projectname+`-dark.min.css`,
+    lightcss: projectname+`-light.min.css`,
+    mainjs:   projectname+`.min.js`,    
+}
+
 // ---------------------------------------------------------------------------------------------
 
-gulp.task('clean', () => del(['dist/**/*']))
+gulp.task('clean', ()=> del(['dist/**/*']))
 gulp.task('default',  ['watch'])
 gulp.task('watch',    ['build'], () => {    
     gulp.watch('../ducd/dist/ducd.js',  ['build'])
@@ -39,7 +48,7 @@ gulp.task('watch',    ['build'], () => {
 // ---------------------------------------------------------------------------------------------
 
 gulp.task('build',    ['webpack', 'sass'])
-gulp.task('tsc', () => {
+gulp.task('tsc', ()=> {
     var tsResult = gulp.src(paths.src + '**/*.ts')
         .pipe(plumber())
         .pipe(ts.createProject(require('./tsconfig').compilerOptions)())
@@ -49,7 +58,7 @@ gulp.task('tsc', () => {
         tsResult.js.pipe(gulp.dest(paths.dist + 'js/'))
     ])
 })
-gulp.task('webpack', ['tsc'], () =>
+gulp.task('webpack', ['tsc'], ()=>
     gulp.src(paths.dist + 'js/' + files.mainjs)
         .pipe(plumber())
         .pipe(webpack({
@@ -67,7 +76,28 @@ var scss = (t)=> gulp.src(paths.src + `**/*${t}.scss`) // all *light.scss or *da
     .pipe(sass())
     .pipe(concat(files[t+'css']))                      // files.lightcss or files.darkcss
     .pipe(gulp.dest(paths.dist))
-gulp.task('sass',    ()=> merge([scss('light'), scss('dark')]))   
 
+gulp.task('sass', ()=> merge([scss('light'), scss('dark')]))   
 
+// ---------------------------------------------------------------------------------------------
 
+gulp.task('minifyjs', ()=> 
+    gulp.src(paths.dist + files.mainjs)
+        .pipe(uglifyjs())
+        .pipe(rename(minfiles.mainjs))
+        .pipe(gulp.dest(paths.dist)))
+
+gulp.task('minifydarkcss', ()=>     
+    gulp.src(paths.dist + files.darkcss)
+        .pipe(uglifycss())
+        .pipe(rename(minfiles.darkcss))
+        .pipe(gulp.dest(paths.dist)))
+
+gulp.task('minifylightcss', ()=>     
+    gulp.src(paths.dist + files.lightcss)
+        .pipe(uglifycss())
+        .pipe(rename(minfiles.lightcss))
+        .pipe(gulp.dest(paths.dist)))
+
+gulp.task('minify', ['minifyjs', 'minifydarkcss', 'minifylightcss'])
+ 

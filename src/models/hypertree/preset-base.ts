@@ -36,11 +36,12 @@ const capitalize = s=> s.charAt(0).toUpperCase() + s.slice(1)
 
 const modelBase : ()=> HypertreeArgs = ()=>
 ({
+    langloader:  ok=> ok(),
     dataInitBFS: (ht:Hypertree, n:N)=> {
         n.precalc.imageHref = undefined
         n.precalc.icon = undefined
         n.precalc.clickable = true
-        n.precalc.cell = true        
+        n.precalc.cell = true      
     },    
     langInitBFS: (ht:Hypertree, n:N)=> {
         n.precalc.label = undefined
@@ -57,8 +58,8 @@ const modelBase : ()=> HypertreeArgs = ()=>
         weight:             (n:N)=> (isLeaf(n)?1:0),
         initSize:           .97,
         rootWedge: {    
-            orientation:     3*π/2,
-            angle:           3*π/2
+            orientation:    3*π/2,
+            angle:          3*π/2
         }
     },
     filter: {
@@ -116,7 +117,7 @@ export const presets : { [key: string]:()=> any } =
                 const id = n.data && n.data.name
                 const l  = ht.langMap && ht.langMap[id] && '𝐖 ' + ht.langMap[id] 
                 n.precalc.wiki = l
-                n.precalc.label = l || id         
+                n.precalc.label = l || id
                 n.precalc.clickable = Boolean(l)              
             },
         //},            
