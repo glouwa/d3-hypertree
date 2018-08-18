@@ -41,6 +41,7 @@ export interface UnitDiskArgs
 
     captionBackground: 'all' | 'center' | 'none'        // x 
     captionFont:       string
+    captionHeight:     number
 
     linkWidth:         (n:N)=> number
     linkCurvature:     ArcCurvature

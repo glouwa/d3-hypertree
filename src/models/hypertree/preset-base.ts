@@ -92,6 +92,7 @@ const modelBase : ()=> HypertreeArgs = ()=>
         linkCurvature:      '-',
         captionBackground:  'all',
         captionFont:        '6.5px Roboto',
+        captionHeight:       .04,
         transformation:     new HyperbolicTransformation({
             P:              { re: 0, im:0 },
             θ:              { re: 1, im:0 },
@@ -113,14 +114,13 @@ export const presets : { [key: string]:()=> any } =
     modelBase: ()=> modelBase(),
 
     otolModel: ()=> ({
-            langInitBFS: (ht:Hypertree, n:N)=> {                
-                const id = n.data && n.data.name
-                const l  = ht.langMap && ht.langMap[id] && '𝐖 ' + ht.langMap[id] 
-                n.precalc.wiki = l
-                n.precalc.label = l || id
-                n.precalc.clickable = Boolean(l)              
-            },
-        //},            
+        langInitBFS: (ht:Hypertree, n:N)=> {                
+            const id = n.data && n.data.name
+            const l  = ht.langMap && ht.langMap[id] && '𝐖 ' + ht.langMap[id] 
+            n.precalc.wiki = l
+            n.precalc.label = l || id
+            n.precalc.clickable = Boolean(l)              
+        },
         geometry: {
             nodeRadius: nodeInitR(.0075)
         }        
@@ -224,5 +224,5 @@ export const presets : { [key: string]:()=> any } =
         }
         console.log('merging otol to main model')
         return mergeDeep(model, diff)
-    }    
+    }
 }

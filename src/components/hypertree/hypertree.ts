@@ -237,7 +237,8 @@ export class Hypertree
             offsetEmoji:        this.args.geometry.offsetLabels,
             offsetLabels:       this.args.geometry.offsetLabels,
             captionBackground:  this.args.geometry.captionBackground,
-            captionFont:        this.args.geometry.captionFont,            
+            captionFont:        this.args.geometry.captionFont,   
+            captionHeight:      this.args.geometry.captionHeight,
         })
     }
 

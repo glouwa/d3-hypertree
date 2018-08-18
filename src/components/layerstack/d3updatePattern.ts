@@ -87,21 +87,23 @@ export class D3UpdatePattern
         this.mainSvgGroup.selectAll('rect').remove()
         var svgRootHere = this.mainSvgGroup
         var T = this
+        var geometry =  T.args.layer.view.hypertree.args.geometry
         
         if (T.args.layer.view.unitdisk) {
-            this.mainSvgGroup.selectAll("text").each(function(d:N, i, v:SVGTextElement[]) {
+            this.mainSvgGroup.selectAll("text")
+            .each(function(d:N, i, v:SVGTextElement[]) {
                 if (true ||   d === T.args.layer.view.unitdisk.cache.centerNode 
                     || d.cachep.r < 0.6)
                 {
                     var view:any = v[i]
                     var w = d.precalc.labellen //= d.precalc.labellen || view.getComputedTextLength()
-                    var h = 0.04
+                    var h = geometry.captionHeight
                     var paddingLeftRight = .08
                     var paddingTopBottom = .02
 
                     svgRootHere.insert('rect', d=> this)
                         .attr("x",         x=> -paddingLeftRight/2)
-                        .attr("y",         x=> -paddingTopBottom*2)
+                        .attr("y",         x=> -paddingTopBottom-h/2)
                         .attr("rx",        x=> .01) //.009
                         .attr("ry",        x=> .03) //.009
                         .attr("width",     x=> w + paddingLeftRight)

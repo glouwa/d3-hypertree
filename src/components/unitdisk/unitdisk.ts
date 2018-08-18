@@ -169,6 +169,7 @@ export class UnitDiskNav implements IUnitDisk
             clipRadius:         1,
             captionBackground:  args.captionBackground,
             captionFont:        args.captionFont, 
+            captionHeight:      args.captionHeight,
         })
 
         var navTransformation =
@@ -218,7 +219,8 @@ export class UnitDiskNav implements IUnitDisk
             offsetLabels:       args.offsetLabels,
             clipRadius:         1.7,
             captionBackground:  args.captionBackground,
-            captionFont:        args.captionFont,            
+            captionFont:        args.captionFont,          
+            captionHeight:      args.captionHeight  
         })
     }
     
