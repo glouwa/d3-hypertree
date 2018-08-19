@@ -124,7 +124,7 @@ new hyt.Hypertree(
                 rangeNodes:     { min:number, max:number }
                 alpha:          number
             }
-            focusExtension:     number        
+            focusExtension:     number
             maxFocusRadius:     number
             wikiRadius:         number
             maxlabels:          number       
@@ -134,7 +134,8 @@ new hyt.Hypertree(
             layerOptions:      {
                 cells: {
                     invisible:  false,
-                    hideOnDrag: false
+                    hideOnDrag: false,
+                    // + layer specific properties 
                 },
             }
             nodeRadius:        (ud:IUnitDisk, n:N)=> number
@@ -145,6 +146,7 @@ new hyt.Hypertree(
 
             captionBackground: 'all' | 'center' | 'root' | 'none' // x 
             captionFont:       string
+            captionHeight:     number
 
             linkWidth:         (n:N)=> number
             linkCurvature:     ArcCurvature
