@@ -1,4 +1,4 @@
-<iframe width="590" height="590" src="https://glouwa.github.io/" frameborder="0" allowfullscreen></iframe>
+<iframe width="590" height="590" src="https://glouwa.github.io/d3-hypertree-examples/demo/" frameborder="0" allowfullscreen></iframe>
 A Scalable Intercative Web Component for Hyperbolic Tree Visualisations
 
 # Installation
