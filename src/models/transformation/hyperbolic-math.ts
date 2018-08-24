@@ -1,4 +1,5 @@
-export function dfs(n, fpre, idx=0) {
+export function dfs(n, fpre, idx?) {
+    idx = idx || 0
     if (!n) return []
     if (fpre) fpre(n, idx)
     if (n.children)
