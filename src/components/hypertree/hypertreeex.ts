@@ -1,3 +1,4 @@
+import * as d3                 from 'd3'
 import { HTML }                from 'ducd'
 import { HypertreeArgs }       from '../../models/hypertree/model'
 import { N }                   from '../../models/n/n'
@@ -183,6 +184,16 @@ export class HypertreeEx extends Hypertree
             if (centerNode !== this.data && this.view_.btnHome.classList.contains('disabled')) {
                 this.view_.btnHome.classList.remove('disabled')
                 //this.view_.btnPathHome.classList.remove('disabled')
+            }
+
+            
+            if (!this.isAnimationRunning() && centerNode.data.name !== 'Root') {                
+                const find = this.unitdisk.cache.voronoiDiagram.find(0, 0)
+                if (find) {
+                    console.log(pathStr, find.data)
+                    this.args.interaction.onNodeSelect(find.data)
+                    
+                }
             }
         }
     }

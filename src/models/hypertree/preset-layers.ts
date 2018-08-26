@@ -42,7 +42,7 @@ export const layerSrc = [
     // interaction-hammer
     (v, ud:UnitDisk)=> new BackgroundLayer(v, {}),    
     (v, ud:UnitDisk)=> new CellLayer(v, {
-        invisible:  false,
+        invisible:  true,
         hideOnDrag: true,
         clip:       '#circle-clip' + ud.args.clipRadius,
         data:       ()=> ud.cache.cells,                            
