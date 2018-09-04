@@ -59,7 +59,7 @@ const modelBase : ()=> HypertreeArgs = ()=>
         initSize:           .97,
         rootWedge: {    
             orientation:    3*π/2,
-            angle:          3*π/2
+            angle:          3*π/2 
         }
     },
     filter: {
@@ -68,9 +68,10 @@ const modelBase : ()=> HypertreeArgs = ()=>
         weightFilter: {
             magic:              160,
             alpha:              1.05,
-            weight:             n=> (isLeaf(n) ? 1 : 0),
+            weight:             n=> (isLeaf(n) ? 1 : Math.pow(2,n.height)),
+            //weight:             n=> (isLeaf(n) ? 1 : n.height*n.height),
             rangeCullingWeight: { min:4,   max:500 },
-            rangeNodes:         { min:300, max:700 },
+            rangeNodes:         { min:300, max:600 },
         },
         focusExtension:     1.6,
         maxFocusRadius:     .85,
@@ -121,9 +122,19 @@ export const presets : { [key: string]:()=> any } =
             n.precalc.label = l || id
             n.precalc.clickable = Boolean(l)              
         },
+        layout: {            
+            weight:             (n:N)=> (isLeaf(n)?1:0),            
+            rootWedge: {    
+                orientation:    3*π/2,
+                angle:          .7*π/2
+            }
+        },
         geometry: {
             nodeRadius: nodeInitR(.0075)
-        }        
+        },
+        interaction: {              
+            λbounds:           [ 1/40, .55 ]         
+        }    
     }),
 
     generatorModel: ()=> ({                        
@@ -168,7 +179,7 @@ export const presets : { [key: string]:()=> any } =
             nodeRadius: nodeInitR(.0075)
         },                  
         interaction: {
-            λbounds: [1/7, .8]
+            λbounds: [1/7, .9]
         }
     }),
     
@@ -196,7 +207,11 @@ export const presets : { [key: string]:()=> any } =
                 maxlabels: 25,
             },
             layout: {
-                initSize: .85
+                initSize: .85,
+                rootWedge: {    
+                    orientation:    3*π/2,
+                    angle:          3*π/2
+                }
             },
             geometry: {
                 nodeRadius: nodeInitRNoInner(.0001),
@@ -204,7 +219,8 @@ export const presets : { [key: string]:()=> any } =
                 nodeFilter: n=> true,
             },            
             interaction: {
-                //onNodeSelect: s=> { console.log('###########', s) },
+                onNodeSelect: s=> { console.log('###########', s) },
+                
                 λbounds: [1/5, .75],
             },            
             langInitBFS: (ht:Hypertree, n:N)=> {
