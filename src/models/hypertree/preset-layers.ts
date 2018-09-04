@@ -123,6 +123,9 @@ export const layerSrc = [
         transform:  d=> d.transformStrCache                            
                         + ` scale(${ud.args.nodeScale(d)})`,
     }),
+
+    // links 
+
     (v, ud:UnitDisk)=> new ArcLayer(v, {
         invisible:  false,
         hideOnDrag: false,
@@ -178,6 +181,9 @@ export const layerSrc = [
                             (((d.pathes && d.pathes.isPartOfAnySelectionPath) || 
                               (d.pathes && d.pathes.isPartOfAnyHoverPath)) ? .015 : 0)), 
     }),
+
+    // nodes
+
     (v, ud:UnitDisk)=> new NodeLayer(v, {        
         invisible:  false,
         hideOnDrag: true,
