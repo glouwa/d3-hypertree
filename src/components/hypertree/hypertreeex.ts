@@ -48,8 +48,9 @@ const maintoobarHTML = `
     ${btn('btnupload', 'cloud_upload', 'disabled')}            
     -->
 
-    ${btn('btnhome', 'home', 'disabled tool-seperator')}
-    ${btn('btnquery', 'search')}
+    ${btn('btnquery', 'search',  'tool-seperator')}
+    ${btn('btnhome', 'home', 'disabled')}
+    
     
     <!--
     ,530, 470
@@ -190,7 +191,7 @@ export class HypertreeEx extends Hypertree
             if (!this.isAnimationRunning() && centerNode.data.name !== 'Root') {                
                 const find = this.unitdisk.cache.voronoiDiagram.find(0, 0)
                 if (find) {
-                    console.log(pathStr, find.data)
+                    console.log('found centernode by voro', pathStr, find.data)
                     this.args.interaction.onNodeSelect(find.data)
                     
                 }
