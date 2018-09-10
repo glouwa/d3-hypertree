@@ -191,7 +191,7 @@ export class HypertreeEx extends Hypertree
             if (!this.isAnimationRunning() && centerNode.data.name !== 'Root') {                
                 const find = this.unitdisk.cache.voronoiDiagram.find(0, 0)
                 if (find) {
-                    console.log('found centernode by voro', pathStr, find.data)
+                    //console.log('found centernode by voro', pathStr, find.data)
                     this.args.interaction.onNodeSelect(find.data)
                     
                 }

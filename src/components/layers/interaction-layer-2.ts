@@ -324,11 +324,16 @@ export class InteractionLayer2 implements ILayer
         console.log('click', this.dist(this.panStart, m), n, 
             this.view.unitdisk.args.transformation.cache.centerNode)
 
+        if (!this.view.hypertree.isAnimationRunning())
+            this.view.hypertree.args.interaction.onNodeClick(n, m, this)
+
+        /*
         if (n.mergeId !== this.view.unitdisk.args.transformation.cache.centerNode.mergeId) {
             //console.log('not same --> goto node')
             this.view.hypertree.api.goto(CmulR({ re:n.layout.z.re, im:n.layout.z.im }, -1), null)
                 .then(()=> this.view.hypertree.drawDetailFrame())
-        }/*
+        }*/ 
+        /*
         else {
             console.log('click on center')
             this.args.onClick(n, m)

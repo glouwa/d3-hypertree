@@ -18,6 +18,7 @@ import { Hypertree }                from '../../components/hypertree/hypertree'
 import { layerSrc, labeloffsets }   from './preset-layers'
 import { cacheUpdate }              from './magic-filter'
 import { mergeDeep }                from 'ducd'
+import { C, CmulR }                 from '../transformation/hyperbolic-math'
 
 const π =              Math.PI
 const hasLazy =        n=> (n.hasOutChildren && n.isOutλ)
@@ -102,6 +103,12 @@ const modelBase : ()=> HypertreeArgs = ()=>
     },
     interaction: {  
         mouseRadius:        .9,
+
+        onNodeClick:            (n:N, m:C)=> {},
+        onCenterNodeChange:     (n:N)=> {},
+        onWikiCenterNodeChange: (n:N)=> {},
+        onHoverNodeChange:      (n:N)=> {},
+
         onNodeSelect:       ()=> {},
         onNodeHold:         ()=> {},                    
         onNodeHover:        ()=> {},
@@ -133,7 +140,15 @@ export const presets : { [key: string]:()=> any } =
             nodeRadius: nodeInitR(.0075)
         },
         interaction: {              
-            λbounds:           [ 1/40, .55 ]         
+            λbounds:           [ 1/40, .55 ],   
+            /*
+            onNodeClick:       (n:N, m:C, l)=> {
+                 if (n.mergeId !== l.view.unitdisk.args.transformation.cache.centerNode.mergeId) {
+                    //console.log('not same --> goto node')
+                    l.view.hypertree.api.goto(CmulR({ re:n.layout.z.re, im:n.layout.z.im }, -1), null)
+                        .then(()=> l.view.hypertree.drawDetailFrame())
+                }
+            }*/      
         }    
     }),
 
@@ -207,7 +222,20 @@ export const presets : { [key: string]:()=> any } =
                 maxlabels: 25,
             },
             layout: {
-                initSize: .85,
+                initSize: .9,
+                weight:   (n:N)=> {
+                    if (isLeaf(n))
+                        return 1
+                    else if (n.data && n.data.name == 'Open-Tree-of-Life')
+                        return 30
+                    else
+                        return 0
+                },
+                /*weight:   (n:N)=> (isLeaf(n)
+                    ?1
+                    :((n.data && n.data.name == 'Open-Tree-of-Life')
+                        ?30
+                        :0)),*/
                 rootWedge: {    
                     orientation:    3*π/2,
                     angle:          3*π/2

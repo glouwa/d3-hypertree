@@ -113,7 +113,7 @@ export const layerSrc = [
                         + ` scale(${ud.args.nodeScale(d)})`,
     }),
     (v, ud:UnitDisk)=> new NodeLayer(v, {                            
-        invisible:  false,
+        invisible:  true,
         hideOnDrag: true,
         name:       'center-node',
         className:  'center-node', 
