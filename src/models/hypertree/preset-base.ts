@@ -69,10 +69,10 @@ const modelBase : ()=> HypertreeArgs = ()=>
         weightFilter: {
             magic:              160,
             alpha:              1.05,
-            weight:             n=> (isLeaf(n) ? 1 : Math.pow(2,n.height)),
+            weight:             n=> (isLeaf(n) ? 1 : Math.pow(10,n.height)),
             //weight:             n=> (isLeaf(n) ? 1 : n.height*n.height),
             rangeCullingWeight: { min:4,   max:500 },
-            rangeNodes:         { min:300, max:600 },
+            rangeNodes:         { min:150, max:500 },
         },
         focusExtension:     1.6,
         maxFocusRadius:     .85,
