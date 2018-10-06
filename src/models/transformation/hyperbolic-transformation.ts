@@ -28,7 +28,7 @@ export class HyperbolicTransformation implements Transformation<N>
 {
     cache: TransformationCache = new TransformationCache()
     state: T
-    dST:   T    
+    dST:   T
     maxMouseR = .95
     
     constructor(tp:T)  { this.state = tp }
@@ -40,7 +40,10 @@ export class HyperbolicTransformation implements Transformation<N>
     onDragEnd =      (m:C)=> this.dST = undefined
     isMoving=        ()=>    this.dST !== undefined
     onDragP =        (s:C, e:C)=> {
-        this.state.P = compose(this.dST, shift(this.dST, s, maxR(e, this.maxMouseR))).P
+        const nt = compose(this.dST, shift(this.dST, s, maxR(e, this.maxMouseR)))
+        this.state.P = nt.P
+        this.state.θ = nt.θ
+        //this.state.θ = setR(nt.θ)
     }
     onDragθ =        (s:C, e:C)=> {}
     onDragλ =        (l:number)=> this.state.λ = l

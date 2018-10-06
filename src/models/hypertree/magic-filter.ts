@@ -84,7 +84,8 @@ function collectNodesByWeight(ud:IUnitDisk, cache:TransformationCache, path:N[])
     cache.emojis =        []
     cache.cells =         []
   
-    const mf = ud.view.hypertree.isAnimationRunning() ? 1:1
+    const mf = ud.view.hypertree.isAnimationRunning() ? 1:1 // todo: make configurable
+
     function abortfilter(n, idx, highway) { // return false to abort
         n.minWeight = highway[0].precalc.cullingWeight 
                     / ud.view.hypertree.args.filter.weightFilter.magic 
@@ -108,6 +109,7 @@ function collectNodesByWeight(ud:IUnitDisk, cache:TransformationCache, path:N[])
     // centernode will be set at this point
 
     // select visible nodes - alle anderen (von startnode bis abortfilter)
+    // path.pop() 
     dfs2({
         node:        startNode,
         abortFilter: abortfilter,
