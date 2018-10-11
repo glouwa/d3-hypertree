@@ -2,7 +2,7 @@
   "name": "d3-hypertree",
   "main": "dist/js/d3-hypertree.js",
   "types": "dist/d/d3-hypertree.d.js",
-  "version": "1.0.6",
+  "version": "1.0.8",
   "description": "Hyperbolictree",
   "author": "Michael Glatzhofer",
   "license": "MIT",

@@ -2,6 +2,7 @@ doc/
 res/
 node_modules/
 src/
+msc/
 
 # qt cerator
 *.directory
