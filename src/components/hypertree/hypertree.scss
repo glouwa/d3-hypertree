@@ -140,19 +140,6 @@
     }
 }
 
-#path {    
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: calc(100% - 33em);
-
-    font-size: .75em;    
-    word-spacing: .3em;
-    position: absolute;
-    top: -1.6em;
-    left: 7em;
-}
-
 .absolute-center {
     margin: auto;
     position: absolute;

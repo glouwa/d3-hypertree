@@ -87,6 +87,7 @@ export interface HypertreeArgs
         onNodeSelect:       (n:N)=> void
         onNodeHold:         ()=>void                          // x 
         onNodeHover:        ()=>void                          // x 
+        onCenterNodeChange: (n:N, s:string)=> void
         λbounds:            [ number, number ]
         wheelFactor:        number
     }

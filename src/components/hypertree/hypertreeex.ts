@@ -175,9 +175,11 @@ export class HypertreeEx extends Hypertree
             const pathStr = centerNode
                 .ancestors()
                 .reduce((a, e)=> `${e.precalc.label?("  "+e.precalc.label+"  "):''}${a?"›":""}${a}`, '') 
-/*
-            this.view_.path.innerText = pathStr // todo: html m frame?
-*/
+
+            //this.view_.path.innerText = pathStr // todo: html m frame?
+            if (this.args.interaction.onCenterNodeChange)
+                this.args.interaction.onCenterNodeChange(centerNode, pathStr)
+
             if (centerNode === this.data && !this.view_.btnHome.classList.contains('disabled')) {
                 this.view_.btnHome.classList.add('disabled')
                 //this.view_.btnPathHome.classList.add('disabled')
@@ -193,7 +195,6 @@ export class HypertreeEx extends Hypertree
                 if (find) {
                     //console.log('found centernode by voro', pathStr, find.data)
                     this.args.interaction.onNodeSelect(find.data)
-                    
                 }
             }
 
