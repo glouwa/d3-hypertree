@@ -17,6 +17,9 @@ are welcome:
 
 ## Project Governance
 
+[Pull request from a fork](https://help.github.com/articles/creating-a-pull-request-from-a-fork/)
+are welcome!
+
 Individuals making significant and valuable contributions are given commit-access to the
 project to contribute as they see fit. 
 
