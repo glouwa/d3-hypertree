@@ -190,7 +190,15 @@ export class Hypertree
         data:           ()=> this.unitdisk.update.data(),        
         transformation: ()=> this.unitdisk.update.transformation(),
         pathes:         ()=> this.unitdisk.update.pathes(),
-        centernode:     (centerNode)=> {}
+        centernode:     (centerNode)=> {            
+            const pathStr = centerNode
+                .ancestors()
+                .reduce((a, e)=> `${e.precalc.label?("  "+e.precalc.label+"  "):''}${a?"›":""}${a}`, '') 
+
+            //this.view_.path.innerText = pathStr // todo: html m frame?
+            if (this.args.interaction.onCenterNodeChange) 
+                this.args.interaction.onCenterNodeChange(centerNode, pathStr)            
+        }
     }
 
     //########################################################################################################

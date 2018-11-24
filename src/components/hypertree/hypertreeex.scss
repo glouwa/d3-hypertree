@@ -18,8 +18,15 @@
     border: none;
 }
 
-/*
+#main-toolbar {
+    margin-top:1.2em;
+
+    #btnquery {
+        visibility: collapse;
+    }    
+}
+
 #path-toolbar {
     visibility: hidden;
 }
-*/
+

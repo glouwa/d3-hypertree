@@ -8,12 +8,11 @@ export interface SymbolLayerArgs extends ILayerArgs
 {
     name:      string,
     data:      ()=> any,
-    r:         (d)=> any,
     transform,
     clip?:     string,
 }
 
-var symbol = d3.symbol().size(.002)
+var symbol = d3.symbol().size(.0012)
 var d_star = symbol.type(d3['symbolStar'])()
 
 const home = 'M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z'
@@ -46,8 +45,7 @@ export class SymbolLayer implements ILayer
             name:              this.args.name,
             className:         'node',
             elementType:       'path',
-            create:            s=> s.attr("r",            d=> this.args.r(d))
-                                    .classed("root",      d=> !d.parent)
+            create:            s=> s.classed("root",      d=> !d.parent)
                                     .classed("lazy",      d=> d.hasOutChildren)
                                     .classed("leaf",      d=> d.parent)
                                     .classed("exit",      d=> (!d.children || !d.children.length)

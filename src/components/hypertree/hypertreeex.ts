@@ -48,8 +48,8 @@ const maintoobarHTML = `
     ${btn('btnupload', 'cloud_upload', 'disabled')}            
     -->
 
-    ${btn('btnquery', 'search',  'tool-seperator')}
     ${btn('btnhome', 'home', 'disabled')}
+    ${btn('btnquery', 'search')}
     
     
     <!--

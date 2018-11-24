@@ -88,7 +88,7 @@ export class LayerStack
         var t2 = performance.now()
         if (this.layers['labels']) 
             this.layers['labels'].update.data()
-
+        
         var t3 = performance.now()
         this.d3meta = { 
             Δ:[t1-t0, t2-t1, t3-t2], 

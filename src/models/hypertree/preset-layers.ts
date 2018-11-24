@@ -198,11 +198,10 @@ export const layerSrc = [
     // IMAGE LABLE SYMBOL EMOJI
 
     (v, ud:UnitDisk)=> new SymbolLayer(v, {
-        invisible:  true,
-        hideOnDrag: true,
+        invisible:  false,
+        hideOnDrag: false,
         name:       'symbols',
-        data:       ()=> ud.cache.spezialNodes,
-        r:          d=> .03,
+        data:       ()=> ud.cache.spezialNodes,        
         transform:  d=> d.transformStrCache 
                         + ` scale(${d.dampedDistScale})`,
     }),
@@ -226,8 +225,8 @@ export const layerSrc = [
                         + `scale(${d.dampedDistScale*2})`
     }),
     (v, ud:UnitDisk)=> new LabelLayer(v, {
-        invisible:  true,
-        hideOnDrag: true,
+        invisible:  false,
+        hideOnDrag: false,
         name:       'labels',
         className:  'caption',
         data:       ()=> ud.cache.labels,
@@ -238,7 +237,7 @@ export const layerSrc = [
                         + d.scaleStrText                            
     }),
     (v, ud:UnitDisk)=> new LabelForceLayer(v, {                            
-        invisible:  false,
+        invisible:  true,
         hideOnDrag: true,                            
         name:       'labels-force',
         className:  'caption caption-label',
