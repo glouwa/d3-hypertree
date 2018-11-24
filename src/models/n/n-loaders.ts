@@ -74,9 +74,16 @@ function loadFromFile(ok, file) {
         })
 }
 
+function loadFromData(ok, data) {    
+    const t0 = performance.now()
+    const dl = 0
+    ok(data, t0, dl)
+}
+
 export var path_ =        len=> ok=> path(ok, len)
 export var star_ =        degree=> ok=> star(ok, degree)
 export var fromFile =     f=> ok=> loadFromFile(ok, f)
+export var fromData =     f=> ok=> loadFromData(ok, f)
 export var fromLangFile = f=> ok=> loadFromLangFile(ok, f)
 
 export function nTreeAtFirst(ok, max=75, deg=6) {
