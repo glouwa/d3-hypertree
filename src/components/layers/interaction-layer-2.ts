@@ -295,7 +295,7 @@ export class InteractionLayer2 implements ILayer
  
     //-----------------------------------------------------------------------------------------
  
-    private ripple(m:C, n:N) {      
+    public ripple(m:C, n:N, ok) {      
         const rippleClip = this.view.parent
             .append('clipPath')            
             .attr('id', `cell-clip-${n.mergeId}`)
@@ -314,19 +314,26 @@ export class InteractionLayer2 implements ILayer
                     .on('animationend', ()=> { 
                         rippleCircle.remove() 
                         rippleClip.remove() 
+                        ok()
                     })
     }
 
     private click(m:C) {
         const q = this.view.unitdisk.cache.voronoiDiagram.find(m.re, m.im)
         const n = q ? q.data : undefined
-        this.ripple(m, n)
-        console.log('click', this.dist(this.panStart, m), n, 
-            this.view.unitdisk.args.transformation.cache.centerNode)
+        console.log('click', this.dist(this.panStart, m), n, this.view.unitdisk.args.transformation.cache.centerNode)
 
-        if (!this.view.hypertree.isAnimationRunning())
-            this.view.hypertree.args.interaction.onNodeClick(n, m, this)
-
+        if (!this.view.unitdisk.layerStack.layers['cells'].args.invisible) {
+            this.ripple(m, n, ()=> {                                
+                if (!this.view.hypertree.isAnimationRunning())
+                    this.view.hypertree.args.interaction.onNodeClick(n, m, this)
+            })
+        }
+        else {
+            if (!this.view.hypertree.isAnimationRunning())
+                this.view.hypertree.args.interaction.onNodeClick(n, m, this)
+        }
+        
         /*
         if (n.mergeId !== this.view.unitdisk.args.transformation.cache.centerNode.mergeId) {
             //console.log('not same --> goto node')
