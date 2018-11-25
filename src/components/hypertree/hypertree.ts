@@ -75,6 +75,7 @@ export class Hypertree
 
     initPromise : Promise<void>
     initPromisHandler : { resolve, reject }
+    isInitializing = false
     
     constructor(view:{ parent:HTMLElement }, args:HypertreeArgs) {
         console.group("hypertree constructor")
@@ -90,6 +91,7 @@ export class Hypertree
     public api = {
         setModel: (model: HypertreeArgs)=> new Promise<void>((ok, err)=> {            
             //model = mergeDeep_(presets[model.baseCfg], model)
+            this.isInitializing = true
             const base = presets.modelBase()
             console.group("set model: merging ", model, ' into ', base)
 
@@ -108,13 +110,13 @@ export class Hypertree
             this.args.langloader = ll
 
             this.args.langloader((langMap, t1, dl)=> {
-                console.group("langloader", langMap && langMap.length)
+                console.group("langloader", langMap && Object.keys(langMap).length || 0)
                 this.langMap = langMap || {}
-                this.updateLang_(dl)
-                this.update.data()
+                this.updateLang_(dl)                
+                requestAnimationFrame(()=> this.update.data())
                 console.groupEnd()
                 
-                if (this.data) ok()
+                if (this.data) { this.isInitializing=false;  ok() }
             })
             console.groupEnd()
         },
@@ -129,7 +131,7 @@ export class Hypertree
                 this.initData(d3h, t0, t1, dl)                                
                 console.groupEnd()
 
-                if (this.langMap) ok()
+                if (this.langMap) { this.isInitializing=false;  ok() }
             })
             console.groupEnd()
         },
@@ -145,7 +147,7 @@ export class Hypertree
         //addPath: (pathid, node:N)=> { this.addPath(pathid, node) },
         //removePath: (pathid, node:N)=> { this.removePath(pathid, node) },
         setPathHead: (pathType:Path, n:N)=> {
-            if (!this.isAnimationRunning()) {
+            if (!this.isInitializing && !this.isAnimationRunning()) {
                 this.setPathHead(pathType, n)
                 this.update.pathes()
             }
@@ -274,7 +276,7 @@ export class Hypertree
         this.args.objects.pathes = []
         this.args.objects.traces = []
         
-        this.update.data()   
+        requestAnimationFrame(()=> this.update.data())
     }
 
     protected initData(d3h, t0, t1, dl) {
@@ -605,10 +607,10 @@ export class Hypertree
     }
 
     public isAnimationRunning() : boolean {
-        var view = this.unitdisk && this.unitdisk.isDraging
-        var nav = this.unitdisk && this.unitdisk.isDraging
-        const lowdetail = this.transition?this.transition.lowdetail:false
-        return view || nav || lowdetail
+        const view = this.unitdisk && this.unitdisk.isDraging
+        const nav = this.unitdisk && this.unitdisk.isDraging
+        const lowdetail = this.transition?this.transition.lowdetail:false        
+        return view || nav || lowdetail 
     }  
 }
 

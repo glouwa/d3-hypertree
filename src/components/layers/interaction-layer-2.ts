@@ -79,10 +79,13 @@ export class InteractionLayer2 implements ILayer
     }
     
     private fireMouseMove() {
-        if (this.mousedown)
+        if (this.mousedown) 
             this.fireMouseEvent('onPointerMove')                    
-        else 
-            this.htapi.setPathHead(this.hoverpath, this.findNodeByCell())        
+        else {
+            if (!this.view.hypertree.isInitializing
+             && !this.view.hypertree.isAnimationRunning())
+                this.htapi.setPathHead(this.hoverpath, this.findNodeByCell())        
+        }
     }
 
     private fireMouseUp() {
