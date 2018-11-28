@@ -113,7 +113,8 @@ export class Hypertree
                 console.group("langloader", langMap && Object.keys(langMap).length || 0)
                 this.langMap = langMap || {}
                 this.updateLang_(dl)                
-                requestAnimationFrame(()=> this.update.data())
+                //requestAnimationFrame(()=> this.update.data())
+                this.update.data()
                 console.groupEnd()
                 
                 if (this.data) { this.isInitializing=false;  ok() }

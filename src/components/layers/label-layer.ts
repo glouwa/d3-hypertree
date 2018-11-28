@@ -61,9 +61,8 @@ export class LabelLayer implements ILayer
                                     .style("stroke",         d=> d.pathes && d.pathes.labelcolor)
                                     .text(                   this.args.text),
             updateColor:       s=> s.style("stroke",         d=> d.pathes && d.pathes.labelcolor),
-            updateTransform:   s=> s.attr("transform", 
-                (d, i, v)=> this.args.transform(d, this.args.delta(d, i, v)))
-                //.text(                   this.args.text)
+            updateTransform:   s=> s.attr("transform",       (d, i, v)=> this.args.transform(d, this.args.delta(d, i, v)))
+           //                         .text(                   this.args.text)
         })
         this.d3updatePattern2 = new D3UpdatePattern({
             parent:            this.view.parent,
@@ -81,7 +80,6 @@ export class LabelLayer implements ILayer
                                     .attr('y2',             d=> d.forcepoints2.y||0)
                                     .attr("stroke-width",   d=> .002)
                                     .attr("stroke-linecap", d=> "round")
-                //.text(                   this.args.text)
         })    
     }
 }
