@@ -271,3 +271,102 @@ export const presets : { [key: string]:()=> any } =
         return mergeDeep(model, diff)
     }
 }
+
+
+
+
+
+
+
+
+
+
+/*
+{
+    langloader:  ok=> ok(),
+
+    dataInitBFS: (ht:Hypertree, n:N)=> {
+        n.precalc.imageHref = undefined
+        n.precalc.icon = undefined
+        n.precalc.clickable = true
+        n.precalc.cell = true      
+    },    
+    langInitBFS: (ht:Hypertree, n:N)=> {
+        n.precalc.label = undefined
+        n.precalc.wiki = undefined
+    },
+
+    objects: {  
+        selections:         [],
+        pathes:             [],
+        traces:             [],
+    },
+
+    layout: {
+        type:               layoutBergé,
+        weight:             (n:N)=> (isLeaf(n)?1:0),
+        initSize:           .97,
+        rootWedge: {    
+            orientation:    3*π/2,
+            angle:          3*π/2 
+        }
+    },
+
+    filter: {
+        type:               'magic',
+        cullingRadius:      .99,
+        weightFilter: {
+            magic:              160,
+            alpha:              1.05,            
+            weight:             n=> (isLeaf(n) ? 1 : n.height*n.height),
+            rangeCullingWeight: { min:4,   max:500 },
+            rangeNodes:         { min:150, max:500 },
+        },
+        focusExtension:     1.6,
+        maxFocusRadius:     .85,
+        wikiRadius:         .85,
+        maxlabels:          25,
+    },
+    geometry: {
+        decorator:          UnitDisk,
+        cacheUpdate:        cacheUpdate,        
+        layers:             layerSrc,
+        layerOptions:       {
+                                'stem-arc': {
+                                    invisible: true,
+                                    hideOnDrag: true
+                                }
+                            },                            
+        clipRadius:         1,
+        nodeRadius:         nodeInitR(.01),
+        nodeScale:          nodeScale,
+        nodeFilter:         hasCircle,
+        offsetEmoji:        labeloffsets['labeloffset'], //outwards,
+        offsetLabels:       labeloffsets['labeloffset'], //outwardsPlusNodeRadius,
+        linkWidth:          arcWidth,        
+        linkCurvature:      '-',
+        captionBackground:  'all',
+        captionFont:        '6.5px Roboto',
+        captionHeight:       .04,
+        transformation:     new HyperbolicTransformation({
+            P:              { re: 0, im:0 },
+            θ:              { re: 1, im:0 },
+            λ:              .1
+        })
+    },
+    interaction: {  
+        mouseRadius:        .9,
+
+        onNodeClick:            (n:N, m:C)=> {},
+        onCenterNodeChange:     (n:N)=> {},
+        onWikiCenterNodeChange: (n:N)=> {},
+        onHoverNodeChange:      (n:N)=> {},
+
+        onNodeSelect:       ()=> {},
+        onNodeHold:         ()=> {},                    
+        onNodeHover:        ()=> {},
+        λbounds:            [ 1/40, .45 ],
+        wheelFactor:        1.175,
+    }
+}
+*/

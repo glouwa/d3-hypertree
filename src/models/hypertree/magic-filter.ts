@@ -171,7 +171,7 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
         (ud.layerStack && !ud.layerStack.layers['cells'].args.hideOnDrag)) 
         doVoronoiStuff(ud, cache) 
 
-    if (!ud.view.hypertree.isAnimationRunning())
+    //if (!ud.view.hypertree.isAnimationRunning())
         doImageStuff(ud, cache)
     
     if (cache.centerNode)         

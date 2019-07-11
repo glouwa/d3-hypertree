@@ -152,9 +152,10 @@ export const layerSrc = [
         nodePosStr: n=> n.strCache,
         width:      d=> ud.args.linkWidth(d),
         classed:    (s, w)=> s
+                         .style("stroke",      d=> (d.pathes && d.pathes.isPartOfAnyHoverPath)?d.pathes && d.pathes.finalcolor:d.pathes && d.pathes.finalcolor)
                          .classed("hovered",   d=> d.pathes && d.pathes.isPartOfAnyHoverPath)
-                         .classed("selected",  d=> d.pathes && d.pathes.isPartOfAnySelectionPath)                         
-                         .style("stroke",      d=> d.pathes && d.pathes.finalcolor)
+                         .classed("selected",  d=> d.pathes && d.pathes.isPartOfAnySelectionPath)
+                         
                          //.attr("stroke-width", d=> w(d))
     }),
     (v, ud:UnitDisk)=> new StemLayer(v, {
@@ -186,7 +187,7 @@ export const layerSrc = [
 
     (v, ud:UnitDisk)=> new NodeLayer(v, {        
         invisible:  false,
-        hideOnDrag: true,
+        hideOnDrag: false,
         name:       'nodes',
         className:  'node',
         data:       ()=> ud.cache.leafOrLazy,
@@ -208,10 +209,12 @@ export const layerSrc = [
     (v, ud:UnitDisk)=> new ImageLayer(v, {
         name:       'images',
         data:       ()=> ud.cache.images,
+        width:      .05,
+        height:     .05,
         imagehref:  (d)=> d.precalc.imageHref,
-        delta:      (d)=> CmulR({ re:-.025, im:-.025 }, d.distScale),
-        transform:  (d, delta)=> 
-                        ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` 
+        delta:      (d)=> CmulR({ re:-.05, im:-.05 }, d.distScale),
+        transform:  (d, delta)=>                         
+                          ` translate(${d.cache.re} ${d.cache.im})` 
                         + ` scale(${d.distScale})`
     }),
     (v, ud:UnitDisk)=> new LabelLayer(v, {

@@ -76,6 +76,8 @@ export class Hypertree
     initPromise : Promise<void>
     initPromisHandler : { resolve, reject }
     isInitializing = false
+
+    lastCenterNode = undefined
     
     constructor(view:{ parent:HTMLElement }, args:HypertreeArgs) {
         console.group("hypertree constructor")
@@ -194,6 +196,10 @@ export class Hypertree
         transformation: ()=> this.unitdisk.update.transformation(),
         pathes:         ()=> this.unitdisk.update.pathes(),
         centernode:     (centerNode)=> {            
+            if (this.lastCenterNode && this.lastCenterNode.mergeId == centerNode.mergeId)
+                return
+
+            this.lastCenterNode = centerNode
             const pathStr = centerNode
                 .ancestors()
                 .reduce((a, e)=> `${e.precalc.label?("  "+e.precalc.label+"  "):''}${a?"›":""}${a}`, '') 
