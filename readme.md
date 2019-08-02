@@ -26,13 +26,18 @@ A Scalable Intercative Web Component for Hyperbolic Tree Visualisations.
 <a href="https://glouwa.github.io/d3-hypertree/"><img 
 src="docs/img/screenshot-light-github.png?raw=true" width="170" align="left" hspace="10" vspace="16"></a>
 
+- Uses same data format as [d3.hierarchy()](https://github.com/d3/d3-hierarchy#hierarchy) 
 - Scalable up to 1000 nodes
 - Scalable up to 50k nodes with weight culling and primeter culling
-- Configurable mouse and touch interaction
-- Configurable layers, visualisation presets
-- Uses same data format as [d3.hierarchy()](https://github.com/d3/d3-hierarchy#hierarchy) 
-- Alternatively file loaders for csv, json, skos, treeml are available
+- Mouse and touch interaction  
+- Configurable layers
+- Animation API 
 <br>
+<br>
+<br>
+<br>
+<br>
+
 
 ## Resources
 - [API Reference](https://glouwa.github.io/d3-hypertree/)
@@ -44,46 +49,52 @@ src="docs/img/screenshot-light-github.png?raw=true" width="170" align="left" hsp
 ```bash
 npm install d3-hypertree --save
 ```
+`node_modules/d3-hypertree/dist/` will contain all necessary files.
 
-<b>Or</b> download the [latest release](https://glouwa.github.io/d3-hypertree/)
-of the prebuild bundle if npm is not used, 
-and add the following lines to your page:
+<b>Or</b> download the [latest release](https://cdn.jsdelivr.net/npm/d3-hypertree@1.1.0/dist/)
+of the prebuilt bundle if npm is not used. 
+The prebuilt bundle declares the global variable `hyt`, 
+therefore an import as in the usage example below is not necessary.
 
+
+
+Add the following lines to your page:
 ```html
 <link  href="index-browser-light.css" rel="stylesheet">
 <script src="d3-hypertree.js"></script>
 ```
 
-The prebuild bundle declares the global variable `hyt`, 
-therefore a import as in the usage example below is not necessary.
-You can find the prebuild bundle also in the npm package `dist` folder. 
-
 ## Webpack
 
 D3-hypertree is tested with webpack. 
-You may use imports in a diffent way,
-but the following usage examples will assume an import like this:  
-
+Dont forget to add the hypertree css to your projects.
+To make the example snippets compatible to the prebuilt bundle,
+the following usage examples will assume an import like this:  
 ```typescript
 import * as hyt from 'd3-hypertree'
 ```
+Experts might prefer to import specific classes like `d3-hypertree/components/hypertree` to optimize bundle size.
 
 ## Usage
 
-Parent DOM element and data source are the only configuration parameters required.
+To begin a minimal example of creating a hypertree component is simple.
+Only parent DOM element and data source, in this case a file in d3 JSON format is sufficient.
 
 ```typescript
 new hyt.Hypertree(
     {
         parent: document.body,        
     },
-    {
-        model: hyt.loaders.fromFile('data/LDA128-ward.d3.json'),
+    {        
+        dataloader: hyt.loaders.fromFile('data/LDA128-ward.d3.json'),
+        //dataloader: ok=> ok(d3.hierarchy(...)),
+        //dataloader: ok=> ok(d3.stratify()...(table)),        
     }
 )
 ```
+You will see a hypertree without any labels or other features. See [API Reference](https://glouwa.github.io/d3-hypertree/). for more configuration options.
 
-See [API Reference](https://glouwa.github.io/d3-hypertree/) or cheat sheet below for additional options.
+The cheat sheet below shows a hypertree component with all available options.
 
 ## Options Cheat Sheet
 
