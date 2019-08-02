@@ -117,30 +117,43 @@ named `n` in the following examples.
 
 A typical data driven property configuration looks like this:
 ```
-    nodeColor: n=> (n.valueX?'red':'blue')
+    nodeColor: function(n, i, v) {
+        if (n.data.valueX>30) return 'red'
+        else return 'blue'
+    }
 ```
 The given function is called by the renderer, for each frame, for each visible node.
+JavaScript supports a shorter syntax for functions, called lambda expressions.
+Most code snippets will use this syntax equivalent to the function above.
+```
+    nodeColor: n=> (n.data.valueX>30 ? 'red' : 'blue')
+```
 
 #### The Node objects `n`
-To calculate colors, or other visual properties, the `n` objects must and do provide 
+To calculate colors, or other visual properties, the `n` objects provide 
 the following information: 
 -   User defined data of node. accessible by `n.data`.
 -   hierarchy structure derived from d3 (d3-hierarchy) `parent`, `children` and more,
-    see d3-hierarchy.
--   hyperbolic coordinates, euclidean coordinates. 
--   precalculated properties. see section [User defined Node Initialization].
+    see [d3-hierarchy]().
+-   hyperbolic coordinates, euclidean coordinates, layout. 
+-   precalculated properties such as labels, image urls or properties hard to compute.
+    See section [User defined Node Initialization].
 
+The type definition of N the according TypeScript interface can be found [here]().
+However, usually its the most simple way to print the object `n` to the console when working with data driven functions.
 
 #### User defined Node Initialization
 if to slow fro each frame, to it at init
 
+href, label example
+
 ### Layer Configuration 
 add remove layers, layer contain config too
 
-### Non blocking API for Animations and data updates
+### Non blocking API for Animations and Data updates
 animations, load
 
-### Event Handling
+### Interaction Event Handling
 on center node change on click, on hover node change
 
 ## Options Cheat Sheet
