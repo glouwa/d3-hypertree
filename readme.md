@@ -76,7 +76,7 @@ The following examples will guide you through the most important concepts,
 beginning with the most simple configuration, followed by more complex configurations.
 For a complete list of configurations parameters 
 See [API Reference](https://github.com/glouwa/d3-hypertree/blob/master/docs/readme.md) 
-or section [Cheat Sheet]
+or section [Cheat Sheet](#Options Cheat Sheet)
 
 The Hypertree constructor takes all configuration parameters, 
 and returns a handle for starting animations or updating the data set.
@@ -87,7 +87,7 @@ Guess what: The hypertree configuration is structured like a hierarchy.
 The topmost objects component positioning configuration, 
 and the visualisation configuration, 
 containing configuration groups `layout`, `filter`, `interaction`, `geometry`.
-See section [# Options Cheat Sheet] for the complete structure.
+See section [Cheat Sheet](#Options Cheat Sheet) for the complete structure.
 The following examples will only show some selected options.
 
 ### Constructing a Component
