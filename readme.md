@@ -31,7 +31,7 @@ src="docs/img/screenshot-light-github.png?raw=true" width="170" align="left" hsp
 - Scalable up to 50k nodes with weight filter and perimeter culling
 - Mouse and touch interaction  
 - Animation API 
-- Compartible with WebKit and Blink browser engines
+- Compatible with WebKit and Blink browser engines
 <br>
 
 
