@@ -128,7 +128,7 @@ export class LabelForceLayer implements ILayer
 
     private attach() {
         function calctransform(d, i, v) {
-            bboxOffset(d)(v[i])
+            //bboxOffset(d)(v[i])
             if (!d.forcepoints)
                 return ` translate(${d.cache.re} ${d.cache.im})` 
             console.assert(d.forcepoints.x || d.depth === 0)

@@ -35,7 +35,7 @@ export class NodeLayer implements ILayer
 
     private attach() {
         this.d3updatePattern = new D3UpdatePattern({
-            parent:            this.view.parent,
+            parent:            this.view.parent, 
             layer:             this,
             clip:              this.args.clip,
             data:              this.args.data,
@@ -50,11 +50,12 @@ export class NodeLayer implements ILayer
                                                               && d.data && d.data.numLeafs),
             updateColor:       s=> s.classed("hovered",   d=> d.pathes && d.pathes.isPartOfAnyHoverPath)
                                     .classed("selected",  d=> d.pathes && d.pathes.isPartOfAnySelectionPath)
-                                    .style("stroke",      d=> d.pathes && d.pathes.labelcolor),
+                                    .style("fill",      d=> (d.pathes && d.pathes.labelcolor) || this.args.nodeColor(d)),
 
             //updateColor:       s=> s.classed("hovered",   d=> d.isPartOfAnyHoverPath && d.parent)
             //                        .classed("selected",  d=> d.isPartOfAnySelectionPath && d.parent),
             updateTransform:   s=> s.attr("transform",    d=> this.args.transform(d))
+                                    .style("stroke",      d=> d.pathes && d.pathes.labelcolor)
                                     .attr("r",            d=> this.args.r(d)),
         })
     }

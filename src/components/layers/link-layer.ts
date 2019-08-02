@@ -51,10 +51,12 @@ export class ArcLayer implements ILayer
             className:         this.args.className,
             elementType:       this.args.curvature === 'l' ? 'line' : 'path',
             create:            s=> {},
-            updateColor:       s=> this.args.classed(s, this.args.width),
+            //updateColor:       s=> this.args.classed(s, this.args.width),
+            updateColor:       s=> this.args.classed(s, this.args.width, this.args.linkColor),
             updateTransform:   s=> {
                 //const c = d=> d.height===0 ? '+' : '-'                 
                 const c = d=> this.args.curvature
+
                 if (this.args.curvature == 'l')
                     s.attr('x1',             d=> this.args.nodePos(d).re)
                      .attr('y1',             d=> this.args.nodePos(d).im)
@@ -66,6 +68,8 @@ export class ArcLayer implements ILayer
                     s.attr("d",              d=> this.arcOptions[c(d)](d))
                      .attr("stroke-width",   d=> this.args.width(d))
                      .attr("stroke-linecap", d=> "round")
+
+                //this.args.classed(s, this.args.width)
             },
         })
     }

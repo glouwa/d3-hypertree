@@ -177,8 +177,9 @@ export class Hypertree
             })
             this.update.pathes()
         },
-        gotoHome: ()=>     this.animateTo(()=>{}, ()=>{}, { re:0, im:0 }, null), 
-        gotoNode: (n:N)=>  this.animateTo(()=>{}, ()=>{}, CmulR({ re:n.layout.z.re, im:n.layout.z.im }, -1), null),
+        gotoHome: ()=>     new Promise((ok, err)=> this.animateTo(ok, err, { re:0, im:0 }, null)), 
+        gotoNode: (n:N)=>  new Promise((ok, err)=> this.animateTo(ok, err, CmulR({ re:n.layout.z.re, im:n.layout.z.im }, -1), null)),
+
         goto:     (p, l)=> new Promise((ok, err)=> this.animateTo(ok, err, p, l)),
         gotoλ:    (l)=>    new Promise((ok, err)=> this.animateToλ(ok, err, l))
     }
@@ -362,7 +363,7 @@ export class Hypertree
 
     private sum(data, value, target) {
         data.eachAfter(node=> {
-            let sum = +value(node.data) || 0
+            let sum = +value(node) || 0
             const children = node.children
             var i = children && children.length
             while (--i >= 0) sum += children[i].precalc[target]

@@ -28,15 +28,15 @@ export class LabelLayer implements ILayer
         parent:         ()=> this.attach(),      
         data:           ()=> {
             this.d3updatePattern.update.data()
-            this.d3updatePattern2.update.data()
+            //this.d3updatePattern2.update.data()
         },
         transformation: ()=> {            
             this.d3updatePattern.update.transformation()
-            this.d3updatePattern2.update.transformation()
+            //this.d3updatePattern2.update.transformation()
         },
         style:          ()=> { 
             this.d3updatePattern.update.style()
-            this.d3updatePattern2.update.style()
+            //this.d3updatePattern2.update.style()
         }
     }
 
@@ -47,6 +47,11 @@ export class LabelLayer implements ILayer
     }
 
     private attach() {
+        const $this = this
+        function offset(d, i, v) {
+            return $this.args.transform(d, $this.args.delta(d, i, v))
+        }
+
         this.d3updatePattern = new D3UpdatePattern({
             parent:            this.view.parent,
             layer:             this,
@@ -59,11 +64,14 @@ export class LabelLayer implements ILayer
                                     .classed("caption-icon", d=> d.precalc.icon && navigator.platform.includes('inux'))
                                     //.style("fill",           d=> d.pathes.finalcolor)
                                     .style("stroke",         d=> d.pathes && d.pathes.labelcolor)
+                                    .style("fill",           d=> this.args.color(d) )
                                     .text(                   this.args.text),
-            updateColor:       s=> s.style("stroke",         d=> d.pathes && d.pathes.labelcolor),
-            updateTransform:   s=> s.attr("transform",       (d, i, v)=> this.args.transform(d, this.args.delta(d, i, v)))
+            updateColor:       s=> s.style("stroke",         d=> d.pathes && d.pathes.labelcolor)
+                                    .style("fill",           d=> this.args.color(d) ),
+            updateTransform:   s=> s.attr("transform",       offset)
            //                         .text(                   this.args.text)
         })
+        /*
         this.d3updatePattern2 = new D3UpdatePattern({
             parent:            this.view.parent,
             layer:             this,
@@ -80,6 +88,7 @@ export class LabelLayer implements ILayer
                                     .attr('y2',             d=> d.forcepoints2.y||0)
                                     .attr("stroke-width",   d=> .002)
                                     .attr("stroke-linecap", d=> "round")
-        })    
+        })
+        */    
     }
 }

@@ -178,6 +178,9 @@ export function layoutBergé(n:N, λ:number, noRecursion=false)
         let liner = 0
         let resetCount = 0
         let anglesum = 0
+
+        //const parentWeight = n.precalc.layoutWeight
+        const parentWeight = (n.children || []).reduce((a, ccn)=> a+ccn.precalc.layoutWeight, 0)            
         cl.forEach((cn,i)=> 
         {          
             const nlen =  (n.children || []).length            
@@ -187,12 +190,22 @@ export function layoutBergé(n:N, λ:number, noRecursion=false)
            
             //const angleWeight = (cn.precalc.layoutWeight || 1) / ( n.precalc.layoutWeight || cllen || 1)            
 
-            const angleWeight = cn.precalc.layoutWeight / n.precalc.layoutWeight            
+            // verhältniss von parent weight zu child weight
+            // sum(c=> c.eight) != parent weight
+            // d.h. dieser wert liegt nicht zwischen 0 und 1
+            // 
+            // angleWeight wird aber zu alglesum addiert, 
+
+            // angleWeights der children müssen in summe 1 ergeben
+            // da angleWidth die ganze wegde ist
+            const angleWeight = cn.precalc.layoutWeight / parentWeight
             //const angleWeight = .99 / nlen
 
             anglesum += angleWeight
             //const angleWeight = 1 / cllen
             const angleOffset = angleWidth * angleWeight
+            
+            // current angle iterated through wegde borders (as hyperbolic angle)
             const α  = currentAngle             
             currentAngle += angleOffset
             const Ω  = πify(currentAngle)

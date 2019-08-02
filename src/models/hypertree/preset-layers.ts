@@ -18,8 +18,22 @@ import { StemLayer }                from '../../components/layers/stem-layer'
 import { bboxOffset }               from '../../d3-hypertree'
 
 export const labeloffsets = {
-    nodeRadiusOffset:   (ls:UnitDisk)=> (d:N)=> CptoCk({ θ:d.cachep.θ, r:ls.args.nodeRadius(ls, d)*2 }),
-    centerOffset:       (ud)=> (d, i, v)=>      CmulR(bboxOffset(d)(v[i]), 1/2),
+    centerOffset:       (ud:UnitDisk)=> (d:N, i, v)=>      CmulR(bboxOffset(d)(v[i]), 1/2),
+
+    nodeRadiusOffset:   (ls:UnitDisk)=> (d:N)=> CptoCk({ 
+                                                    θ: d.cachep.θ, 
+                                                    r: ls.args.nodeRadius(ls, d) * d.distScale * 1.5 
+                                                }),
+
+    nodeRadiusOffset1:  (ud)=> (d, i, v)=>      CaddC(
+                                                    labeloffsets.nodeRadiusOffset(ud)(d),
+                                                    bboxOffset(d)(v[i])
+                                                ),
+    nodeRadiusOffset2:  (ud)=> (d, i, v)=>      CaddC(
+                                                    labeloffsets.nodeRadiusOffset(ud)(d),
+                                                    { re:0, im:.1 }
+                                                ),
+    
     labeloffset:        (ud)=> (d, i, v)=>      CaddC(
                                                     labeloffsets.nodeRadiusOffset(ud)(d),
                                                     bboxOffset(d)(v[i])
@@ -91,7 +105,7 @@ export const layerSrc = [
     }),
 
     // CIRCLE STUFF END
-
+/*
     (v, ud:UnitDisk)=> new NodeLayer(v, {
         invisible:  true,
         hideOnDrag: true,
@@ -112,12 +126,15 @@ export const layerSrc = [
         transform:  d=> d.transformStrCache 
                         + ` scale(${ud.args.nodeScale(d)})`,
     }),
+
+*/
     (v, ud:UnitDisk)=> new NodeLayer(v, {                            
         invisible:  true,
         hideOnDrag: true,
         name:       'center-node',
         className:  'center-node', 
         //clip:       '#node-32-clip', centernode.id
+        nodeColor:  n=> undefined,
         data:       ()=> ud.cache.centerNode?[ud.cache.centerNode]:[],
         r:          d=> .1,
         transform:  d=> d.transformStrCache                            
@@ -135,6 +152,7 @@ export const layerSrc = [
         data:       ()=> ud.cache.paths,                            
         nodePos:    n=> n.cache,
         nodePosStr: n=> n.strCache,
+        linkColor:  n=> undefined,
         width:      d=> ud.args.linkWidth(d) + (.013 * d.dampedDistScale),
         classed:    s=> s.classed("hovered-path",  d=> d.pathes && d.pathes.isPartOfAnyHoverPath)
                          .classed("selected-path", d=> d.pathes && d.pathes.isPartOfAnySelectionPath)
@@ -150,9 +168,10 @@ export const layerSrc = [
         data:       ()=> ud.cache.links,                            
         nodePos:    n=> n.cache,
         nodePosStr: n=> n.strCache,
+        linkColor:  n=> undefined,
         width:      d=> ud.args.linkWidth(d),
-        classed:    (s, w)=> s
-                         .style("stroke",      d=> (d.pathes && d.pathes.isPartOfAnyHoverPath)?d.pathes && d.pathes.finalcolor:d.pathes && d.pathes.finalcolor)
+        classed:    (s, w, c)=> s
+                         .style("stroke",      d=> ((d.pathes && d.pathes.isPartOfAnyHoverPath)?d.pathes && d.pathes.finalcolor:d.pathes && d.pathes.finalcolor) || c(d) )
                          .classed("hovered",   d=> d.pathes && d.pathes.isPartOfAnyHoverPath)
                          .classed("selected",  d=> d.pathes && d.pathes.isPartOfAnySelectionPath)
                          
@@ -189,8 +208,9 @@ export const layerSrc = [
         invisible:  false,
         hideOnDrag: false,
         name:       'nodes',
-        className:  'node',
+        className:  'node',        
         data:       ()=> ud.cache.leafOrLazy,
+        nodeColor:  n=> undefined,
         r:          d=> ud.args.nodeRadius(ud, d),        
         transform:  d=> d.transformStrCache                            
                         + ` scale(${ud.args.nodeScale(d)})`,
@@ -223,6 +243,7 @@ export const layerSrc = [
         data:       ()=> ud.cache.emojis,
         text:       (d)=> d.precalc.icon,
         delta:      labeloffsets.centerOffset(ud), //(d, i, v)=> ({ re:0, im:0 }),
+        color:      ()=> undefined,
         transform:  (d, delta)=> 
                         ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` 
                         + `scale(${d.dampedDistScale*2})`
@@ -235,6 +256,20 @@ export const layerSrc = [
         data:       ()=> ud.cache.labels,
         text:       (d)=> d.precalc.label,
         delta:      labeloffsets.labeloffset(ud),
+        color:      ()=> undefined,
+        transform:  (d, delta)=> 
+                        ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` 
+                        + d.scaleStrText                            
+    }),
+    (v, ud:UnitDisk)=> new LabelLayer(v, {
+        invisible:  true,
+        hideOnDrag: true,
+        name:       'labels2',
+        className:  'caption',
+        data:       ()=> ud.cache.labels,
+        text:       (d)=> d.precalc.label,
+        delta:      labeloffsets.labeloffset(ud),
+        color:      ()=> undefined,
         transform:  (d, delta)=> 
                         ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` 
                         + d.scaleStrText                            

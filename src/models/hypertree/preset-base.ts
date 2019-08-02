@@ -89,8 +89,8 @@ const modelBase : ()=> HypertreeArgs = ()=>
         nodeRadius:         nodeInitR(.01),
         nodeScale:          nodeScale,
         nodeFilter:         hasCircle,
-        offsetEmoji:        labeloffsets['labeloffset'], //outwards,
-        offsetLabels:       labeloffsets['labeloffset'], //outwardsPlusNodeRadius,
+        offsetEmoji:        labeloffsets.labeloffset, //outwards,
+        offsetLabels:       labeloffsets.labeloffset, //outwardsPlusNodeRadius,
         linkWidth:          arcWidth,        
         linkCurvature:      '-',
         captionBackground:  'all',
@@ -284,7 +284,6 @@ export const presets : { [key: string]:()=> any } =
 /*
 {
     langloader:  ok=> ok(),
-
     dataInitBFS: (ht:Hypertree, n:N)=> {
         n.precalc.imageHref = undefined
         n.precalc.icon = undefined
@@ -301,7 +300,6 @@ export const presets : { [key: string]:()=> any } =
         pathes:             [],
         traces:             [],
     },
-
     layout: {
         type:               layoutBergé,
         weight:             (n:N)=> (isLeaf(n)?1:0),
@@ -311,13 +309,14 @@ export const presets : { [key: string]:()=> any } =
             angle:          3*π/2 
         }
     },
-
     filter: {
         type:               'magic',
         cullingRadius:      .99,
         weightFilter: {
             magic:              160,
-            alpha:              1.05,            
+            alpha:              1.05,
+            //weight:             n=> (isLeaf(n) ? 1 : 0),
+            //weight:             n=> (isLeaf(n) ? 1 : Math.pow(n.height, 5)),
             weight:             n=> (isLeaf(n) ? 1 : n.height*n.height),
             rangeCullingWeight: { min:4,   max:500 },
             rangeNodes:         { min:150, max:500 },
@@ -331,12 +330,7 @@ export const presets : { [key: string]:()=> any } =
         decorator:          UnitDisk,
         cacheUpdate:        cacheUpdate,        
         layers:             layerSrc,
-        layerOptions:       {
-                                'stem-arc': {
-                                    invisible: true,
-                                    hideOnDrag: true
-                                }
-                            },                            
+        layerOptions:       {},
         clipRadius:         1,
         nodeRadius:         nodeInitR(.01),
         nodeScale:          nodeScale,
