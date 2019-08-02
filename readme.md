@@ -87,7 +87,7 @@ Guess what: The hypertree configuration is structured like a hierarchy.
 The topmost objects component positioning configuration, 
 and the visualisation configuration, 
 containing configuration groups `layout`, `filter`, `interaction`, `geometry`.
-See section [Cheet Sheet] for the complete structure.
+See section [# Options Cheat Sheet] for the complete structure.
 The following examples will only show some selected options.
 
 ### Constructing a Component
