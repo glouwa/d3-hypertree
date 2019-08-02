@@ -40,7 +40,7 @@ src="docs/img/screenshot-light-github.png?raw=true" width="170" align="left" hsp
 - [API Reference](https://github.com/glouwa/d3-hypertree/blob/master/docs/readme.md)
 - [Tree of Life Demo](https://hyperbolic-tree-of-life.github.io/)
 - [API Demo](https://glouwa.github.io/d3-hypertree-examples/examples-html/mouse-events/)
-- [HTML / Webpack / Python Examples](https://github.com/glouwa/d3-hypertree-examples/)
+- [HTML](https://github.com/glouwa/d3-hypertree-examples/)
 
 ## Installation
 
