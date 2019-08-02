@@ -33,7 +33,6 @@ src="docs/img/screenshot-light-github.png?raw=true" width="170" align="left" hsp
 - Configurable layers
 - Animation API 
 <br>
-<br>
 
 
 ## Resources
@@ -52,11 +51,11 @@ npm install d3-hypertree --save
 <b>Or</b> download the [latest release](https://cdn.jsdelivr.net/npm/d3-hypertree@1.1.0/dist/)
 of the prebuilt bundle if npm is not used. 
 The prebuilt bundle declares the global variable `hyt`, 
-therefore an import as in the usage example below is not necessary.
+therefore an import as in the Webpack example below is not necessary.
 
 
 
-Add the following lines to your page:
+And add the following lines to your page:
 ```html
 <link  href="index-browser-light.css" rel="stylesheet">
 <script src="d3-hypertree.js"></script>
@@ -65,7 +64,7 @@ Add the following lines to your page:
 ## Webpack
 
 D3-hypertree is tested with webpack. 
-Dont forget to add the hypertree css to your projects.
+Remember to add one of the hypertree css files to your projects.
 To make the example snippets compatible to the prebuilt bundle,
 the following usage examples will assume an import like this:  
 ```typescript
@@ -75,8 +74,8 @@ Experts might prefer to import specific classes like `d3-hypertree/components/hy
 
 ## Usage
 
-To begin a minimal example of creating a hypertree component is simple.
-Only parent DOM element and data source, in this case a file in d3 JSON format is sufficient.
+This first snippet shows the minimal configuration for creating a hypertree component.
+Only parent DOM element and data source, in this case a file in d3 JSON format is sufficient. You can also use `d3-hierarchy` object as data source, as show in the comments.
 
 ```typescript
 new hyt.Hypertree(
@@ -90,13 +89,13 @@ new hyt.Hypertree(
     }
 )
 ```
-You will see a hypertree without any labels or other features. See [API Reference](https://github.com/glouwa/d3-hypertree/blob/master/docs/readme.md). for more configuration options.
+You will see a hypertree without any labels or other features. See [API Reference](https://github.com/glouwa/d3-hypertree/blob/master/docs/readme.md) or Cheat Sheet below for more configuration options. If the parent DOM element contains other children,
+the will be removed before creation. The Hypertree should stay the only children of the parent element.
 
-The cheat sheet below shows a hypertree component with all available options.
 
 ## Options Cheat Sheet
 
-This example shows a component instantiation using most features. For detailed descriptions and a complete list of features see 
+This example shows a component instantiation using all configuration options. For detailed descriptions and a complete list of features see 
 [API Reference](https://github.com/glouwa/d3-hypertree/blob/master/docs/readme.md).
 
 ```typescript
