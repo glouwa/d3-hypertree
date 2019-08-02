@@ -30,9 +30,10 @@ src="docs/img/screenshot-light-github.png?raw=true" width="170" align="left" hsp
 - Scalable up to 1000 nodes
 - Scalable up to 50k nodes with weight filter and perimeter culling
 - Mouse and touch interaction  
-- Configurable layers
 - Animation API 
+- Compartible with WebKit and Blink browser engines
 <br>
+
 
 
 ## Resources
@@ -95,7 +96,10 @@ the will be removed before creation. The Hypertree should stay the only children
 
 ## Options Cheat Sheet
 
-This example shows a component instantiation using all configuration options. For detailed descriptions and a complete list of features see 
+This example shows a component instantiation using all configuration options. 
+It uses TypeScript annotations to show parameter types.
+
+For detailed descriptions and a complete list of features see 
 [API Reference](https://github.com/glouwa/d3-hypertree/blob/master/docs/readme.md).
 
 ```typescript
