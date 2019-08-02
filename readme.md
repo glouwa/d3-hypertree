@@ -77,6 +77,11 @@ Experts might prefer to import specific classes like `d3-hypertree/components/hy
 
 This first snippet shows the minimal configuration for creating a hypertree component.
 Only parent DOM element and data source, in this case a file in d3 JSON format is sufficient. You can also use `d3-hierarchy` object as data source, as show in the comments.
+You will see a hypertree without any labels or other features. See [API Reference](https://github.com/glouwa/d3-hypertree/blob/master/docs/readme.md) or Cheat Sheet below for more configuration options. If the parent DOM element contains other children,
+the will be removed before creation. The Hypertree should stay the only children of the parent element.
+
+
+### Constructing a Component
 
 ```typescript
 new hyt.Hypertree(
@@ -90,9 +95,14 @@ new hyt.Hypertree(
     }
 )
 ```
-You will see a hypertree without any labels or other features. See [API Reference](https://github.com/glouwa/d3-hypertree/blob/master/docs/readme.md) or Cheat Sheet below for more configuration options. If the parent DOM element contains other children,
-the will be removed before creation. The Hypertree should stay the only children of the parent element.
 
+### Global Parameters
+### The Node Class N
+### Data Driven Configuration
+### User defined Node Initialization
+### Layer Configuration 
+### Non blocking API for Animations and data updates
+### Event Handling
 
 ## Options Cheat Sheet
 
