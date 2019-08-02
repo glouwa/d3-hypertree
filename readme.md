@@ -40,7 +40,7 @@ src="docs/img/screenshot-light-github.png?raw=true" width="170" align="left" hsp
 - [API Reference](https://github.com/glouwa/d3-hypertree/blob/master/docs/readme.md)
 - [Tree of Life Demo](https://hyperbolic-tree-of-life.github.io/)
 - [API Demo](https://glouwa.github.io/d3-hypertree-examples/examples-html/mouse-events/)
-- [HTML / Webpack / Python Examples](https://github.com/glouwa/d3-hypertree-examples/)
+- [HTML Examples](https://github.com/glouwa/d3-hypertree-examples/)
 
 ## Installation
 
@@ -75,13 +75,31 @@ Experts might prefer to import specific classes like `d3-hypertree/components/hy
 
 ## Usage
 
-This first snippet shows the minimal configuration for creating a hypertree component.
-Only parent DOM element and data source, in this case a file in d3 JSON format is sufficient. You can also use `d3-hierarchy` object as data source, as show in the comments.
-You will see a hypertree without any labels or other features. See [API Reference](https://github.com/glouwa/d3-hypertree/blob/master/docs/readme.md) or Cheat Sheet below for more configuration options. If the parent DOM element contains other children,
-the will be removed before creation. The Hypertree should stay the only children of the parent element.
+The following examples will guide you through the most important concepts, 
+beginning with the most simple configuration, followed by more complex configurations.
 
+The Hypertree constructor takes all configuration parameters, 
+and returns a handle for starting animating or updating the data of the component.
+d3 like callbacks are supplied to the constructor to create a data driven visualisation, 
+see "Data Driven Configuration".
+
+Guess what: The hypertree configuration is structured like a hierarchy.
+The topmost objects component positioning configuration, 
+and the visualisation configuration, 
+containing configuration groups `layout`, `filter`, `interaction`, `geometry`.
+For a complete list of configurations parameters 
+See [API Reference](https://github.com/glouwa/d3-hypertree/blob/master/docs/readme.md) 
+or section [Cheat Sheet]
 
 ### Constructing a Component
+
+This first snippet shows the minimal configuration for creating a hypertree component.
+
+Only parent DOM element and data source, in this case a file in d3 JSON format is sufficient. 
+You can also use `d3-hierarchy` object as data source, as show in the comments.
+You will see a hypertree without any labels or other features, see [Demo 1]().  
+
+When a Hypertree is attached to a DOM node, all existing child nodes are removed.
 
 ```typescript
 new hyt.Hypertree(
@@ -97,9 +115,9 @@ new hyt.Hypertree(
 ```
 
 ### Global Parameters
-### The Node Class N
 ### Data Driven Configuration
-### User defined Node Initialization
+#### The Node Class N 
+#### User defined Node Initialization
 ### Layer Configuration 
 ### Non blocking API for Animations and data updates
 ### Event Handling
@@ -109,7 +127,7 @@ new hyt.Hypertree(
 This example shows a component instantiation using all configuration options. 
 It uses TypeScript annotations to show parameter types.
 
-For detailed descriptions and a complete list of features see 
+For detailed documentation and a complete list of features see 
 [API Reference](https://github.com/glouwa/d3-hypertree/blob/master/docs/readme.md).
 
 ```typescript
