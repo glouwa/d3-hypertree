@@ -76,7 +76,8 @@ Experts might prefer to import specific classes like `d3-hypertree/components/hy
 ## Usage
 
 This first snippet shows the minimal configuration for creating a hypertree component.
-Only parent DOM element and data source, in this case a file in d3 JSON format is sufficient. You can also use `d3-hierarchy` object as data source, as show in the comments.
+Specifying a parent DOM element and a data source is sufficient. 
+You can also use `d3-hierarchy` objects as data source, as shown in the comments.
 
 ```typescript
 new hyt.Hypertree(
