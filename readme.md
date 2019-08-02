@@ -43,7 +43,6 @@ src="docs/img/screenshot-light-github.png?raw=true" width="170" align="left" hsp
 - [HTML Examples](https://github.com/glouwa/d3-hypertree-examples/)
 
 ## Installation
-
 ```bash
 npm install d3-hypertree --save
 ```
@@ -63,7 +62,6 @@ And add the following lines to your page:
 ```
 
 ## Webpack
-
 D3-hypertree is tested with webpack. 
 Remember to add one of the hypertree css files to your projects.
 To make the example snippets compatible to the prebuilt bundle,
@@ -74,12 +72,14 @@ import * as hyt from 'd3-hypertree'
 Experts might prefer to import specific classes like `d3-hypertree/components/hypertree` to optimize bundle size.
 
 ## Usage
-
 The following examples will guide you through the most important concepts, 
 beginning with the most simple configuration, followed by more complex configurations.
+For a complete list of configurations parameters 
+See [API Reference](https://github.com/glouwa/d3-hypertree/blob/master/docs/readme.md) 
+or section [Cheat Sheet]
 
 The Hypertree constructor takes all configuration parameters, 
-and returns a handle for starting animating or updating the data of the component.
+and returns a handle for starting animations or updating the data set.
 d3 like callbacks are supplied to the constructor to create a data driven visualisation, 
 see "Data Driven Configuration".
 
@@ -87,22 +87,14 @@ Guess what: The hypertree configuration is structured like a hierarchy.
 The topmost objects component positioning configuration, 
 and the visualisation configuration, 
 containing configuration groups `layout`, `filter`, `interaction`, `geometry`.
-For a complete list of configurations parameters 
-See [API Reference](https://github.com/glouwa/d3-hypertree/blob/master/docs/readme.md) 
-or section [Cheat Sheet]
+See section [Cheet Sheet] for the complete structure.
+The following examples will only show some selected options.
 
 ### Constructing a Component
-
-This first snippet shows the minimal configuration for creating a hypertree component.
-
-Only parent DOM element and data source, in this case a file in d3 JSON format is sufficient. 
-You can also use `d3-hierarchy` object as data source, as show in the comments.
-You will see a hypertree without any labels or other features, see [Demo 1]().  
-
-When a Hypertree is attached to a DOM node, all existing child nodes are removed.
-
+This first snippet shows the minimal configuration for creating a Hypertree component.
+Parent DOM element and data source are required settings.
 ```typescript
-new hyt.Hypertree(
+mytree = new hyt.Hypertree(
     {
         parent: document.body,        
     },
@@ -113,14 +105,43 @@ new hyt.Hypertree(
     }
 )
 ```
+You can also use `d3-hierarchy` object as data source, as shown in the comments.
+You will see a hypertree without any labels or other features, see [Demo 1](). 
+When a Hypertree is attached to a DOM node, all existing child nodes are removed.
 
-### Global Parameters
 ### Data Driven Configuration
-#### The Node Class N 
+Visualizing node properties is achieved by using callbacks with the node as parameter.
+It is the same concept as d3 uses, and in fact d3 is behind the scenes. 
+However, in this case the for d3 typical parameter `d` is a always a node,
+named `n` in the following examples.
+
+A typical data driven property configuration looks like this:
+```
+    nodeColor: n=> (n.valueX?'red':'blue')
+```
+The given function is called by the renderer, for each frame, for each visible node.
+
+#### The Node objects `n`
+To calculate colors, or other visual properties, the `n` objects must and do provide 
+the following information: 
+-   User defined data of node. accessible by `n.data`.
+-   hierarchy structure derived from d3 (d3-hierarchy) `parent`, `children` and more,
+    see d3-hierarchy.
+-   hyperbolic coordinates, euclidean coordinates. 
+-   precalculated properties. see section [User defined Node Initialization].
+
+
 #### User defined Node Initialization
+if to slow fro each frame, to it at init
+
 ### Layer Configuration 
+add remove layers, layer contain config too
+
 ### Non blocking API for Animations and data updates
+animations, load
+
 ### Event Handling
+on center node change on click, on hover node change
 
 ## Options Cheat Sheet
 
