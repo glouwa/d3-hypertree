@@ -26,22 +26,20 @@ A Scalable Intercative Web Component for Hyperbolic Tree Visualisations.
 <a href="https://glouwa.github.io/d3-hypertree/"><img 
 src="docs/img/screenshot-light-github.png?raw=true" width="170" align="left" hspace="10" vspace="16"></a>
 
-- Uses same data format as [d3.hierarchy()](https://github.com/d3/d3-hierarchy#hierarchy) 
+- Compatible to [d3.hierarchy()](https://github.com/d3/d3-hierarchy#hierarchy) 
 - Scalable up to 1000 nodes
-- Scalable up to 50k nodes with weight culling and primeter culling
+- Scalable up to 50k nodes with weight filter and perimeter culling
 - Mouse and touch interaction  
 - Configurable layers
 - Animation API 
 <br>
 <br>
-<br>
-<br>
-<br>
 
 
 ## Resources
-- [API Reference](https://glouwa.github.io/d3-hypertree/)
-- [Live Demos](https://glouwa.github.io/d3-hypertree-examples/)
+- [API Reference](https://github.com/glouwa/d3-hypertree/blob/master/docs/readme.md)
+- [Tree of Life Demo](https://hyperbolic-tree-of-life.github.io/)
+- [API Demo](https://glouwa.github.io/d3-hypertree-examples/examples-html/mouse-events/)
 - [HTML / Webpack / Python Examples](https://github.com/glouwa/d3-hypertree-examples/)
 
 ## Installation
@@ -92,14 +90,14 @@ new hyt.Hypertree(
     }
 )
 ```
-You will see a hypertree without any labels or other features. See [API Reference](https://glouwa.github.io/d3-hypertree/). for more configuration options.
+You will see a hypertree without any labels or other features. See [API Reference](https://github.com/glouwa/d3-hypertree/blob/master/docs/readme.md). for more configuration options.
 
 The cheat sheet below shows a hypertree component with all available options.
 
 ## Options Cheat Sheet
 
 This example shows a component instantiation using most features. For detailed descriptions and a complete list of features see 
-[API Reference](https://glouwa.github.io/d3-hypertree/).
+[API Reference](https://github.com/glouwa/d3-hypertree/blob/master/docs/readme.md).
 
 ```typescript
 new hyt.Hypertree(
