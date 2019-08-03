@@ -216,7 +216,10 @@ It is possible to write [custom layer sets](https://github.com/glouwa/d3-hypertr
 
 
 ### Non blocking API for Animations and Data updates
-animations, load
+This example shows how to attach an annimation to the load process.
+The Hypertree compoenent provides a JavaScript `Promise` for initialisation.
+Attach promises to handle asyncronouse execution.
+To start animations use the promise returning functions in `ht.api` whereby `ht` is your hypertree component variable.
 ```
 const ht = new hyt.Hypertree(
     { parent: document.body }, 
@@ -239,9 +242,15 @@ ht.initPromise
 
 
 ### Interaction Event Handling
-on center node change on click, on hover node change
+Basically some callbacks. 
+Typical functions used in them:
+- uer action like open view
+- toggle path 
+- ripple
+- update path like root-hover path, or root-centernode path
+- got animaion
 ```
-const ht = new hyt.Hypertree(
+ht = new hyt.Hypertree(
     { 
         parent: document.body 
     },
