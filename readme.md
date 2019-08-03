@@ -253,8 +253,9 @@ mytree = new hyt.Hypertree(
     { 
         dataloader: hyt.loaders.generators.nT1,
         interaction: {
+
             // the node click area is the voronoi cell in euclidean space.
-            // this way, wherever the user clicks, a node can be associated            
+            // this way, wherever the user clicks, a node can be associated.
             onNodeClick: (n, m, l)=> { 
                 console.log(`#onNodeClick: Node=${n}, click coordinates=${m}, source layer=${l}`)
 
@@ -262,14 +263,8 @@ mytree = new hyt.Hypertree(
                     .then(()=> l.view.hypertree.drawDetailFrame())       
             },
             
-            onCenterNodeChange: n=> console.log(`#onCenterNodeChange: Node=${n}`),
-            
-            // defines minimum and maximum link length
-            // default mouse wheel behavior is to change λ 
-            λbounds: [ .25, .5 ],
-
-            // mouse wheel speed
-            wheelFactor: 1.175,
+            // center node is defined as node with minimal distance to the center.
+            onCenterNodeChange: n=> console.log(`#onCenterNodeChange: Node=${n}`)
         }       
     }
 )
