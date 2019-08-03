@@ -116,7 +116,7 @@ However, in this case the for d3 typical parameter `d` is a always a node,
 named `n` in the following examples.
 
 A typical data driven property configuration looks like this:
-```
+```typescript
     nodeColor: function(n, i, v) {
         if (n.data.valueX>30) return 'red'
         else return 'blue'
@@ -125,7 +125,7 @@ A typical data driven property configuration looks like this:
 The given function is called by the renderer, for each frame, for each visible node.
 JavaScript supports a shorter syntax for functions, called lambda expressions.
 Most code snippets will use this syntax equivalent to the function above.
-```
+```typescript
     nodeColor: n=> (n.data.valueX>30 ? 'red' : 'blue')
 ```
 
@@ -149,7 +149,7 @@ Use this functions to calculate static properties.
 Some layers expect specific properties in `n.precalc` like `label`, `icon`, `imageHref`, `clickable`, `cell`.
 Label dimensions and layout weight will be stored by the hypertree component 
 in `n.precalc`.
-```
+```typescript
 // dataInitBFS is called when data set changes.
 // node properties which do not change during runtime 
 // should be set in this function.
@@ -176,11 +176,9 @@ Use invisible to deactivate a layer, use hideOnDrag to increase framerate
 if necessary. hideOnDrag will hide the layer only when animations or interactions are active.
 Layers might contain additional configuration properties, 
 see [Cheat Sheet](#options-cheat-sheet) for a complete list of options.
-```
-const ht = new hyt.Hypertree(
-    { 
-        parent: document.body 
-    },
+```typescript
+const mytree = new hyt.Hypertree(
+    { parent: document.body },
     { 
         dataloader: hyt.loaders.generators.nT1,
         dataInitBFS: (ht, n)=> {
@@ -219,25 +217,25 @@ It is possible to write [custom layer sets](https://github.com/glouwa/d3-hypertr
 This example shows how to attach an annimation to the load process.
 The Hypertree compoenent provides a JavaScript `Promise` for initialisation.
 Attach promises to handle asyncronouse execution.
-To start animations use the promise returning functions in `ht.api` whereby `ht` is your hypertree component variable.
-```
-const ht = new hyt.Hypertree(
+To start animations use the promise returning functions in `mytree.api` whereby `mytree` is your hypertree component variable.
+```typescript
+const mytree = new hyt.Hypertree(
     { parent: document.body }, 
     { dataloader: hyt.loaders.generators.nT1 }
 )
 
-var animationNode1 = ht.data.children[1]
-var animationNode2 = ht.data.children[0].children[1]
+var animationNode1 = mytree.data.children[1]
+var animationNode2 = mytree.data.children[0].children[1]
 
-ht.initPromise
-    .then(()=> new Promise((ok, err)=> ht.animateUp(ok, err)))
-    .then(()=> ht.api.gotoNode(animationNode1))
-    .then(()=> ht.api.gotoNode(animationNode2))
-    .then(()=> ht.api.gotoHome())
-    .then(()=> ht.api.gotoλ(.25))
-    .then(()=> ht.api.gotoλ(.5))
-    .then(()=> ht.api.gotoλ(.4))
-    .then(()=> ht.drawDetailFrame())
+mytree.initPromise
+    .then(()=> new Promise((ok, err)=> mytree.animateUp(ok, err)))
+    .then(()=> mytree.api.gotoNode(animationNode1))
+    .then(()=> mytree.api.gotoNode(animationNode2))
+    .then(()=> mytree.api.gotoHome())
+    .then(()=> mytree.api.gotoλ(.25))
+    .then(()=> mytree.api.gotoλ(.5))
+    .then(()=> mytree.api.gotoλ(.4))
+    .then(()=> mytree.drawDetailFrame())
 ```
 
 
@@ -249,8 +247,8 @@ Typical functions used in them:
 - ripple
 - update path like root-hover path, or root-centernode path
 - got animaion
-```
-ht = new hyt.Hypertree(
+```typescript
+mytree = new hyt.Hypertree(
     { 
         parent: document.body 
     },
@@ -265,7 +263,7 @@ ht = new hyt.Hypertree(
             onNodeClick: (n, m, l)=> { 
                 console.log('### EVENT: onNodeClick', n.mergeId, n)
 
-                ht.api.goto({ re:-n.layout.z.re, im:-n.layout.z.im }, null)
+                mytree.api.goto({ re:-n.layout.z.re, im:-n.layout.z.im }, null)
                     .then(()=> l.view.hypertree.drawDetailFrame())       
             },
             // is called when center node changes.
