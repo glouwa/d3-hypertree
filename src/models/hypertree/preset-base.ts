@@ -250,7 +250,7 @@ export const presets : { [key: string]:()=> any } =
             interaction: {
                 onNodeSelect: s=> { console.log('###########', s) },
                 onNodeHover: s=> { console.log('########onnodehover', s)},
-                λbounds: [1/5, .75],
+                λbounds: [.25, .6],
             },            
             langInitBFS: (ht:Hypertree, n:N)=> {
                 const id = n.data.name
