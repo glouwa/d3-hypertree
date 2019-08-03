@@ -139,22 +139,143 @@ the following information:
 -   precalculated properties such as labels, image urls or properties hard to compute.
     See section [User defined Node Initialization].
 
-The type definition of N the according TypeScript interface can be found [here]().
-However, usually its the most simple way to print the object `n` to the console when working with data driven functions.
+See [TypeScript interface](https://github.com/glouwa/d3-hypertree/blob/master/src/models/n/n.ts) for a complete list of properties. 
+And [d3-hierarchy]() for base functionality.
+Keep in mind, usually its the most simple way to print the object `n` to the console when working with data driven functions.
 
 #### User defined Node Initialization
-if to slow fro each frame, to it at init
-
-href, label example
+dataInitBFS and langInitBFS are called at startup in Breath first order.
+Use this functions to calculate static properties. 
+Some layers expect specific properties in `n.precalc` like `label`, `icon`, `imageHref`, `clickable`, `cell`.
+Label dimensions and layout weight will be stored by the hypertree component 
+in `n.precalc`.
+```
+// dataInitBFS is called when data set changes.
+// node properties which do not change during runtime 
+// should be set in this function.
+// this way calculations are not necessary for each frame.
+dataInitBFS: (ht, n)=> {
+    if (n.mergeId == 12)
+        n.precalc.imageHref = 'img/example.png'   
+}, 
+// is called when data or language is changed, 
+// otherwise similar to dataInitBFS.
+// typically node labels are calculated in this function.
+langInitBFS: (ht, n)=> {                        
+    n.precalc.label = `Label ${n.mergeId} / ${n.precalc.layoutWeight}`
+}
+```
 
 ### Layer Configuration 
-add remove layers, layer contain config too
+This example shows how to add labels and images to nodes by
+enabling the according layers, 
+and providing necessary node properties `n.precalc.label` and `n.precalc.imageHref`.
+
+All Layers have the prperties `invisible` and `hideOnDrag`. 
+Use invisible to deactivate a layer, use hideOnDrag to increase framerate 
+if necessary. hideOnDrag will hide the layer only when animations or interactions are active.
+Layers might contain additional configuration properties, 
+see [Cheat Sheet](#options-cheat-sheet) for a complete list of options.
+```
+const ht = new hyt.Hypertree(
+    { 
+        parent: document.body 
+    },
+    { 
+        dataloader: hyt.loaders.generators.nT1,
+        dataInitBFS: (ht, n)=> {
+            if (n.mergeId == 12)
+                n.precalc.imageHref = 'img/example.png'         
+        }, 
+        langInitBFS: (ht, n)=> {                        
+            n.precalc.label = `Label ${n.mergeId} / ${n.precalc.layoutWeight}`
+        },        
+        geometry: {                        
+            layerOptions:       {                
+                'cells':       { invisible: true, hideOnDrag: true },                
+                'images':      { width: .1, height: .1 },
+                'link-arcs':   { 
+                    linkColor: n=> {
+                        if (n.mergeId == 12) return 'orange'
+                        return undefined
+                    }
+                }, 
+                'nodes': {                     
+                    nodeColor: n=> {
+                        if (n.mergeId == 12) return 'yellow'
+                        if (!n.children) return 'red'
+                        return '#a5d6a7'
+                    }
+                }
+            },                                               
+        }
+    }
+)
+```
+It is possible to write [custom layer sets](https://github.com/glouwa/d3-hypertree/blob/master/src/models/hypertree/preset-layers.ts), and apply it by setting the `geometry.layers` property. 
+
 
 ### Non blocking API for Animations and Data updates
 animations, load
+```
+const ht = new hyt.Hypertree(
+    { parent: document.body }, 
+    { dataloader: hyt.loaders.generators.nT1 }
+)
+
+var animationNode1 = ht.data.children[1]
+var animationNode2 = ht.data.children[0].children[1]
+
+ht.initPromise
+    .then(()=> new Promise((ok, err)=> ht.animateUp(ok, err)))
+    .then(()=> ht.api.gotoNode(animationNode1))
+    .then(()=> ht.api.gotoNode(animationNode2))
+    .then(()=> ht.api.gotoHome())
+    .then(()=> ht.api.gotoλ(.25))
+    .then(()=> ht.api.gotoλ(.5))
+    .then(()=> ht.api.gotoλ(.4))
+    .then(()=> ht.drawDetailFrame())
+```
+
 
 ### Interaction Event Handling
 on center node change on click, on hover node change
+```
+const ht = new hyt.Hypertree(
+    { 
+        parent: document.body 
+    },
+    { 
+        dataloader: hyt.loaders.generators.nT1,
+        interaction: {
+            // the node click area is the voronoi cell in euclidean space.
+            // this way, wherever the user clicks, a node can be associated
+            // n: clicked node
+            // m: click coordinates
+            // l: event source layer
+            onNodeClick: (n, m, l)=> { 
+                console.log('### EVENT: onNodeClick', n.mergeId, n)
+
+                ht.api.goto({ re:-n.layout.z.re, im:-n.layout.z.im }, null)
+                    .then(()=> l.view.hypertree.drawDetailFrame())       
+            },
+            // is called when center node changes.
+            // the new center node is given by n
+            onCenterNodeChange: n=> console.log(
+                '### EVENT: onCenterNodeChange', n.mergeId, n),         
+            
+            // defines minimum and maximum link length
+            // default mouse wheel behavior is to change λ 
+            λbounds: [ .25, .5 ],
+
+            // mouse wheel speed
+            wheelFactor: 1.175,
+        }       
+    }
+)
+```
+
+### Coordinate Systems and Transformations
 
 ## Options Cheat Sheet
 
@@ -174,13 +295,8 @@ new hyt.Hypertree(
     },
     {
         dataloader?:            LoaderFunction   
-        dataInitBFS:            (ht:Hypertree, n:N)=> void       // emoji, imghref
-        langInitBFS:            (ht:Hypertree, n:N)=> void       // text, wiki, clickable, cell,
-        objects: {
-            roots:              N[]
-            pathes:             Path[]
-            selections:         N[]    
-        }
+        dataInitBFS:            (ht:Hypertree, n:N)=> void
+        langInitBFS:            (ht:Hypertree, n:N)=> void         
         layout: {
             type:               LayoutFunction
             weight:             (n:N)=> number
@@ -225,12 +341,10 @@ new hyt.Hypertree(
             linkWidth:         (n:N)=> number
             linkCurvature:     ArcCurvature
         }
-        interaction: {          
-            //type:               'clickonly' | 'selction' | 'multiselection' | centernodeselectable'
+        interaction: {            
             mouseRadius:        number,
-            onNodeSelect:       (n:N)=> void
-            onNodeHold:         ()=>void                          // x 
-            onNodeHover:        ()=>void                          // x 
+            onNodeClick:        (n:N)=> void
+            onCenterNodeChange: (n:N)=> void 
             λbounds:            [ number, number ]
             wheelSensitivity:   number
         }
