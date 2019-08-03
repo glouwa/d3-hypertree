@@ -428,8 +428,22 @@ export class Hypertree
             || (this.virtualCanvasContext = canvas.getContext("2d"))
         context.font = this.args.geometry.captionFont
         //context.textBaseLine = 'middle'
-        //context.textAlign = 'center'
+        //context.textAlign = 'center' 
 
+        const updateLabelLen_ = (txtprop, lenprop)=>
+        {
+            this.data.each(n=> {
+                if (n.precalc[txtprop]) {
+                    const metrics = context.measureText(n.precalc[txtprop])
+                    n.precalc[lenprop] = metrics.width/200/window.devicePixelRatio
+                }
+                else
+                    n.precalc[lenprop] = undefined 
+            })    
+        }
+        updateLabelLen_('label', 'labellen')
+        updateLabelLen_('label2', 'label2len')
+        /*
         this.data.each(n=> {
             if (n.precalc.label) {
                 const metrics = context.measureText(n.precalc.label)
@@ -438,6 +452,15 @@ export class Hypertree
             else
                 n.precalc.labellen = 0 
         })
+
+        this.data.each(n=> {
+            if (n.precalc.label2) {
+                const metrics = context.measureText(n.precalc.label2)
+                n.precalc.label2len = metrics.width/200/window.devicePixelRatio
+            }
+            else
+                n.precalc.label2len = undefined 
+        })*/
     }
 
     public updateLayoutPath_(preservingnode:N) : void {

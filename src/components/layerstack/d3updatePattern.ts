@@ -79,7 +79,7 @@ export class D3UpdatePattern
         
 // extrashit
         if (this.args.name === 'labels-force' && true) this.addTextBackgroundRects()
-        //if (this.args.name === 'labels' && true)       this.addTextBackgroundRects()
+        if (this.args.name === 'labels' && true)       this.addTextBackgroundRects()
     }
 
     private addTextBackgroundRects()
@@ -91,7 +91,8 @@ export class D3UpdatePattern
         
         if (T.args.layer.view.unitdisk) {
             this.mainSvgGroup.selectAll("text")
-            .each(function(d:N, i, v:SVGTextElement[]) {
+            .each(function(d:N, i, v:SVGTextElement[]) 
+            {
                 if (true ||   d === T.args.layer.view.unitdisk.cache.centerNode 
                     || d.cachep.r < 0.6)
                 {

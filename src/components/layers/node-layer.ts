@@ -47,15 +47,18 @@ export class NodeLayer implements ILayer
                                     .classed("lazy",      d=> d.hasOutChildren)
                                     .classed("leaf",      d=> d.parent)                                        
                                     .classed("exit",      d=> (!d.children || !d.children.length)
-                                                              && d.data && d.data.numLeafs),
+                                                              && d.data && d.data.numLeafs)
+                                    .style("stroke",       d=> (d.pathes && d.pathes.labelcolor) || this.args.stroke(d))
+                                    .style("stroke-width", d=> (d.pathes && d.pathes.labelcolor) || this.args.strokeWidth(d)),
+
             updateColor:       s=> s.classed("hovered",   d=> d.pathes && d.pathes.isPartOfAnyHoverPath)
                                     .classed("selected",  d=> d.pathes && d.pathes.isPartOfAnySelectionPath)
-                                    .style("fill",      d=> (d.pathes && d.pathes.labelcolor) || this.args.nodeColor(d)),
+                                    .style("fill",      d=> (d.pathes && d.pathes.labelcolor) || this.args.fill(d)),
 
             //updateColor:       s=> s.classed("hovered",   d=> d.isPartOfAnyHoverPath && d.parent)
             //                        .classed("selected",  d=> d.isPartOfAnySelectionPath && d.parent),
             updateTransform:   s=> s.attr("transform",    d=> this.args.transform(d))
-                                    .style("stroke",      d=> d.pathes && d.pathes.labelcolor)
+                                    //.style("stroke",      d=> d.pathes && d.pathes.labelcolor)
                                     .attr("r",            d=> this.args.r(d)),
         })
     }

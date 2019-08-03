@@ -331,25 +331,28 @@ new hyt.Hypertree(
                 cells: {
                     invisible:         false
                     hideOnDrag:        false
-                    color:             (n:N)=> color
-                    borderColor:       (n:N)=> color
-                    borderWidth:       (n:N)=> number
+                    fill:              (n:N)=> color
+                    stroke:            (n:N)=> color
+                    strokeWidth:       (n:N)=> number
                 },
                 links: {
-                    color:             (n:N)=> color                    
-                    width:             (n:N)=> number
+                    stroke:            (n:N)=> color
+                    strokeWidth:       (n:N)=> number
                     linkCurvature:     '+' | '-' | 'l'
                 },
                 nodes: {
-                    color:             (n:N)=> color
-                    borderColor:       (n:N)=> color
-                    borderWidth:       (n:N)=> number
+                    fill:              (n:N)=> color
+                    stroke:            (n:N)=> color
+                    strokeWidth:       (n:N)=> number
                 },
-                labels: {
-                    offsetLabels:      (d, i, v)=> C
-                    captionBackground: 'all' | 'center' | 'root' | 'none'
+                labels: {                    
+                    backgroundRect:    (n:N)=> boolean //'all' | 'center' | 'root' | 'none'
                     captionFont:       string
-                    captionHeight:     number                    
+                    captionHeight:     number
+                    delta:             (d, i, v)=> C
+                    offsetLabels:      (n:N)=> C
+                    color:             (n:N)=> color
+                    backgroundColor:   (n:N)=> color   
                 },
                 /*
                 'cells',

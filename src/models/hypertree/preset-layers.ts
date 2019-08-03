@@ -60,6 +60,9 @@ export const layerSrc = [
         hideOnDrag: true,
         clip:       '#circle-clip' + ud.args.clipRadius,
         data:       ()=> ud.cache.cells,                            
+        fill:        n=> undefined,
+        stroke:      n=> undefined,
+        strokeWidth: n=> undefined,
     }),
     (v, ud:UnitDisk)=> new FocusLayer(v, {        
         invisible:  true,
@@ -134,7 +137,9 @@ export const layerSrc = [
         name:       'center-node',
         className:  'center-node', 
         //clip:       '#node-32-clip', centernode.id
-        nodeColor:  n=> undefined,
+        fill:        n=> undefined,
+        stroke:      n=> undefined,
+        strokeWidth: n=> undefined,
         data:       ()=> ud.cache.centerNode?[ud.cache.centerNode]:[],
         r:          d=> .1,
         transform:  d=> d.transformStrCache                            
@@ -152,8 +157,8 @@ export const layerSrc = [
         data:       ()=> ud.cache.paths,                            
         nodePos:    n=> n.cache,
         nodePosStr: n=> n.strCache,
-        linkColor:  n=> undefined,
-        width:      d=> ud.args.linkWidth(d) + (.013 * d.dampedDistScale),
+        stroke:     n=> undefined,
+        strokeWidth:d=> ud.args.linkWidth(d) + (.013 * d.dampedDistScale),
         classed:    s=> s.classed("hovered-path",  d=> d.pathes && d.pathes.isPartOfAnyHoverPath)
                          .classed("selected-path", d=> d.pathes && d.pathes.isPartOfAnySelectionPath)
                          .style("stroke",          d=> d.pathes && d.pathes.finalcolor)
@@ -168,8 +173,8 @@ export const layerSrc = [
         data:       ()=> ud.cache.links,                            
         nodePos:    n=> n.cache,
         nodePosStr: n=> n.strCache,
-        linkColor:  n=> undefined,
-        width:      d=> ud.args.linkWidth(d),
+        stroke:     n=> undefined,
+        strokeWidth:d=> ud.args.linkWidth(d),
         classed:    (s, w, c)=> s
                          .style("stroke",      d=> ((d.pathes && d.pathes.isPartOfAnyHoverPath)?d.pathes && d.pathes.finalcolor:d.pathes && d.pathes.finalcolor) || c(d) )
                          .classed("hovered",   d=> d.pathes && d.pathes.isPartOfAnyHoverPath)
@@ -205,14 +210,16 @@ export const layerSrc = [
     // nodes
 
     (v, ud:UnitDisk)=> new NodeLayer(v, {        
-        invisible:  false,
-        hideOnDrag: false,
-        name:       'nodes',
-        className:  'node',        
-        data:       ()=> ud.cache.leafOrLazy,
-        nodeColor:  n=> undefined,
-        r:          d=> ud.args.nodeRadius(ud, d),        
-        transform:  d=> d.transformStrCache                            
+        invisible:   false,
+        hideOnDrag:  false,
+        name:        'nodes',
+        className:   'node',        
+        data:        ()=> ud.cache.leafOrLazy,
+        fill:        n=> undefined,
+        stroke:      n=> undefined,
+        strokeWidth: n=> undefined,
+        r:           d=> ud.args.nodeRadius(ud, d),        
+        transform:   d=> d.transformStrCache                            
                         + ` scale(${ud.args.nodeScale(d)})`,
     }),             
     

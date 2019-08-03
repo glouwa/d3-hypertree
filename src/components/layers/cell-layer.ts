@@ -38,11 +38,17 @@ export class CellLayer implements ILayer
             elementType:       'polygon',
             create:            s=> s.attr('id', d=> 'cell-' + d.data.mergeId)
                                     .classed("leaf", false)/*s.classed("root",      d=> !d.data.parent)   */
-                                    .classed("lazy", true),/*
+                                    .classed("lazy", true)
+                                    .style("stroke",       d=> (d.pathes && d.pathes.labelcolor) || this.args.stroke(d))
+                                    .style("stroke-width", d=> (d.pathes && d.pathes.labelcolor) || this.args.strokeWidth(d)),
+                                    
+                                    
+                                    /*
                                     .classed("lazy",      d=> d.data.hasOutChildren)                                 
                                     .classed("leaf",      d=> !d.data.children),*/
             updateColor:       s=>  //s.classed("lazy",      d=> d.data.hasOutChildren),
-                                    s.classed("hovered",   d=> d.data.isPartOfAnyHoverPath && d.data.parent),
+                                    s.classed("hovered",   d=> d.data.isPartOfAnyHoverPath && d.data.parent)
+                                    .style("fill",      d=> (d.pathes && d.pathes.labelcolor) || this.args.fill(d)),
                                     //.classed("selected",  d=> d.data.isPartOfAnySelectionPath && d.data.parent),
             updateTransform:   s=> s//.classed("lazy",      d=> d.data.hasOutChildren)                                 
                                     .attr("points",       d=> {
