@@ -132,15 +132,15 @@ Most code snippets will use this syntax equivalent to the function above.
 #### The Node objects `n`
 To calculate colors, or other visual properties, the `n` objects provide 
 the following information: 
--   User defined data of node. accessible by `n.data`.
--   hierarchy structure derived from d3 (d3-hierarchy) `parent`, `children` and more,
-    see [d3-hierarchy]().
--   hyperbolic coordinates, euclidean coordinates, layout. 
--   precalculated properties such as labels, image urls or properties hard to compute.
-    See section [User defined Node Initialization].
+-   All properties derived from [d3-hierarchy](https://github.com/d3/d3-hierarchy#hierarchy) like: 
+    -   User defined data of the node, accessible by `n.data`.
+    -   Hierarchy structure derived from d3 like `parent`, `children` and more.
+-   Hyperbolic coordinates, euclidean coordinates, layout. 
+-   Precalculated properties such as labels, image urls or properties hard to compute.
+    See section [User defined Node Initialization](User-defined-Node-Initialization) for a complete list.
 
-See [TypeScript interface](https://github.com/glouwa/d3-hypertree/blob/master/src/models/n/n.ts) for a complete list of properties. 
-And [d3-hierarchy]() for base functionality.
+See [TypeScript interface](https://github.com/glouwa/d3-hypertree/blob/master/src/models/n/n.ts) for a complete list of node properties, 
+and [d3-hierarchy]() for base functionality.
 Keep in mind, usually its the most simple way to print the object `n` to the console when working with data driven functions.
 
 #### User defined Node Initialization
@@ -261,6 +261,11 @@ mytree = new hyt.Hypertree(
 
                 mytree.api.goto({ re:-n.layout.z.re, im:-n.layout.z.im }, null)
                     .then(()=> l.view.hypertree.drawDetailFrame())       
+                /*
+                var s = n.ancestors().find(e=> true)                
+                ud.view.hypertree.api.toggleSelection(s)
+                ud.view.hypertree.args.interaction.onNodeSelect(s)
+                */
             },
             
             // center node is defined as node with minimal distance to the center.
@@ -283,19 +288,19 @@ For detailed documentation and a complete list of features see
 ```typescript
 new hyt.Hypertree(
     {
-        id:                     'my-component',
-        classes:                'add-class another-class',
-        parent:                 document.body,        
-        preserveAspectRatio:    'xMidYMid meet'
+        id:                     string
+        classes:                string
+        parent:                 HTMLElement        
+        preserveAspectRatio:    'xMidYMid meet' | ...
     },
     {
-        dataloader?:            LoaderFunction   
+        dataloader?:            (ok:(root:N, t0:number, dl:number)=>void, err:(err)=>void)=> void   
         dataInitBFS:            (ht:Hypertree, n:N)=> void
         langInitBFS:            (ht:Hypertree, n:N)=> void         
         layout: {
-            type:               LayoutFunction
+            type:               (root:N, t?:number, noRecursion?:boolean) => void
             weight:             (n:N)=> number
-            initSize:           number
+            len:                (n:N)=> number            
             rootWedge: {
                 orientation:    number
                 angle:          number
@@ -310,38 +315,57 @@ new hyt.Hypertree(
                 alpha:          number
             }
             focusExtension:     number
-            maxFocusRadius:     number
-            wikiRadius:         number
+            maxFocusRadius:     number            
             maxlabels:          number       
         }       
         geometry: {        
-            layers:            ((v, ls:IUnitDisk)=> ILayer)[]
-            layerOptions:      {
-                cells: {
-                    invisible:  false,
-                    hideOnDrag: false,
-                    // + layer specific properties 
+            layers:             ((v, ls:IUnitDisk)=> ILayer)[]
+            layerOptions: {
+                layerbase: {
+                    invisible:  false
+                    hideOnDrag: false                    
                 },
+                cells: {
+                    invisible:         false
+                    hideOnDrag:        false
+                    color:             (n:N)=> color
+                    borderColor:       (n:N)=> color
+                    borderWidth:       (n:N)=> number
+                },
+                links: {
+                    color:             (n:N)=> color                    
+                    width:             (n:N)=> number
+                    linkCurvature:     '+' | '-' | 'l'
+                },
+                nodes: {
+                    color:             (n:N)=> color
+                    borderColor:       (n:N)=> color
+                    borderWidth:       (n:N)=> number
+                },
+                labels: {
+                    offsetLabels:      (d, i, v)=> C
+                    captionBackground: 'all' | 'center' | 'root' | 'none'
+                    captionFont:       string
+                    captionHeight:     number                    
+                },
+                /*
+                'cells',
+                'culling-r', 'mouse-r', 'focus-r', 'labels-r-𝐖', 'λ', 'zerozero-circle',
+                'center-node', 'path-arcs', 'stem-arc', 'nodes', 'symbols', 'images', 'emojis',  
+                'labels', 'labels2', 'labels-force', 
+                'traces',
+                */
             }
             nodeRadius:        (ud:IUnitDisk, n:N)=> number
             nodeScale:         (n:N)=> number
             nodeFilter:        (n:N)=> boolean
-            offsetEmoji:       (d, i, v)=> C
-            offsetLabels:      (d, i, v)=> C
-
-            captionBackground: 'all' | 'center' | 'root' | 'none' // x 
-            captionFont:       string
-            captionHeight:     number
-
-            linkWidth:         (n:N)=> number
-            linkCurvature:     ArcCurvature
         }
         interaction: {            
-            mouseRadius:        number,
-            onNodeClick:        (n:N)=> void
+            onNodeClick:        (n:N, m:C, l:ILayer)=> void
             onCenterNodeChange: (n:N)=> void 
             λbounds:            [ number, number ]
             wheelSensitivity:   number
+            mouseRadius:        number
         }
     }
 )

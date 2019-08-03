@@ -153,7 +153,10 @@ export function layoutBergé(n:N, λ:number, noRecursion=false)
             const angleWidth = πify(wedge.Ω - wedge.α)
             const bisectionAngle = wedge.α + (angleWidth / 2.0)
             
-            const nz1 = CptoCk({ θ:bisectionAngle, r:λ*(1+L||1) })
+            let deflen = 1
+            if (!n.parent.parent) deflen = .5
+
+            const nz1 = CptoCk({ θ:bisectionAngle, r:λ*(deflen+L||1) })
             setZ(n, h2e(makeT(n.parent.layout.z, one), nz1))
             
             wedgeTranslate(wedge, n.parent.layout.z)
