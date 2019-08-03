@@ -53,7 +53,7 @@ of the prebuilt bundle if npm is not used.
 The prebuilt bundle declares the global variable `hyt`, 
 therefore an import as in the Webpack example below is not necessary.
 
-
+### Plain HTML
 
 And add the following lines to your page:
 ```html
@@ -61,7 +61,7 @@ And add the following lines to your page:
 <script src="d3-hypertree.js"></script>
 ```
 
-## Webpack
+### Webpack
 D3-hypertree is tested with webpack. 
 Remember to add one of the hypertree css files to your projects.
 To make the example snippets compatible to the prebuilt bundle,
@@ -70,6 +70,9 @@ the following usage examples will assume an import like this:
 import * as hyt from 'd3-hypertree'
 ```
 Experts might prefer to import specific classes like `d3-hypertree/components/hypertree` to optimize bundle size.
+
+### Oservable
+See basic example and its forks.
 
 ## Usage
 The following examples will guide you through the most important concepts, 
