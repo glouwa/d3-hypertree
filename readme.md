@@ -144,26 +144,26 @@ And [d3-hierarchy]() for base functionality.
 Keep in mind, usually its the most simple way to print the object `n` to the console when working with data driven functions.
 
 #### User defined Node Initialization
-dataInitBFS and langInitBFS are called at startup in Breath first order.
+`dataInitBFS` and `langInitBFS` are called at startup in Breath first order.
 Use this functions to calculate static properties. 
 Some layers expect specific properties in `n.precalc` like `label`, `icon`, `imageHref`, `clickable`, `cell`.
 Label dimensions and layout weight will be stored by the hypertree component 
 in `n.precalc`.
 ```typescript
-// dataInitBFS is called when data set changes.
-// node properties which do not change during runtime 
-// should be set in this function.
-// this way calculations are not necessary for each frame.
-dataInitBFS: (ht, n)=> {
-    if (n.mergeId == 12)
-        n.precalc.imageHref = 'img/example.png'   
-}, 
-// is called when data or language is changed, 
-// otherwise similar to dataInitBFS.
-// typically node labels are calculated in this function.
-langInitBFS: (ht, n)=> {                        
-    n.precalc.label = `Label ${n.mergeId} / ${n.precalc.layoutWeight}`
-}
+    // dataInitBFS is called when data set changes.
+    // node properties which do not change during runtime 
+    // should be set in this function.
+    // this way calculations are not necessary for each frame.
+    dataInitBFS: (ht, n)=> {
+        if (n.mergeId == 12)
+            n.precalc.imageHref = 'img/example.png'   
+    }, 
+    // is called when data or language is changed, 
+    // otherwise similar to dataInitBFS.
+    // typically node labels are calculated in this function.
+    langInitBFS: (ht, n)=> {                        
+        n.precalc.label = `Label ${n.mergeId} / ${n.precalc.layoutWeight}`
+    }
 ```
 
 ### Layer Configuration 
@@ -249,27 +249,20 @@ Typical functions used in them:
 - got animaion
 ```typescript
 mytree = new hyt.Hypertree(
-    { 
-        parent: document.body 
-    },
+    { parent: document.body },
     { 
         dataloader: hyt.loaders.generators.nT1,
         interaction: {
             // the node click area is the voronoi cell in euclidean space.
-            // this way, wherever the user clicks, a node can be associated
-            // n: clicked node
-            // m: click coordinates
-            // l: event source layer
+            // this way, wherever the user clicks, a node can be associated            
             onNodeClick: (n, m, l)=> { 
-                console.log('### EVENT: onNodeClick', n.mergeId, n)
+                console.log(`#onNodeClick: Node=${n}, click coordinates=${m}, source layer=${l}`)
 
                 mytree.api.goto({ re:-n.layout.z.re, im:-n.layout.z.im }, null)
                     .then(()=> l.view.hypertree.drawDetailFrame())       
             },
-            // is called when center node changes.
-            // the new center node is given by n
-            onCenterNodeChange: n=> console.log(
-                '### EVENT: onCenterNodeChange', n.mergeId, n),         
+            
+            onCenterNodeChange: n=> console.log(`#onCenterNodeChange: Node=${n}`),
             
             // defines minimum and maximum link length
             // default mouse wheel behavior is to change λ 
