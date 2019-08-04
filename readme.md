@@ -321,7 +321,7 @@ new hyt.Hypertree(
             maxFocusRadius:     number            
             maxlabels:          number       
         }       
-        geometry: {        
+        geometry: {
             layers:             ((v, ls:IUnitDisk)=> ILayer)[]
             layerOptions: {
                 layerbase: {
@@ -345,14 +345,12 @@ new hyt.Hypertree(
                     stroke:            (n:N)=> color
                     strokeWidth:       (n:N)=> number
                 },
-                labels: {                    
-                    backgroundRect:    (n:N)=> boolean //'all' | 'center' | 'root' | 'none'
-                    captionFont:       string
-                    captionHeight:     number
-                    delta:             (d, i, v)=> C
-                    offsetLabels:      (n:N)=> C
+                labels: {                                        
+                    font:              string                    
+                    delta:             (n:N)=> C
                     color:             (n:N)=> color
-                    backgroundColor:   (n:N)=> color   
+                    background:        (n:N)=> (undefined | color)
+                    backgroundHeight:  number                    
                 },
                 /*
                 'cells',
