@@ -242,9 +242,10 @@ export const layerSrc = [
         className:  'caption',                          
         data:       ()=> ud.cache.emojis,
         text:       (d)=> d.precalc.icon,
-        delta:      labeloffsets.centerOffset('emojilen'), 
-        //delta:      (d, i, v)=> ({ re:0, im:0 }),
+        delta:      labeloffsets.centerOffset('emojislen'), 
+        //delta:      (d, i, v)=> ({ re:0, im:0 }),        
         color:      ()=> undefined,
+        background: undefined,
         transform:  (d, delta)=> 
                         ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` 
                         + `scale(${d.dampedDistScale*2})`
@@ -258,6 +259,7 @@ export const layerSrc = [
         text:       (d)=> d.precalc.label,
         delta:      labeloffsets.labeloffset(ud),
         color:      ()=> undefined,
+        background: undefined,
         transform:  (d, delta)=> 
                         ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` 
                         + d.scaleStrText                            
@@ -270,7 +272,7 @@ export const layerSrc = [
         data:       ()=> ud.cache.labels,
         text:       (d)=> d.precalc.label,
         delta:      labeloffsets.labeloffset(ud),
-        color:      ()=> undefined,
+        color:      ()=> undefined,        
         transform:  (d, delta)=> 
                         ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` 
                         + d.scaleStrText                            
@@ -282,6 +284,7 @@ export const layerSrc = [
         className:  'caption caption-label',
         data:       ()=> ud.cache.labels,
         text:       (d)=> d.precalc.label,        
+        background: n=> !n.parent,
         transform:  (d, delta)=> 
                         ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` 
                         + d.scaleStrText                            

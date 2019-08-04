@@ -76,14 +76,10 @@ export class D3UpdatePattern
             .merge(newElements)
                 //.call(this.all)
                 .call(this.args.updateTransform)
-                .call(this.args.updateColor)
-        
-// extrashit
-        if (this.args.name === 'labels-force' && true) this.addTextBackgroundRects()
-        if (this.args.name === 'labels' && true)       this.addTextBackgroundRects()
+                .call(this.args.updateColor)        
     }
 
-    private addTextBackgroundRects()
+    public addTextBackgroundRects(paddingLeftRight, paddingTopBottom, height, layername)
     { 
         this.mainSvgGroup.selectAll('rect').remove()
         var svgRootHere = this.mainSvgGroup
@@ -98,50 +94,25 @@ export class D3UpdatePattern
                     || d.cachep.r < 0.6)
                 {
                     var view:any = v[i]
-                    var w = d.precalc.labellen //= d.precalc.labellen || view.getComputedTextLength()
+                    var w = d.precalc[layername+'len'] || 0
                     var h = geometry.captionHeight
                     
-                    svgRootHere.insert('rect', d=> this)
-                        .attr("x",         x=> -paddingLeftRight/2)
-                        .attr("y",         x=> -paddingTopBottom-h/2)
-                        .attr("rx",        x=> .01) //.009
-                        .attr("ry",        x=> .03) //.009
-                        .attr("width",     x=> w + paddingLeftRight)
-                        .attr("height",    x=> h + paddingTopBottom)
-                        .attr("transform", x=> view.attributes.transform.value)//d.transformStrCache + d.scaleStrText)
-                        .classed('caption-background', true)                    
+                    if (!w)
+                        console.warn("labellen == 0", d)                    
+
+                    else
+                        svgRootHere.insert('rect', d=> this)
+                            .attr("x",         x=> -paddingLeftRight/2)
+                            .attr("y",         x=> -paddingTopBottom-h/2)
+                            .attr("rx",        x=> .01) //.009
+                            .attr("ry",        x=> .03) //.009
+                            .attr("width",     x=> w + paddingLeftRight)
+                            .attr("height",    x=> h + paddingTopBottom)
+                            .attr("transform", x=> view.attributes.transform.value)//d.transformStrCache + d.scaleStrText)
+                            .classed('caption-background', true)                    
                 }
             })
         }
     }
 }
 
-var paddingLeftRight = .08
-var paddingTopBottom = .02
-
-export var bboxCenter = (d, cacheId='labellen')=> {
-    var w = d.precalc[cacheId]
-    var h = .045              
-    return { re:-w/2, im:h/3}        
-}
-
-export var bboxOval = (d, cacheId='labellen', θn=undefined)=> {
-    var w = d.precalc[cacheId]
-    var h = .045              
-    const θ = θn ? θn.θ : d.cachep.θ
-/*
-    return CsubC(        
-        { 
-            re:(w/2+paddingLeftRight/2)*Math.cos(θ), 
-            im:(h/2+paddingTopBottom/2)*Math.sin(θ) 
-        },
-        { re:w/2, im:h/2}
-    )
-*/    
-    const result = {
-        re:(paddingLeftRight/2 + w/2) * Math.cos(θ) - w/2,
-        im:(paddingTopBottom/2 + h/2) * Math.sin(θ) + h/3
-    }
-    console.assert(result.re)
-    return result
-}

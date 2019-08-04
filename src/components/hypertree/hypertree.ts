@@ -336,7 +336,7 @@ export class Hypertree
         // langInitBFS:
         // - lang
         // - wiki*
-        // - labellen automatisch
+        // - labelslen automatisch
         // - clickable=selectable*
         // - cell* default = clickable? oder true?
         this.updateLang_()
@@ -436,32 +436,16 @@ export class Hypertree
                 if (n.precalc[txtprop]) {
                     const metrics = context.measureText(n.precalc[txtprop])
                     n.precalc[lenprop] = metrics.width/200/window.devicePixelRatio
+                    console.assert(typeof n.precalc[lenprop] === 'number')
                 }
                 else
                     n.precalc[lenprop] = undefined 
             })    
         }
-        updateLabelLen_('label', 'labellen')
-        updateLabelLen_('label2', 'label2len')
-        updateLabelLen_('icon', 'emojilen')
-        /*
-        this.data.each(n=> {
-            if (n.precalc.label) {
-                const metrics = context.measureText(n.precalc.label)
-                n.precalc.labellen = metrics.width/200/window.devicePixelRatio
-            }
-            else
-                n.precalc.labellen = 0 
-        })
-
-        this.data.each(n=> {
-            if (n.precalc.label2) {
-                const metrics = context.measureText(n.precalc.label2)
-                n.precalc.label2len = metrics.width/200/window.devicePixelRatio
-            }
-            else
-                n.precalc.label2len = undefined 
-        })*/
+        updateLabelLen_('label', 'labels-forcelen')
+        updateLabelLen_('label', 'labelslen')
+        updateLabelLen_('label2', 'labels2len')
+        updateLabelLen_('icon', 'emojislen')      
     }
 
     public updateLayoutPath_(preservingnode:N) : void {

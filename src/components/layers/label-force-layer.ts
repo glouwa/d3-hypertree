@@ -7,7 +7,7 @@ import { ILayerArgs }      from '../layerstack/layer'
 import { D3UpdatePattern } from '../layerstack/d3updatePattern'
 import { CptoCk, CktoCp }  from '../../models/transformation/hyperbolic-math'
 import { CmulR, CaddC }    from '../../models/transformation/hyperbolic-math'
-import { bboxCenter }      from '../layerstack/d3updatePattern';
+import { bboxCenter }      from '../layers/label-layer';
 
 export interface LabelForceLayerArgs extends ILayerArgs
 {
@@ -20,6 +20,10 @@ export interface LabelForceLayerArgs extends ILayerArgs
     text,
     clip?:       string,
 }
+
+
+var paddingLeftRight = .08
+var paddingTopBottom = .02
 
 export class LabelForceLayer implements ILayer
 {    
@@ -47,6 +51,13 @@ export class LabelForceLayer implements ILayer
             this.update.force()
             this.d3updatePattern.update.data()
             this.d3updatePattern2.update.data()
+
+            if (this.args.background)
+                this.d3updatePattern.addTextBackgroundRects(                
+                    paddingLeftRight, 
+                    paddingTopBottom,
+                    .05,
+                    this.args.name)
         },
         transformation: ()=> { 
             this.update.force()           
@@ -126,13 +137,19 @@ export class LabelForceLayer implements ILayer
     simulationTick() {
     }
 
+    private labellen(d)
+    {
+        return d.precalc[this.args.name+'len']||0
+    }
+
     private attach() {
+        const T = this
         function calctransform(d, i, v) {
             //bboxCenter(d)(v[i])
             if (!d.forcepoints)
                 return ` translate(${d.cache.re} ${d.cache.im})` 
             console.assert(d.forcepoints.x || d.depth === 0)            
-            return ` translate(${(d.forcepoints.x||0)-(d.precalc.labellen||0)/2} ${d.forcepoints.y||0})`
+            return ` translate(${(d.forcepoints.x||0)-T.labellen(d)/2} ${d.forcepoints.y||0})`
         }
 
         this.d3updatePattern = new D3UpdatePattern({
