@@ -1,5 +1,6 @@
 import { N } from '../../models/n/n'
 import { ILayer } from './layer'
+import { CaddC, CsubC } from '../../models/transformation/hyperbolic-math'
 
 export interface D3UpdatePatternArgs
 {
@@ -99,9 +100,7 @@ export class D3UpdatePattern
                     var view:any = v[i]
                     var w = d.precalc.labellen //= d.precalc.labellen || view.getComputedTextLength()
                     var h = geometry.captionHeight
-                    var paddingLeftRight = .08
-                    var paddingTopBottom = .02
-
+                    
                     svgRootHere.insert('rect', d=> this)
                         .attr("x",         x=> -paddingLeftRight/2)
                         .attr("y",         x=> -paddingTopBottom-h/2)
@@ -117,15 +116,32 @@ export class D3UpdatePattern
     }
 }
 
-export var bboxOffset = (d, cacheId='labellen', θn=undefined)=> v=> {
-    var w = d.precalc[cacheId] //= d.precalc[cacheId] || v.getComputedTextLength()  //var bb = v.getBBox() war schlechter
-    var h = .045
-    var paddingLeftRight = .08
-    var paddingTopBottom = .02
+var paddingLeftRight = .08
+var paddingTopBottom = .02
+
+export var bboxCenter = (d, cacheId='labellen')=> {
+    var w = d.precalc[cacheId]
+    var h = .045              
+    return { re:-w/2, im:h/3}        
+}
+
+export var bboxOval = (d, cacheId='labellen', θn=undefined)=> {
+    var w = d.precalc[cacheId]
+    var h = .045              
     const θ = θn ? θn.θ : d.cachep.θ
-    return {
+/*
+    return CsubC(        
+        { 
+            re:(w/2+paddingLeftRight/2)*Math.cos(θ), 
+            im:(h/2+paddingTopBottom/2)*Math.sin(θ) 
+        },
+        { re:w/2, im:h/2}
+    )
+*/    
+    const result = {
         re:(paddingLeftRight/2 + w/2) * Math.cos(θ) - w/2,
         im:(paddingTopBottom/2 + h/2) * Math.sin(θ) + h/3
     }
+    console.assert(result.re)
+    return result
 }
-

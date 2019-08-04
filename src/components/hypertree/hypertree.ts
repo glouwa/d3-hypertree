@@ -443,6 +443,7 @@ export class Hypertree
         }
         updateLabelLen_('label', 'labellen')
         updateLabelLen_('label2', 'label2len')
+        updateLabelLen_('icon', 'emojilen')
         /*
         this.data.each(n=> {
             if (n.precalc.label) {

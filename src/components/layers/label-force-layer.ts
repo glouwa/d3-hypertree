@@ -7,7 +7,7 @@ import { ILayerArgs }      from '../layerstack/layer'
 import { D3UpdatePattern } from '../layerstack/d3updatePattern'
 import { CptoCk, CktoCp }  from '../../models/transformation/hyperbolic-math'
 import { CmulR, CaddC }    from '../../models/transformation/hyperbolic-math'
-import { bboxOffset }      from '../layerstack/d3updatePattern';
+import { bboxCenter }      from '../layerstack/d3updatePattern';
 
 export interface LabelForceLayerArgs extends ILayerArgs
 {
@@ -128,11 +128,11 @@ export class LabelForceLayer implements ILayer
 
     private attach() {
         function calctransform(d, i, v) {
-            //bboxOffset(d)(v[i])
+            //bboxCenter(d)(v[i])
             if (!d.forcepoints)
                 return ` translate(${d.cache.re} ${d.cache.im})` 
-            console.assert(d.forcepoints.x || d.depth === 0)
-            return ` translate(${(d.forcepoints.x||0)-d.precalc.labellen/2} ${d.forcepoints.y||0})`
+            console.assert(d.forcepoints.x || d.depth === 0)            
+            return ` translate(${(d.forcepoints.x||0)-(d.precalc.labellen||0)/2} ${d.forcepoints.y||0})`
         }
 
         this.d3updatePattern = new D3UpdatePattern({

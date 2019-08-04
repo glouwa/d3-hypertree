@@ -15,28 +15,19 @@ import { TraceLayer }               from '../../components/layers/trace-layer'
 import { ImageLayer }               from '../../components/layers/image-layer'
 import { FocusLayer }               from '../../components/layers/focus-layer'
 import { StemLayer }                from '../../components/layers/stem-layer'
-import { bboxOffset }               from '../../d3-hypertree'
+import { bboxCenter, bboxOval }     from '../../d3-hypertree'
 
 export const labeloffsets = {
-    centerOffset:       (ud:UnitDisk)=> (d:N, i, v)=>      CmulR(bboxOffset(d)(v[i]), 1/2),
+    centerOffset:       (cache:string)=> (d:N, i, v)=> bboxCenter(d, cache),
 
     nodeRadiusOffset:   (ls:UnitDisk)=> (d:N)=> CptoCk({ 
                                                     θ: d.cachep.θ, 
                                                     r: ls.args.nodeRadius(ls, d) * d.distScale * 1.5 
                                                 }),
-
-    nodeRadiusOffset1:  (ud)=> (d, i, v)=>      CaddC(
-                                                    labeloffsets.nodeRadiusOffset(ud)(d),
-                                                    bboxOffset(d)(v[i])
-                                                ),
-    nodeRadiusOffset2:  (ud)=> (d, i, v)=>      CaddC(
-                                                    labeloffsets.nodeRadiusOffset(ud)(d),
-                                                    { re:0, im:.1 }
-                                                ),
     
     labeloffset:        (ud)=> (d, i, v)=>      CaddC(
                                                     labeloffsets.nodeRadiusOffset(ud)(d),
-                                                    bboxOffset(d)(v[i])
+                                                    bboxOval(d)
                                                 ),
     outwards:                                   undefined,
     outwardsPlusNodeRadius:                     undefined
@@ -245,11 +236,14 @@ export const layerSrc = [
                         + ` scale(${d.distScale})`
     }),
     (v, ud:UnitDisk)=> new LabelLayer(v, {
+        //invisible:  true,
+        //hideOnDrag: true,
         name:       'emojis',  
         className:  'caption',                          
         data:       ()=> ud.cache.emojis,
         text:       (d)=> d.precalc.icon,
-        delta:      labeloffsets.centerOffset(ud), //(d, i, v)=> ({ re:0, im:0 }),
+        delta:      labeloffsets.centerOffset('emojilen'), 
+        //delta:      (d, i, v)=> ({ re:0, im:0 }),
         color:      ()=> undefined,
         transform:  (d, delta)=> 
                         ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` 

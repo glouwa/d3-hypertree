@@ -303,7 +303,7 @@ new hyt.Hypertree(
         layout: {
             type:               (root:N, t?:number, noRecursion?:boolean) => void
             weight:             (n:N)=> number
-            len:                (n:N)=> number            
+            linklen:            (n:N)=> number            
             rootWedge: {
                 orientation:    number
                 angle:          number

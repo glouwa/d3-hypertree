@@ -2,7 +2,7 @@ import { N }                       from '../../models/n/n'
 import { C, CktoCp, CptoCk }       from '../../models/transformation/hyperbolic-math'
 import { CmulR, CsubC, CaddC }     from '../../models/transformation/hyperbolic-math'
 import { CtoStr }                  from '../../models/transformation/hyperbolic-math'
-import { bboxOffset }              from '../layerstack/d3updatePattern'
+import { bboxCenter }              from '../layerstack/d3updatePattern'
 import { ILayer }                  from '../layerstack/layer'
 import { NodeLayer }               from '../layers/node-layer'
 import { CellLayer }               from '../layers/cell-layer'
@@ -27,11 +27,11 @@ const nodeRadiusOffset = (ud:UnitDisk)=> (d:N)=>
 const labelDelta = (ud:UnitDisk)=> (d:N, i:number, v:N[])=> 
     CaddC(
         nodeRadiusOffset(ud)(d),
-        bboxOffset(
+        bboxCenter(
             d, 
             'labellen-bg', 
             d.layoutReference.zp || CktoCp(d.layout.z)
-        )(v[i])
+        )
     )
 
 export const navBackgroundLayers = [
