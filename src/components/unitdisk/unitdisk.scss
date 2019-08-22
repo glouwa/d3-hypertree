@@ -93,7 +93,7 @@
             pointer-events: none;
             cursor: crosshair;
             opacity: 0;
-            animation: ripple 1000ms ease-out;
+            animation: ripple 500ms ease-out;
         }
         @keyframes ripple {
             0% {

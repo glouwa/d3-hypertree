@@ -49,10 +49,10 @@
             position: absolute;
             /*left: calc(50% - 1.5em);
             top: calc(50% - 1.5em);*/
-            left: calc(50% - 3em);
-            top: calc(50% - .4em);
-            width: 3em;
-            height: 3em;
+            left: 45%;
+            top: 45%;
+            width: 10%;
+            height: 10%;
         }
     }
     /*
@@ -64,8 +64,8 @@
 }
     */
     .spinner {
-        width: 100px;
-        height: 100px;
+        width: 7%;  //100px
+        height: 7%; //100px
         position: relative;
         top: 50%;
         margin: 0 50%;

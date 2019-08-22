@@ -298,27 +298,44 @@ export class InteractionLayer2 implements ILayer
  
     //-----------------------------------------------------------------------------------------
  
-    public ripple(m:C, n:N, ok) {      
-        const rippleClip = this.view.parent
-            .append('clipPath')            
-            .attr('id', `cell-clip-${n.mergeId}`)
-            .html(`<use xlink:href="#cell-${n.mergeId}"></use>`)
-            
-        const rippleCircle = this.view.parent
-            .insert('g', ':first-child')
-            .attr('class', 'ripple-world')
-            .attr('clip-path', `url(#cell-clip-${n.mergeId})`)
-                .append('circle')
-                    .attr('class', 'ripple-circle')
-                    .attr('r', .1)
-                    .attr('cx', m.re)
-                    .attr('cy', m.im)            
-                    .attr('transform-origin', `${m.re}  ${m.im}`)                    
-                    .on('animationend', ()=> { 
-                        rippleCircle.remove() 
-                        rippleClip.remove() 
-                        ok()
-                    })
+    public ripple(n:N, m:C, ok, useClip=true) { 
+        if (useClip && !this.view.unitdisk.layerStack.layers['cells'].args.invisible) {
+            const rippleClip = this.view.parent
+                .append('clipPath')            
+                .attr('id', `cell-clip-${n.mergeId}`)
+                .html(`<use xlink:href="#cell-${n.mergeId}"></use>`)
+                
+            const rippleCircle = this.view.parent
+                .insert('g', ':first-child')
+                .attr('class', 'ripple-world')
+                .attr('clip-path', `url(#cell-clip-${n.mergeId})`)
+                    .append('circle')
+                        .attr('class', 'ripple-circle')
+                        .attr('r', .1)
+                        .attr('cx', m.re)
+                        .attr('cy', m.im)            
+                        .attr('transform-origin', `${m.re}  ${m.im}`)                    
+                        .on('animationend', ()=> { 
+                            rippleCircle.remove() 
+                            rippleClip.remove() 
+                            ok()
+                        })
+        }
+        else {                
+            const rippleCircle = this.view.parent
+                .insert('g', ':first-child')
+                .attr('class', 'ripple-world')                
+                    .append('circle')
+                        .attr('class', 'ripple-circle')
+                        .attr('r', .1)
+                        .attr('cx', m.re)
+                        .attr('cy', m.im)            
+                        .attr('transform-origin', `${m.re}  ${m.im}`)                    
+                        .on('animationend', ()=> { 
+                            rippleCircle.remove()                         
+                            ok()
+                        })
+        }
     }
 
     private click(m:C) {
@@ -326,28 +343,8 @@ export class InteractionLayer2 implements ILayer
         const n = q ? q.data : undefined
         console.log('click', this.dist(this.panStart, m), n, this.view.unitdisk.args.transformation.cache.centerNode)
 
-        if (!this.view.unitdisk.layerStack.layers['cells'].args.invisible) {
-            this.ripple(m, n, ()=> {                                
-                if (!this.view.hypertree.isAnimationRunning())
-                    this.view.hypertree.args.interaction.onNodeClick(n, m, this)
-            })
-        }
-        else {
-            if (!this.view.hypertree.isAnimationRunning())
+        if (!this.view.hypertree.isAnimationRunning())
                 this.view.hypertree.args.interaction.onNodeClick(n, m, this)
-        }
-        
-        /*
-        if (n.mergeId !== this.view.unitdisk.args.transformation.cache.centerNode.mergeId) {
-            //console.log('not same --> goto node')
-            this.view.hypertree.api.goto(CmulR({ re:n.layout.z.re, im:n.layout.z.im }, -1), null)
-                .then(()=> this.view.hypertree.drawDetailFrame())
-        }*/ 
-        /*
-        else {
-            console.log('click on center')
-            this.args.onClick(n, m)
-        }*/
     }
 
     private findTrace(pid) {

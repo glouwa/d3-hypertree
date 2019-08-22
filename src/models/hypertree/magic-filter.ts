@@ -246,6 +246,6 @@ function peocessNode(ud:IUnitDisk, cache:TransformationCache, n:N, focusR, minWe
     if (!cache.centerNode || cache.centerNode.cachep.r > n.cachep.r)
         cache.centerNode = n
 
-    if (n.precalc.icon)
+    if (n.precalc.icon && !n.isOut)
         cache.emojis.push(n)
 }
