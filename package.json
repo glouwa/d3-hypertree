@@ -20,7 +20,7 @@
     "globalinstall": "npm i -g gulp"
   },
   "dependencies": {
-    "d3": "^4.13.0",
+    "d3": "^7.6.1",
     "d3-force-gravity": "^1.0.2",
     "xml2js": "^0.4.17"
   },
