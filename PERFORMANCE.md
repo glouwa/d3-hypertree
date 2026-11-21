@@ -69,9 +69,10 @@ and wheel, two simulated touch points (CDP `Input.dispatchTouchEvent`) for pinch
 - **wheel**: 20 steps zooming out, then 20 zooming in, 60 ms apart.
 - **pinch**: two fingers move from 300 px apart to 120 px and back.
 
-`bench-interaction.mjs` first animates to λ = 0.3, because the computed start
-zoom can lie outside `interaction.λbounds`, where the wheel handler rejects
-every step (known bug, see the plan).
+`bench-interaction.mjs` first animates to λ = 0.3, so every tree starts from
+the same, valid zoom. (Originally a workaround: the computed start zoom can lie
+outside `interaction.λbounds`, and the wheel used to reject every step there.
+That's fixed; the fixed start zoom keeps results comparable with the baseline.)
 
 ### Metrics
 

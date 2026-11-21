@@ -72,20 +72,68 @@ test.describe('interaction', () => {
         expectNoErrors(errors)
     })
 
-    // Known bug: the default start zoom (λ ≈ 0.48) lies outside the default
-    // interaction.λbounds [1/40, 0.45], so the wheel handler rejects zooming in
-    // right after load. Remove .fail once fixed.
-    test.fail('mouse wheel zooms in right after load', async ({ page }) => {
+    // The computed start zoom ignores interaction.λbounds, so wide trees start
+    // far above the default maximum (0.45). Zoom steps that move back towards
+    // the bounds must still work (regression: they used to be rejected, which
+    // made the wheel do nothing at all on such trees).
+    test('mouse wheel zooms out when the start zoom is above λbounds', async ({ page }) => {
+        const errors = collectErrors(page)
+        await openTree(page, 'gen=nTree&depth=5&childs=8')
+        const λ = () => page.evaluate(() => harness.ht.unitdisk.args.transformation.state.λ)
+        const max = await page.evaluate(() => harness.ht.args.interaction.λbounds[1])
+        const before = await λ()
+        expect(before).toBeGreaterThan(max) // precondition: starts outside the bounds
+
+        const box = await diskBox(page)
+        await page.mouse.move(box.x + box.width / 2 + 50, box.y + box.height / 2 - 50)
+        for (let i = 0; i < 5; i++) { await page.mouse.wheel(0, 100); await page.waitForTimeout(50) }
+        await waitForStable(page)
+
+        expect(await λ()).toBeLessThan(before)
+        expectNoErrors(errors)
+    })
+
+    test('mouse wheel does not zoom in beyond λbounds', async ({ page }) => {
         await openTree(page, 'gen=nTree&depth=10&childs=2')
         const λ = () => page.evaluate(() => harness.ht.unitdisk.args.transformation.state.λ)
+        const max = await page.evaluate(() => harness.ht.args.interaction.λbounds[1])
         const before = await λ()
+        expect(before).toBeGreaterThan(max) // binary tree starts slightly above the maximum
 
         const box = await diskBox(page)
         await page.mouse.move(box.x + box.width / 2 + 50, box.y + box.height / 2 - 50)
         for (let i = 0; i < 5; i++) { await page.mouse.wheel(0, -100); await page.waitForTimeout(50) }
         await waitForStable(page)
 
-        expect(await λ()).toBeGreaterThan(before)
+        expect(await λ()).toBe(before)
+    })
+
+    test.describe('touch', () => {
+        test.use({ hasTouch: true })
+
+        test('pinching zooms out when the start zoom is above λbounds', async ({ page }) => {
+            const errors = collectErrors(page)
+            await openTree(page, 'gen=nTree&depth=5&childs=8')
+            const λ = () => page.evaluate(() => harness.ht.unitdisk.args.transformation.state.λ)
+            const before = await λ()
+
+            const box = await diskBox(page)
+            const cx = box.x + box.width / 2, cy = box.y + box.height / 2
+            const cdp = await page.context().newCDPSession(page)
+            const touch = (type, d) => cdp.send('Input.dispatchTouchEvent', {
+                type, touchPoints: type === 'touchEnd' ? [] : [{ x: cx - d, y: cy, id: 0 }, { x: cx + d, y: cy, id: 1 }],
+            })
+            // a small pinch (finger distance 300 -> 240 px, factor 0.8): the target
+            // zoom stays above the maximum, so it only works if steps back
+            // towards the bounds are allowed
+            await touch('touchStart', 150)
+            for (let d = 150; d >= 120; d -= 3) { await touch('touchMove', d); await page.waitForTimeout(16) }
+            await touch('touchEnd', 120)
+            await waitForStable(page)
+
+            expect(await λ()).toBeLessThan(before)
+            expectNoErrors(errors)
+        })
     })
 })
 

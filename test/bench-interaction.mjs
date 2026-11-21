@@ -103,8 +103,8 @@ async function open(browser, tree, cpu) {
     await page.goto(base + tree.query)
     await page.waitForFunction(() => window.harness)
     await page.evaluate(() => harness.ready)
-    // Known bug: the computed start zoom can lie outside interaction.λbounds, and
-    // then the wheel handler rejects zooming in *and* out. Start from a valid zoom.
+    // Same, valid start zoom for every tree (comparable with the baseline). The
+    // computed start zoom can lie outside interaction.λbounds.
     await page.evaluate(() => harness.ht.api.gotoλ(0.3))
     await page.waitForTimeout(1000)
     await page.evaluate(() => {

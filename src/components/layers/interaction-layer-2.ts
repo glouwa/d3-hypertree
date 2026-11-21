@@ -12,6 +12,19 @@ import { compose, shift }         from '../../models/transformation/hyperbolic-m
 
 const π = Math.PI
 
+/**
+ * Whether a zoom step from oldλ to newλ is allowed by interaction.λbounds.
+ * Steps within the bounds are allowed. Steps that end outside are allowed if
+ * they move towards the bounds: the computed start zoom (or an API call) can
+ * leave λ outside the bounds, and the user must still be able to zoom back.
+ */
+function isλStepAllowed(bounds:[number, number], oldλ:number, newλ:number) : boolean {
+    const [min, max] = bounds
+    if (newλ > min && newλ < max) return true
+    return (oldλ >= max && newλ < oldλ)
+        || (oldλ <= min && newλ > oldλ)
+}
+
 export interface InteractionLayer2Args extends ILayerArgs
 {  
     mouseRadius,
@@ -115,9 +128,8 @@ export class InteractionLayer2 implements ILayer
         const oldλp = this.view.unitdisk.args.transformation.state.λ
         const Δsens = this.view.hypertree.args.interaction.wheelFactor
         const newλp = (mΔ>=0 ? oldλp/Δsens : oldλp*Δsens) //- λΔ
-        
-        if (newλp > this.view.hypertree.args.interaction.λbounds[0] &&
-            newλp < this.view.hypertree.args.interaction.λbounds[1]) 
+
+        if (isλStepAllowed(this.view.hypertree.args.interaction.λbounds, oldλp, newλp))
         {
             const m = this.currMousePosAsArr()
             
@@ -240,9 +252,9 @@ export class InteractionLayer2 implements ILayer
             const dist = this.dist(t0e, t1e)
             const f = dist / this.pinchInitDist
             const newλp = this.pinchInitλp * f
-            
-            if (newλp > this.view.hypertree.args.interaction.λbounds[0] &&
-                newλp < this.view.hypertree.args.interaction.λbounds[1] ) 
+            const oldλp = this.view.unitdisk.args.transformation.state.λ
+
+            if (isλStepAllowed(this.view.hypertree.args.interaction.λbounds, oldλp, newλp))
             {
                 const pinchcenter2 = maxR(CmulR(CaddC(t0e, t1e), .5), this.args.mouseRadius)
                 
