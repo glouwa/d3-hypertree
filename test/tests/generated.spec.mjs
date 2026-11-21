@@ -160,6 +160,42 @@ test.describe('deep trees', () => {
     })
 })
 
+test.describe('hover', () => {
+    test('hovering a node highlights the voronoi cells on its hover path', async ({ page }) => {
+        const errors = collectErrors(page)
+        await openTree(page, 'gen=nTree&depth=10&childs=2')
+        await page.evaluate(() => {
+            harness.ht.unitdisk.layerStack.layers.cells.args.invisible = false
+            harness.ht.update.data()
+        })
+        const target = await page.evaluate(() => {
+            const c = [...document.querySelectorAll('#nodes circle')]
+                .filter(c => c.__data__ && c.__data__.depth >= 2)
+                .sort((a, b) => b.getBoundingClientRect().width - a.getBoundingClientRect().width)[0]
+            const r = c.getBoundingClientRect()
+            return { x: r.x + r.width / 2, y: r.y + r.height / 2 }
+        })
+        await page.mouse.move(target.x, target.y)
+        await page.waitForTimeout(300)
+
+        const r = await page.evaluate(() => {
+            const cells = [...document.querySelectorAll('#cells > *')]
+            const onPath = cells.filter(c => c.__data__.data.pathes
+                && c.__data__.data.pathes.isPartOfAnyHoverPath && c.__data__.data.parent)
+            const hovered = document.querySelectorAll('#cells .hovered')
+            return {
+                expected: onPath.length,
+                hovered: hovered.length,
+                fill: hovered[0] ? getComputedStyle(hovered[0]).fill : null,
+            }
+        })
+        expect(r.expected).toBeGreaterThan(1)
+        expect(r.hovered).toBe(r.expected)
+        expect(r.fill).not.toBe('none') // the CSS rule applies
+        expectNoErrors(errors)
+    })
+})
+
 test.describe('layers', () => {
     test('layers can be shown and hidden individually', async ({ page }) => {
         const errors = collectErrors(page)

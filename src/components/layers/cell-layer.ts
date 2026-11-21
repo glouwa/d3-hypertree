@@ -46,10 +46,11 @@ export class CellLayer implements ILayer
                                     /*
                                     .classed("lazy",      d=> d.data.hasOutChildren)                                 
                                     .classed("leaf",      d=> !d.data.children),*/
-            updateColor:       s=>  //s.classed("lazy",      d=> d.data.hasOutChildren),
-                                    s.classed("hovered",   d=> d.data.isPartOfAnyHoverPath && d.data.parent)
+            // d is a voronoi polygon; d.data is its node. Path membership lives
+            // in n.pathes (same as in the node layer).
+            updateColor:       s=>  s.classed("hovered",  d=> !!(d.data.pathes && d.data.pathes.isPartOfAnyHoverPath && d.data.parent))
+                                    .classed("selected", d=> !!(d.data.pathes && d.data.pathes.isPartOfAnySelectionPath && d.data.parent))
                                     .style("fill",      d=> (d.pathes && d.pathes.labelcolor) || this.args.fill(d)),
-                                    //.classed("selected",  d=> d.data.isPartOfAnySelectionPath && d.data.parent),
             updateTransform:   s=> s//.classed("lazy",      d=> d.data.hasOutChildren)                                 
                                     .attr("points",       d=> {
                                         return d && d.join(" ")

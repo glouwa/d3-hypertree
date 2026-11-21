@@ -86,7 +86,7 @@ $nodeStroke:    #90caf9;
         .hovered.arc      { stroke: rgba($hovercolor, 1);                                                          }
         .hovered-path.arc { stroke: rgba($hovercolor, .8);                                                          }
         .hovered-path-nav.arc { stroke: rgba(red, .65);                                                          }
-        //.hovered.cell   { stroke: rgba($hovercolor, .05);              fill: rgba($hovercolor, .0)                  }
+        .hovered.cell     { stroke: rgba($hovercolor, .35);              fill: rgba($hovercolor, .15);                }
         .hovered.node     { stroke: darken($hovercolor, 10%);                                                         }
 
         //.selected       { stroke: $selectedcolor;                      fill: lighten($selectedcolor, 25%);          }

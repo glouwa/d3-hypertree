@@ -73,8 +73,12 @@ export class LayerStack
         if (this.layers['link-arcs']) 
             this.layers['link-arcs'].update.style()
 
-        if (this.layers['stem-arc']) 
+        if (this.layers['stem-arc'])
             this.layers['stem-arc'].update.style()
+
+        // hovered and selected voronoi cells
+        if (this.layers['cells'])
+            this.layers['cells'].update.style()
 
         if (this.layers['path-arcs'])
             this.layers['path-arcs'].update.data()
