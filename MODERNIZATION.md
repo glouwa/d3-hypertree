@@ -58,7 +58,7 @@ interaction step.
 
 Target: every drag, pinch and wheel step within one frame (16.7 ms) on a
 mid-range machine, measured with `bench-interaction.mjs` and `bench-layers.mjs`
-at CPU 1× and 4×.
+at CPU 1× and 4× (see [PERFORMANCE.md](PERFORMANCE.md) for method and current numbers).
 
 Update pipeline (layout, filter):
 
@@ -144,58 +144,9 @@ Fix options, depending on the cause:
    nodes instead of drawing garbage. Prevents broken pictures but doesn't make
    deep regions reachable.
 
-## Benchmark: interaction (phase 0 baseline)
+## Performance measurements
 
-`node bench-interaction.mjs`: generated trees without labels or emojis,
-starting at λ = 0.3, ~3 s per gesture, headless Edge 900×900. Values are ms
-per tree update; the JavaScript split comes from a CPU profile attributed by
-call stack. Budget for 60 fps: 16.7 ms.
-
-| Tree (visible nodes) | Gesture | CPU 1× | CPU 4× | Layout | Filter | Voronoi | Layers (DOM) | Browser |
-|----------------------|---------|-------:|-------:|-------:|-------:|--------:|-------------:|--------:|
-| binary (129)         | drag    | 4.9    | 23.2   | 0.7    | 0.3    | 0.0     | 1.7          | 1.4     |
-| binary (129)         | wheel   | 8.8    | 42.6   | 1.1    | 0.6    | 0.9     | 2.3          | 1.9     |
-| binary (129)         | pinch   | 5.0    | 24.8   | 0.7    | 0.4    | 0.0     | 1.8          | 1.5     |
-| wide 8^5 (513)       | drag    | 18.1   | 93.5   | 4.1    | 1.9    | 0.0     | 6.4          | 5.1     |
-| wide 8^5 (513)       | wheel   | 29.4   | 146.9  | 5.4    | 2.5    | 3.4     | 8.2          | 6.5     |
-| wide 8^5 (513)       | pinch   | 14.2   | 66.4   | 5.9    | 1.9    | 0.0     | 3.3          | 2.7     |
-| large 6^6 (217)      | drag    | 9.4    | 46.6   | 2.5    | 1.1    | 0.0     | 2.9          | 2.4     |
-| large 6^6 (217)      | wheel   | 23.3   | 152.5  | 2.9    | 2.0    | 2.3     | 6.9          | 5.1     |
-| large 6^6 (217)      | pinch   | 6.0    | 32.0   | 1.9    | 0.8    | 0.0     | 1.4          | 1.4     |
-
-(Layout to Browser columns: CPU 1×.) Reading: with ~500 visible nodes no
-gesture fits the frame budget even on a fast machine without throttling; at
-4× it's 7–15 fps. Wheel steps are the most expensive because they run in full
-detail (voronoi). Layout is a large share in every gesture, including drag,
-where it wouldn't need to run at all.
-
-## Benchmark: render cost per layer (phase 0 baseline)
-
-Generated tree `nTree` depth 5, 8 children (37,449 nodes; ~513 visible), with
-labels and icons. Per tree update while dragging, headless Edge 900×900, CPU 1×.
-`isolated` = only this layer visible, minus "interaction only".
-
-| Configuration | ms / update |
-|---------------|------------:|
-| interaction only (math, filter, layout of the tree model) | 3.9 |
-| all default layers (1,726 SVG elements) | 468.7 |
-
-| Layer        | Elements | Isolated ms | of which style+layout | of which paint+composite | JS ms (all layers on) |
-|--------------|---------:|------------:|----------------------:|-------------------------:|----------------------:|
-| emojis       | 586      | 454.9       | 102.7                 | 18.2                     | 0.4                   |
-| labels-force | 2        | 3.7         | 0.2                   | 0.2                      | 0.0                   |
-| nodes        | 513      | 2.1         | 0.4                   | 0.4                      | 0.5                   |
-| cells        | 585      | 1.9         | 0.2                   | 0.2                      | 0.0                   |
-| link-arcs    | 584      | 1.4         | 0.4                   | 0.2                      | 0.8                   |
-| all others   | ≤ 2      | < 1 each    |                       |                          |                       |
-
-Reading: nodes, links and cells are cheap even at 500+ elements. The emoji
-layer alone accounts for almost all of the frame time. A trace shows the time
-going into glyph rasterization (`GpuRasterBuffer::Playback`, with the main
-thread blocked in `WaitForCommitCompletion`) and text shaping
-(`ShapeTextIncludingFirstLine`). Headless Edge rasterizes without a real GPU,
-so absolute numbers are likely exaggerated; the ranking needs confirming on a
-real GPU.
+Benchmarks, method, current numbers and findings: [PERFORMANCE.md](PERFORMANCE.md).
 
 ## Running the tests
 
