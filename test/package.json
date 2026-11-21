@@ -5,7 +5,8 @@
   "scripts": {
     "test": "playwright test",
     "test:update": "playwright test --update-snapshots",
-    "bench": "node bench-layers.mjs"
+    "bench": "node bench-layers.mjs",
+    "bench:interaction": "node bench-interaction.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.65.1"
