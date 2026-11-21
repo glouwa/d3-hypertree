@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>d3-hypertree test harness</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="../dist/d3-hypertree-light.css">
+    <style>
+        html, body { margin: 0; height: 100%; background: #fff; }
+        #tree { width: 900px; height: 900px; }
+    </style>
+</head>
+<body>
+    <div id="tree"></div>
+    <script src="../dist/d3-hypertree.js"></script>
+    <script>
+        // Test harness: renders a generated tree with default settings.
+        //   ?gen=nTree&depth=10&childs=2   full n-ary tree (default: binary, depth 10 = 2047 nodes)
+        //   ?gen=star&n=250                one root with n children
+        //   ?gen=path&n=50                 a path of n nodes
+        //   ?gen=deepStar&arms=4&depth=30  root with arms, each a path
+        // window.harness exposes the component and helpers for tests and benchmarks.
+        const q = new URLSearchParams(location.search)
+        const num = (k, d) => Number(q.get(k) || d)
+        const gen = q.get('gen') || 'nTree'
+        const loaders = {
+            nTree:    ok => hyt.nTree(ok, num('depth', 10), num('childs', 2)),
+            star:     hyt.star_(num('n', 250)),
+            path:     hyt.path_(num('n', 50)),
+            deepStar: ok => hyt.deepStar(ok, num('arms', 4), num('depth', 30)),
+        }
+        if (!loaders[gen]) throw new Error('unknown generator ' + gen)
+
+        //   &labels=1  give every node a deterministic label (exercises the label layers)
+        //   &icons=1   give every node an emoji (exercises the emoji layer)
+        const model = { dataloader: loaders[gen] }
+        if (q.get('labels') === '1') {
+            let i = 0
+            model.langInitBFS = (ht, n) => { n.precalc.label = 'Node ' + (i++) }
+        }
+        if (q.get('icons') === '1') {
+            const emojis = ['🌳', '🐟', '🐦', '🦎', '🐸', '🐭', '🦋', '🌸']
+            let i = 0
+            model.dataInitBFS = (ht, n) => { n.precalc.icon = emojis[(i++) % emojis.length] }
+        }
+
+        const ht = new hyt.Hypertree({ parent: document.querySelector('#tree') }, model)
+
+        const layerStack = () => ht.unitdisk.layerStack || ht.unitdisk.mainView.layerStack
+
+        window.harness = {
+            ht,
+            ready: ht.initPromise,
+            layerNames: () => Object.keys(layerStack().layers),
+            /** Per-layer JS time (ms) of the most recent update, as measured by the layer stack. */
+            lastLayerTimings: () => {
+                const m = layerStack().d3meta
+                return m ? Object.fromEntries(m.names.map((n, i) => [n, m.Δ[i]])) : {}
+            },
+            /**
+             * Show only the given layers (also while dragging), hide all others.
+             * Returns the previous visibility so it can be restored.
+             */
+            showOnly: names => {
+                const layers = layerStack().layers
+                for (const [n, l] of Object.entries(layers)) {
+                    const visible = names === 'all' ? !l.args.__origInvisible : names.includes(n)
+                    if (l.args.__origInvisible === undefined) {
+                        l.args.__origInvisible = !!l.args.invisible
+                        l.args.__origHideOnDrag = !!l.args.hideOnDrag
+                    }
+                    l.args.invisible  = names === 'all' ? l.args.__origInvisible  : !visible
+                    l.args.hideOnDrag = names === 'all' ? l.args.__origHideOnDrag : !visible
+                }
+                ht.update.data()
+            },
+        }
+    </script>
+</body>
+</html>

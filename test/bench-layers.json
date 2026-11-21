@@ -1,0 +1,1128 @@
+{
+  "date": "2026-11-21T23:01:56.464Z",
+  "tree": "gen=nTree&depth=5&childs=8&labels=1&icons=1",
+  "cpuThrottle": 1,
+  "note": "Per tree update while dragging, headless Edge 900x900. none = interaction layers only; isolatedMs = (only this layer visible) - none, includes style/layout/paint; jsInAllMs = JS time inside the layer with all default layers visible.",
+  "summary": {
+    "noneMsPerUpdate": 3.86,
+    "allMsPerUpdate": 468.73,
+    "allBreakdownPerUpdate": {
+      "scripting": 5.48,
+      "style": 1.06,
+      "layout": 99.97,
+      "paint": 19.75,
+      "composite": 1.31,
+      "gc": 1.19,
+      "other": 339.98
+    },
+    "allElements": 1726
+  },
+  "layers": [
+    {
+      "layer": "emojis",
+      "elements": 586,
+      "jsInAllMs": 0.4,
+      "isolatedMs": 454.86,
+      "scriptMs": 1.54,
+      "styleLayoutMs": 102.72,
+      "paintCompMs": 18.19
+    },
+    {
+      "layer": "labels-force",
+      "elements": 2,
+      "jsInAllMs": 0.01,
+      "isolatedMs": 3.7,
+      "scriptMs": 2.94,
+      "styleLayoutMs": 0.19,
+      "paintCompMs": 0.18
+    },
+    {
+      "layer": "nodes",
+      "elements": 513,
+      "jsInAllMs": 0.46,
+      "isolatedMs": 2.08,
+      "scriptMs": 1.12,
+      "styleLayoutMs": 0.36,
+      "paintCompMs": 0.39
+    },
+    {
+      "layer": "cells",
+      "elements": 585,
+      "jsInAllMs": 0.01,
+      "isolatedMs": 1.87,
+      "scriptMs": 1.2,
+      "styleLayoutMs": 0.24,
+      "paintCompMs": 0.24
+    },
+    {
+      "layer": "link-arcs",
+      "elements": 584,
+      "jsInAllMs": 0.78,
+      "isolatedMs": 1.4,
+      "scriptMs": 0.68,
+      "styleLayoutMs": 0.35,
+      "paintCompMs": 0.2
+    },
+    {
+      "layer": "symbols",
+      "elements": 2,
+      "jsInAllMs": 0.05,
+      "isolatedMs": 0.83,
+      "scriptMs": 0.43,
+      "styleLayoutMs": 0.08,
+      "paintCompMs": 0.14
+    },
+    {
+      "layer": "stem-arc",
+      "elements": null,
+      "jsInAllMs": 0.04,
+      "isolatedMs": 0.8,
+      "scriptMs": 0.46,
+      "styleLayoutMs": 0.08,
+      "paintCompMs": 0.12
+    },
+    {
+      "layer": "images",
+      "elements": 0,
+      "jsInAllMs": 0,
+      "isolatedMs": 0.61,
+      "scriptMs": 0.52,
+      "styleLayoutMs": 0,
+      "paintCompMs": 0.02
+    },
+    {
+      "layer": "labels",
+      "elements": 1,
+      "jsInAllMs": 0.03,
+      "isolatedMs": 0.56,
+      "scriptMs": 0.1,
+      "styleLayoutMs": 0.25,
+      "paintCompMs": 0.14
+    },
+    {
+      "layer": "center-node",
+      "elements": 1,
+      "jsInAllMs": 0,
+      "isolatedMs": 0.47,
+      "scriptMs": 0.1,
+      "styleLayoutMs": 0.1,
+      "paintCompMs": 0.15
+    },
+    {
+      "layer": "labels2",
+      "elements": 1,
+      "jsInAllMs": 0,
+      "isolatedMs": 0.45,
+      "scriptMs": 0.05,
+      "styleLayoutMs": 0.18,
+      "paintCompMs": 0.13
+    },
+    {
+      "layer": "traces",
+      "elements": 0,
+      "jsInAllMs": 0,
+      "isolatedMs": 0.32,
+      "scriptMs": 0.08,
+      "styleLayoutMs": 0.04,
+      "paintCompMs": 0.1
+    },
+    {
+      "layer": "λ",
+      "elements": 1,
+      "jsInAllMs": 0.02,
+      "isolatedMs": 0.18,
+      "scriptMs": 0.09,
+      "styleLayoutMs": 0.02,
+      "paintCompMs": 0.01
+    },
+    {
+      "layer": "culling-r",
+      "elements": 1,
+      "jsInAllMs": 0.01,
+      "isolatedMs": 0.11,
+      "scriptMs": 0.05,
+      "styleLayoutMs": 0.02,
+      "paintCompMs": 0.01
+    },
+    {
+      "layer": "labels-r-𝐖",
+      "elements": 1,
+      "jsInAllMs": 0,
+      "isolatedMs": 0.11,
+      "scriptMs": 0.05,
+      "styleLayoutMs": 0.02,
+      "paintCompMs": 0.01
+    },
+    {
+      "layer": "mouse-r",
+      "elements": 1,
+      "jsInAllMs": 0,
+      "isolatedMs": 0.03,
+      "scriptMs": -0.01,
+      "styleLayoutMs": 0.02,
+      "paintCompMs": 0.01
+    },
+    {
+      "layer": "(0,0)",
+      "elements": 1,
+      "jsInAllMs": 0.01,
+      "isolatedMs": 0.02,
+      "scriptMs": -0.03,
+      "styleLayoutMs": 0.02,
+      "paintCompMs": 0.01
+    },
+    {
+      "layer": "focus-r",
+      "elements": 1,
+      "jsInAllMs": 0,
+      "isolatedMs": 0.01,
+      "scriptMs": -0.03,
+      "styleLayoutMs": 0.02,
+      "paintCompMs": 0.01
+    },
+    {
+      "layer": "path-arcs",
+      "elements": 0,
+      "jsInAllMs": 0.01,
+      "isolatedMs": 0,
+      "scriptMs": 0,
+      "styleLayoutMs": 0,
+      "paintCompMs": 0.01
+    },
+    {
+      "layer": "background",
+      "elements": 1,
+      "jsInAllMs": 0.02,
+      "isolatedMs": -0.04,
+      "scriptMs": -0.04,
+      "styleLayoutMs": 0,
+      "paintCompMs": 0.01
+    }
+  ],
+  "runs": [
+    {
+      "config": "none",
+      "updates": 182,
+      "elements": {
+        "layer": null,
+        "total": 35
+      },
+      "msPerUpdate": 3.86,
+      "breakdownPerUpdate": {
+        "scripting": 3.2,
+        "style": 0,
+        "layout": 0.02,
+        "paint": 0.01,
+        "composite": 0.05,
+        "gc": 0.15,
+        "other": 0.43
+      },
+      "layerJsMsPerUpdate": {
+        "background": 0.01,
+        "cells": 0.01,
+        "culling-r": 0,
+        "mouse-r": 0,
+        "focus-r": 0,
+        "labels-r-𝐖": 0,
+        "λ": 0,
+        "(0,0)": 0,
+        "center-node": 0,
+        "path-arcs": 0.01,
+        "link-arcs": 0,
+        "stem-arc": 0.01,
+        "nodes": 0,
+        "symbols": 0,
+        "images": 0,
+        "emojis": 0,
+        "labels": 0,
+        "labels2": 0,
+        "labels-force": 0.01,
+        "interaction": 0,
+        "interaction-2": 0,
+        "traces": 0
+      }
+    },
+    {
+      "config": "all",
+      "updates": 182,
+      "elements": {
+        "layer": null,
+        "total": 1726
+      },
+      "msPerUpdate": 468.73,
+      "breakdownPerUpdate": {
+        "scripting": 5.48,
+        "style": 1.06,
+        "layout": 99.97,
+        "paint": 19.75,
+        "composite": 1.31,
+        "gc": 1.19,
+        "other": 339.98
+      },
+      "layerJsMsPerUpdate": {
+        "background": 0.02,
+        "cells": 0.01,
+        "culling-r": 0.01,
+        "mouse-r": 0,
+        "focus-r": 0,
+        "labels-r-𝐖": 0,
+        "λ": 0.02,
+        "(0,0)": 0.01,
+        "center-node": 0,
+        "path-arcs": 0.01,
+        "link-arcs": 0.78,
+        "stem-arc": 0.04,
+        "nodes": 0.46,
+        "symbols": 0.05,
+        "images": 0,
+        "emojis": 0.4,
+        "labels": 0.03,
+        "labels2": 0,
+        "labels-force": 0.01,
+        "interaction": 0,
+        "interaction-2": 0,
+        "traces": 0
+      }
+    },
+    {
+      "config": "background",
+      "updates": 182,
+      "elements": {
+        "layer": 1,
+        "total": 36
+      },
+      "msPerUpdate": 3.82,
+      "breakdownPerUpdate": {
+        "scripting": 3.16,
+        "style": 0,
+        "layout": 0.02,
+        "paint": 0.01,
+        "composite": 0.06,
+        "gc": 0.13,
+        "other": 0.44
+      },
+      "layerJsMsPerUpdate": {
+        "background": 0.01,
+        "cells": 0.01,
+        "culling-r": 0,
+        "mouse-r": 0,
+        "focus-r": 0,
+        "labels-r-𝐖": 0,
+        "λ": 0,
+        "(0,0)": 0,
+        "center-node": 0.01,
+        "path-arcs": 0.01,
+        "link-arcs": 0,
+        "stem-arc": 0.01,
+        "nodes": 0,
+        "symbols": 0,
+        "images": 0,
+        "emojis": 0.01,
+        "labels": 0,
+        "labels2": 0,
+        "labels-force": 0.02,
+        "interaction": 0,
+        "interaction-2": 0,
+        "traces": 0
+      }
+    },
+    {
+      "config": "cells",
+      "updates": 182,
+      "elements": {
+        "layer": 585,
+        "total": 620
+      },
+      "msPerUpdate": 5.73,
+      "breakdownPerUpdate": {
+        "scripting": 4.4,
+        "style": 0.16,
+        "layout": 0.1,
+        "paint": 0.16,
+        "composite": 0.14,
+        "gc": 0.17,
+        "other": 0.59
+      },
+      "layerJsMsPerUpdate": {
+        "background": 0.01,
+        "cells": 0.76,
+        "culling-r": 0.01,
+        "mouse-r": 0,
+        "focus-r": 0,
+        "labels-r-𝐖": 0,
+        "λ": 0,
+        "(0,0)": 0,
+        "center-node": 0,
+        "path-arcs": 0,
+        "link-arcs": 0,
+        "stem-arc": 0.01,
+        "nodes": 0,
+        "symbols": 0,
+        "images": 0,
+        "emojis": 0,
+        "labels": 0,
+        "labels2": 0,
+        "labels-force": 0.01,
+        "interaction": 0,
+        "interaction-2": 0,
+        "traces": 0
+      }
+    },
+    {
+      "config": "culling-r",
+      "updates": 182,
+      "elements": {
+        "layer": 1,
+        "total": 36
+      },
+      "msPerUpdate": 3.97,
+      "breakdownPerUpdate": {
+        "scripting": 3.25,
+        "style": 0.02,
+        "layout": 0.02,
+        "paint": 0.01,
+        "composite": 0.06,
+        "gc": 0.13,
+        "other": 0.47
+      },
+      "layerJsMsPerUpdate": {
+        "background": 0.01,
+        "cells": 0.01,
+        "culling-r": 0.03,
+        "mouse-r": 0,
+        "focus-r": 0,
+        "labels-r-𝐖": 0,
+        "λ": 0,
+        "(0,0)": 0,
+        "center-node": 0,
+        "path-arcs": 0.01,
+        "link-arcs": 0,
+        "stem-arc": 0.01,
+        "nodes": 0,
+        "symbols": 0,
+        "images": 0,
+        "emojis": 0.01,
+        "labels": 0,
+        "labels2": 0,
+        "labels-force": 0.01,
+        "interaction": 0,
+        "interaction-2": 0,
+        "traces": 0
+      }
+    },
+    {
+      "config": "mouse-r",
+      "updates": 182,
+      "elements": {
+        "layer": 1,
+        "total": 36
+      },
+      "msPerUpdate": 3.89,
+      "breakdownPerUpdate": {
+        "scripting": 3.19,
+        "style": 0.02,
+        "layout": 0.02,
+        "paint": 0.01,
+        "composite": 0.06,
+        "gc": 0.13,
+        "other": 0.45
+      },
+      "layerJsMsPerUpdate": {
+        "background": 0.01,
+        "cells": 0.01,
+        "culling-r": 0.01,
+        "mouse-r": 0.02,
+        "focus-r": 0,
+        "labels-r-𝐖": 0,
+        "λ": 0,
+        "(0,0)": 0,
+        "center-node": 0,
+        "path-arcs": 0.01,
+        "link-arcs": 0.01,
+        "stem-arc": 0,
+        "nodes": 0,
+        "symbols": 0,
+        "images": 0.01,
+        "emojis": 0,
+        "labels": 0,
+        "labels2": 0,
+        "labels-force": 0.01,
+        "interaction": 0,
+        "interaction-2": 0,
+        "traces": 0
+      }
+    },
+    {
+      "config": "focus-r",
+      "updates": 182,
+      "elements": {
+        "layer": 1,
+        "total": 36
+      },
+      "msPerUpdate": 3.87,
+      "breakdownPerUpdate": {
+        "scripting": 3.17,
+        "style": 0.02,
+        "layout": 0.02,
+        "paint": 0.01,
+        "composite": 0.06,
+        "gc": 0.13,
+        "other": 0.46
+      },
+      "layerJsMsPerUpdate": {
+        "background": 0.01,
+        "cells": 0.01,
+        "culling-r": 0,
+        "mouse-r": 0,
+        "focus-r": 0.02,
+        "labels-r-𝐖": 0,
+        "λ": 0,
+        "(0,0)": 0,
+        "center-node": 0,
+        "path-arcs": 0,
+        "link-arcs": 0,
+        "stem-arc": 0.01,
+        "nodes": 0,
+        "symbols": 0,
+        "images": 0.01,
+        "emojis": 0,
+        "labels": 0,
+        "labels2": 0,
+        "labels-force": 0.02,
+        "interaction": 0,
+        "interaction-2": 0,
+        "traces": 0
+      }
+    },
+    {
+      "config": "labels-r-𝐖",
+      "updates": 182,
+      "elements": {
+        "layer": 1,
+        "total": 36
+      },
+      "msPerUpdate": 3.97,
+      "breakdownPerUpdate": {
+        "scripting": 3.25,
+        "style": 0.02,
+        "layout": 0.02,
+        "paint": 0.01,
+        "composite": 0.06,
+        "gc": 0.13,
+        "other": 0.47
+      },
+      "layerJsMsPerUpdate": {
+        "background": 0.01,
+        "cells": 0.01,
+        "culling-r": 0,
+        "mouse-r": 0,
+        "focus-r": 0,
+        "labels-r-𝐖": 0.02,
+        "λ": 0,
+        "(0,0)": 0,
+        "center-node": 0.01,
+        "path-arcs": 0.01,
+        "link-arcs": 0,
+        "stem-arc": 0.01,
+        "nodes": 0,
+        "symbols": 0,
+        "images": 0,
+        "emojis": 0.01,
+        "labels": 0,
+        "labels2": 0,
+        "labels-force": 0.01,
+        "interaction": 0,
+        "interaction-2": 0,
+        "traces": 0
+      }
+    },
+    {
+      "config": "λ",
+      "updates": 182,
+      "elements": {
+        "layer": 1,
+        "total": 36
+      },
+      "msPerUpdate": 4.04,
+      "breakdownPerUpdate": {
+        "scripting": 3.29,
+        "style": 0.02,
+        "layout": 0.02,
+        "paint": 0.01,
+        "composite": 0.06,
+        "gc": 0.15,
+        "other": 0.49
+      },
+      "layerJsMsPerUpdate": {
+        "background": 0.01,
+        "cells": 0.01,
+        "culling-r": 0,
+        "mouse-r": 0,
+        "focus-r": 0,
+        "labels-r-𝐖": 0,
+        "λ": 0.03,
+        "(0,0)": 0,
+        "center-node": 0.01,
+        "path-arcs": 0.01,
+        "link-arcs": 0,
+        "stem-arc": 0.01,
+        "nodes": 0,
+        "symbols": 0,
+        "images": 0,
+        "emojis": 0,
+        "labels": 0,
+        "labels2": 0,
+        "labels-force": 0.01,
+        "interaction": 0,
+        "interaction-2": 0,
+        "traces": 0
+      }
+    },
+    {
+      "config": "(0,0)",
+      "updates": 182,
+      "elements": {
+        "layer": 1,
+        "total": 36
+      },
+      "msPerUpdate": 3.88,
+      "breakdownPerUpdate": {
+        "scripting": 3.17,
+        "style": 0.02,
+        "layout": 0.02,
+        "paint": 0.01,
+        "composite": 0.06,
+        "gc": 0.13,
+        "other": 0.46
+      },
+      "layerJsMsPerUpdate": {
+        "background": 0.01,
+        "cells": 0.01,
+        "culling-r": 0,
+        "mouse-r": 0,
+        "focus-r": 0,
+        "labels-r-𝐖": 0,
+        "λ": 0,
+        "(0,0)": 0.02,
+        "center-node": 0,
+        "path-arcs": 0,
+        "link-arcs": 0,
+        "stem-arc": 0.01,
+        "nodes": 0,
+        "symbols": 0,
+        "images": 0,
+        "emojis": 0,
+        "labels": 0,
+        "labels2": 0,
+        "labels-force": 0.02,
+        "interaction": 0,
+        "interaction-2": 0,
+        "traces": 0
+      }
+    },
+    {
+      "config": "center-node",
+      "updates": 182,
+      "elements": {
+        "layer": 1,
+        "total": 36
+      },
+      "msPerUpdate": 4.33,
+      "breakdownPerUpdate": {
+        "scripting": 3.3,
+        "style": 0.07,
+        "layout": 0.05,
+        "paint": 0.09,
+        "composite": 0.12,
+        "gc": 0.13,
+        "other": 0.56
+      },
+      "layerJsMsPerUpdate": {
+        "background": 0.01,
+        "cells": 0.01,
+        "culling-r": 0.01,
+        "mouse-r": 0,
+        "focus-r": 0,
+        "labels-r-𝐖": 0,
+        "λ": 0,
+        "(0,0)": 0,
+        "center-node": 0.05,
+        "path-arcs": 0,
+        "link-arcs": 0,
+        "stem-arc": 0,
+        "nodes": 0,
+        "symbols": 0,
+        "images": 0,
+        "emojis": 0,
+        "labels": 0,
+        "labels2": 0,
+        "labels-force": 0.01,
+        "interaction": 0,
+        "interaction-2": 0,
+        "traces": 0
+      }
+    },
+    {
+      "config": "path-arcs",
+      "updates": 182,
+      "elements": {
+        "layer": 0,
+        "total": 35
+      },
+      "msPerUpdate": 3.86,
+      "breakdownPerUpdate": {
+        "scripting": 3.2,
+        "style": 0,
+        "layout": 0.02,
+        "paint": 0.01,
+        "composite": 0.06,
+        "gc": 0.13,
+        "other": 0.45
+      },
+      "layerJsMsPerUpdate": {
+        "background": 0.01,
+        "cells": 0.01,
+        "culling-r": 0,
+        "mouse-r": 0,
+        "focus-r": 0,
+        "labels-r-𝐖": 0,
+        "λ": 0,
+        "(0,0)": 0,
+        "center-node": 0.01,
+        "path-arcs": 0,
+        "link-arcs": 0,
+        "stem-arc": 0.01,
+        "nodes": 0,
+        "symbols": 0,
+        "images": 0.01,
+        "emojis": 0,
+        "labels": 0,
+        "labels2": 0,
+        "labels-force": 0.02,
+        "interaction": 0,
+        "interaction-2": 0,
+        "traces": 0
+      }
+    },
+    {
+      "config": "link-arcs",
+      "updates": 182,
+      "elements": {
+        "layer": 584,
+        "total": 619
+      },
+      "msPerUpdate": 5.26,
+      "breakdownPerUpdate": {
+        "scripting": 3.88,
+        "style": 0.25,
+        "layout": 0.12,
+        "paint": 0.15,
+        "composite": 0.11,
+        "gc": 0.19,
+        "other": 0.57
+      },
+      "layerJsMsPerUpdate": {
+        "background": 0.01,
+        "cells": 0.01,
+        "culling-r": 0.01,
+        "mouse-r": 0,
+        "focus-r": 0,
+        "labels-r-𝐖": 0,
+        "λ": 0,
+        "(0,0)": 0,
+        "center-node": 0,
+        "path-arcs": 0,
+        "link-arcs": 0.69,
+        "stem-arc": 0.01,
+        "nodes": 0,
+        "symbols": 0,
+        "images": 0,
+        "emojis": 0.01,
+        "labels": 0,
+        "labels2": 0,
+        "labels-force": 0.01,
+        "interaction": 0,
+        "interaction-2": 0,
+        "traces": 0
+      }
+    },
+    {
+      "config": "stem-arc",
+      "updates": 182,
+      "elements": {
+        "layer": null,
+        "total": 37
+      },
+      "msPerUpdate": 4.66,
+      "breakdownPerUpdate": {
+        "scripting": 3.66,
+        "style": 0.04,
+        "layout": 0.06,
+        "paint": 0.08,
+        "composite": 0.1,
+        "gc": 0.13,
+        "other": 0.6
+      },
+      "layerJsMsPerUpdate": {
+        "background": 0.01,
+        "cells": 0.01,
+        "culling-r": 0,
+        "mouse-r": 0,
+        "focus-r": 0,
+        "labels-r-𝐖": 0,
+        "λ": 0,
+        "(0,0)": 0,
+        "center-node": 0.01,
+        "path-arcs": 0.01,
+        "link-arcs": 0,
+        "stem-arc": 0.08,
+        "nodes": 0,
+        "symbols": 0,
+        "images": 0.01,
+        "emojis": 0,
+        "labels": 0,
+        "labels2": 0,
+        "labels-force": 0.01,
+        "interaction": 0,
+        "interaction-2": 0,
+        "traces": 0.01
+      }
+    },
+    {
+      "config": "nodes",
+      "updates": 182,
+      "elements": {
+        "layer": 513,
+        "total": 548
+      },
+      "msPerUpdate": 5.94,
+      "breakdownPerUpdate": {
+        "scripting": 4.32,
+        "style": 0.3,
+        "layout": 0.08,
+        "paint": 0.21,
+        "composite": 0.24,
+        "gc": 0.17,
+        "other": 0.63
+      },
+      "layerJsMsPerUpdate": {
+        "background": 0.01,
+        "cells": 0.01,
+        "culling-r": 0.01,
+        "mouse-r": 0,
+        "focus-r": 0,
+        "labels-r-𝐖": 0,
+        "λ": 0,
+        "(0,0)": 0,
+        "center-node": 0,
+        "path-arcs": 0.01,
+        "link-arcs": 0,
+        "stem-arc": 0.01,
+        "nodes": 0.61,
+        "symbols": 0,
+        "images": 0,
+        "emojis": 0,
+        "labels": 0,
+        "labels2": 0,
+        "labels-force": 0.01,
+        "interaction": 0,
+        "interaction-2": 0,
+        "traces": 0
+      }
+    },
+    {
+      "config": "symbols",
+      "updates": 182,
+      "elements": {
+        "layer": 2,
+        "total": 37
+      },
+      "msPerUpdate": 4.69,
+      "breakdownPerUpdate": {
+        "scripting": 3.63,
+        "style": 0.05,
+        "layout": 0.05,
+        "paint": 0.08,
+        "composite": 0.12,
+        "gc": 0.15,
+        "other": 0.6
+      },
+      "layerJsMsPerUpdate": {
+        "background": 0.01,
+        "cells": 0.01,
+        "culling-r": 0.01,
+        "mouse-r": 0,
+        "focus-r": 0,
+        "labels-r-𝐖": 0,
+        "λ": 0,
+        "(0,0)": 0,
+        "center-node": 0,
+        "path-arcs": 0,
+        "link-arcs": 0,
+        "stem-arc": 0.01,
+        "nodes": 0,
+        "symbols": 0.07,
+        "images": 0.01,
+        "emojis": 0.01,
+        "labels": 0,
+        "labels2": 0,
+        "labels-force": 0.01,
+        "interaction": 0,
+        "interaction-2": 0,
+        "traces": 0
+      }
+    },
+    {
+      "config": "images",
+      "updates": 182,
+      "elements": {
+        "layer": 0,
+        "total": 35
+      },
+      "msPerUpdate": 4.47,
+      "breakdownPerUpdate": {
+        "scripting": 3.72,
+        "style": 0,
+        "layout": 0.02,
+        "paint": 0.01,
+        "composite": 0.07,
+        "gc": 0.15,
+        "other": 0.51
+      },
+      "layerJsMsPerUpdate": {
+        "background": 0.01,
+        "cells": 0.01,
+        "culling-r": 0,
+        "mouse-r": 0,
+        "focus-r": 0,
+        "labels-r-𝐖": 0,
+        "λ": 0,
+        "(0,0)": 0,
+        "center-node": 0.01,
+        "path-arcs": 0.01,
+        "link-arcs": 0,
+        "stem-arc": 0.01,
+        "nodes": 0,
+        "symbols": 0,
+        "images": 0.01,
+        "emojis": 0.01,
+        "labels": 0,
+        "labels2": 0,
+        "labels-force": 0.01,
+        "interaction": 0,
+        "interaction-2": 0,
+        "traces": 0
+      }
+    },
+    {
+      "config": "emojis",
+      "updates": 182,
+      "elements": {
+        "layer": 586,
+        "total": 621
+      },
+      "msPerUpdate": 458.72,
+      "breakdownPerUpdate": {
+        "scripting": 4.74,
+        "style": 0.55,
+        "layout": 102.19,
+        "paint": 17.19,
+        "composite": 1.06,
+        "gc": 1.32,
+        "other": 331.67
+      },
+      "layerJsMsPerUpdate": {
+        "background": 0.01,
+        "cells": 0.01,
+        "culling-r": 0,
+        "mouse-r": 0,
+        "focus-r": 0,
+        "labels-r-𝐖": 0,
+        "λ": 0,
+        "(0,0)": 0,
+        "center-node": 0.01,
+        "path-arcs": 0.01,
+        "link-arcs": 0,
+        "stem-arc": 0.01,
+        "nodes": 0,
+        "symbols": 0,
+        "images": 0,
+        "emojis": 0.59,
+        "labels": 0.01,
+        "labels2": 0,
+        "labels-force": 0.01,
+        "interaction": 0,
+        "interaction-2": 0,
+        "traces": 0
+      }
+    },
+    {
+      "config": "labels",
+      "updates": 182,
+      "elements": {
+        "layer": 1,
+        "total": 36
+      },
+      "msPerUpdate": 4.42,
+      "breakdownPerUpdate": {
+        "scripting": 3.3,
+        "style": 0.07,
+        "layout": 0.2,
+        "paint": 0.09,
+        "composite": 0.11,
+        "gc": 0.12,
+        "other": 0.52
+      },
+      "layerJsMsPerUpdate": {
+        "background": 0.01,
+        "cells": 0.01,
+        "culling-r": 0,
+        "mouse-r": 0,
+        "focus-r": 0,
+        "labels-r-𝐖": 0,
+        "λ": 0,
+        "(0,0)": 0,
+        "center-node": 0,
+        "path-arcs": 0.01,
+        "link-arcs": 0,
+        "stem-arc": 0.01,
+        "nodes": 0,
+        "symbols": 0,
+        "images": 0,
+        "emojis": 0,
+        "labels": 0.06,
+        "labels2": 0,
+        "labels-force": 0.01,
+        "interaction": 0,
+        "interaction-2": 0,
+        "traces": 0
+      }
+    },
+    {
+      "config": "labels2",
+      "updates": 182,
+      "elements": {
+        "layer": 1,
+        "total": 36
+      },
+      "msPerUpdate": 4.31,
+      "breakdownPerUpdate": {
+        "scripting": 3.25,
+        "style": 0.06,
+        "layout": 0.14,
+        "paint": 0.08,
+        "composite": 0.11,
+        "gc": 0.13,
+        "other": 0.54
+      },
+      "layerJsMsPerUpdate": {
+        "background": 0.01,
+        "cells": 0.01,
+        "culling-r": 0,
+        "mouse-r": 0,
+        "focus-r": 0,
+        "labels-r-𝐖": 0,
+        "λ": 0,
+        "(0,0)": 0,
+        "center-node": 0,
+        "path-arcs": 0.01,
+        "link-arcs": 0,
+        "stem-arc": 0.01,
+        "nodes": 0,
+        "symbols": 0,
+        "images": 0,
+        "emojis": 0,
+        "labels": 0,
+        "labels2": 0.04,
+        "labels-force": 0.01,
+        "interaction": 0,
+        "interaction-2": 0,
+        "traces": 0
+      }
+    },
+    {
+      "config": "labels-force",
+      "updates": 182,
+      "elements": {
+        "layer": 2,
+        "total": 38
+      },
+      "msPerUpdate": 7.56,
+      "breakdownPerUpdate": {
+        "scripting": 6.14,
+        "style": 0.1,
+        "layout": 0.11,
+        "paint": 0.11,
+        "composite": 0.13,
+        "gc": 0.37,
+        "other": 0.6
+      },
+      "layerJsMsPerUpdate": {
+        "background": 0,
+        "cells": 0.01,
+        "culling-r": 0,
+        "mouse-r": 0,
+        "focus-r": 0,
+        "labels-r-𝐖": 0,
+        "λ": 0,
+        "(0,0)": 0,
+        "center-node": 0,
+        "path-arcs": 0,
+        "link-arcs": 0,
+        "stem-arc": 0.01,
+        "nodes": 0,
+        "symbols": 0,
+        "images": 0.01,
+        "emojis": 0,
+        "labels": 0,
+        "labels2": 0,
+        "labels-force": 3.07,
+        "interaction": 0,
+        "interaction-2": 0,
+        "traces": 0
+      }
+    },
+    {
+      "config": "traces",
+      "updates": 182,
+      "elements": {
+        "layer": 0,
+        "total": 35
+      },
+      "msPerUpdate": 4.18,
+      "breakdownPerUpdate": {
+        "scripting": 3.28,
+        "style": 0,
+        "layout": 0.06,
+        "paint": 0.07,
+        "composite": 0.09,
+        "gc": 0.14,
+        "other": 0.55
+      },
+      "layerJsMsPerUpdate": {
+        "background": 0.01,
+        "cells": 0.01,
+        "culling-r": 0,
+        "mouse-r": 0,
+        "focus-r": 0,
+        "labels-r-𝐖": 0,
+        "λ": 0,
+        "(0,0)": 0,
+        "center-node": 0,
+        "path-arcs": 0,
+        "link-arcs": 0,
+        "stem-arc": 0.01,
+        "nodes": 0,
+        "symbols": 0,
+        "images": 0.01,
+        "emojis": 0,
+        "labels": 0,
+        "labels2": 0,
+        "labels-force": 0.01,
+        "interaction": 0,
+        "interaction-2": 0,
+        "traces": 0.06
+      }
+    }
+  ]
+}
