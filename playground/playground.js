@@ -499,7 +499,7 @@
         g = section('Geometry', ['linkCurvature', 'captionFontPx', 'captionHeight', 'nodeRadius', 'linkWidth', 'theme'])
         hint(g, 'Options that apply to several layers (model.geometry). Options of a single layer are in the layer list below (▸).')
         select(g, 'linkCurvature', 'linkCurvature', [['-', '− (default, hyperbolic geodesic)'], ['+', '+ (arc to the other side)'], ['0', '0 (straight, SVG path)'], ['l', 'l (straight, SVG line)']])
-        hint(g, 'Default curvature of link-arcs and path-arcs; a layer can override it. 0 and l look the same; l is a little faster to draw.')
+        hint(g, 'Default curvature of link-arcs and path-arcs; a layer can override it. 0 and l look the same (straight lines); 0 is a little faster to draw.')
         range(g, 'caption font', 'captionFontPx', 3, 16, 0.5, null, v => `${v}px`)
         range(g, 'captionHeight', 'captionHeight', 0.01, 0.12, 0.005)
         optionalNumber(g, 'nodeRadius', 'nodeRadius', 0.002, 0.05, 0.001, 0.01)
