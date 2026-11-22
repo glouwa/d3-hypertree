@@ -161,38 +161,48 @@ test.describe('deep trees', () => {
 })
 
 test.describe('hover', () => {
-    test('hovering a node highlights the voronoi cells on its hover path', async ({ page }) => {
+    // Only the cell under the mouse is highlighted: moving on clears the previous
+    // cell, leaving the tree clears all.
+    test('hover highlights exactly the voronoi cell under the mouse', async ({ page }) => {
         const errors = collectErrors(page)
+        await page.setViewportSize({ width: 1100, height: 900 }) // room to leave the tree
         await openTree(page, 'gen=nTree&depth=10&childs=2')
         await page.evaluate(() => {
             harness.ht.unitdisk.layerStack.layers.cells.args.invisible = false
             harness.ht.update.data()
         })
-        const target = await page.evaluate(() => {
-            const c = [...document.querySelectorAll('#nodes circle')]
-                .filter(c => c.__data__ && c.__data__.depth >= 2)
-                .sort((a, b) => b.getBoundingClientRect().width - a.getBoundingClientRect().width)[0]
-            const r = c.getBoundingClientRect()
-            return { x: r.x + r.width / 2, y: r.y + r.height / 2 }
-        })
-        await page.mouse.move(target.x, target.y)
-        await page.waitForTimeout(300)
+        const targets = await page.evaluate(() => [...document.querySelectorAll('#nodes circle')]
+            .filter(c => c.__data__ && c.__data__.depth >= 2)
+            .sort((a, b) => b.getBoundingClientRect().width - a.getBoundingClientRect().width)
+            .slice(0, 3)
+            .map(c => { const r = c.getBoundingClientRect(); return { id: c.__data__.mergeId, x: r.x + r.width / 2, y: r.y + r.height / 2 } }))
+        const hoveredCells = () => page.evaluate(() => [...document.querySelectorAll('#cells .hovered')].map(c => c.__data__.data.mergeId))
 
-        const r = await page.evaluate(() => {
-            const cells = [...document.querySelectorAll('#cells > *')]
-            const onPath = cells.filter(c => c.__data__.data.pathes
-                && c.__data__.data.pathes.isPartOfAnyHoverPath && c.__data__.data.parent)
-            const hovered = document.querySelectorAll('#cells .hovered')
-            return {
-                expected: onPath.length,
-                hovered: hovered.length,
-                fill: hovered[0] ? getComputedStyle(hovered[0]).fill : null,
-            }
-        })
-        expect(r.expected).toBeGreaterThan(1)
-        expect(r.hovered).toBe(r.expected)
-        expect(r.fill).not.toBe('none') // the CSS rule applies
+        for (const t of targets) {
+            await page.mouse.move(t.x, t.y)
+            await page.waitForTimeout(250)
+            expect(await hoveredCells(), `only the cell of node ${t.id}`).toEqual([t.id])
+        }
+        const fill = await page.evaluate(() => getComputedStyle(document.querySelector('#cells .hovered')).fill)
+        expect(fill).not.toBe('none') // the CSS rule applies
+
+        await page.mouse.move(1050, 450) // outside the tree
+        await page.waitForTimeout(250)
+        expect(await hoveredCells()).toEqual([])
         expectNoErrors(errors)
+    })
+
+    test('selected nodes highlight their own cell only', async ({ page }) => {
+        await openTree(page, 'gen=nTree&depth=6&childs=2&filter=off')
+        const ids = await page.evaluate(() => {
+            harness.ht.unitdisk.layerStack.layers.cells.args.invisible = false
+            harness.ht.update.data()
+            const n = harness.ht.data.children[0].children[1].leaves()[0]
+            harness.ht.api.toggleSelection(n)
+            return [n.mergeId]
+        })
+        await page.waitForTimeout(250)
+        expect(await page.evaluate(() => [...document.querySelectorAll('#cells .selected')].map(c => c.__data__.data.mergeId))).toEqual(ids)
     })
 })
 

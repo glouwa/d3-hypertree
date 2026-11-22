@@ -46,11 +46,17 @@ export class CellLayer implements ILayer
                                     /*
                                     .classed("lazy",      d=> d.data.hasOutChildren)                                 
                                     .classed("leaf",      d=> !d.data.children),*/
-            // d is a voronoi polygon; d.data is its node. Path membership lives
-            // in n.pathes (same as in the node layer).
-            updateColor:       s=>  s.classed("hovered",  d=> !!(d.data.pathes && d.data.pathes.isPartOfAnyHoverPath && d.data.parent))
-                                    .classed("selected", d=> !!(d.data.pathes && d.data.pathes.isPartOfAnySelectionPath && d.data.parent))
-                                    .style("fill",      d=> (d.pathes && d.pathes.labelcolor) || this.args.fill(d)),
+            // d is a voronoi polygon; d.data is its node. Only the cell of the node
+            // under the mouse is "hovered", and only cells of selected nodes are
+            // "selected" (not every cell on the path to them).
+            updateColor:       s=>  {
+                                    const objects = this.view.hypertree.args.objects
+                                    const hoverPath = objects.pathes.find(p=> p.type === 'HoverPath')
+                                    const hovered = hoverPath ? hoverPath.head : undefined
+                                    return s.classed("hovered",  d=> d.data === hovered)
+                                            .classed("selected", d=> objects.selections.indexOf(d.data) !== -1)
+                                            .style("fill",      d=> (d.pathes && d.pathes.labelcolor) || this.args.fill(d))
+                               },
             updateTransform:   s=> s//.classed("lazy",      d=> d.data.hasOutChildren)                                 
                                     .attr("points",       d=> {
                                         return d && d.join(" ")
