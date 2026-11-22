@@ -196,3 +196,33 @@ test.describe('node layer option show', () => {
         expect(await page.evaluate(() => [...new Set([...document.querySelectorAll('#nodes circle')].map(c => c.__data__.depth))])).toEqual([3])
     })
 })
+
+// Layer option shrinkAtRim (labels, labels-force, emojis): scale with the distance to
+// the center like the links instead of the damped scale (or none for labels-force).
+test.describe('shrinkAtRim', () => {
+    const scales = (page, layer) => page.evaluate(layer => [...document.querySelectorAll(`[id="${layer}"] text`)].map(t => {
+        const m = /scale\(([^)]+)\)/.exec(t.getAttribute('transform') || '')
+        return { s: m ? +m[1] : 1, r: t.__data__.cachep.r, k: t.__data__.distScale }
+    }), layer)
+    for (const [layer, query, factor] of [
+        ['labels', 'labels=1', 1],
+        ['emojis', 'icons=1', 2],
+        ['labels-force', `labels=1&layers=${encodeURIComponent('{"labels-force":{"invisible":false}}')}`, 1],
+    ]) {
+        test(`${layer}: off by default, on scales like the links`, async ({ page }) => {
+            const errors = collectErrors(page)
+            await openTree(page, `gen=nTree&depth=6&childs=2&filter=off&${query}`)
+            const off = await scales(page, layer)
+            expect(off.length).toBeGreaterThan(5)
+            const layers = layer === 'labels-force' ? { 'labels-force': { invisible: false, shrinkAtRim: true } } : { [layer]: { shrinkAtRim: true } }
+            await openTree(page, `gen=nTree&depth=6&childs=2&filter=off&${query.replace(/&layers=.*/, '')}&layers=${encodeURIComponent(JSON.stringify(layers))}`)
+            const on = await scales(page, layer)
+            // on: the scale is the node's distance factor (times 2 for emojis)
+            expect(on.every(t => Math.abs(t.s - t.k * factor) < 1e-6)).toBe(true)
+            // the outermost element is smaller than without the option
+            const outermost = list => list.reduce((a, b) => (b.r > a.r ? b : a))
+            expect(outermost(on).s).toBeLessThan(outermost(off).s)
+            expectNoErrors(errors)
+        })
+    }
+})

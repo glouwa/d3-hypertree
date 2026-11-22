@@ -20,6 +20,7 @@ export interface LabelForceLayerArgs extends ILayerArgs
     text,
     clip?:       string,
     background?: any,          // falsy, or a function of the node: draw a background rect
+    shrinkAtRim?: boolean,     // scale with the distance to the center like the links (default false: constant size)
 }
 
 
@@ -146,7 +147,12 @@ export class LabelForceLayer implements ILayer
         function calctransform(d, i, v) {
             if (!d.forcepoints)
                 return ` translate(${d.cache.re} ${d.cache.im})` 
-            console.assert(d.forcepoints.x || d.depth === 0)            
+            console.assert(d.forcepoints.x || d.depth === 0)
+            // option shrinkAtRim: scale with the distance like the links (centered)
+            if (T.args.shrinkAtRim) {
+                const k = d.distScale || 1
+                return ` translate(${(d.forcepoints.x||0)-T.labellen(d)/2*k} ${d.forcepoints.y||0}) scale(${k})`
+            }
             return ` translate(${(d.forcepoints.x||0)-T.labellen(d)/2} ${d.forcepoints.y||0})`
         }
 

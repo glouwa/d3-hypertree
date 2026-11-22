@@ -82,9 +82,9 @@
         'stem-arc':    [['curvature', 'curvature'], ['width', 'number', 0.001, 0.05, 0.0005]],
         'nodes':       [['show', 'choice', ['leaves', 'all']], ['hover', 'choice', ['path', 'node', 'none']], ['selection', 'choice', ['path', 'node', 'none']], ['fill', 'color'], ['stroke', 'color'], ['strokeWidth', 'number', 0, 0.02, 0.0005], ['r', 'number', 0.002, 0.06, 0.001]],
         'images':      [['width', 'number', 0.01, 0.3, 0.005], ['height', 'number', 0.01, 0.3, 0.005]],
-        'emojis':      [['color', 'color'], ['background', 'bool']],
-        'labels':      [['color', 'color'], ['background', 'bool']],
-        'labels-force':[['background', 'bool']],
+        'emojis':      [['shrinkAtRim', 'bool'], ['color', 'color'], ['background', 'bool']],
+        'labels':      [['shrinkAtRim', 'bool'], ['color', 'color'], ['background', 'bool']],
+        'labels-force':[['shrinkAtRim', 'bool'], ['background', 'bool']],
     }
     // what a layer shows, when its name doesn't say it
     const LAYER_ALIASES = { 'cells': 'voronoi', 'λ': 'zoom', '(0,0)': 'origin' }

@@ -292,9 +292,14 @@ export const layerSrc = [
         //delta:      (d, i, v)=> ({ re:0, im:0 }),        
         color:      ()=> undefined,
         background: undefined,
-        transform:  (d, delta)=> 
-                        ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` 
-                        + `scale(${d.dampedDistScale*2})`
+        // option shrinkAtRim: scale with the distance like the links (to 0 at the
+        // rim) instead of the damped scale (1 to 0.5); the offset shrinks along
+        transform:  (d, delta)=> {
+                        const k = layerArgs(ud, 'emojis').shrinkAtRim ? d.distScale : d.dampedDistScale
+                        const f = layerArgs(ud, 'emojis').shrinkAtRim ? d.distScale / d.dampedDistScale : 1
+                        return ` translate(${d.cache.re + delta.re*f} ${d.cache.im + delta.im*f})`
+                             + `scale(${k*2})`
+                    }
     }),
     (v, ud:UnitDisk)=> new LabelLayer(v, {
         invisible:  false,
@@ -306,9 +311,13 @@ export const layerSrc = [
         delta:      labeloffsets.labeloffset(ud),
         color:      ()=> undefined,
         background: undefined,
-        transform:  (d, delta)=> 
-                        ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` 
-                        + d.scaleStrText                            
+        // option shrinkAtRim: see emojis
+        transform:  (d, delta)=> {
+                        if (!layerArgs(ud, 'labels').shrinkAtRim)
+                            return ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` + d.scaleStrText
+                        const f = d.distScale / d.dampedDistScale
+                        return ` translate(${d.cache.re + delta.re*f} ${d.cache.im + delta.im*f}) scale(${d.distScale})`
+                    }
     }),
     (v, ud:UnitDisk)=> new LabelForceLayer(v, {                            
         invisible:  true,

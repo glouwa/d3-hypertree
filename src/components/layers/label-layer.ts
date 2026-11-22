@@ -16,6 +16,7 @@ export interface LabelLayerArgs extends ILayerArgs
     clip?:       string,
     color?:      (d)=> any,
     background?: any,          // falsy, or a function of the node: draw a background rect
+    shrinkAtRim?: boolean,     // scale with the distance like the links (to 0 at the rim) instead of the damped scale (1 to 0.5)
 }
 
 export class LabelLayer implements ILayer
