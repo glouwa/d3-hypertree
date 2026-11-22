@@ -121,6 +121,8 @@ changing for a few frames after loading and after each interaction;
 - [ ] Remove debug output (`console.log` in hot paths such as the layer stack)
 - [ ] Fix the known bugs below (the deep-tree bug comes after the modernization)
 - [ ] Triage the open GitHub issues (currently only Dependabot PRs)
+- [ ] Hover and selection: separate node state, interaction strategy and display
+      (see "Design: hover and selection" below)
 
 ### Phase 3: Interaction performance (priority)
 
@@ -186,6 +188,54 @@ Rendering (DOM, browser), in order of expected gain:
 | **Crash when nodes have an icon but no label.** `preset-process.ts` calls `precalc.label.startsWith(...)` without checking that a label exists. | **Fixed:** checks the label first; covered by `data.spec.mjs` and the playground test |
 | **Invisible layers appear while dragging.** `d3updatePattern.ts` and `label-force-layer.ts` only checked `hideOnDrag` during drags and animations, so a layer with `invisible: true, hideOnDrag: false` was drawn while dragging. No default layer has this combination; found in the playground. | **Fixed:** `invisible` always hides, `hideOnDrag` additionally while dragging; covered by `interaction.spec.mjs` |
 | **Hover and selection highlight of the cells could not be turned off.** The cell layer always showed the interaction state. | **Added:** layer options `hover` and `selection` (default true) on `cells`; events, callbacks and the hover path are unaffected. Same pattern possible for `nodes`, arcs and symbols |
+
+### Design: hover and selection (for Phase 2)
+
+Agreed on 2026-11-22, to be implemented after Phase 1. Idea: every node has the
+states *hovered* and *selected*; the interaction defines how they are set, the
+layers only define how they are shown.
+
+**Today**
+
+- *Hover* is set by `interaction-layer-2.ts` (node under the mouse via the voronoi
+  cells, `api.setPathHead(HoverPath, n)`) and stored as a path in `objects.pathes`
+  plus `pathes.isPartOfAnyHoverPath` on the ancestors. Each layer finds the hovered
+  node itself (`cells` searches the head of the HoverPath).
+- *Selection* is changed only by `api.toggleSelection(n)`: multi selection with a
+  hidden limit (once there are more than 11 paths, hover path included, the oldest
+  selection is dropped). Stored three times: `objects.selections`, a
+  `SelectionPath` per node, `isPartOfAnySelectionPath` on the ancestors.
+- Clicking selects only if the application's `onNodeClick` calls `toggleSelection`.
+  The `onClick: toggleSelection` given to `InteractionLayer2` in `preset-layers.ts`
+  is never called (only the old, invisible `InteractionLayer` calls its `onClick`).
+- Display differs per layer: `cells` the node's own cell (options `hover`,
+  `selection`), `nodes` the whole path, `symbols` the selection path without the
+  root, `link-arcs`/`path-arcs` the path.
+
+**Target**
+
+1. *State on the node* (single source): `n.hovered`, `n.selected`, derived
+   `n.onHoverPath`, `n.onSelectionPath` for path layers. `objects.selections` stays
+   as the list in selection order, maintained by the same code.
+2. *Strategies set the state* (`model.interaction`, not the layers):
+   - `interaction.hover`: `'pointer'` (today) | `'none'`, more later
+   - `interaction.selection`: `'none'` | `'single'` (a new selection replaces the
+     old one) | `'multi'` with `maxSelections` (today implicitly 10)
+   - `interaction.clickAction`: e.g. `'select'` | `'goto'` | `'none'`; `onNodeClick`
+     stays as an additional callback
+   - the API goes through the same strategy: `api.select`, `api.deselect`,
+     `api.clearSelection`, `api.toggleSelection`; the strategy fires `onNodeSelect`
+     and `onNodeHover`, so nothing can select around it
+3. *Layers only display*: `cells` keeps `hover`/`selection` (later a style choice
+   instead of on/off); `nodes`, `symbols` and the arcs get the same options with
+   `'node' | 'path' | false`, defaults as today.
+
+**Compatibility**: the defaults reproduce today's behavior (`hover: 'pointer'`,
+`selection: 'multi'`, `maxSelections: 10`, click only via `onNodeClick`);
+`objects.selections` and `toggleSelection` remain.
+
+**Playground**: Interaction gets Hover, Selection (none/single/multi, maximum) and
+Click; the layers keep their display options.
 
 ### Analysis of the deep-tree bug (for later)
 
