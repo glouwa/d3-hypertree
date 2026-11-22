@@ -19,7 +19,8 @@ export interface LabelForceLayerArgs extends ILayerArgs
     text,
     clip?:       string,
     background?: any,          // falsy, or a function of the node: draw a background rect
-    shrinkAtRim?: boolean,     // scale with the distance to the center like the links (default false: constant size)
+    scale?:       number | ((n)=> number),   // size bound to the data (default 1), times geometry.shrinkAtRim
+    sizeOf?:      (n)=> number,  // the resulting size (set by the preset); default 1
     maxLabels?:   number,      // at most this many labels (default filter.maxlabels; preset-layers.ts)
 }
 
@@ -148,12 +149,10 @@ export class LabelForceLayer implements ILayer
             if (!d.forcepoints)
                 return ` translate(${d.cache.re} ${d.cache.im})` 
             console.assert(d.forcepoints.x || d.depth === 0)
-            // option shrinkAtRim: scale with the distance like the links (centered)
-            if (T.args.shrinkAtRim) {
-                const k = d.distScale || 1
-                return ` translate(${(d.forcepoints.x||0)-T.labellen(d)/2*k} ${d.forcepoints.y||0}) scale(${k})`
-            }
-            return ` translate(${(d.forcepoints.x||0)-T.labellen(d)/2} ${d.forcepoints.y||0})`
+            // size of the label (sizeOf, from the preset: layer option scale times
+            // geometry.shrinkAtRim), centered on its force point
+            const k = T.args.sizeOf ? T.args.sizeOf(d) : 1
+            return ` translate(${(d.forcepoints.x||0)-T.labellen(d)/2*k} ${d.forcepoints.y||0}) scale(${k})`
         }
 
         this.d3updatePattern = new D3UpdatePattern({

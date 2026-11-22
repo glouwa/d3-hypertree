@@ -45,6 +45,7 @@ export interface UnitDiskArgs
 
     linkWidth:         (n:N)=> number
     linkCurvature:     ArcCurvature
+    shrinkAtRim?:      'none' | 'damped' | 'full'   // labels and emojis toward the rim: constant, 1 to 0.5 (default), like the links (to 0)
 
     startPosition?:    C                    // initial translation (documented as filter.transformation.P)
     addLayer?:         string[]             // layer names to show (layerOptions[name].invisible = false)

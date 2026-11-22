@@ -16,7 +16,7 @@ export interface LabelLayerArgs extends ILayerArgs
     clip?:       string,
     color?:      (d)=> any,
     background?: any,          // falsy, or a function of the node: draw a background rect
-    shrinkAtRim?: boolean,     // scale with the distance like the links (to 0 at the rim) instead of the damped scale (1 to 0.5)
+    scale?:       number | ((n)=> number),   // size bound to the data (default 1), times geometry.shrinkAtRim (preset-layers.ts)
     maxLabels?:   number,      // at most this many labels (default filter.maxlabels; preset-layers.ts)
     asImage?:    boolean,      // draw each distinct text once as a bitmap and reuse it (emoji layer default: true)
 }

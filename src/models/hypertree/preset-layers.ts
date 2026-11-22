@@ -22,6 +22,22 @@ import { labelsFor }                from './preset-process'
 const layerArgs = (ud:UnitDisk, name:string) : any =>
     (ud.layerStack && ud.layerStack.layers[name] && ud.layerStack.layers[name].args) || {}
 
+// Size of labels and emojis: the layer option scale (a number or a function of the
+// node, bound to the data; default 1) times the rim factor of geometry.shrinkAtRim:
+// 'none' constant, 'damped' (default) from 1 in the center to 0.5 at the rim,
+// 'full' like the links (to 0 at the rim).
+export const rimScale = (ud:UnitDisk, d:N) : number => {
+    const mode = ud.view.hypertree.args.geometry.shrinkAtRim
+    return mode === 'none' ? 1 : mode === 'full' ? d.distScale : d.dampedDistScale
+}
+const layerScale = (ud:UnitDisk, name:string, d:N) : number => {
+    const s = layerArgs(ud, name).scale
+    return s === undefined || s === null ? 1 : typeof s === 'function' ? s(d) : s
+}
+const sizeAt = (ud:UnitDisk, name:string, d:N)=> rimScale(ud, d) * layerScale(ud, name, d)
+// offsets (delta) are measured at the damped scale: factor for the actual rim scale
+const offsetFactor = (ud:UnitDisk, d:N)=> rimScale(ud, d) / d.dampedDistScale
+
 export const labeloffsets = {
     centerOffset:       (cache:string)=> (d:N, i, v)=> bboxCenter(d, cache),
 
@@ -271,13 +287,12 @@ export const layerSrc = [
         //delta:      (d, i, v)=> ({ re:0, im:0 }),        
         color:      ()=> undefined,
         background: undefined,
-        // option shrinkAtRim: scale with the distance like the links (to 0 at the
-        // rim) instead of the damped scale (1 to 0.5); the offset shrinks along
+        // size: layer option scale times geometry.shrinkAtRim (see sizeAt); the offset
+        // follows the rim factor
         transform:  (d, delta)=> {
-                        const k = layerArgs(ud, 'emojis').shrinkAtRim ? d.distScale : d.dampedDistScale
-                        const f = layerArgs(ud, 'emojis').shrinkAtRim ? d.distScale / d.dampedDistScale : 1
+                        const f = offsetFactor(ud, d)
                         return ` translate(${d.cache.re + delta.re*f} ${d.cache.im + delta.im*f})`
-                             + `scale(${k*2})`
+                             + `scale(${sizeAt(ud, 'emojis', d)*2})`
                     }
     }),
     (v, ud:UnitDisk)=> new LabelLayer(v, {
@@ -291,12 +306,10 @@ export const layerSrc = [
         delta:      labeloffsets.labeloffset(ud),
         color:      ()=> undefined,
         background: undefined,
-        // option shrinkAtRim: see emojis
+        // size: see emojis
         transform:  (d, delta)=> {
-                        if (!layerArgs(ud, 'labels').shrinkAtRim)
-                            return ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` + d.scaleStrText
-                        const f = d.distScale / d.dampedDistScale
-                        return ` translate(${d.cache.re + delta.re*f} ${d.cache.im + delta.im*f}) scale(${d.distScale})`
+                        const f = offsetFactor(ud, d)
+                        return ` translate(${d.cache.re + delta.re*f} ${d.cache.im + delta.im*f}) scale(${sizeAt(ud, 'labels', d)})`
                     }
     }),
     (v, ud:UnitDisk)=> new LabelForceLayer(v, {                            
@@ -307,6 +320,8 @@ export const layerSrc = [
         data:       ()=> labelsFor(ud, layerArgs(ud, 'labels-force').maxLabels),
         text:       (d)=> d.precalc.label,        
         background: n=> !n.parent,
+        // size: see emojis (layer option scale times geometry.shrinkAtRim)
+        sizeOf:     d=> sizeAt(ud, 'labels-force', d),
         transform:  (d, delta)=> 
                         ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` 
                         + d.scaleStrText                            

@@ -307,9 +307,8 @@ Rendering (DOM, browser), in order of expected gain:
         on their own, checkbox "inner nodes like the leaves" (playground/harness
         only, no new library option). `geometry.nodeRadius`, `nodeScale`,
         `linkWidth` stay in geometry: several layers depend on each
-  - [ ] Open question: leaves are still faint (pale green #a5d6a7, ~4 px); proposal:
-        stronger fill in the light theme (e.g. #5eb561)
-  - [ ] Step 2, `geometry.shrinkAtRim`: `'none'` | `'damped'` (today's label
+  - [x] Leaves were faint (pale green #a5d6a7, ~4 px): light theme fill #5eb561
+  - [x] Step 2, `geometry.shrinkAtRim`: `'none'` | `'damped'` (today's label
         default, scale 1 → 0.5) | `'full'` (like the links, 1 → 0) for labels,
         labels-force and emojis; replaces the per-layer `shrinkAtRim` bool (not
         released, no alias needed). The layers only bind their size to the data

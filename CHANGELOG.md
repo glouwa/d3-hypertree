@@ -9,6 +9,13 @@ are listed first.
 
 ### Changed behavior
 
+- **`geometry.shrinkAtRim`** for labels, force labels and emojis toward the rim:
+  `'none'` (constant), `'damped'` (default: 1 in the center to 0.5 at the rim, as
+  labels and emojis before), `'full'` (like the links, to 0). Force labels used
+  to keep a constant size; with the default they now get smaller toward the rim
+  (`'none'` for the old look).
+- **Node color** (light theme): disks filled with #5eb561 instead of the pale
+  #a5d6a7, so the leaves are visible.
 - **Default node radius** follows `geometry.linkWidth`: inner nodes half the width
   of their link (the disk never sticks out of it), leaves 1.5 times (a disk three
   times as wide as the link; they were nearly invisible at the end of their thin
@@ -61,8 +68,8 @@ are listed first.
     `filter.maxlabels`);
   - `show` on `nodes`: `'leaves'` (default), `'all'` (a disk for every visible
     node) or a function `n => boolean`;
-  - `shrinkAtRim` on `labels`, `labels-force`, `emojis`: scale with the distance
-    to the center like the links;
+  - `scale` on `labels`, `labels-force`, `emojis`: size bound to the data (a
+    number or a function of the node), times `geometry.shrinkAtRim`;
   - `asImage` on label layers (default on `emojis`);
   - `plane`: the compositor plane of a layer (see Performance).
 - **Multi-line labels:** a `\n` in `precalc.label` gives several lines.

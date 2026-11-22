@@ -197,32 +197,34 @@ test.describe('node layer option show', () => {
     })
 })
 
-// Layer option shrinkAtRim (labels, labels-force, emojis): scale with the distance to
-// the center like the links instead of the damped scale (or none for labels-force).
-test.describe('shrinkAtRim', () => {
-    const scales = (page, layer) => page.evaluate(layer => [...document.querySelectorAll(`[id="${layer}"] > text, [id="${layer}"] > image`)].map(t => {
-        const m = /scale\(([^)]+)\)/.exec(t.getAttribute('transform') || '')
-        return { s: m ? +m[1] : 1, r: t.__data__.cachep.r, k: t.__data__.distScale }
-    }), layer)
-    for (const [layer, query, factor] of [
-        ['labels', 'labels=1', 1],
-        ['emojis', 'icons=1', 2],
-        ['labels-force', `labels=1&layers=${encodeURIComponent('{"labels-force":{"invisible":false}}')}`, 1],
-    ]) {
-        test(`${layer}: off by default, on scales like the links`, async ({ page }) => {
-            const errors = collectErrors(page)
-            await openTree(page, `gen=nTree&depth=6&childs=2&filter=off&${query}`)
-            const off = await scales(page, layer)
-            expect(off.length).toBeGreaterThan(5)
-            const layers = layer === 'labels-force' ? { 'labels-force': { invisible: false, shrinkAtRim: true } } : { [layer]: { shrinkAtRim: true } }
-            await openTree(page, `gen=nTree&depth=6&childs=2&filter=off&${query.replace(/&layers=.*/, '')}&layers=${encodeURIComponent(JSON.stringify(layers))}`)
-            const on = await scales(page, layer)
-            // on: the scale is the node's distance factor (times 2 for emojis)
-            expect(on.every(t => Math.abs(t.s - t.k * factor) < 1e-6)).toBe(true)
-            // the outermost element is smaller than without the option
-            const outermost = list => list.reduce((a, b) => (b.r > a.r ? b : a))
-            expect(outermost(on).s).toBeLessThan(outermost(off).s)
-            expectNoErrors(errors)
+// geometry.shrinkAtRim (labels, labels-force, emojis): 'none' constant, 'damped' (default)
+// 1 to 0.5, 'full' like the links; times the layer option scale (bound to the data)
+test.describe('shrinkAtRim and layer scale', () => {
+    const scales = (page, layer) => page.evaluate(layer => [...document.querySelectorAll(`[id="${layer}"] > text, [id="${layer}"] > image`)]
+        .filter(t => t.__data__.forcepoints !== undefined || layer !== 'labels-force').map(t => {
+            const m = /scale\(([^)]+)\)/.exec(t.getAttribute('transform') || '')
+            return { s: m ? +m[1] : 1, k: t.__data__.distScale, damped: t.__data__.dampedDistScale }
+        }), layer)
+    const open = (page, query, geometry, layers) => openTree(page, `gen=nTree&depth=6&childs=2&filter=off&${query}`
+        + (geometry ? `&geometry=${encodeURIComponent(JSON.stringify(geometry))}` : '')
+        + `&layers=${encodeURIComponent(JSON.stringify(layers))}`)
+    for (const [layer, query, factor] of [['labels', 'labels=1', 1], ['emojis', 'icons=1', 2], ['labels-force', 'labels=1', 1]]) {
+        const base = layer === 'labels-force' ? { 'labels-force': { invisible: false } } : {}
+        for (const [mode, expected] of [[undefined, t => t.damped], ['none', () => 1], ['damped', t => t.damped], ['full', t => t.k]]) {
+            test(`${layer}: shrinkAtRim ${mode || 'default (damped)'}`, async ({ page }) => {
+                const errors = collectErrors(page)
+                await open(page, query, mode && { shrinkAtRim: mode }, base)
+                const list = await scales(page, layer)
+                expect(list.length).toBeGreaterThan(5)
+                for (const t of list) expect(t.s).toBeCloseTo(expected(t) * factor, 6)
+                expectNoErrors(errors)
+            })
+        }
+        test(`${layer}: layer option scale multiplies the size`, async ({ page }) => {
+            await open(page, query, { shrinkAtRim: 'full' }, { [layer]: { ...(base[layer] || {}), scale: 1.5 } })
+            const list = await scales(page, layer)
+            expect(list.length).toBeGreaterThan(5)
+            for (const t of list) expect(t.s).toBeCloseTo(t.k * 1.5 * factor, 6)
         })
     }
 })

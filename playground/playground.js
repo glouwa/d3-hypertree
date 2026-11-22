@@ -30,6 +30,7 @@
         lang: false, labels: true, multiline: false, iconPercent: 10, preset: '', theme: 'light',
         // geometry: options that apply to several layers
         linkCurvature: base.geometry.linkCurvature,
+        shrinkAtRim: base.geometry.shrinkAtRim,
         captionFontPx: parseFloat(base.geometry.captionFont),
         captionHeight: base.geometry.captionHeight,
         leafRadius: null,     // null: library default (1.5 x the link width)
@@ -86,9 +87,9 @@
         'stem-arc':    [['curvature', 'curvature'], ['width', 'number', 0.001, 0.05, 0.0005]],
         'nodes':       [['show', 'choice', ['leaves', 'all']], ['hover', 'choice', ['path', 'node', 'none']], ['selection', 'choice', ['path', 'node', 'none']], ['fill', 'color'], ['stroke', 'color'], ['strokeWidth', 'number', 0, 0.02, 0.0005], ['r', 'number', 0.002, 0.06, 0.001]],
         'images':      [['width', 'number', 0.01, 0.3, 0.005], ['height', 'number', 0.01, 0.3, 0.005]],
-        'emojis':      [['shrinkAtRim', 'bool'], ['color', 'color'], ['background', 'bool']],
-        'labels':      [['maxLabels', 'number', 0, 200, 1], ['shrinkAtRim', 'bool'], ['color', 'color'], ['background', 'bool']],
-        'labels-force':[['maxLabels', 'number', 0, 200, 1], ['shrinkAtRim', 'bool'], ['background', 'bool']],
+        'emojis':      [['scale', 'number', 0.2, 3, 0.05], ['color', 'color'], ['background', 'bool']],
+        'labels':      [['maxLabels', 'number', 0, 200, 1], ['scale', 'number', 0.2, 3, 0.05], ['color', 'color'], ['background', 'bool']],
+        'labels-force':[['maxLabels', 'number', 0, 200, 1], ['scale', 'number', 0.2, 3, 0.05], ['background', 'bool']],
     }
     // what a layer shows, when its name doesn't say it
     const LAYER_ALIASES = { 'cells': 'voronoi', 'λ': 'zoom', '(0,0)': 'origin' }
@@ -178,6 +179,7 @@
 
         const g = {}
         if (c.linkCurvature !== DEFAULTS.linkCurvature) g.linkCurvature = c.linkCurvature
+        if (c.shrinkAtRim !== DEFAULTS.shrinkAtRim) g.shrinkAtRim = c.shrinkAtRim
         if (c.captionFontPx !== DEFAULTS.captionFontPx) g.captionFont = `${c.captionFontPx}px Roboto`
         if (c.captionHeight !== DEFAULTS.captionHeight) g.captionHeight = c.captionHeight
         // harness format: nodeRadius { leaves, inner } (test/config.js makes the function)
@@ -230,6 +232,7 @@
         if (p.get('geometry')) {
             const g = JSON.parse(p.get('geometry'))
             if (g.linkCurvature) c.linkCurvature = g.linkCurvature
+            if (g.shrinkAtRim) c.shrinkAtRim = g.shrinkAtRim
             if (g.captionFont) c.captionFontPx = parseFloat(g.captionFont)
             if (g.captionHeight !== undefined) c.captionHeight = g.captionHeight
             if (typeof g.nodeRadius === 'number') { c.leafRadius = g.nodeRadius; c.innerLikeLeaves = true }   // older links
@@ -522,10 +525,12 @@
         hint(g, 'maxlabels: at most this many labels in the label layers (highest subtree weight × display scale², big subtrees near the center first; the root always). A label layer can set its own limit (Layers › labels › maxLabels).')
         hint(g, 'The filter adapts its weight threshold a little on every update, so the visible set settles over a few frames after loading or interacting.')
 
-        g = section('Geometry', ['linkCurvature', 'captionFontPx', 'captionHeight', 'leafRadius', 'innerRadius', 'innerLikeLeaves', 'linkWidth', 'theme'])
+        g = section('Geometry', ['linkCurvature', 'shrinkAtRim', 'captionFontPx', 'captionHeight', 'leafRadius', 'innerRadius', 'innerLikeLeaves', 'linkWidth', 'theme'])
         hint(g, 'Options that apply to several layers (model.geometry). Options of a single layer are in the layer list below (▸).')
         select(g, 'linkCurvature', 'linkCurvature', [['-', '− (default, hyperbolic geodesic)'], ['+', '+ (arc to the other side)'], ['0', '0 (straight)']])
         hint(g, 'Default curvature of link-arcs and path-arcs; a layer can override it. The library also accepts l (straight, as SVG lines): looks like 0 and needs a little more JavaScript per frame.')
+        select(g, 'shrinkAtRim', 'shrinkAtRim', [['damped', 'damped (default): 1 to 0.5 at the rim'], ['none', 'none: constant size'], ['full', 'full: like the links, to 0 at the rim']])
+        hint(g, 'Size of labels, force labels and emojis toward the rim. A layer binds its own size to the data with its option scale (number or function), times this factor.')
         range(g, 'caption font', 'captionFontPx', 3, 16, 0.5, null, v => `${v}px`)
         range(g, 'captionHeight', 'captionHeight', 0.01, 0.12, 0.005)
         optionalNumber(g, 'radius: leaves', 'leafRadius', 0.002, 0.05, 0.001, 0.015)
