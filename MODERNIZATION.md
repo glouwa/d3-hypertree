@@ -102,10 +102,44 @@ expected-to-fail test): `nodeColor`/`linkColor` (readme example; the code reads
 `filter.cullingWeight`, `filter.transformation.P`.
 
 **How the filter behaves** (learned while writing the filter tests): it adapts
-`weightFilter.magic` by `alpha` on every update, so the visible node set keeps
-changing for a few frames after loading and after each interaction;
+`weightFilter.magic` by `alpha` on every update, so the visible node set kept
+changing for a few frames after loading and after each interaction (fixed in
+phase 2 step 4: magic settles at initialization);
 `cullingRadius` only removes nodes whose parent lies outside the focus area;
 `rangeNodes` is bounded by `rangeCullingWeight`.
+
+**How the start value of magic is computed** (phase 2 step 4, `settleMagic` in
+`src/models/hypertree/magic-filter.ts`):
+
+- *What magic does.* Every node has a culling weight, its weight summed over its
+  subtree (default: leaves 1, inner nodes height²). A node is hidden when its
+  culling weight is at most *weight of the first node on the path to the focus ÷
+  magic*. A larger magic hides less, so more nodes are visible. The number of
+  visible nodes grows monotonically with magic.
+- *The rule* (unchanged, `adjustMagic`): on every update, if more than
+  `rangeNodes.max` nodes are visible, magic is divided by `alpha` (1.05); if fewer
+  than `rangeNodes.min`, it is multiplied by `alpha`; magic stays within
+  `rangeCullingWeight` [4, 500].
+- *Before:* `resetData()` set magic to 20 and the rule ran once per update. Without
+  interaction there are hardly any updates, so after loading the tree stayed far
+  below the configured range (e.g. 28 visible nodes of a binary tree, range
+  150–500) and nodes appeared bit by bit while the user dragged.
+- *Now:* after the start zoom is found (`findInitλ_`), `settleMagic` repeats the
+  same rule right away, without drawing: one rule step plus a node selection
+  (`collectNodesByWeight`) per iteration, starting at 20, until magic doesn't
+  change any more. That happens when the visible count lies within `rangeNodes`, or
+  magic reached a bound of `rangeCullingWeight`, or every node is visible already
+  (then a larger magic can't show more, so it stops early). At most 1000 steps;
+  each step is one selection pass over the visible nodes, at α = 1.05 the way from
+  20 to the bound 500 takes 66 steps.
+- *Result:* the first frame shows the set the frame-by-frame adaptation would have
+  reached eventually, and the rule keeps the count in range while navigating, as
+  before. The binary tree above now shows 82 nodes at once (magic reaches its upper
+  bound 500 there; the tree has too few heavy nodes near the focus for 150).
+- Why not a closed formula or a binary search: the visible count depends on the
+  layout, the transformation and the culling radius, so it's only known by
+  running the selection; repeating the existing rule reproduces exactly the state
+  users already got after interacting, with the same `alpha` and bounds.
 
 ### Phase 1: Modern build
 
@@ -144,10 +178,11 @@ A bug or feature counts as done when its expected-to-fail test becomes a normal 
        - `linkCurvature: '0'` crashes; it means straight lines (SVG path), like `'l'`
          (SVG line). Values: `'-'` (default, hyperbolic geodesic), `'+'` (arc
          bending the other way), `'0'`, `'l'`
-4. [ ] **Filter: only the range is configured.** `weightFilter.magic` becomes
-       internal: the library picks the start value so that the number of visible
+4. [x] **Filter: only the range is configured.** `weightFilter.magic` is
+       internal: the library computes the start value so that the number of visible
        nodes is within `rangeNodes` from the first frame (no settling over several
-       frames). A configured `magic` is ignored with a warning.
+       frames). A configured `magic` is ignored with a warning. How the start value
+       is computed: see "How the start value of magic is computed" below.
 5. [ ] **Documented features back** (expected-to-fail tests in `documented.spec.mjs`):
        - renamed, alias with a deprecation warning: `nodeColor`/`linkColor`
          (→ `fill`/`stroke`), `interaction.wheelSensitivity` (→ `wheelFactor`),
@@ -238,7 +273,7 @@ Rendering (DOM, browser), in order of expected gain:
 | **Hover and selection classes of nodes and symbols lagged.** Path changes (hover, `toggleSelection`, `selectQuery`) only refreshed the path layers, so `.hovered`/`.selected` node styles and query colors appeared only with the next transformation. | **Fixed:** `LayerStack.updatePath` also refreshes nodes, symbols and cells; covered by tests |
 | **`goto(p, λ)` ignores the zoom.** `animateTo` never uses its `newλ` argument. | **Fixed:** the zoom is animated together with the translation (limited to `λbounds`); tests in `api.spec.mjs` |
 | **Animations stop slightly short of the target.** `animateTo` interpolates with `1 − sigmoid(progress)`, and `sigmoid(1) < 1`, so ~0.3% of the way remains (e.g. `gotoHome` ends at \| **Fixed:** `sigmoid01`, the easing scaled to end exactly at 1; tests now require the exact target |
-| **`weightFilter.magic` can't be configured.** `resetData()` always sets it to 20 (presets say 160); afterwards the filter adapts it to keep the visible node count within `rangeNodes`. | Documented; decide in v2 whether it's an option or internal |
+| **`weightFilter.magic` can't be configured.** `resetData()` always sets it to 20 (presets say 160); afterwards the filter adapts it to keep the visible node count within `rangeNodes`. | **Decided: internal.** Settled at initialization (`settleMagic`), so the visible count is within `rangeNodes` from the first frame; a configured value is ignored with a warning |
 | **Documented option names that don't exist.** The readme example uses `nodeColor`/`linkColor`; the code reads `fill`/`stroke`/`strokeWidth`. More documented-only features in phase 0b. | See phase 0b, documented features |
 | **Link curvature `'0'` crashes.** Mentioned in a comment in `preset-layers.ts` (not in the docs): "Cannot read properties of undefined (reading 'nodePosStr')". | **Fixed:** the path function lost its `this`; `'0'` draws straight lines as SVG paths. Tests in `config.spec.mjs`, option in the playground |
 | **Crash when nodes have an icon but no label.** `preset-process.ts` calls `precalc.label.startsWith(...)` without checking that a label exists. | **Fixed:** checks the label first; covered by `data.spec.mjs` and the playground test |

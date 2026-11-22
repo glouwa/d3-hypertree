@@ -67,7 +67,6 @@ const modelBase : ()=> HypertreeArgs = ()=>
         type:               'magic',
         cullingRadius:      .99,
         weightFilter: {
-            magic:              160,
             alpha:              1.05,
             //weight:             n=> (isLeaf(n) ? 1 : 0),
             //weight:             n=> (isLeaf(n) ? 1 : Math.pow(n.height, 5)),
@@ -313,7 +312,6 @@ export const presets : { [key: string]:()=> any } =
         type:               'magic',
         cullingRadius:      .99,
         weightFilter: {
-            magic:              160,
             alpha:              1.05,
             //weight:             n=> (isLeaf(n) ? 1 : 0),
             //weight:             n=> (isLeaf(n) ? 1 : Math.pow(n.height, 5)),

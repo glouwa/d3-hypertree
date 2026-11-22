@@ -13,6 +13,7 @@ import { CaddC, CsubC, CmulR } from '../../models/transformation/hyperbolic-math
 import { sigmoid, sigmoid01 }  from '../../models/transformation/hyperbolic-math'
 import { IUnitDisk }           from '../unitdisk/unitdisk'
 import { presets }             from '../../models/hypertree/preset-base'
+import { settleMagic }         from '../../models/hypertree/magic-filter'
 import { mergeDeep }           from '../../ducd'
 
 let globelhtid = 0
@@ -93,6 +94,9 @@ export class Hypertree
             //model = mergeDeep_(presets[model.baseCfg], model)
             this.isInitializing = true
             const base = presets.modelBase()
+            if (model && model.filter && model.filter.weightFilter && model.filter.weightFilter.magic !== undefined)
+                console.warn('d3-hypertree: filter.weightFilter.magic is set internally and ignored; '
+                           + 'configure the number of visible nodes with filter.weightFilter.rangeNodes')
 
             //this.args = mergeDeep(model, base)
             this.args = mergeDeep(base, model)
@@ -398,8 +402,11 @@ export class Hypertree
             this.updateLayoutPath_(this.data)
             this.unitdisk.args.cacheUpdate(this.unitdisk, this.unitdisk.cache)
         }
-        this.data.each((n:N)=> n.layoutReference = clone(n.layout))                
-        
+        // the filter's magic settles now, so the first frame shows the final visible set
+        if (this.args.filter.weightFilter)
+            settleMagic(this.unitdisk, this.unitdisk.cache)
+        this.data.each((n:N)=> n.layoutReference = clone(n.layout))
+
     }
 
     //########################################################################################################

@@ -140,9 +140,9 @@
             }
         }
         if (q.get('filter') === 'off') {
-            // weightFilter.magic can't be configured: resetData() sets it to 20 and the
-            // filter then adapts it until the visible node count is within rangeNodes.
-            // Demanding an unreachable minimum makes it grow until nothing is culled.
+            // weightFilter.magic is internal: set at initialization so the visible node
+            // count is within rangeNodes. Demanding an unreachable minimum makes it grow
+            // until nothing is culled.
             merge(model, { filter: {
                 cullingRadius: 1,
                 weightFilter: {

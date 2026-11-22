@@ -138,6 +138,34 @@ function addPathToUnculled(ud:IUnitDisk, cache:TransformationCache, p)
     }   
 }
 
+/**
+ * Settles weightFilter.magic before the first frame.
+ *
+ * magic decides how much smaller than the focus a node's culling weight may be
+ * before the node is hidden (minWeight = weight at the focus / magic): a larger
+ * magic shows more nodes. adjustMagic changes it by one step (× or ÷ alpha) per
+ * update until the number of visible nodes lies within rangeNodes. Done frame by
+ * frame, the visible set kept changing for many frames after loading.
+ *
+ * This runs the same steps right away, without drawing, until magic doesn't
+ * change any more: the number of visible nodes is within rangeNodes, or magic
+ * reached a bound of rangeCullingWeight, or every node is visible already. The
+ * result equals the state the frame-by-frame adaptation used to settle in.
+ * Returns the number of steps.
+ */
+export function settleMagic(ud:IUnitDisk, cache:TransformationCache, maxSteps = 1000) : number {
+    const filter = ud.view.hypertree.args.filter.weightFilter
+    const total = ud.args.data ? ud.args.data.descendants().length : 0
+    for (let step = 0; step < maxSteps; step++) {
+        const before = filter.magic
+        collectNodesByWeight(ud, cache, pathToLastVisible(ud, cache))   // one adjustMagic step + selection
+        if (filter.magic === before) return step
+        // every node visible: a larger magic can't show more
+        if (cache.unculledNodes.length + 1 >= total && cache.unculledNodes.length < filter.rangeNodes.min) return step
+    }
+    return maxSteps
+}
+
 export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
     // constants 
     const t0 =   performance.now()   

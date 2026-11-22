@@ -1,4 +1,28 @@
 import { test, expect } from '@playwright/test'
+
+// The filter's internal magic settles at initialization: the first frame already shows
+// the final visible set (it used to grow over many updates, mostly while interacting).
+test('the visible node set is final from the first frame', async ({ page }) => {
+    await page.goto('harness.html?gen=nTree&depth=10&childs=2')
+    await page.waitForFunction(() => window.harness && harness.ht.data && document.querySelector('#link-arcs > *'))
+    const visible = () => page.evaluate(() => harness.ht.unitdisk.cache.unculledNodes.length)
+    const first = await visible()
+    for (let i = 0; i < 20; i++) await page.evaluate(() => harness.ht.update.transformation())
+    expect(await visible()).toBe(first)
+    // within rangeNodes, unless magic reached its upper bound (this tree has too few
+    // heavy nodes near the focus to show 150)
+    const f = await page.evaluate(() => harness.ht.args.filter.weightFilter)
+    expect(first <= f.rangeNodes.max).toBe(true)
+    expect(first >= f.rangeNodes.min || f.magic >= f.rangeCullingWeight.max).toBe(true)
+})
+
+test('a configured weightFilter.magic is ignored with a warning', async ({ page }) => {
+    const warnings = []
+    page.on('console', m => { if (m.type() === 'warning') warnings.push(m.text()) })
+    await page.goto('harness.html?gen=nTree&depth=6&childs=2&filterOpt=' + encodeURIComponent('{"weightFilter":{"magic":3}}'))
+    await page.waitForFunction(() => window.harness && harness.ht.data)
+    expect(warnings.some(w => w.includes('magic') && w.includes('rangeNodes'))).toBe(true)
+})
 import { collectErrors, expectNoErrors, openTree, expectScene, expectPlausibleScene } from './helpers.mjs'
 
 // Filter options. The filter decides which nodes are visible, so each option gets

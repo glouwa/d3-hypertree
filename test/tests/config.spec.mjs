@@ -68,8 +68,10 @@ test.describe('layer options', () => {
         const errors = collectErrors(page)
         await openTree(page, 'gen=nTree&depth=6&childs=2&colors=1')
         const s = await page.evaluate(() => harness.scene())
-        expect(new Set(s.nodes.map(n => n.fill)).size).toBeGreaterThan(1)
+        // node circles are only drawn for leaves (all at depth 6 here), so the
+        // colors by depth show on the links, which cover every depth
         expect(s.nodes.every(n => n.fill && n.fill.startsWith('rgb'))).toBe(true)
+        expect(Object.keys(s.linkColors).length).toBeGreaterThan(1)
         expect(Object.keys(s.linkColors).every(c => c.startsWith('rgb'))).toBe(true)
         await expectScene(page, testInfo, 'colors')
         expectNoErrors(errors)

@@ -16,7 +16,7 @@
   "(0,0)": 0,
   "center-node": 0,
   "path-arcs": 0,
-  "link-arcs": 39,
+  "link-arcs": 120,
   "stem-arc": 0,
   "nodes": 0,
   "symbols": 0,
@@ -31,7 +31,7 @@
  },
  "labels": [],
  "linkColors": {
-  "css": 39
+  "css": 120
  },
  "selections": []
 }
