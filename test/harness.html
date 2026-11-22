@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>d3-hypertree test harness</title>
     <link rel="icon" href="data:,">
-    <link rel="stylesheet" href="../dist/d3-hypertree-light.css">
+    <link rel="stylesheet" id="theme" href="../dist/d3-hypertree-light.css">
     <style>
         html, body { margin: 0; height: 100%; background: #fff; }
         #tree { width: 900px; height: 900px; }
@@ -14,40 +14,91 @@
     <div id="tree"></div>
     <script src="../dist/d3-hypertree.js"></script>
     <script>
-        // Test harness: renders a generated tree with default settings.
-        //   ?gen=nTree&depth=10&childs=2   full n-ary tree (default: binary, depth 10 = 2047 nodes)
-        //   ?gen=star&n=250                one root with n children
-        //   ?gen=path&n=50                 a path of n nodes
-        //   ?gen=deepStar&arms=4&depth=30  root with arms, each a path
-        // window.harness exposes the component and helpers for tests and benchmarks.
+        // Test harness for d3-hypertree. Everything is configured by URL parameters,
+        // so every test and benchmark describes its input in one string.
+        //
+        // Data (one of):
+        //   gen=nTree&depth=10&childs=2   full n-ary tree (default: binary, depth 10 = 2047 nodes)
+        //   gen=star&n=250                one root with n children
+        //   gen=path&n=50                 a path of n nodes
+        //   gen=deepStar&arms=4&depth=30  root with arms, each a path
+        //   gen=data                      small inline tree via loaders.fromData
+        //   file=fixtures/flare.csv       loaders.fromFile (.d3.json, .csv, SKOS/TreeML .xml)
+        //   lang=fixtures/small.lang.json loaders.fromLangFile; labels from the language map
+        //
+        // Node content:
+        //   labels=1   deterministic label per node     icons=1   emoji per node
+        //   colors=1   color callbacks for nodes and links (by depth)
+        //
+        // Configuration (JSON, deep-merged into the model):
+        //   filter=off                    no culling at all: every node is visible
+        //   filterOpt={"cullingRadius":.9}            -> model.filter
+        //   layout={"rootWedge":{"angle":3.14}}       -> model.layout
+        //   layoutType=spiral|buchheim|unitLines|unitVectors|berge
+        //   layers={"cells":{"invisible":false}}      -> model.geometry.layerOptions
+        //   interaction={"wheelFactor":1.5}           -> model.interaction
+        //   preset=otolModel              start from hyt.presets[preset]() instead of the defaults
+        //   theme=dark
+        //
+        // window.harness exposes the component, recorded callbacks and helpers.
         const q = new URLSearchParams(location.search)
         const num = (k, d) => Number(q.get(k) || d)
+        const json = k => q.get(k) ? JSON.parse(q.get(k)) : undefined
+        const isObj = v => v && typeof v === 'object' && !Array.isArray(v)
+        const merge = (a, b) => {
+            for (const [k, v] of Object.entries(b || {}))
+                if (v !== undefined)
+                    a[k] = isObj(v) && isObj(a[k]) ? merge(a[k], v) : v
+            return a
+        }
+
+        if (q.get('theme') === 'dark') document.getElementById('theme').href = '../dist/d3-hypertree-dark.css'
+
+        const inlineData = {
+            name: 'root', children: [
+                { name: 'a', children: [{ name: 'a1' }, { name: 'a2' }] },
+                { name: 'b', children: [{ name: 'b1' }, { name: 'b2' }, { name: 'b3' }] },
+                { name: 'c' },
+            ],
+        }
         const gen = q.get('gen') || 'nTree'
         const loaders = {
             nTree:    ok => hyt.nTree(ok, num('depth', 10), num('childs', 2)),
             star:     hyt.star_(num('n', 250)),
             path:     hyt.path_(num('n', 50)),
             deepStar: ok => hyt.deepStar(ok, num('arms', 4), num('depth', 30)),
+            data:     hyt.fromData(inlineData),
         }
-        if (!loaders[gen]) throw new Error('unknown generator ' + gen)
+        const dataloader = q.get('file') ? hyt.fromFile(q.get('file')) : loaders[gen]
+        if (!dataloader) throw new Error('unknown generator ' + gen)
 
-        //   &labels=1  give every node a deterministic label (exercises the label layers)
-        //   &icons=1   give every node an emoji (exercises the emoji layer)
         // every interaction callback is recorded in harness.events
         const events = []
         const record = type => (n, ...rest) => events.push({
             type, id: n ? n.mergeId : undefined, arg: typeof rest[0] === 'boolean' ? rest[0] : undefined,
         })
-        const model = {
-            dataloader: loaders[gen],
-            interaction: {
-                onNodeClick:        record('click'),
-                onNodeHold:         record('hold'),
-                onNodeHover:        record('hover'),
-                onHoverNodeChange:  record('hoverchange'),
-                onNodeSelect:       record('select'),
-                onCenterNodeChange: record('center'),
-            },
+        const recorders = {
+            onNodeClick:        record('click'),
+            onNodeHold:         record('hold'),
+            onNodeHover:        record('hover'),
+            onHoverNodeChange:  record('hoverchange'),
+            onNodeSelect:       record('select'),
+            onCenterNodeChange: record('center'),
+        }
+
+        let model
+        if (q.get('preset')) {
+            model = hyt.presets[q.get('preset')]()
+            model.dataloader = dataloader
+            if (!q.get('lang')) model.langloader = ok => ok({})   // presets may point to app files
+            model.interaction = Object.assign({}, model.interaction, recorders)
+        } else {
+            model = { dataloader, interaction: recorders }
+        }
+
+        if (q.get('lang')) {
+            model.langloader = hyt.fromLangFile(q.get('lang'))
+            model.langInitBFS = (ht, n) => { n.precalc.label = ht.langMap && ht.langMap[n.data.name] }
         }
         if (q.get('labels') === '1') {
             let i = 0
@@ -58,10 +109,52 @@
             let i = 0
             model.dataInitBFS = (ht, n) => { n.precalc.icon = emojis[(i++) % emojis.length] }
         }
+        if (q.get('filter') === 'off') {
+            // weightFilter.magic can't be configured: resetData() sets it to 20 and the
+            // filter then adapts it until the visible node count is within rangeNodes.
+            // Demanding an unreachable minimum makes it grow until nothing is culled.
+            merge(model, { filter: {
+                cullingRadius: 1,
+                weightFilter: {
+                    alpha: 2,
+                    rangeCullingWeight: { min: 0, max: 1e300 },
+                    rangeNodes: { min: 1e9, max: 1e10 },
+                },
+            } })
+        }
+        merge(model, { filter: json('filterOpt') })
+        merge(model, { layout: json('layout') })
+        merge(model, { interaction: json('interaction') })
+        merge(model, { geometry: { layerOptions: json('layers') } })
+        if (q.get('layoutType')) {
+            const types = {
+                berge: hyt.layouts.layoutBergé, spiral: hyt.layouts.layoutSpiral,
+                buchheim: hyt.layouts.layoutBuchheim, unitLines: hyt.layouts.layoutUnitLines,
+                unitVectors: hyt.layouts.layoutUnitVectors,
+            }
+            merge(model, { layout: { type: types[q.get('layoutType')] } })
+        }
+        if (q.get('colors') === '1') {
+            const palette = ['#e53935', '#43a047', '#1e88e5', '#fb8c00', '#8e24aa', '#00acc1']
+            // option names as the code reads them (the readme example's nodeColor/linkColor don't exist)
+            merge(model, { geometry: { layerOptions: {
+                'nodes':     { fill:   n => palette[n.depth % palette.length] },
+                'link-arcs': { stroke: n => palette[n.depth % palette.length] },
+            } } })
+        }
+        //   docColors=1  the readme example's option names (nodeColor / linkColor)
+        if (q.get('docColors') === '1') {
+            merge(model, { geometry: { layerOptions: {
+                'nodes':     { nodeColor: n => '#e53935' },
+                'link-arcs': { linkColor: n => '#e53935' },
+            } } })
+        }
 
         const ht = new hyt.Hypertree({ parent: document.querySelector('#tree') }, model)
 
         const layerStack = () => ht.unitdisk.layerStack || ht.unitdisk.mainView.layerStack
+        const r1 = v => Math.round(v * 10) / 10
+        const r4 = v => Math.round(v * 1e4) / 1e4
 
         window.harness = {
             ht,
@@ -69,27 +162,69 @@
             events,
             clearEvents: () => { events.length = 0 },
             layerNames: () => Object.keys(layerStack().layers),
+            layer: name => layerStack().layers[name],
             /** Per-layer JS time (ms) of the most recent update, as measured by the layer stack. */
             lastLayerTimings: () => {
                 const m = layerStack().d3meta
                 return m ? Object.fromEntries(m.names.map((n, i) => [n, m.Δ[i]])) : {}
             },
-            /**
-             * Show only the given layers (also while dragging), hide all others.
-             * Returns the previous visibility so it can be restored.
-             */
+            /** Show only the given layers (also while dragging), hide all others; 'all' restores. */
             showOnly: names => {
                 const layers = layerStack().layers
                 for (const [n, l] of Object.entries(layers)) {
-                    const visible = names === 'all' ? !l.args.__origInvisible : names.includes(n)
                     if (l.args.__origInvisible === undefined) {
                         l.args.__origInvisible = !!l.args.invisible
                         l.args.__origHideOnDrag = !!l.args.hideOnDrag
                     }
+                    const visible = names !== 'all' && names.includes(n)
                     l.args.invisible  = names === 'all' ? l.args.__origInvisible  : !visible
                     l.args.hideOnDrag = names === 'all' ? l.args.__origHideOnDrag : !visible
                 }
                 ht.update.data()
+            },
+            /** Screen position of a node's circle (page coordinates), or null if not rendered. */
+            nodePos: id => {
+                const c = [...document.querySelectorAll('#nodes circle')].find(c => c.__data__ && c.__data__.mergeId === id)
+                if (!c) return null
+                const r = c.getBoundingClientRect()
+                return { x: r.x + r.width / 2, y: r.y + r.height / 2, r: r.width / 2 }
+            },
+            /**
+             * Compact description of what's drawn, for scene snapshots: visible nodes
+             * (id, position relative to the component, radius, fill), element count per
+             * layer, label texts, zoom and translation.
+             */
+            scene: () => {
+                const box = document.querySelector('#tree').getBoundingClientRect()
+                const nodes = [...document.querySelectorAll('#nodes circle')]
+                    .filter(c => c.__data__)
+                    .map(c => {
+                        const r = c.getBoundingClientRect()
+                        return {
+                            id: c.__data__.mergeId,
+                            x: r1(r.x + r.width / 2 - box.x), y: r1(r.y + r.height / 2 - box.y), r: r1(r.width / 2),
+                            fill: c.style.fill || c.getAttribute('fill') || null,
+                        }
+                    })
+                    .sort((a, b) => a.id - b.id)
+                const layers = {}
+                for (const name of Object.keys(layerStack().layers)) {
+                    const g = document.getElementById(name)
+                    layers[name] = g ? g.querySelectorAll('*').length : 0
+                }
+                const labels = [...document.querySelectorAll('#labels text, #labels2 text, #labels-force text')]
+                    .map(t => t.textContent).filter(Boolean).sort()
+                const linkColors = {}
+                document.querySelectorAll('#link-arcs path').forEach(p => {
+                    const c = p.style.stroke || p.getAttribute('stroke') || 'css'
+                    linkColors[c] = (linkColors[c] || 0) + 1
+                })
+                const s = ht.unitdisk.args.transformation.state
+                return {
+                    λ: r4(s.λ), P: { re: r4(s.P.re), im: r4(s.P.im) },
+                    nodes, layers, labels, linkColors,
+                    selections: ht.args.objects.selections.map(n => n.mergeId).sort((a, b) => a - b),
+                }
             },
         }
     </script>

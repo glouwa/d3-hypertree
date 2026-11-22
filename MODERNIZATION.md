@@ -75,11 +75,9 @@ Tests for all existing features, following the test strategy above:
       click), `onNodeHold` (mouse, touch, cancelled by moving), `onNodeHover`/`onHoverNodeChange`,
       `onNodeSelect`, `onCenterNodeChange`
 - [x] Hover cell highlight, wheel/pinch zoom at the λbounds edge
-- [ ] Interaction with scene snapshots: drag, wheel, pinch, one-finger pan, hover path, ripple
-- [ ] API: `gotoNode`, `gotoHome`, `goto`, `gotoλ`, `animateUp`,
-      `toggleSelection`, `setPathHead`, `selectQuery`
-- [ ] Data: `fromData`, `fromFile` (`.d3.json`, CSV, SKOS, TreeML fixtures),
-      `fromLangFile`, `dataInitBFS`/`langInitBFS`, generators
+- [x] Interaction with scene snapshots (filter off and default): drag, wheel, pinch, one-finger pan, hover path, hideOnDrag (`interaction.spec.mjs`)
+- [x] API (`api.spec.mjs`): `gotoNode`, `gotoHome`, `goto`, `gotoλ`, `animateUp`, `drawDetailFrame`, `toggleSelection`, `setPathHead`, `selectQuery`, `ripple`
+- [x] Data (`data.spec.mjs`): generators, `fromData`, `fromFile` (`.d3.json`, CSV, SKOS, TreeML fixtures), `fromLangFile`, `dataInitBFS`/`langInitBFS`
 - [ ] Configuration: layer options (visibility, color callbacks,
       `linkCurvature`, …), layout options (`rootWedge`, `weight`, `linklen`,
       alternative layouts), one snapshot set per filter option
@@ -155,6 +153,12 @@ Rendering (DOM, browser), in order of expected gain:
 | **Declared callbacks never called.** `onNodeHold`, `onNodeHover`, `onHoverNodeChange` and (in the plain `Hypertree`) `onNodeSelect` were declared but never invoked. | **Implemented:** hover fires when the hovered node changes (undefined on leaving); hold fires after `interaction.holdDuration` (default 500 ms) without moving and suppresses the click; `api.toggleSelection` fires `onNodeSelect(n, selected)`. Covered by tests. `onWikiCenterNodeChange` is still never called |
 | **Hovered voronoi cells aren't highlighted.** `cell-layer.ts` checks `d.data.isPartOfAnyHoverPath`, which no longer exists (now `d.data.pathes.isPartOfAnyHoverPath`, as the node layer uses), and the `.hovered.cell` CSS rule is commented out in both themes since the CSS split-up. Verified: with the cells layer on, 6 cells belong to hover-path nodes, none gets the `hovered` class. Also, hovering only refreshed the path layers, never the cells. | **Fixed:** correct property for `hovered` and `selected`, cells refresh on hover (`LayerStack.updatePath`), CSS rule re-enabled (the dark theme's old rule was invisible, now mirrors the light one); covered by a test |
 | **Hover highlights stay after the pointer leaves the tree.** Both the hover path and the hovered cells remain highlighted after moving the mouse out of the component. | Observed while fixing the cell highlight; not yet analyzed |
+| **Files loaded asynchronously weren't drawn.** Rendering only happened in the language loader's callback; the default language loader is synchronous, so data arriving later (every `fromFile` format: `.d3.json`, CSV, SKOS, TreeML) was laid out but not drawn until the first interaction, although `initPromise` had resolved. | **Fixed:** the data callback renders when the language map is already there; covered by tests for every loader (they fail on the old code) |
+| **Hover and selection classes of nodes and symbols lagged.** Path changes (hover, `toggleSelection`, `selectQuery`) only refreshed the path layers, so `.hovered`/`.selected` node styles and query colors appeared only with the next transformation. | **Fixed:** `LayerStack.updatePath` also refreshes nodes, symbols and cells; covered by tests |
+| **`goto(p, λ)` ignores the zoom.** `animateTo` never uses its `newλ` argument. | Expected-to-fail test |
+| **Animations stop slightly short of the target.** `animateTo` interpolates with `1 − sigmoid(progress)`, and `sigmoid(1) < 1`, so ~0.3% of the way remains (e.g. `gotoHome` ends at \|P\| ≈ 0.0013). | Observed; tests use a 0.005–0.01 tolerance |
+| **`weightFilter.magic` can't be configured.** `resetData()` always sets it to 20 (presets say 160); afterwards the filter adapts it to keep the visible node count within `rangeNodes`. | Documented; decide in v2 whether it's an option or internal |
+| **Documented option names that don't exist.** The readme example uses `nodeColor`/`linkColor`; the code reads `fill`/`stroke`/`strokeWidth`. More documented-only features in phase 0b. | See phase 0b, documented features |
 | **Crash when nodes have an icon but no label.** `preset-process.ts` calls `precalc.label.startsWith(...)` without checking that a label exists. | Found while writing the benchmark |
 
 ### Analysis of the deep-tree bug (for later)

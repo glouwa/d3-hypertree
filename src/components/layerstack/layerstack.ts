@@ -76,9 +76,14 @@ export class LayerStack
         if (this.layers['stem-arc'])
             this.layers['stem-arc'].update.style()
 
-        // hovered and selected voronoi cells
+        // hovered and selected classes of cells, nodes and symbols
+        // (otherwise they only changed with the next transformation update)
         if (this.layers['cells'])
             this.layers['cells'].update.style()
+        if (this.layers['nodes'])
+            this.layers['nodes'].update.style()
+        if (this.layers['symbols'])
+            this.layers['symbols'].update.style()
 
         if (this.layers['path-arcs'])
             this.layers['path-arcs'].update.data()
@@ -99,6 +104,6 @@ export class LayerStack
             names:['path-arcs', 'link-arcs-focus', 'labels'] 
         }
         //if (this.layers['link-lines']) this.layers['link-lines'].update.style()            
-        //if (this.layers.nodes) this.layers.nodes.update.style()        
+
     }
 }

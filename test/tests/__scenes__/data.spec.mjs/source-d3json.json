@@ -1,0 +1,94 @@
+{
+ "λ": 0.7076,
+ "P": {
+  "re": 0,
+  "im": 0
+ },
+ "nodes": [
+  {
+   "id": 1,
+   "x": 450,
+   "y": 450,
+   "r": 4.3,
+   "fill": null
+  },
+  {
+   "id": 4,
+   "x": 587.7,
+   "y": 516.3,
+   "r": 4,
+   "fill": null
+  },
+  {
+   "id": 5,
+   "x": 122,
+   "y": 571.8,
+   "r": 2.5,
+   "fill": null
+  },
+  {
+   "id": 6,
+   "x": 76.1,
+   "y": 364.7,
+   "r": 2,
+   "fill": null
+  },
+  {
+   "id": 7,
+   "x": 207.4,
+   "y": 197.9,
+   "r": 2.5,
+   "fill": null
+  },
+  {
+   "id": 8,
+   "x": 482.5,
+   "y": 101.6,
+   "r": 2.5,
+   "fill": null
+  },
+  {
+   "id": 10,
+   "x": 764.9,
+   "y": 175.9,
+   "r": 1.1,
+   "fill": null
+  },
+  {
+   "id": 11,
+   "x": 815.9,
+   "y": 243.1,
+   "r": 1,
+   "fill": null
+  }
+ ],
+ "layers": {
+  "background": 1,
+  "cells": 0,
+  "culling-r": 0,
+  "mouse-r": 0,
+  "focus-r": 0,
+  "labels-r-𝐖": 0,
+  "λ": 1,
+  "(0,0)": 1,
+  "center-node": 0,
+  "path-arcs": 0,
+  "link-arcs": 10,
+  "stem-arc": 0,
+  "nodes": 8,
+  "symbols": 2,
+  "images": 0,
+  "emojis": 0,
+  "labels": 0,
+  "labels2": 0,
+  "labels-force": 0,
+  "interaction": 0,
+  "interaction-2": 0,
+  "traces": 0
+ },
+ "labels": [],
+ "linkColors": {
+  "css": 10
+ },
+ "selections": []
+}

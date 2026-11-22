@@ -1,0 +1,73 @@
+{
+ "λ": 0.7676,
+ "P": {
+  "re": 0,
+  "im": 0
+ },
+ "nodes": [
+  {
+   "id": 1,
+   "x": 450,
+   "y": 450,
+   "r": 4.3,
+   "fill": null
+  },
+  {
+   "id": 4,
+   "x": 76.2,
+   "y": 475.3,
+   "r": 2.2,
+   "fill": null
+  },
+  {
+   "id": 5,
+   "x": 192,
+   "y": 151.8,
+   "r": 1.8,
+   "fill": null
+  },
+  {
+   "id": 6,
+   "x": 696.4,
+   "y": 167.8,
+   "r": 2.2,
+   "fill": null
+  },
+  {
+   "id": 7,
+   "x": 843.2,
+   "y": 478.4,
+   "r": 1.8,
+   "fill": null
+  }
+ ],
+ "layers": {
+  "background": 1,
+  "cells": 0,
+  "culling-r": 0,
+  "mouse-r": 0,
+  "focus-r": 0,
+  "labels-r-𝐖": 0,
+  "λ": 1,
+  "(0,0)": 1,
+  "center-node": 0,
+  "path-arcs": 0,
+  "link-arcs": 6,
+  "stem-arc": 0,
+  "nodes": 5,
+  "symbols": 2,
+  "images": 0,
+  "emojis": 0,
+  "labels": 0,
+  "labels2": 0,
+  "labels-force": 0,
+  "interaction": 0,
+  "interaction-2": 0,
+  "traces": 0
+ },
+ "labels": [],
+ "linkColors": {
+  "css": 6
+ },
+ "selections": []
+}

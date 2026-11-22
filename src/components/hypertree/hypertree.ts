@@ -131,10 +131,14 @@ export class Hypertree
             
             this.args.dataloader((d3h, t1, dl)=> {
                 console.group("dataloader")
-                this.initData(d3h, t0, t1, dl)                                
+                this.initData(d3h, t0, t1, dl)
                 console.groupEnd()
 
-                if (this.langMap) { this.isInitializing=false;  ok() }
+                // If the language map arrived first (the default langloader is
+                // synchronous), its callback found no data and didn't render;
+                // render now. Without this, asynchronously loaded data (CSV,
+                // SKOS, TreeML files) stayed invisible until the next interaction.
+                if (this.langMap) { this.update.data(); this.isInitializing=false;  ok() }
             })
             console.groupEnd()
         },
