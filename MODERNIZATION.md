@@ -184,6 +184,7 @@ Rendering (DOM, browser), in order of expected gain:
 | **Documented option names that don't exist.** The readme example uses `nodeColor`/`linkColor`; the code reads `fill`/`stroke`/`strokeWidth`. More documented-only features in phase 0b. | See phase 0b, documented features |
 | **Link curvature `'0'` crashes.** Mentioned in a comment in `preset-layers.ts` (not in the docs): "Cannot read properties of undefined (reading 'nodePosStr')". | Expected-to-fail test |
 | **Crash when nodes have an icon but no label.** `preset-process.ts` calls `precalc.label.startsWith(...)` without checking that a label exists. | **Fixed:** checks the label first; covered by `data.spec.mjs` and the playground test |
+| **Invisible layers appear while dragging.** `d3updatePattern.ts` and `label-force-layer.ts` only checked `hideOnDrag` during drags and animations, so a layer with `invisible: true, hideOnDrag: false` was drawn while dragging. No default layer has this combination; found in the playground. | **Fixed:** `invisible` always hides, `hideOnDrag` additionally while dragging; covered by `interaction.spec.mjs` |
 
 ### Analysis of the deep-tree bug (for later)
 

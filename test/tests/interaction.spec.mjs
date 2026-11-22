@@ -204,3 +204,24 @@ test('layers with hideOnDrag are hidden while dragging and come back afterwards'
     }
     expectNoErrors(errors)
 })
+
+// Regression: while dragging, only hideOnDrag was checked, so an invisible layer
+// with hideOnDrag false (the playground's emoji layer) appeared during a drag.
+test('invisible layers stay hidden while dragging', async ({ page }) => {
+    const errors = collectErrors(page)
+    await openTree(page, 'gen=nTree&depth=5&childs=4&labels=1&icons=1&layers={"emojis":{"invisible":true,"hideOnDrag":false},"link-arcs":{"invisible":true}}')
+    const n = name => page.evaluate(name => document.getElementById(name).querySelectorAll('*').length, name)
+    expect(await n('emojis')).toBe(0)
+    const box = await diskBox(page)
+    await page.mouse.move(box.x + box.width * 0.6, box.y + box.height * 0.45)
+    await page.mouse.down()
+    await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.5, { steps: 6 })
+    await page.waitForTimeout(150)
+    expect(await n('emojis'), 'emojis while dragging').toBe(0)
+    expect(await n('link-arcs'), 'link-arcs while dragging').toBe(0)
+    expect(await n('nodes'), 'visible layers still render').toBeGreaterThan(0)
+    await page.mouse.up()
+    await waitForStable(page)
+    expect(await n('emojis')).toBe(0)
+    expectNoErrors(errors)
+})

@@ -36,7 +36,7 @@ export class LabelForceLayer implements ILayer
     update = {
         parent:         ()=> this.attach(),    
         force:          ()=> { 
-            if (!this.view.hypertree.isAnimationRunning() && this.args.invisible)
+            if (this.args.invisible)
                 return
             
             if (this.view.hypertree.isAnimationRunning() && this.args.hideOnDrag)

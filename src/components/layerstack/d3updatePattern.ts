@@ -52,8 +52,9 @@ export class D3UpdatePattern
     private updateData() {
         this.data = []
         var isAnimating = this.args.layer.view.hypertree.isAnimationRunning()
-        if ((!isAnimating && !this.args.layer.args.invisible) ||
-             (isAnimating && !this.args.layer.args.hideOnDrag)) 
+        // invisible hides the layer always, hideOnDrag additionally while dragging or animating
+        const layerArgs = this.args.layer.args
+        if (!layerArgs.invisible && !(isAnimating && layerArgs.hideOnDrag))
         {
             this.data = this.mayEval(this.args.data)
         }
