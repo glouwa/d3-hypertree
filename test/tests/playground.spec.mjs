@@ -35,7 +35,7 @@ test('controls change URL and tree; the panel stays clickable', async ({ page })
     expect(labels.some(l => /^Node \d+$/.test(l))).toBe(false)
 
     await page.click('summary:has-text("Layers")')
-    await page.locator('table.layers tr', { hasText: /^cells/ }).locator('input').first().check()
+    await page.locator('tr[data-layer="cells"] input[type=checkbox]').first().check()
     await page.waitForFunction(() => document.querySelectorAll('#tree #cells > *').length > 0)
     expect(decodeURIComponent(await page.evaluate(() => location.search))).toContain('"cells":{"invisible":false}')
     expectNoErrors(errors)
@@ -73,4 +73,35 @@ test('callbacks are logged and a click can select a node', async ({ page }) => {
     expect(log).toContain('onNodeClick')
     expect(log).toContain('onNodeSelect')
     expect(await page.evaluate(() => window.ht.args.objects.selections.length)).toBe(1)
+})
+
+test('each layer has its own options; geometry applies to several layers', async ({ page }) => {
+    const errors = collectErrors(page)
+    await page.goto('../playground/?gen=nTree&depth=6&childs=2&labels=1')
+    await ready(page)
+    const opt = (layer, key) => page.locator(`tr[data-layer-options="${layer}"] .row`)
+        .filter({ has: page.locator('label', { hasText: new RegExp(`^${key}$`) }) })
+    await page.locator('summary').filter({ hasText: /^Layers/ }).click()
+
+    // nodes: fill (constant color)
+    await page.click('tr[data-layer="nodes"] button.expander')
+    await opt('nodes', 'fill').locator('select').selectOption('const')
+    await opt('nodes', 'fill').locator('input[type=color]').fill('#ff0000')
+    await page.waitForFunction(() => document.querySelector('#tree #nodes circle') && document.querySelector('#tree #nodes circle').style.fill === 'rgb(255, 0, 0)')
+
+    // geometry.linkCurvature 'l' turns both arc layers into lines...
+    await page.locator('summary').filter({ hasText: /^Geometry/ }).click()
+    await page.locator('.row', { has: page.locator('label', { hasText: /^linkCurvature$/ }) }).locator('select').selectOption('l')
+    await page.waitForFunction(() => document.querySelector('#tree #link-arcs > *') && document.querySelector('#tree #link-arcs > *').tagName === 'line')
+
+    // ...unless a layer overrides it
+    await page.click('tr[data-layer="link-arcs"] button.expander')
+    await opt('link-arcs', 'curvature').locator('select').selectOption('+')
+    await page.waitForFunction(() => document.querySelector('#tree #link-arcs > *') && document.querySelector('#tree #link-arcs > *').tagName === 'path')
+
+    const url = decodeURIComponent(await page.evaluate(() => location.search))
+    expect(url).toContain('geometry={"linkCurvature":"l"}')
+    expect(url).toContain('"nodes":{"fill":"#ff0000"}')
+    expect(url).toContain('"link-arcs":{"curvature":"+"}')
+    expectNoErrors(errors)
 })

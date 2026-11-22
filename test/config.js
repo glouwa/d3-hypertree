@@ -23,7 +23,10 @@
 //   filterOpt={"cullingRadius":.9}            -> model.filter
 //   layout={"rootWedge":{"angle":3.14}}       -> model.layout
 //   layoutType=spiral|buchheim|unitLines|unitVectors|berge
-//   layers={"cells":{"invisible":false}}      -> model.geometry.layerOptions
+//   layers={"cells":{"invisible":false}}      -> model.geometry.layerOptions; per-node function
+//                                 options accept "depth" (palette) or a constant, e.g.
+//                                 {"nodes":{"fill":"#e53935","r":0.02}}
+//   geometry={"linkCurvature":"+"}            -> model.geometry (options for all layers)
 //   interaction={"wheelFactor":1.5}           -> model.interaction
 //   model={"iconmap":{}}                      -> the whole model (any documented option)
 //   preset=otolModel              start from hyt.presets[preset]() instead of the defaults
@@ -44,6 +47,36 @@
             { name: 'b', children: [{ name: 'b1' }, { name: 'b2' }, { name: 'b3' }] },
             { name: 'c' },
         ],
+    }
+
+    // Many layer options are functions of the node (fill: n => color). URL values
+    // are converted: "depth" -> palette color by depth, any other string or number
+    // -> constant. Which options are functions is defined by the layers' code.
+    const palette = ['#e53935', '#43a047', '#1e88e5', '#fb8c00', '#8e24aa', '#00acc1']
+    const FUNCTION_OPTIONS = {
+        '*':         ['fill', 'stroke', 'strokeWidth', 'color'],
+        'nodes':       ['r'],
+        'center-node': ['r'],
+        'stem-arc':    ['width'],
+    }
+    const toFunction = v => typeof v === 'function' ? v
+        : v === 'depth' ? (n => palette[(n.depth || 0) % palette.length])
+        : () => v
+    function layerOptions(layers) {
+        if (!layers) return undefined
+        for (const [name, opts] of Object.entries(layers))
+            for (const key of Object.keys(opts))
+                if (FUNCTION_OPTIONS['*'].includes(key) || (FUNCTION_OPTIONS[name] || []).includes(key))
+                    opts[key] = toFunction(opts[key])
+        return layers
+    }
+    //   geometry={"linkCurvature":"+","nodeRadius":0.012,"linkWidth":0.004,
+    //             "captionFont":"8px Roboto","captionHeight":0.05}
+    function geometryOptions(g) {
+        if (!g) return undefined
+        if (typeof g.nodeRadius === 'number') { const r = g.nodeRadius; g.nodeRadius = (ud, n) => r }
+        if (typeof g.linkWidth === 'number') { const w = g.linkWidth; g.linkWidth = n => w }
+        return g
     }
 
     /**
@@ -116,7 +149,8 @@
         merge(model, { filter: json('filterOpt') })
         merge(model, { layout: json('layout') })
         merge(model, { interaction: json('interaction') })
-        merge(model, { geometry: { layerOptions: json('layers') } })
+        merge(model, { geometry: geometryOptions(json('geometry')) })
+        merge(model, { geometry: { layerOptions: layerOptions(json('layers')) } })
         if (q.get('layoutType')) {
             const types = {
                 berge: hyt.layouts.layoutBergé, spiral: hyt.layouts.layoutSpiral,

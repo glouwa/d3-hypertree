@@ -27,8 +27,13 @@
     const base = hyt.presets.modelBase()
     const DEFAULTS = {
         source: 'gen:nTree', depth: 10, childs: 2, n: 250, arms: 4, armDepth: 30,
-        lang: false, labels: true, icons: true, colors: false, preset: '', theme: 'light',
-        curvature: base.geometry.linkCurvature,
+        lang: false, labels: true, icons: true, preset: '', theme: 'light',
+        // geometry: options that apply to several layers
+        linkCurvature: base.geometry.linkCurvature,
+        captionFontPx: parseFloat(base.geometry.captionFont),
+        captionHeight: base.geometry.captionHeight,
+        nodeRadius: null,     // null: library default (a function of the node)
+        linkWidth: null,
         layoutType: 'berge',
         wedgeOrientation: deg(base.layout.rootWedge.orientation),
         wedgeAngle: deg(base.layout.rootWedge.angle),
@@ -46,7 +51,7 @@
         wheelFactor: base.interaction.wheelFactor,
         holdDuration: base.interaction.holdDuration || 500,
         mouseRadius: base.interaction.mouseRadius,
-        layers: {},           // overrides: name -> { invisible, hideOnDrag }
+        layers: {},           // overrides: name -> { invisible, hideOnDrag, <layer options> }
         click: 'goto',        // playground only: what a click on a node does
     }
     const PRESETS = Object.keys(hyt.presets).filter(p => p !== 'modelBase')
@@ -61,6 +66,37 @@
         ['file:fixtures/animals.skos.xml', 'File: animals.skos.xml (SKOS)'],
         ['file:fixtures/primates.treeml.xml', 'File: primates.treeml.xml (TreeML)'],
     ]
+
+    // Options each layer reads (from the default layer set in preset-layers.ts).
+    // color: function of the node -> default / constant / by depth
+    // number: constant (function options get a constant function)
+    // curvature: '+', '-', 'l'; default = geometry.linkCurvature
+    const LAYER_OPTIONS = {
+        'cells':       [['fill', 'color'], ['stroke', 'color'], ['strokeWidth', 'number', 0, 0.02, 0.0005]],
+        'center-node': [['fill', 'color'], ['stroke', 'color'], ['strokeWidth', 'number', 0, 0.02, 0.0005], ['r', 'number', 0.01, 0.3, 0.005]],
+        'path-arcs':   [['curvature', 'curvature'], ['stroke', 'color'], ['strokeWidth', 'number', 0.001, 0.05, 0.0005]],
+        'link-arcs':   [['curvature', 'curvature'], ['stroke', 'color'], ['strokeWidth', 'number', 0.001, 0.05, 0.0005]],
+        'stem-arc':    [['curvature', 'curvature'], ['width', 'number', 0.001, 0.05, 0.0005]],
+        'nodes':       [['fill', 'color'], ['stroke', 'color'], ['strokeWidth', 'number', 0, 0.02, 0.0005], ['r', 'number', 0.002, 0.06, 0.001]],
+        'images':      [['width', 'number', 0.01, 0.3, 0.005], ['height', 'number', 0.01, 0.3, 0.005]],
+        'emojis':      [['color', 'color'], ['background', 'bool']],
+        'labels':      [['color', 'color'], ['background', 'bool']],
+        'labels2':     [['color', 'color']],
+        'labels-force':[['background', 'bool']],
+    }
+    const LAYER_NOTES = {
+        'culling-r': 'circle at filter.cullingRadius',
+        'mouse-r': 'circle at interaction.mouseRadius',
+        'focus-r': 'circle at the filter\'s focus radius',
+        'labels-r-𝐖': 'circle at filter.wikiRadius',
+        'λ': 'circle at the zoom λ (pinch center while pinching)',
+        '(0,0)': 'the origin',
+        'symbols': 'root and start node symbols',
+        'images': 'needs n.precalc.imageHref (not set by the playground data)',
+        'traces': 'touch traces while touching',
+        'interaction': 'old interaction layer (click selects)',
+        'interaction-2': 'active interaction layer: mouse, touch, wheel',
+    }
 
     // layer set and per-layer defaults from a hidden probe instance
     let LAYER_DEFAULTS = {}
@@ -98,7 +134,6 @@
         // generated trees have no names: number them; data with names shows its names
         if (c.labels && !c.lang) p.set('labels', kind === 'gen' && value !== 'data' ? '1' : 'name')
         if (c.icons) p.set('icons', '1')
-        if (c.colors) p.set('colors', '1')
         if (c.preset) p.set('preset', c.preset)
         if (c.theme !== 'light') p.set('theme', c.theme)
         if (c.layoutType !== 'berge') p.set('layoutType', c.layoutType)
@@ -126,9 +161,15 @@
         if (c.mouseRadius !== DEFAULTS.mouseRadius) i.mouseRadius = c.mouseRadius
         if (Object.keys(i).length) p.set('interaction', JSON.stringify(i))
 
-        const layers = JSON.parse(JSON.stringify(c.layers))
-        if (c.curvature !== DEFAULTS.curvature) layers['link-arcs'] = Object.assign(layers['link-arcs'] || {}, { curvature: c.curvature })
-        if (Object.keys(layers).length) p.set('layers', JSON.stringify(layers))
+        const g = {}
+        if (c.linkCurvature !== DEFAULTS.linkCurvature) g.linkCurvature = c.linkCurvature
+        if (c.captionFontPx !== DEFAULTS.captionFontPx) g.captionFont = `${c.captionFontPx}px Roboto`
+        if (c.captionHeight !== DEFAULTS.captionHeight) g.captionHeight = c.captionHeight
+        if (c.nodeRadius !== null) g.nodeRadius = c.nodeRadius
+        if (c.linkWidth !== null) g.linkWidth = c.linkWidth
+        if (Object.keys(g).length) p.set('geometry', JSON.stringify(g))
+
+        if (Object.keys(c.layers).length) p.set('layers', JSON.stringify(c.layers))
 
         if (!forHarness && c.click !== DEFAULTS.click) p.set('click', c.click)
         return p
@@ -144,7 +185,6 @@
         c.lang = p.has('lang')
         c.labels = p.get('labels') === '1' || p.get('labels') === 'name'
         c.icons = p.get('icons') === '1'
-        c.colors = p.get('colors') === '1'
         c.preset = p.get('preset') || ''
         c.theme = p.get('theme') || 'light'
         c.layoutType = p.get('layoutType') || 'berge'
@@ -166,10 +206,21 @@
             if (i.λbounds) { c.λmin = i.λbounds[0]; c.λmax = i.λbounds[1] }
             for (const k of ['wheelFactor', 'holdDuration', 'mouseRadius']) if (i[k] !== undefined) c[k] = i[k]
         }
+        if (p.get('geometry')) {
+            const g = JSON.parse(p.get('geometry'))
+            if (g.linkCurvature) c.linkCurvature = g.linkCurvature
+            if (g.captionFont) c.captionFontPx = parseFloat(g.captionFont)
+            if (g.captionHeight !== undefined) c.captionHeight = g.captionHeight
+            if (typeof g.nodeRadius === 'number') c.nodeRadius = g.nodeRadius
+            if (typeof g.linkWidth === 'number') c.linkWidth = g.linkWidth
+        }
         if (p.get('layers')) {
             const l = JSON.parse(p.get('layers'))
-            if (l['link-arcs'] && l['link-arcs'].curvature) { c.curvature = l['link-arcs'].curvature; delete l['link-arcs'].curvature }
             for (const [name, o] of Object.entries(l)) if (Object.keys(o).length) c.layers[name] = o
+        }
+        if (p.get('colors') === '1') { // older links: color callbacks by depth
+            c.layers.nodes = Object.assign({}, c.layers.nodes, { fill: 'depth' })
+            c.layers['link-arcs'] = Object.assign({}, c.layers['link-arcs'], { stroke: 'depth' })
         }
         c.click = p.get('click') || DEFAULTS.click
         // a URL without any parameter shows the defaults with labels and icons
@@ -286,6 +337,69 @@
     }
     function hint(group, text) { group.append(el('p', { class: 'hint' }, text)) }
 
+    // a number that is either the library default (null) or a custom constant
+    function optionalNumber(group, label, key, min, max, step, start) {
+        const on = el('input', { type: 'checkbox', title: 'custom value' })
+        const out = el('output')
+        const r = el('input', { type: 'range', min, max, step })
+        on.addEventListener('change', () => set(key, on.checked ? (+r.value || start) : null))
+        r.addEventListener('input', () => { out.textContent = r.value; if (on.checked) set(key, +r.value) })
+        const wrap = el('div', { class: 'check' }, on, r)
+        controls.push({ refresh: () => {
+            const v = get(key)
+            on.checked = v !== null; r.disabled = v === null
+            r.value = v === null ? start : v; out.textContent = v === null ? 'default' : v
+        } })
+        return row(group, label, wrap, out)
+    }
+
+    // one option of one layer, stored in cfg.layers[name][key]
+    function layerOptionControl(name, key, type, min, max, step, setLayer) {
+        const cur = () => (cfg.layers[name] || {})[key]
+        const label = el('label', {}, key)
+        let input
+        if (type === 'color') {
+            const mode = el('select', {}, el('option', { value: '' }, 'default'), el('option', { value: 'const' }, 'color'), el('option', { value: 'depth' }, 'by depth'))
+            const color = el('input', { type: 'color', value: '#1e88e5' })
+            const apply = () => setLayer(key, mode.value === '' ? undefined : mode.value === 'depth' ? 'depth' : color.value)
+            mode.addEventListener('change', apply)
+            color.addEventListener('input', () => { if (mode.value === 'const') apply() })
+            controls.push({ refresh: () => {
+                const v = cur()
+                mode.value = v === undefined ? '' : v === 'depth' ? 'depth' : 'const'
+                if (v && v !== 'depth') color.value = v
+                color.style.visibility = mode.value === 'const' ? '' : 'hidden'
+            } })
+            input = el('div', { class: 'check' }, mode, color)
+        } else if (type === 'number') {
+            const on = el('input', { type: 'checkbox', title: 'custom value' })
+            const out = el('output')
+            const r = el('input', { type: 'range', min, max, step })
+            const start = +(min + (max - min) * 0.25).toFixed(4)   // a sensible first custom value
+            r.value = start
+            on.addEventListener('change', () => setLayer(key, on.checked ? +r.value : undefined))
+            r.addEventListener('input', () => { out.textContent = r.value; if (on.checked) setLayer(key, +r.value) })
+            controls.push({ refresh: () => {
+                const v = cur()
+                on.checked = v !== undefined; r.disabled = v === undefined
+                if (v !== undefined) r.value = v
+                out.textContent = v === undefined ? 'default' : v
+            } })
+            input = el('div', { class: 'check' }, on, r, out)
+        } else if (type === 'curvature') {
+            const sel = el('select', { onchange: e => setLayer(key, e.target.value || undefined) },
+                el('option', { value: '' }, 'default (geometry)'), el('option', { value: '-' }, '−'), el('option', { value: '+' }, '+'), el('option', { value: 'l' }, 'l (lines)'))
+            controls.push({ refresh: () => { sel.value = cur() || '' } })
+            input = sel
+        } else if (type === 'bool') {
+            const sel = el('select', { onchange: e => setLayer(key, e.target.value === '' ? undefined : e.target.value === 'on') },
+                el('option', { value: '' }, 'default'), el('option', { value: 'on' }, 'on'), el('option', { value: 'off' }, 'off'))
+            controls.push({ refresh: () => { const v = cur(); sel.value = v === undefined ? '' : v ? 'on' : 'off' } })
+            input = sel
+        }
+        return el('div', { class: 'row two' }, label, input)
+    }
+
     function buildControls() {
         const isGen = g => () => cfg.source === 'gen:' + g
 
@@ -300,10 +414,20 @@
         select(g, 'Preset', 'preset', [['', 'none (library defaults)'], ...PRESETS.map(p => [p, p])])
         hint(g, 'Deep trees (e.g. deep star with arm depth > 40) show the known deep-tree bug when navigating far down.')
 
-        g = section('Node content', ['labels', 'icons', 'colors'])
+        g = section('Node content', ['labels', 'icons'])
         check(g, 'Labels (langInitBFS): node names, or numbers for generated trees', 'labels', () => !cfg.lang)
         check(g, 'Icons / emojis (dataInitBFS)', 'icons', null, 'Emojis are the most expensive layer to render. Icons without labels crash (known bug).')
-        check(g, 'Color callbacks (nodes fill, link-arcs stroke by depth)', 'colors')
+
+        g = section('Geometry', ['linkCurvature', 'captionFontPx', 'captionHeight', 'nodeRadius', 'linkWidth', 'theme'])
+        hint(g, 'Options that apply to several layers (model.geometry). Options of a single layer are in the layer list below (▸).')
+        select(g, 'linkCurvature', 'linkCurvature', [['-', '− (default)'], ['+', '+'], ['l', 'l (straight lines)']])
+        hint(g, 'Default curvature of link-arcs and path-arcs; a layer can override it.')
+        range(g, 'caption font', 'captionFontPx', 3, 16, 0.5, null, v => `${v}px`)
+        range(g, 'captionHeight', 'captionHeight', 0.01, 0.12, 0.005)
+        optionalNumber(g, 'nodeRadius', 'nodeRadius', 0.002, 0.05, 0.001, 0.01)
+        optionalNumber(g, 'linkWidth', 'linkWidth', 0.0005, 0.03, 0.0005, 0.005)
+        hint(g, 'nodeRadius, nodeScale, linkWidth and nodeFilter are functions of the node by default; here you can replace nodeRadius and linkWidth by a constant.')
+        select(g, 'Theme (CSS)', 'theme', [['light', 'light'], ['dark', 'dark']])
 
         g = section('Layers', () => Object.keys(cfg.layers).length)
         const table = el('table', { class: 'layers' },
@@ -315,24 +439,36 @@
             const eff = () => Object.assign({}, d, cfg.layers[name] || {})
             const setLayer = (k, v) => {
                 const o = Object.assign({}, cfg.layers[name] || {}, { [k]: v })
-                for (const kk of Object.keys(o)) if (o[kk] === d[kk]) delete o[kk]
+                for (const kk of Object.keys(o)) if (o[kk] === undefined || ((kk === 'invisible' || kk === 'hideOnDrag') && o[kk] === d[kk])) delete o[kk]
                 if (Object.keys(o).length) cfg.layers[name] = o; else delete cfg.layers[name]
                 scheduleRebuild()
             }
             const vis = el('input', { type: 'checkbox', onchange: e => setLayer('invisible', !e.target.checked) })
             const hod = el('input', { type: 'checkbox', onchange: e => setLayer('hideOnDrag', e.target.checked) })
-            const tr = el('tr', {}, el('td', {}, name), el('td', { class: 'c' }, vis), el('td', { class: 'c' }, hod))
+            const opts = LAYER_OPTIONS[name] || []
+            const toggle = el('button', { class: 'link expander', title: 'layer options' }, opts.length ? '▸' : '')
+            const nameCell = el('td', {}, toggle, ' ', name)
+            const tr = el('tr', { 'data-layer': name }, nameCell, el('td', { class: 'c' }, vis), el('td', { class: 'c' }, hod))
             tbody.append(tr)
+
+            const optRow = el('tr', { class: 'layer-options', 'data-layer-options': name, hidden: true })
+            const optCell = el('td', { colspan: 3 })
+            optRow.append(optCell)
+            if (LAYER_NOTES[name]) optCell.append(el('p', { class: 'hint' }, LAYER_NOTES[name]))
+            for (const [key, type, min, max, step] of opts)
+                optCell.append(layerOptionControl(name, key, type, min, max, step, setLayer))
+            if (opts.length || LAYER_NOTES[name]) {
+                tbody.append(optRow)
+                const open = () => { optRow.hidden = !optRow.hidden; toggle.textContent = optRow.hidden ? '▸' : '▾' }
+                toggle.textContent = '▸'
+                toggle.addEventListener('click', open)
+            }
             controls.push({ refresh: () => {
                 vis.checked = !eff().invisible; hod.checked = eff().hideOnDrag
                 tr.classList.toggle('changed', !!cfg.layers[name])
             } })
         }
-        hint(g, '"hide on drag" hides a layer while dragging, pinching or animating.')
-
-        g = section('Appearance', ['curvature', 'theme'])
-        select(g, 'Link curvature', 'curvature', [['-', '− (default)'], ['+', '+'], ['l', 'l (straight lines)']])
-        select(g, 'Theme', 'theme', [['light', 'light'], ['dark', 'dark']])
+        hint(g, '▸ shows the options of a layer. "hide on drag" hides a layer while dragging, pinching or animating.')
 
         g = section('Layout', ['layoutType', 'wedgeOrientation', 'wedgeAngle'])
         select(g, 'Type', 'layoutType', [['berge', 'Bergé (default, supports culling)'], ['spiral', 'spiral'], ['buchheim', 'Buchheim'], ['unitLines', 'unit lines'], ['unitVectors', 'unit vectors']])
