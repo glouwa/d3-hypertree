@@ -185,6 +185,7 @@ Rendering (DOM, browser), in order of expected gain:
 | **Link curvature `'0'` crashes.** Mentioned in a comment in `preset-layers.ts` (not in the docs): "Cannot read properties of undefined (reading 'nodePosStr')". | Expected-to-fail test |
 | **Crash when nodes have an icon but no label.** `preset-process.ts` calls `precalc.label.startsWith(...)` without checking that a label exists. | **Fixed:** checks the label first; covered by `data.spec.mjs` and the playground test |
 | **Invisible layers appear while dragging.** `d3updatePattern.ts` and `label-force-layer.ts` only checked `hideOnDrag` during drags and animations, so a layer with `invisible: true, hideOnDrag: false` was drawn while dragging. No default layer has this combination; found in the playground. | **Fixed:** `invisible` always hides, `hideOnDrag` additionally while dragging; covered by `interaction.spec.mjs` |
+| **Hover and selection highlight of the cells could not be turned off.** The cell layer always showed the interaction state. | **Added:** layer options `hover` and `selection` (default true) on `cells`; events, callbacks and the hover path are unaffected. Same pattern possible for `nodes`, arcs and symbols |
 
 ### Analysis of the deep-tree bug (for later)
 

@@ -250,3 +250,17 @@ test('by default 10 % of the nodes get an icon', async ({ page }) => {
     expect(r.c).toBe(Math.floor(r.n * 0.1))
     expect(decodeURIComponent(await page.evaluate(() => location.search))).toContain('iconPercent=10')
 })
+
+test('cells: hover and selection highlighting are layer options', async ({ page }) => {
+    await page.goto('../playground/?gen=nTree&depth=6&childs=2&labels=1')
+    await ready(page)
+    await page.locator('summary').filter({ hasText: /^Layers/ }).click()
+    await page.click('tr[data-layer="cells"] button.expander')
+    const opt = key => page.locator('tr[data-layer-options="cells"] .row')
+        .filter({ has: page.locator('label', { hasText: new RegExp(`^${key}$`) }) }).locator('select')
+    await opt('hover').selectOption('off')
+    await opt('selection').selectOption('off')
+    await page.waitForFunction(() => window.ht.unitdisk.layerStack.layers.cells.args.hover === false
+        && window.ht.unitdisk.layerStack.layers.cells.args.selection === false)
+    expect(decodeURIComponent(await page.evaluate(() => location.search))).toContain('"hover":false,"selection":false')
+})

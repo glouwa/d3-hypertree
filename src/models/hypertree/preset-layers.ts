@@ -51,6 +51,8 @@ export const layerSrc = [
         hideOnDrag: true,
         clip:       '#circle-clip' + ud.args.clipRadius,
         data:       ()=> ud.cache.cells,                            
+        hover:       true,       // highlight the cell under the mouse
+        selection:   true,       // highlight the cells of selected nodes
         fill:        n=> undefined,
         stroke:      n=> undefined,
         strokeWidth: n=> undefined,

@@ -7,6 +7,10 @@ export interface CellLayerArgs extends ILayerArgs
 {    
     clip?:       string,
     data:        ()=> any,
+    // whether the layer shows the interaction state (the events and callbacks
+    // don't depend on it): the cell under the mouse, the cells of selected nodes
+    hover?:      boolean,     // default true
+    selection?:  boolean,     // default true
 } 
 
 export class CellLayer implements ILayer
@@ -53,8 +57,10 @@ export class CellLayer implements ILayer
                                     const objects = this.view.hypertree.args.objects
                                     const hoverPath = objects.pathes.find(p=> p.type === 'HoverPath')
                                     const hovered = hoverPath ? hoverPath.head : undefined
-                                    return s.classed("hovered",  d=> d.data === hovered)
-                                            .classed("selected", d=> objects.selections.indexOf(d.data) !== -1)
+                                    const showHover = this.args.hover !== false
+                                    const showSelection = this.args.selection !== false
+                                    return s.classed("hovered",  d=> showHover && d.data === hovered)
+                                            .classed("selected", d=> showSelection && objects.selections.indexOf(d.data) !== -1)
                                             .style("fill",      d=> (d.pathes && d.pathes.labelcolor) || this.args.fill(d))
                                },
             updateTransform:   s=> s//.classed("lazy",      d=> d.data.hasOutChildren)                                 

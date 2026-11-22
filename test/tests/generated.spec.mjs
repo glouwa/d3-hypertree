@@ -150,3 +150,116 @@ test.describe('interaction', () => {
         })
     })
 })
+
+
+test.describe('deep trees', () => {
+    // Known bug: node positions are global Poincaré-disk coordinates composed from
+    // parent to child, so deep nodes end up extremely close to the boundary.
+    // Navigating down a long arm then makes the view collapse (no NaN, but the
+    // values are no longer usable for the transformation). Remove .fail once fixed.
+    test.fail('navigating down a deep arm keeps the neighbourhood visible', async ({ page }) => {
+        await openTree(page, 'gen=deepStar&arms=8&depth=80')
+        let visible = 0
+        for (let step = 0; step < 4; step++) {
+            visible = await page.evaluate(async () => {
+                const rendered = [...document.querySelectorAll('#nodes circle')].map(c => c.__data__).filter(Boolean)
+                const deepest = rendered.reduce((a, b) => (b.depth > a.depth ? b : a))
+                await harness.ht.api.gotoNode(deepest)
+                return document.querySelectorAll('#nodes circle').length
+            })
+            await waitForStable(page)
+        }
+        visible = await page.evaluate(() => document.querySelectorAll('#nodes circle').length)
+        // a focused node on a path should show several neighbours around it
+        expect(visible).toBeGreaterThanOrEqual(5)
+    })
+})
+
+test.describe('hover', () => {
+    // Only the cell under the mouse is highlighted: moving on clears the previous
+    // cell, leaving the tree clears all.
+    test('hover highlights exactly the voronoi cell under the mouse', async ({ page }) => {
+        const errors = collectErrors(page)
+        await page.setViewportSize({ width: 1100, height: 900 }) // room to leave the tree
+        await openTree(page, 'gen=nTree&depth=10&childs=2')
+        await page.evaluate(() => {
+            harness.ht.unitdisk.layerStack.layers.cells.args.invisible = false
+            harness.ht.update.data()
+        })
+        const targets = await page.evaluate(() => [...document.querySelectorAll('#nodes circle')]
+            .filter(c => c.__data__ && c.__data__.depth >= 2)
+            .sort((a, b) => b.getBoundingClientRect().width - a.getBoundingClientRect().width)
+            .slice(0, 3)
+            .map(c => { const r = c.getBoundingClientRect(); return { id: c.__data__.mergeId, x: r.x + r.width / 2, y: r.y + r.height / 2 } }))
+        const hoveredCells = () => page.evaluate(() => [...document.querySelectorAll('#cells .hovered')].map(c => c.__data__.data.mergeId))
+
+        for (const t of targets) {
+            await page.mouse.move(t.x, t.y)
+            await page.waitForTimeout(250)
+            expect(await hoveredCells(), `only the cell of node ${t.id}`).toEqual([t.id])
+        }
+        const fill = await page.evaluate(() => getComputedStyle(document.querySelector('#cells .hovered')).fill)
+        expect(fill).not.toBe('none') // the CSS rule applies
+
+        await page.mouse.move(1050, 450) // outside the tree
+        await page.waitForTimeout(250)
+        expect(await hoveredCells()).toEqual([])
+        expectNoErrors(errors)
+    })
+
+    test('selected nodes highlight their own cell only', async ({ page }) => {
+        await openTree(page, 'gen=nTree&depth=6&childs=2&filter=off')
+        const ids = await page.evaluate(() => {
+            harness.ht.unitdisk.layerStack.layers.cells.args.invisible = false
+            harness.ht.update.data()
+            const n = harness.ht.data.children[0].children[1].leaves()[0]
+            harness.ht.api.toggleSelection(n)
+            return [n.mergeId]
+        })
+        await page.waitForTimeout(250)
+        expect(await page.evaluate(() => [...document.querySelectorAll('#cells .selected')].map(c => c.__data__.data.mergeId))).toEqual(ids)
+    })
+
+    // Layer options hover / selection: the layer doesn't show the state, but the
+    // events, callbacks and the hover path work as before.
+    test('cells option hover: false shows no hover highlight, callbacks still fire', async ({ page }) => {
+        const errors = collectErrors(page)
+        await openTree(page, 'gen=nTree&depth=10&childs=2&layers=' + encodeURIComponent('{"cells":{"invisible":false,"hover":false}}'))
+        const t = await page.evaluate(() => {
+            const c = [...document.querySelectorAll('#nodes circle')].filter(c => c.__data__ && c.__data__.depth >= 2)
+                .sort((a, b) => b.getBoundingClientRect().width - a.getBoundingClientRect().width)[0]
+            const r = c.getBoundingClientRect(); return { id: c.__data__.mergeId, x: r.x + r.width / 2, y: r.y + r.height / 2 }
+        })
+        await page.mouse.move(t.x, t.y)
+        await page.waitForTimeout(250)
+        expect(await page.locator('#cells .hovered').count()).toBe(0)
+        expect(await page.evaluate(() => harness.events.filter(e => e.type === 'hover').map(e => e.id))).toContain(t.id)
+        expect(await page.evaluate(() => harness.ht.args.objects.pathes.some(p => p.type === 'HoverPath'))).toBe(true)
+        expectNoErrors(errors)
+    })
+
+    test('cells option selection: false shows no selection highlight', async ({ page }) => {
+        await openTree(page, 'gen=nTree&depth=6&childs=2&filter=off&layers=' + encodeURIComponent('{"cells":{"invisible":false,"selection":false}}'))
+        await page.evaluate(() => harness.ht.api.toggleSelection(harness.ht.data.children[0].children[1].leaves()[0]))
+        await page.waitForTimeout(250)
+        expect(await page.evaluate(() => harness.ht.args.objects.selections.length)).toBe(1)
+        expect(await page.locator('#cells .selected').count()).toBe(0)
+    })
+})
+
+test.describe('layers', () => {
+    test('layers can be shown and hidden individually', async ({ page }) => {
+        const errors = collectErrors(page)
+        await openTree(page, 'gen=nTree&depth=10&childs=2')
+
+        await page.evaluate(() => harness.showOnly(['nodes']))
+        let c = await counts(page)
+        expect(c.nodes).toBeGreaterThan(20)
+        expect(c.links).toBe(0)
+
+        await page.evaluate(() => harness.showOnly('all'))
+        c = await counts(page)
+        expect(c.links).toBeGreaterThan(20)
+        expectNoErrors(errors)
+    })
+})

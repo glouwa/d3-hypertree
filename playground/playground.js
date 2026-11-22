@@ -74,7 +74,7 @@
     // number: constant (function options get a constant function)
     // curvature: '+', '-', 'l'; default = geometry.linkCurvature
     const LAYER_OPTIONS = {
-        'cells':       [['fill', 'color'], ['stroke', 'color'], ['strokeWidth', 'number', 0, 0.02, 0.0005]],
+        'cells':       [['hover', 'bool'], ['selection', 'bool'], ['fill', 'color'], ['stroke', 'color'], ['strokeWidth', 'number', 0, 0.02, 0.0005]],
         'center-node': [['fill', 'color'], ['stroke', 'color'], ['strokeWidth', 'number', 0, 0.02, 0.0005], ['r', 'number', 0.01, 0.3, 0.005]],
         'path-arcs':   [['curvature', 'curvature'], ['stroke', 'color'], ['strokeWidth', 'number', 0.001, 0.05, 0.0005]],
         'link-arcs':   [['curvature', 'curvature'], ['stroke', 'color'], ['strokeWidth', 'number', 0.001, 0.05, 0.0005]],
@@ -89,7 +89,7 @@
     // what a layer shows, when its name doesn't say it
     const LAYER_ALIASES = { 'cells': 'voronoi', 'λ': 'zoom', '(0,0)': 'origin' }
     const LAYER_NOTES = {
-        'cells': 'Voronoi cells of the visible nodes: hovered and selected cells are highlighted. The cells are always computed (hover and click find the node under the pointer with them); this layer only draws them.',
+        'cells': 'Voronoi cells of the visible nodes: hover and selection highlight a cell (options hover, selection; the events and callbacks fire either way). The cells are always computed (hover and click find the node under the pointer with them); this layer only draws them.',
         'culling-r': 'circle at filter.cullingRadius',
         'mouse-r': 'circle at interaction.mouseRadius',
         'focus-r': 'circle at the filter\'s focus radius',
