@@ -209,9 +209,29 @@ function pathToLastVisible(ud:IUnitDisk, cache:TransformationCache) {
     return path.reverse()
 }
 
+/**
+ * Lays out n (its position and its children's wedges) unless the stored layout is
+ * still valid: computed by the same layout function, with the same λ, and from the
+ * parent's current position (setZ creates a new position object on every layout,
+ * so a relaid parent invalidates its children). Panning doesn't change λ, so while
+ * dragging the layout isn't recomputed (phase 3).
+ */
+export function layoutNode(ht, n:N, λ:number) {
+    const type = ht.args.layout.type
+    const L = <any>n.layout
+    const basis = n.parent && n.parent.layout ? n.parent.layout.z : null
+    if (L && L.z && L.λ === λ && L.basis === basis && L.type === type)
+        return
+    type(n, λ, true)
+    const L2 = <any>n.layout
+    L2.λ = λ
+    L2.basis = n.parent && n.parent.layout ? n.parent.layout.z : null
+    L2.type = type
+}
+
 function peocessNodeTransformation(ud:IUnitDisk, cache:TransformationCache, n:N) {
-    n.cache = n.cache || { re:0, im:0 }    
-    ud.view.hypertree.args.layout.type(n, ud.args.transformation.state.λ, true)
+    n.cache = n.cache || { re:0, im:0 }
+    layoutNode(ud.view.hypertree, n, ud.args.transformation.state.λ)
     CassignC(n.cache, ud.args.transform(n)) 
     n.cachep = CktoCp(n.cache)   
 }

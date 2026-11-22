@@ -31,6 +31,7 @@ export interface IUnitDisk
     HypertreeMetaType
     navParameter?:      UnitDisk,
     isDraging?:         boolean
+    isWheeling?:        boolean          // during a wheel burst (low detail, like dragging)
 
     api: {
         setTransform: (t:string, tn:string)=> void
@@ -57,6 +58,7 @@ export class UnitDisk implements IUnitDisk
     public layerStack    : LayerStack    
     public pinchcenter   : C
     public isDraging     : boolean
+    public isWheeling    : boolean          // during a wheel burst (low detail, like dragging)
     public HypertreeMetaType = HypertreeMeta
     public cacheMeta
 

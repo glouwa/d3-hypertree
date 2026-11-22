@@ -99,10 +99,7 @@ export class D3UpdatePattern
                     var lines = view.childElementCount || 1          // multi-line labels: one tspan per line
                     var h = geometry.captionHeight * lines
                     
-                    if (!w)
-                        console.warn("labellen == 0", d)                    
-
-                    else
+                    if (w)   // nodes without a measured label get no background
                         svgRootHere.insert('rect', d=> this)
                             .attr("x",         x=> -paddingLeftRight/2)
                             .attr("y",         x=> -paddingTopBottom-geometry.captionHeight/2)   // top of the first line

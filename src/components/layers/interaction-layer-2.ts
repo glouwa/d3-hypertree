@@ -24,6 +24,9 @@ export class InteractionLayer2 implements ILayer
     view:       ILayerView
     args:       InteractionLayer2Args    
     name =      'interaction-2'
+    // ms after the last wheel event until the full detail frame
+    static wheelSettle = 150
+    private wheelSettleTimer : any = undefined
 
     mousedown:  boolean
     dST
@@ -162,7 +165,18 @@ export class InteractionLayer2 implements ILayer
         if (newλp !== oldλp)
         {
             const m = this.currMousePosAsArr()
-            
+
+            // A wheel burst is an interaction like dragging: low detail (no voronoi,
+            // no labels, hideOnDrag layers hidden) until no wheel event came for
+            // wheelSettle ms, then one full detail frame.
+            const ud = this.view.unitdisk
+            ud.isWheeling = true
+            clearTimeout(this.wheelSettleTimer)
+            this.wheelSettleTimer = setTimeout(()=> {
+                ud.isWheeling = false
+                this.view.hypertree.update.transformation()
+            }, InteractionLayer2.wheelSettle)
+
             requestAnimationFrame(()=> {
                 const t = this.view.unitdisk.args.transformation            
                 const preservingNode = this.findUnculledNodeByCell(ArrtoC(m))
@@ -261,10 +275,8 @@ export class InteractionLayer2 implements ILayer
     private onPointerMove(pid, m)
     {
         const trace = this.findTrace(pid)
-        if (!trace) {
-            console.warn('onPointerMove ')
+        if (!trace)   // a pointer that didn't start on the component
             return false
-        }
         trace.points.push(m)
 
         // moving beyond the click threshold cancels a pending hold
@@ -411,16 +423,17 @@ export class InteractionLayer2 implements ILayer
         return find ? find.data : undefined
     }
 
-    private findUnculledNodeByCell = (m:C)=> {   
-        const voronoiLayout = d3.voronoi<N>()
-            .x(d=> { console.assert(typeof d.cache.re === 'number'); return d.cache.re; })
-            .y(d=> { console.assert(typeof d.cache.re === 'number'); return d.cache.im; })
-            //.x(d=> d.cache.re)
-            //.y(d=> d.cache.im)
-            .extent([[-2,-2], [2,2]])             
-        const voronoiDiagram = voronoiLayout(this.view.unitdisk.cache.unculledNodes)
-        const find = voronoiDiagram.find(m.re, m.im)
-        return find ? find.data : undefined
+    // The visible node nearest to m: what the voronoi cell under m would give (a
+    // voronoi cell is the area nearest to its node), without building a diagram.
+    // Used for the node that stays under the pointer while zooming (wheel, pinch).
+    private findUnculledNodeByCell = (m:C)=> {
+        let best:N = undefined, bestD = Infinity
+        for (const n of this.view.unitdisk.cache.unculledNodes) {
+            const dx = n.cache.re - m.re, dy = n.cache.im - m.im
+            const d = dx*dx + dy*dy
+            if (d < bestD) { bestD = d; best = n }
+        }
+        return best
     }
 
     private dist(a:C, b:C) {

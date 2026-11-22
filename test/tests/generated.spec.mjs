@@ -307,3 +307,55 @@ test.describe('console', () => {
         expect(messages).toEqual([])
     })
 })
+
+// Phase 3: a wheel burst is handled like dragging (low detail: no voronoi, no labels)
+// and gets one full detail frame when it settles; the node under the pointer stays
+// under the pointer while zooming.
+test.describe('wheel burst', () => {
+    test('no voronoi during the burst, a full frame when it settles', async ({ page }) => {
+        const errors = collectErrors(page)
+        await openTree(page, 'gen=nTree&depth=10&childs=2')
+        await page.evaluate(() => harness.ht.api.gotoλ(0.3))
+        await waitForStable(page)
+        const box = await diskBox(page)
+        await page.mouse.move(box.x + box.width * 0.6, box.y + box.height * 0.45)
+        await page.evaluate(() => { window.__voronoi = harness.ht.unitdisk.cache.voronoiDiagram })
+        for (let i = 0; i < 4; i++) { await page.mouse.wheel(0, 100); await page.waitForTimeout(40) }
+        const during = await page.evaluate(() => ({
+            wheeling: harness.ht.unitdisk.isWheeling, sameVoronoi: harness.ht.unitdisk.cache.voronoiDiagram === window.__voronoi }))
+        expect(during).toEqual({ wheeling: true, sameVoronoi: true })
+        await page.waitForTimeout(400)
+        const after = await page.evaluate(() => ({
+            wheeling: !!harness.ht.unitdisk.isWheeling, sameVoronoi: harness.ht.unitdisk.cache.voronoiDiagram === window.__voronoi }))
+        expect(after).toEqual({ wheeling: false, sameVoronoi: false })
+        // hover works right after the burst
+        await page.mouse.move(box.x + box.width * 0.6 + 2, box.y + box.height * 0.45 + 2)
+        await page.waitForTimeout(200)
+        expect(await page.evaluate(() => harness.ht.args.objects.pathes.some(p => p.type === 'HoverPath'))).toBe(true)
+        expectNoErrors(errors)
+    })
+
+    test('the node under the pointer stays under the pointer', async ({ page }) => {
+        await openTree(page, 'gen=nTree&depth=8&childs=2&filter=off')
+        await page.evaluate(() => harness.ht.api.gotoλ(0.3))
+        await waitForStable(page)
+        const box = await diskBox(page)
+        const m = { x: box.x + box.width * 0.62, y: box.y + box.height * 0.4 }
+        await page.mouse.move(m.x, m.y)
+        // the visible node nearest to the pointer, in disk coordinates
+        const nearest = () => page.evaluate(({ x, y, bx, by, bw }) => {
+            const p = { re: (x - bx) / bw * 2 - 1, im: (y - by) / bw * 2 - 1 }
+            let best, bd = Infinity
+            for (const n of harness.ht.unitdisk.cache.unculledNodes) {
+                const d = (n.cache.re - p.re) ** 2 + (n.cache.im - p.im) ** 2
+                if (d < bd) { bd = d; best = n }
+            }
+            return { id: best.mergeId, re: best.cache.re, im: best.cache.im }
+        }, { x: m.x, y: m.y, bx: box.x, by: box.y, bw: box.width })
+        const before = await nearest()
+        await page.mouse.wheel(0, -100)
+        await page.waitForTimeout(400)
+        const after = await page.evaluate(id => { const n = harness.ht.data.descendants().find(n => n.mergeId === id); return { re: n.cache.re, im: n.cache.im } }, before.id)
+        expect(Math.hypot(after.re - before.re, after.im - before.im)).toBeLessThan(1e-6)
+    })
+})

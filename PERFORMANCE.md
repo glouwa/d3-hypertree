@@ -191,6 +191,37 @@ Absolute layer times were about 4× higher than the phase 0 baseline above for
 not the code. So compare only runs from the same session; the baseline JSON
 files are kept as they were.
 
+## Phase 3: update pipeline (2026-11-22)
+
+Before (end of phase 2) and after, each from its own snapshot of `dist/` and
+`test/` measured back to back (the development watcher rebuilds `dist/` on every
+change, so a benchmark must not load the working copy's `dist/` while editing).
+`bench-interaction.mjs`, ms per tree update; *layout* and *voronoi* are the
+JavaScript time in those phases.
+
+| Tree, gesture, CPU | total before → after | layout | voronoi |
+|--------------------|---------------------:|-------:|--------:|
+| wide 8⁵ drag 1×    | 18.8 → 16.8   | 3.98 → 0.24 | – |
+| wide 8⁵ drag 4×    | 129 → 106     | 26.3 → 1.05 | – |
+| large 6⁶ drag 1×   | 11.9 → 9.2    | 2.70 → 0.17 | – |
+| wide 8⁵ wheel 1×   | 30.4 → 21.0   | 4.72 → 3.96 | 2.66 → 0.09 |
+| large 6⁶ wheel 1×  | 29.3 → 17.9   | 3.21 → 2.47 | 2.31 → 0.10 |
+| wide 8⁵ wheel 4×   | 198 → 162     | 32.7 → 18.3 | 19.7 → 11.2 |
+| large 6⁶ wheel 4×  | 160 → 115     | 18.5 → 12.3 | 13.9 → 8.9 |
+| wide 8⁵ pinch 1×   | 14.1 → 17.0   | 6.09 → 6.24 | – |
+| wide 8⁵ pinch 4×   | 92.0 → 93.2   | 34.0 → 35.6 | – |
+
+- **Drag:** the layout is cached while λ stays the same (`layoutNode` in
+  `magic-filter.ts`): almost no layout cost left; 10–22% less per update.
+- **Wheel:** a wheel burst runs in low detail like dragging (no voronoi, no
+  labels) with one full frame 150 ms after the last wheel event; the node kept
+  under the pointer is found by a nearest-node search instead of a separate
+  voronoi diagram per step: 19–39% less per update. The remaining voronoi time at
+  4× is the settle frame.
+- **Pinch:** unchanged within the noise. The layout really changes there; skipping
+  the wedge translation for leaves didn't show, most visible nodes are inner
+  nodes with hidden children. A faster layout for zoom changes is still open.
+
 ## Comparing after a change
 
 1. Rebuild `dist/`, run the benchmark, commit nothing yet.

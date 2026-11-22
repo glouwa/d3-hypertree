@@ -151,9 +151,17 @@ export function layoutBergé(n:N, λ:number, noRecursion=false)
 
             const nz1 = CptoCk({ θ:bisectionAngle, r:λ*(deflen+L||1) })
             setZ(n, h2e(makeT(n.parent.layout.z, one), nz1))
-            
-            wedgeTranslate(wedge, n.parent.layout.z)
-            wedgeTranslate(wedge, Cneg(n.layout.z))
+
+            // the translated wedge is only used to place the children: skip it for
+            // leaves (most nodes; 4 Möbius transformations each)
+            if (n.children && n.children.length) {
+                wedgeTranslate(wedge, n.parent.layout.z)
+                wedgeTranslate(wedge, Cneg(n.layout.z))
+            }
+        }
+        if (!n.children || !n.children.length) {
+            count++
+            return
         }
 
         let angleWidth = πify(wedge.Ω - wedge.α)
@@ -166,13 +174,10 @@ export function layoutBergé(n:N, λ:number, noRecursion=false)
         let resetCount = 0
         let anglesum = 0
 
-        const parentWeight = (n.children || []).reduce((a, ccn)=> a+ccn.precalc.layoutWeight, 0)            
-        cl.forEach((cn,i)=> 
-        {          
-            const nlen =  (n.children || []).length            
-            const cnlen = (cn.children || []).length            
-            //                  / (Math.log10(cn.value || 1))
-           
+        const parentWeight = (n.children || []).reduce((a, ccn)=> a+ccn.precalc.layoutWeight, 0)
+        const rowcount = cllen / Math.log(cllen) / 2   // the same for every child
+        cl.forEach((cn,i)=>
+        {
 
             // verhältniss von parent weight zu child weight
             // sum(c=> c.eight) != parent weight
@@ -201,7 +206,6 @@ export function layoutBergé(n:N, λ:number, noRecursion=false)
             if (cn.height === 0)
                 liner += .1
 
-            const rowcount = cllen / Math.log(cllen) / 2
         
             if (linecount >= rowcount)
             {

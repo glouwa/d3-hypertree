@@ -230,20 +230,25 @@ at CPU 1× and 4× (see [PERFORMANCE.md](PERFORMANCE.md) for method and current 
 
 Update pipeline (layout, filter):
 
-- [ ] **Don't re-run the layout while dragging.** The layout only depends on
+- [x] **Don't re-run the layout while dragging.** The layout only depends on
       the zoom λ; panning only changes the transformation. Yet the filter calls
       `layout.type(n, λ)` for every visited node on every update (~4 ms of
       ~18 ms per drag step on the wide test tree). Cache the layout while λ
-      stays the same
-- [ ] **Treat wheel zoom like drag and pinch.** Wheel steps don't count as an
+      stays the same. Done: `layoutNode` keeps a node's layout while λ and the
+      parent's position are the same (drag layout 4 → 0.2 ms, see PERFORMANCE.md)
+- [x] **Treat wheel zoom like drag and pinch.** Wheel steps don't count as an
       animation, so every step runs in full detail and recomputes the voronoi
       cells (3.4 ms per step at 1×, 18 ms at 4×). Use low detail while zooming
-      and compute voronoi and labels once zooming settles
+      and compute voronoi and labels once zooming settles. Done: low detail during
+      a burst, a full frame 150 ms after the last wheel event; the node under the
+      pointer by nearest-node search instead of a voronoi diagram per step (wheel
+      19–39% faster)
 - [ ] **Faster layout for zoom changes.** On pinch and wheel the layout
       really changes and is the largest JavaScript cost (~6 ms of ~14 ms per
       pinch step). Options: fewer chained Möbius transformations per node,
-      incremental updates, typed arrays
-- [ ] Remove `console.warn`/`console.log` from hot paths (e.g. every touch move)
+      incremental updates, typed arrays. Tried: skipping the wedge translation for
+      leaves (no measurable gain, most visible nodes have hidden children). Still open
+- [x] Remove `console.warn`/`console.log` from hot paths (e.g. every touch move)
 
 Rendering (DOM, browser), in order of expected gain:
 

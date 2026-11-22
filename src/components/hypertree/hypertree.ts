@@ -687,8 +687,9 @@ export class Hypertree
     public isAnimationRunning() : boolean {
         const view = this.unitdisk && this.unitdisk.isDraging
         const nav = this.unitdisk && this.unitdisk.isDraging
+        const wheel = this.unitdisk && this.unitdisk.isWheeling
         const lowdetail = this.transition?this.transition.lowdetail:false        
-        return view || nav || lowdetail 
+        return view || nav || wheel || lowdetail 
     }  
 }
 
@@ -758,7 +759,7 @@ class Animation extends Transition
     {
         super(args.hypertree)
         if (args.hypertree.transition) {            
-            console.warn("Animaiion collision")
+            console.warn("d3-hypertree: an animation is already running, the new one is ignored")
             return            
         }
         
