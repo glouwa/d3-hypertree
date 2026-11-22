@@ -177,3 +177,28 @@ test('the voronoi cells are recognizable as a layer and can be turned on', async
     await row.locator('input[type=checkbox]').first().check()
     await page.waitForFunction(() => document.querySelectorAll('#tree #cells > *').length > 10)
 })
+
+test('the radius indicator layers form the group Indicators', async ({ page }) => {
+    const errors = collectErrors(page)
+    await page.goto('../playground/?gen=nTree&depth=6&childs=2&labels=1')
+    await ready(page)
+    await page.locator('summary').filter({ hasText: /^Layers/ }).click()
+    const group = page.locator('tr[data-group="Indicators"]')
+    const members = ['culling-r', 'mouse-r', 'focus-r', 'labels-r-𝐖']
+    await expect(group).toContainText('4 layers')
+    for (const m of members) await expect(page.locator(`tr[data-layer="${m}"]`)).toBeHidden()
+    // the group's checkbox switches all members on
+    await group.locator('input[type=checkbox]').first().check()
+    await page.waitForFunction(() => ['culling-r', 'mouse-r', 'focus-r'].every(id => document.querySelector(`#tree [id="${id}"] > *`)))
+    await group.click({ position: { x: 20, y: 8 } })
+    for (const m of members) {
+        await expect(page.locator(`tr[data-layer="${m}"]`)).toBeVisible()
+        expect(await page.locator(`tr[data-layer="${m}"] input[type=checkbox]`).first().isChecked()).toBe(true)
+    }
+    // one member off: the group shows a mixed state
+    await page.locator('tr[data-layer="mouse-r"] input[type=checkbox]').first().uncheck()
+    await page.waitForFunction(() => document.querySelector('tr[data-group="Indicators"] input').indeterminate)
+    // other layers are not in the group
+    await expect(page.locator('tr[data-layer="cells"]')).toBeVisible()
+    expectNoErrors(errors)
+})

@@ -506,7 +506,52 @@
         const tbody = el('tbody')
         table.append(tbody)
         g.append(table)
+        // Playground only: the radius indicator circles (culling-r, mouse-r, focus-r,
+        // labels-r-𝐖) form one group, shown where its first layer is.
+        const GROUPS = [{ name: 'Indicators', test: n => /-r(-|$)/.test(n),
+            note: 'circles that show radii of the filter and the interaction' }]
+        const groupOf = name => GROUPS.find(gr => gr.test(name))
+        const groupRows = {}   // group name -> { rows: member rows, open }
+
+        function addGroupRow(gr) {
+            const members = Object.keys(LAYER_DEFAULTS).filter(gr.test)
+            const effOf = n => Object.assign({}, LAYER_DEFAULTS[n], cfg.layers[n] || {})
+            const setAll = (k, v) => {
+                for (const n of members) {
+                    const d = LAYER_DEFAULTS[n]
+                    const o = Object.assign({}, cfg.layers[n] || {}, { [k]: v })
+                    if (o[k] === d[k]) delete o[k]
+                    if (Object.keys(o).length) cfg.layers[n] = o; else delete cfg.layers[n]
+                }
+                scheduleRebuild()
+            }
+            const vis = el('input', { type: 'checkbox', onchange: e => setAll('invisible', !e.target.checked) })
+            const hod = el('input', { type: 'checkbox', onchange: e => setAll('hideOnDrag', e.target.checked) })
+            const toggle = el('button', { class: 'link expander', title: 'group' }, '▸')
+            const tr = el('tr', { class: 'layer-group expandable', 'data-group': gr.name, title: gr.note },
+                el('td', {}, toggle, ' ', gr.name, el('span', { class: 'alias' }, ` ${members.length} layers`)),
+                el('td', { class: 'c' }, vis), el('td', { class: 'c' }, hod))
+            tbody.append(tr)
+            const info = { rows: [], open: false }
+            groupRows[gr.name] = info
+            tr.addEventListener('click', e => {
+                if (e.target.closest('input, label')) return
+                info.open = !info.open
+                toggle.textContent = info.open ? '▾' : '▸'
+                // members show their own row; their option rows stay as they were
+                for (const r of info.rows) r.tr.hidden = !info.open, r.optRow.hidden = !info.open || !r.optOpen()
+            })
+            controls.push({ refresh: () => {
+                const visible = members.map(n => !effOf(n).invisible), hidden = members.map(n => !!effOf(n).hideOnDrag)
+                vis.checked = visible.every(Boolean); vis.indeterminate = !vis.checked && visible.some(Boolean)
+                hod.checked = hidden.every(Boolean); hod.indeterminate = !hod.checked && hidden.some(Boolean)
+                tr.classList.toggle('changed', members.some(layerChanged))
+            } })
+        }
+
         for (const [name, d] of Object.entries(LAYER_DEFAULTS)) {
+            const gr = groupOf(name)
+            if (gr && !groupRows[gr.name]) addGroupRow(gr)
             const eff = () => Object.assign({}, d, cfg.layers[name] || {})
             const setLayer = (k, v) => {
                 const o = Object.assign({}, cfg.layers[name] || {}, { [k]: v })
@@ -520,6 +565,7 @@
             const toggle = el('button', { class: 'link expander', title: 'layer options' }, opts.length ? '▸' : '')
             const nameCell = el('td', {}, toggle, ' ', name, LAYER_ALIASES[name] ? el('span', { class: 'alias' }, ' ' + LAYER_ALIASES[name]) : null)
             const tr = el('tr', { 'data-layer': name }, nameCell, el('td', { class: 'c' }, vis), el('td', { class: 'c' }, hod))
+            if (gr) { tr.classList.add('in-group'); tr.hidden = true }
             tbody.append(tr)
 
             const optRow = el('tr', { class: 'layer-options', 'data-layer-options': name, hidden: true })
@@ -528,9 +574,12 @@
             if (LAYER_NOTES[name]) optCell.append(el('p', { class: 'hint' }, LAYER_NOTES[name]))
             for (const [key, type, min, max, step] of opts)
                 optCell.append(layerOptionControl(name, key, type, min, max, step, setLayer))
+            if (gr && !(opts.length || LAYER_NOTES[name])) groupRows[gr.name].rows.push({ tr, optRow, optOpen: () => false })
             if (opts.length || LAYER_NOTES[name]) {
                 tbody.append(optRow)
-                const open = () => { optRow.hidden = !optRow.hidden; toggle.textContent = optRow.hidden ? '▸' : '▾' }
+                let optOpen = false
+                const open = () => { optOpen = !optOpen; optRow.hidden = !optOpen; toggle.textContent = optOpen ? '▾' : '▸' }
+                if (gr) { optRow.classList.add('in-group'); groupRows[gr.name].rows.push({ tr, optRow, optOpen: () => optOpen }) }
                 toggle.textContent = '▸'
                 // the whole row toggles, except its checkboxes
                 tr.classList.add('expandable')
