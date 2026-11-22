@@ -466,6 +466,24 @@
             () => `initSize ${base.layout.initSize}, λbounds [${+cfg.λmin.toFixed(3)}, ${+cfg.λmax.toFixed(3)}]`)
         hint(g, 'A preset (Data) may replace these callbacks with its own.')
 
+        g = section('Layout', ['layoutType', 'wedgeOrientation', 'wedgeAngle'])
+        select(g, 'Type', 'layoutType', [['berge', 'Bergé (default, supports culling)'], ['spiral', 'spiral'], ['buchheim', 'Buchheim'], ['unitLines', 'unit lines'], ['unitVectors', 'unit vectors']])
+        range(g, 'Root wedge dir.', 'wedgeOrientation', 0, 360, 1, null, v => `${v}°`)
+        range(g, 'Root wedge angle', 'wedgeAngle', 10, 360, 1, null, v => `${v}°`)
+
+        g = section('Filter', ['filterOff', 'cullingRadius', 'rangeNodesMin', 'rangeNodesMax', 'rcwMin', 'rcwMax', 'focusExtension', 'maxFocusRadius', 'maxlabels'])
+        check(g, 'Filter off (every node visible)', 'filterOff', null, 'Fine for small trees; large trees get slow.')
+        const on = () => !cfg.filterOff
+        range(g, 'cullingRadius', 'cullingRadius', 0.5, 1, 0.01, on)
+        number(g, 'rangeNodes min', 'rangeNodesMin', 0, 5000, 10, on)
+        number(g, 'rangeNodes max', 'rangeNodesMax', 0, 5000, 10, on)
+        number(g, 'cullingWeight min', 'rcwMin', 0, 10000, 1, on)
+        number(g, 'cullingWeight max', 'rcwMax', 0, 10000, 10, on)
+        range(g, 'focusExtension', 'focusExtension', 0.5, 4, 0.05, on)
+        range(g, 'maxFocusRadius', 'maxFocusRadius', 0.1, 0.99, 0.01, on)
+        number(g, 'maxlabels', 'maxlabels', 0, 200, 1, on)
+        hint(g, 'The filter adapts its weight threshold a little on every update, so the visible set settles over a few frames after loading or interacting.')
+
         g = section('Geometry', ['linkCurvature', 'captionFontPx', 'captionHeight', 'nodeRadius', 'linkWidth', 'theme'])
         hint(g, 'Options that apply to several layers (model.geometry). Options of a single layer are in the layer list below (▸).')
         select(g, 'linkCurvature', 'linkCurvature', [['-', '− (default)'], ['+', '+'], ['l', 'l (straight lines)']])
@@ -521,24 +539,6 @@
             } })
         }
         hint(g, '▸ shows the options of a layer. "hide on drag" hides a layer while dragging, pinching or animating.')
-
-        g = section('Layout', ['layoutType', 'wedgeOrientation', 'wedgeAngle'])
-        select(g, 'Type', 'layoutType', [['berge', 'Bergé (default, supports culling)'], ['spiral', 'spiral'], ['buchheim', 'Buchheim'], ['unitLines', 'unit lines'], ['unitVectors', 'unit vectors']])
-        range(g, 'Root wedge dir.', 'wedgeOrientation', 0, 360, 1, null, v => `${v}°`)
-        range(g, 'Root wedge angle', 'wedgeAngle', 10, 360, 1, null, v => `${v}°`)
-
-        g = section('Filter', ['filterOff', 'cullingRadius', 'rangeNodesMin', 'rangeNodesMax', 'rcwMin', 'rcwMax', 'focusExtension', 'maxFocusRadius', 'maxlabels'])
-        check(g, 'Filter off (every node visible)', 'filterOff', null, 'Fine for small trees; large trees get slow.')
-        const on = () => !cfg.filterOff
-        range(g, 'cullingRadius', 'cullingRadius', 0.5, 1, 0.01, on)
-        number(g, 'rangeNodes min', 'rangeNodesMin', 0, 5000, 10, on)
-        number(g, 'rangeNodes max', 'rangeNodesMax', 0, 5000, 10, on)
-        number(g, 'cullingWeight min', 'rcwMin', 0, 10000, 1, on)
-        number(g, 'cullingWeight max', 'rcwMax', 0, 10000, 10, on)
-        range(g, 'focusExtension', 'focusExtension', 0.5, 4, 0.05, on)
-        range(g, 'maxFocusRadius', 'maxFocusRadius', 0.1, 0.99, 0.01, on)
-        number(g, 'maxlabels', 'maxlabels', 0, 200, 1, on)
-        hint(g, 'The filter adapts its weight threshold a little on every update, so the visible set settles over a few frames after loading or interacting.')
 
         g = section('Interaction', ['λmin', 'λmax', 'wheelFactor', 'holdDuration', 'mouseRadius', 'click'])
         select(g, 'Click on a node', 'click', [['goto', 'animate it to the center'], ['select', 'toggle selection'], ['ripple', 'ripple'], ['none', 'nothing (log only)']])
