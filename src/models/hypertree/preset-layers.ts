@@ -296,8 +296,7 @@ export const layerSrc = [
         onClick:     (n:N, m:C)=> {
                         var s = n.ancestors().find(e=> true)               // obsolete
                         //ud.args.hypertree.updatePath('SelectionPath', s) // toggle selection 
-                        ud.view.hypertree.api.toggleSelection(s)           // toggle selection 
-                        ud.view.hypertree.args.interaction.onNodeSelect(s) // focus splitter
+                        ud.view.hypertree.api.toggleSelection(s)           // toggle selection, calls onNodeSelect
         }
     }),
     (v, ud:UnitDisk)=> new InteractionLayer2(v, {                            
@@ -305,8 +304,7 @@ export const layerSrc = [
         onClick:     (n:N, m:C)=> {
                         var s = n.ancestors().find(e=> true)               // obsolete
                         //ud.args.hypertree.updatePath('SelectionPath', s) // toggle selection 
-                        ud.view.hypertree.api.toggleSelection(s)           // toggle selection 
-                        ud.view.hypertree.args.interaction.onNodeSelect(s) // focus splitter
+                        ud.view.hypertree.api.toggleSelection(s)           // toggle selection, calls onNodeSelect
         }
     }),
     (v, ud:UnitDisk)=> new TraceLayer(v, {  

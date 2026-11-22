@@ -71,9 +71,11 @@ the modernization is measured against. Intended changes get accepted with
 
 Tests for all existing features, following the test strategy above:
 
-- [ ] Interaction: drag, wheel, pinch, one-finger pan, click/tap with
-      `onNodeClick`, hover path, hover cell (broken, expected to fail), ripple,
-      `onCenterNodeChange`
+- [x] Callbacks (`test/tests/callbacks.spec.mjs`): `onNodeClick` (click, tap, drag is no
+      click), `onNodeHold` (mouse, touch, cancelled by moving), `onNodeHover`/`onHoverNodeChange`,
+      `onNodeSelect`, `onCenterNodeChange`
+- [x] Hover cell highlight, wheel/pinch zoom at the λbounds edge
+- [ ] Interaction with scene snapshots: drag, wheel, pinch, one-finger pan, hover path, ripple
 - [ ] API: `gotoNode`, `gotoHome`, `goto`, `gotoλ`, `animateUp`,
       `toggleSelection`, `setPathHead`, `selectQuery`
 - [ ] Data: `fromData`, `fromFile` (`.d3.json`, CSV, SKOS, TreeML fixtures),
@@ -150,6 +152,7 @@ Rendering (DOM, browser), in order of expected gain:
 |-----|--------|
 | **Deep trees break down far from the origin.** Navigating down a long branch makes the view jump: the area around the focus stays empty and only a node far away remains visible. No NaN occurs; the values just stop being usable for the transformation. Node positions are global Poincaré-disk coordinates composed from parent to child, so deep nodes end up very close to the boundary. Reproduced with `deepStar` (8 arms × 80 levels): the jump happens when going to a node at depth 48. | Confirmed by the author. Covered by an expected-to-fail test. **Deferred until after the modernization; until then, avoid trees this deep.** See "Analysis" below |
 | **Mouse-wheel zoom blocked right after load.** The computed start zoom ignores `interaction.λbounds` [1/40, 0.45 by default], and wheel and pinch rejected every step ending outside the bounds, even steps back towards them. On wider trees (start λ ≈ 0.71) the wheel did nothing at all, and small pinches were ignored. | **Fixed:** steps that move towards the bounds are allowed (`isλStepAllowed` in `interaction-layer-2.ts`); covered by tests. **Open decision:** should the start zoom itself be clamped to `λbounds`? That would change the initial view of many trees |
+| **Declared callbacks never called.** `onNodeHold`, `onNodeHover`, `onHoverNodeChange` and (in the plain `Hypertree`) `onNodeSelect` were declared but never invoked. | **Implemented:** hover fires when the hovered node changes (undefined on leaving); hold fires after `interaction.holdDuration` (default 500 ms) without moving and suppresses the click; `api.toggleSelection` fires `onNodeSelect(n, selected)`. Covered by tests. `onWikiCenterNodeChange` is still never called |
 | **Hovered voronoi cells aren't highlighted.** `cell-layer.ts` checks `d.data.isPartOfAnyHoverPath`, which no longer exists (now `d.data.pathes.isPartOfAnyHoverPath`, as the node layer uses), and the `.hovered.cell` CSS rule is commented out in both themes since the CSS split-up. Verified: with the cells layer on, 6 cells belong to hover-path nodes, none gets the `hovered` class. Also, hovering only refreshed the path layers, never the cells. | **Fixed:** correct property for `hovered` and `selected`, cells refresh on hover (`LayerStack.updatePath`), CSS rule re-enabled (the dark theme's old rule was invisible, now mirrors the light one); covered by a test |
 | **Hover highlights stay after the pointer leaves the tree.** Both the hover path and the hovered cells remain highlighted after moving the mouse out of the component. | Observed while fixing the cell highlight; not yet analyzed |
 | **Crash when nodes have an icon but no label.** `preset-process.ts` calls `precalc.label.startsWith(...)` without checking that a label exists. | Found while writing the benchmark |

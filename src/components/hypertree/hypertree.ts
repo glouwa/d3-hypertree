@@ -146,6 +146,8 @@ export class Hypertree
                 this.removePath('SelectionPath', toremove)
             }
             this.update.pathes()
+            if (this.args.interaction.onNodeSelect)
+                this.args.interaction.onNodeSelect(n, this.args.objects.selections.includes(n))
         },
         //addPath: (pathid, node:N)=> { this.addPath(pathid, node) },
         //removePath: (pathid, node:N)=> { this.removePath(pathid, node) },

@@ -33,7 +33,22 @@
 
         //   &labels=1  give every node a deterministic label (exercises the label layers)
         //   &icons=1   give every node an emoji (exercises the emoji layer)
-        const model = { dataloader: loaders[gen] }
+        // every interaction callback is recorded in harness.events
+        const events = []
+        const record = type => (n, ...rest) => events.push({
+            type, id: n ? n.mergeId : undefined, arg: typeof rest[0] === 'boolean' ? rest[0] : undefined,
+        })
+        const model = {
+            dataloader: loaders[gen],
+            interaction: {
+                onNodeClick:        record('click'),
+                onNodeHold:         record('hold'),
+                onNodeHover:        record('hover'),
+                onHoverNodeChange:  record('hoverchange'),
+                onNodeSelect:       record('select'),
+                onCenterNodeChange: record('center'),
+            },
+        }
         if (q.get('labels') === '1') {
             let i = 0
             model.langInitBFS = (ht, n) => { n.precalc.label = 'Node ' + (i++) }
@@ -51,6 +66,8 @@
         window.harness = {
             ht,
             ready: ht.initPromise,
+            events,
+            clearEvents: () => { events.length = 0 },
             layerNames: () => Object.keys(layerStack().layers),
             /** Per-layer JS time (ms) of the most recent update, as measured by the layer stack. */
             lastLayerTimings: () => {

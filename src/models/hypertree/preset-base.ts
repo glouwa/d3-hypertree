@@ -111,7 +111,8 @@ const modelBase : ()=> HypertreeArgs = ()=>
         onHoverNodeChange:      (n:N)=> {},
 
         onNodeSelect:       ()=> {},
-        onNodeHold:         ()=> {},                    
+        onNodeHold:         ()=> {},
+        holdDuration:       500,
         onNodeHover:        ()=> {},
         λbounds:            [ 1/40, .45 ],
         wheelFactor:        1.175,
@@ -357,7 +358,8 @@ export const presets : { [key: string]:()=> any } =
         onHoverNodeChange:      (n:N)=> {},
 
         onNodeSelect:       ()=> {},
-        onNodeHold:         ()=> {},                    
+        onNodeHold:         ()=> {},
+        holdDuration:       500,
         onNodeHover:        ()=> {},
         λbounds:            [ 1/40, .45 ],
         wheelFactor:        1.175,

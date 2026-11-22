@@ -367,6 +367,11 @@ new hyt.Hypertree(
         }
         interaction: {            
             onNodeClick:        (n:N, m:C, l:ILayer)=> void
+            onNodeHold:         (n:N, m:C, l:ILayer)=> void  // pressed for holdDuration ms without moving; no click follows
+            holdDuration:       number                       // default 500
+            onNodeHover:        (n:N)=> void                 // hovered node changed; undefined when leaving
+            onHoverNodeChange:  (n:N)=> void                 // same as onNodeHover
+            onNodeSelect:       (n:N, selected:boolean)=> void // called by api.toggleSelection
             onCenterNodeChange: (n:N)=> void 
             λbounds:            [ number, number ]
             wheelSensitivity:   number

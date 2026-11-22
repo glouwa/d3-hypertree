@@ -64,7 +64,7 @@ export class InteractionLayer2 implements ILayer
             .on('mousedown',    e=> this.fireMouseDown())
             .on('mousemove',    e=> this.fireMouseMove())
             .on('mouseup',      e=> this.fireMouseUp())
-            .on('mouseout',     e=> this.htapi.setPathHead(this.hoverpath, undefined))                
+            .on('mouseout',     e=> { this.setHoverNode(undefined); this.htapi.setPathHead(this.hoverpath, undefined) })
             
             .on('touchstart',   e=> this.fireTouchEvent('onPointerStart'))
             .on('touchmove',    e=> this.fireTouchEvent('onPointerMove'))
@@ -96,9 +96,45 @@ export class InteractionLayer2 implements ILayer
             this.fireMouseEvent('onPointerMove')                    
         else {
             if (!this.view.hypertree.isInitializing
-             && !this.view.hypertree.isAnimationRunning())
-                this.htapi.setPathHead(this.hoverpath, this.findNodeByCell())        
+             && !this.view.hypertree.isAnimationRunning()) {
+                const n = this.findNodeByCell()
+                this.setHoverNode(n)
+                this.htapi.setPathHead(this.hoverpath, n)
+            }
         }
+    }
+
+    // onNodeHover / onHoverNodeChange: only when the node under the mouse changes
+    private hoverNode : N | undefined = undefined
+    private setHoverNode(n:N | undefined) {
+        if (n === this.hoverNode) return
+        this.hoverNode = n
+        const i = this.view.hypertree.args.interaction
+        if (i.onNodeHover)       i.onNodeHover(n)
+        if (i.onHoverNodeChange) i.onHoverNodeChange(n)
+    }
+
+    // onNodeHold: pointer pressed for holdDuration ms without moving
+    private holdTimer : any = null
+    private held = false
+    private startHoldTimer(m:C) {
+        this.cancelHoldTimer()
+        this.held = false
+        const i = this.view.hypertree.args.interaction
+        if (!i.onNodeHold) return
+        this.holdTimer = setTimeout(()=> {
+            this.holdTimer = null
+            const traces = this.view.hypertree.args.objects.traces
+            if (traces.length !== 1 || !this.nopinch) return
+            const q = this.view.unitdisk.cache.voronoiDiagram
+                && this.view.unitdisk.cache.voronoiDiagram.find(m.re, m.im)
+            this.held = true
+            i.onNodeHold(q ? q.data : undefined, m, this)
+        }, i.holdDuration || 500)
+    }
+    private cancelHoldTimer() {
+        if (this.holdTimer) clearTimeout(this.holdTimer)
+        this.holdTimer = null
     }
 
     private fireMouseUp() {
@@ -212,8 +248,10 @@ export class InteractionLayer2 implements ILayer
             //console.log(still » pan || pinch » pan)
             this.panStart = m
             this.nopinch = true
+            this.startHoldTimer(m)
         }
-        else if (this.view.hypertree.args.objects.traces.length === 2) {       
+        else if (this.view.hypertree.args.objects.traces.length === 2) {
+            this.cancelHoldTimer()
             const t0 = this.view.hypertree.args.objects.traces[0]
             const t0e = t0.points[t0.points.length-1]
             this.pinchcenter = CmulR(CaddC(t0e, m), .5)
@@ -237,7 +275,11 @@ export class InteractionLayer2 implements ILayer
         }
         trace.points.push(m)
 
-        if (this.view.hypertree.args.objects.traces.length === 1) 
+        // moving beyond the click threshold cancels a pending hold
+        if (this.holdTimer && this.dist(this.panStart, m) >= .006)
+            this.cancelHoldTimer()
+
+        if (this.view.hypertree.args.objects.traces.length === 1)
         {
             //this.view.unitdisk.args.transformation.onDragP(this.panStart, m)
             const t = this.view.unitdisk.args.transformation
@@ -286,6 +328,12 @@ export class InteractionLayer2 implements ILayer
             //this.view.unitdisk.args.transformation.onDragEnd(m)
             this.dST = undefined
             this.view.unitdisk.isDraging = false
+
+            this.cancelHoldTimer()
+            if (this.held) {        // a hold doesn't end in a click
+                this.held = false
+                return false
+            }
 
             if (this.dist(this.panStart, m) < .006 && this.nopinch) {
                 if (CktoCp(m).r < 1) {

@@ -7,6 +7,8 @@ import { UnitDiskArgs }        from '../unitdisk/unitdisk-model'
 import { UnitDiskView }        from '../unitdisk/unitdisk-model'
 import { Hypertree }           from '../../components/hypertree/hypertree'
 import { IUnitDisk }           from '../../components/unitdisk/unitdisk'
+import { ILayer }              from '../../components/layerstack/layer'
+import { C }                   from '../transformation/hyperbolic-math'
 
 type Partial<T> = {
     [P in keyof T]?: T[P];
@@ -64,9 +66,15 @@ export interface HypertreeArgs
     interaction: {
         //type:               'clickonly' | 'selction' | 'multiselection' | 'centernodeselectable'
         mouseRadius:        number,
-        onNodeSelect:       (n:N)=> void
-        onNodeHold:         ()=>void                          // x 
-        onNodeHover:        ()=>void                          // x 
+        onNodeClick?:       (n:N, m:C, l:ILayer)=> void
+        // called by api.toggleSelection; selected = state after the toggle
+        onNodeSelect:       (n:N, selected?:boolean)=> void
+        // pointer pressed on a node for holdDuration ms without moving; no click follows
+        onNodeHold:         (n:N, m:C, l:ILayer)=> void
+        holdDuration?:      number
+        // node under the mouse changed (undefined when leaving the tree)
+        onNodeHover:        (n:N)=> void
+        onHoverNodeChange?: (n:N)=> void
         onCenterNodeChange: (n:N, s:string)=> void
         λbounds:            [ number, number ]
         wheelFactor:        number
