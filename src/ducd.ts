@@ -49,17 +49,14 @@ export const mergeDeep = (target, source)=> {
     {
         if (isObject(source[key]))
         {
-            console.debug('merging Object: ', key)
             target[key] = mergeDeep(target[key] || Object.create(Object.getPrototypeOf(source[key])) , source[key])
         }
         else if (isArray(source[key]))
         {
-            console.debug('merging Array: ', key)
             target[key] = mergeDeep(target[key] || [], source[key])
         }
         else if (isPrimitive(source[key]))
         {
-            console.debug('merging Primitive: ', key)
             target[key] = source[key]
         }
         else console.assert(false)

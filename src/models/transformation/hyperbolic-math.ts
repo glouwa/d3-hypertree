@@ -223,8 +223,8 @@ export function ArrAddR(p:[number, number], s:number) : [number,number] { return
                 re:(a.re * b.re + a.im * b.im) / dn,
                 im:(a.im * b.re - a.re * b.im) / dn
             }
-            if (isNaN(r.re)) { r.re = 0; console.log('r.re=NaN') }
-            if (isNaN(r.im)) { r.im = 0; console.log('r.im=NaN') }
+            if (isNaN(r.re)) { r.re = 0 }
+            if (isNaN(r.im)) { r.im = 0 }
             return r
         }
 

@@ -93,7 +93,6 @@ export class UnitDisk implements IUnitDisk
     }
 
     private updateParent() {      
-        console.log('UPDATEING UNITDISK PARENT')  
         this.mainsvg = d3.select(this.view.parent).append('g')
             .attr('class', this.view.className)
             .attr('transform', this.view.position)

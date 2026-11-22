@@ -80,10 +80,8 @@ export class Hypertree
     lastCenterNode = undefined
     
     constructor(view:{ parent:HTMLElement }, args:HypertreeArgs) {
-        console.group("hypertree constructor")
         this.view_ = view        
         this.initPromise = this.api.setModel(args)
-        console.groupEnd()
     }
  
     /*
@@ -95,44 +93,34 @@ export class Hypertree
             //model = mergeDeep_(presets[model.baseCfg], model)
             this.isInitializing = true
             const base = presets.modelBase()
-            console.group("set model: merging ", model, ' into ', base)
 
             //this.args = mergeDeep(model, base)
             this.args = mergeDeep(base, model)
-            console.log('merge result: ', this.args)
 
             // wenn parent updatedated hat wraum ist da nich eine alte transformations in der disk            
             this.update.view.parent()
             this.api.setDataloader(ok, err, this.args.dataloader) // resetData is hier drin 🤔 
             this.api.setLangloader(ok, err, this.args.langloader)
-            console.groupEnd()
         }),
         setLangloader: (ok, err, ll)=> { 
-            console.group("langloader initiate")
             this.args.langloader = ll
 
             this.args.langloader((langMap, t1, dl)=> {
-                console.group("langloader", langMap && Object.keys(langMap).length || 0)
                 this.langMap = langMap || {}
                 this.updateLang_(dl)                
                 //requestAnimationFrame(()=> this.update.data())
                 this.update.data()
-                console.groupEnd()
                 
                 if (this.data) { this.isInitializing=false;  ok() }
             })
-            console.groupEnd()
         },
         setDataloader: (ok, err, dl)=> {            
-            console.group("dataloader initiate")
             this.args.dataloader = dl
             const t0 = performance.now()
             this.resetData()
             
             this.args.dataloader((d3h, t1, dl)=> {
-                console.group("dataloader")
                 this.initData(d3h, t0, t1, dl)
-                console.groupEnd()
 
                 // If the language map arrived first (the default langloader is
                 // synchronous), its callback found no data and didn't render;
@@ -140,7 +128,6 @@ export class Hypertree
                 // SKOS, TreeML files) stayed invisible until the next interaction.
                 if (this.langMap) { this.update.data(); this.isInitializing=false;  ok() }
             })
-            console.groupEnd()
         },
         toggleSelection: (n:N)=> {
             this.toggleSelection(n)
@@ -170,7 +157,6 @@ export class Hypertree
                 n.pathes.finalcolor = undefined                
                 n.pathes.isPartOfAnyQuery = false                
             })
-            console.log('QUERY:', lq)
             this.args.objects.pathes = []
             this.data.each(n=> {                
                 if (n.data) {
@@ -225,7 +211,6 @@ export class Hypertree
 
     protected updateParent()
     {
-        console.log("_updateParent")
         this.view_.parent.innerHTML = '' // actually just remove this.view if present ... do less
         this.view_.html = HTML.parse<HTMLElement>(hypertreehtml)()
         this.view_.parent.appendChild(this.view_.html)
@@ -235,7 +220,6 @@ export class Hypertree
 
     protected updateUnitdiskView()
     {
-        console.log("_updateUnitdiskView")
         var udparent = this.view_.html.querySelector('.unitdisk-nav > svg')
         udparent.innerHTML = bubbleSvgDef
         this.unitdisk = new this.args.geometry.decorator({
@@ -273,7 +257,6 @@ export class Hypertree
     //########################################################################################################
 
     protected resetData() {        
-        console.log("_resetData")
         this.view_.html.querySelector('.preloader').innerHTML = htmlpreloader
         this.unitdisk.args.data = undefined
         this.data = undefined 
@@ -294,7 +277,6 @@ export class Hypertree
     }
 
     protected initData(d3h, t0, t1, dl) {
-        console.log("_initData")
         var t2 = performance.now()
         var ncount = 1
         globelhtid++
@@ -354,7 +336,6 @@ export class Hypertree
     }
 
     protected updateWeights_() : void {
-        console.log("_updateWeights")        
         // sum dinger
         this.sum(this.data, this.args.layout.weight, 'layoutWeight')
         this.sum(this.data, this.args.filter.weightFilter.weight, 'cullingWeight')
@@ -378,7 +359,6 @@ export class Hypertree
     }
 
     protected updateLang_(dl=0) : void {
-        console.log("_updateLang")
         const t0 = performance.now()
 
         if (this.data) {
@@ -394,7 +374,6 @@ export class Hypertree
     }
 
     protected findInitλ_() : void {
-        console.groupCollapsed('_findInitλ')
 
         for (let i=0; i<50; i++)
         {
@@ -408,7 +387,6 @@ export class Hypertree
             const maxR = unculledNodes.reduce((max, n)=> Math.max(max, n.layout.zp.r), 0)           
                 
             if (maxR > (this.args.layout.initSize || .95)) {
-                console.info('MaxR at abort', maxR)
                 break
             }
         }
@@ -422,8 +400,6 @@ export class Hypertree
         }
         this.data.each((n:N)=> n.layoutReference = clone(n.layout))                
         
-        console.groupEnd()
-        console.info('auto λ = ', this.args.geometry.transformation.state.λ)
     }
 
     //########################################################################################################
@@ -435,7 +411,6 @@ export class Hypertree
     private virtualCanvas = undefined
     private virtualCanvasContext = undefined
     protected updateLabelLen_() : void {
-        console.log("_updateLabelLen")
         var canvas = this.virtualCanvas 
             || (this.virtualCanvas = document.createElement("canvas"))
         var context = this.virtualCanvasContext 
@@ -687,7 +662,6 @@ export class Transition
     {
         this.currentframe = undefined
         this.hypertree.transition = undefined        
-        console.groupEnd()
     }
 }
 
@@ -722,7 +696,6 @@ class Animation extends Transition
             return            
         }
         
-        console.group('Transition: ' + args.name)
         args.hypertree.transition = this
         this.hypertree.log.push(this.hypertree.transition)
         
@@ -745,7 +718,6 @@ class Animation extends Transition
             if (now > this.endTime) {
                 args.frame(1)
                 this.end()
-                console.log('resolve by: time (maybe jump at end)')
                 args.resolve()                
             }
             else {
@@ -755,7 +727,6 @@ class Animation extends Transition
                              
             this.currentframe = undefined
             //console.groupEnd()
-            console.debug('frame end', )
         }
 
         requestAnimationFrame(()=> frame())

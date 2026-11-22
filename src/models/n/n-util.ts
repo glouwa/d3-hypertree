@@ -44,7 +44,7 @@ class TreeNode {
     if (!this.hasOwnProperty('id')){
       throw new MissingFieldError('id');
     }
-    console.log('deserialize ' + this.id);
+    console.error('deserialize ' + this.id);
     if (!this.hasOwnProperty('children')) {
       throw new MissingFieldError('children');
     }
@@ -104,11 +104,11 @@ class Tree {
         try {
           let _this = this;
           this.setupTreeHierarchy(json, null);
-          console.log(this.tree_);
+          console.error(this.tree_);
           ok(this.tree_[0]);
         } catch(e) {
-          console.log("Invalid JSON data file.");
-          console.log(e);
+          console.error("Invalid JSON data file.");
+          console.error(e);
         }
       }
     };

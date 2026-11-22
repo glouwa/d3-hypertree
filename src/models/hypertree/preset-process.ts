@@ -10,9 +10,7 @@ export function doVoronoiStuff(ud:IUnitDisk, cache:TransformationCache) {
     cache.cells = cache.voronoiDiagram.polygons()
     /*
     if (cache.cells.length)
-        console.log('UPDATEING VORO')
     else
-        console.log('RESEETING VORO')
         */
 }
 

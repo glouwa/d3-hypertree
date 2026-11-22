@@ -121,8 +121,8 @@ import { parseString } from 'xml2js'
       try {
         return this.createNodes(parsedJson);;
       } catch (e) {
-        console.log("Invalid data file.");
-        console.log(e);
+        console.error("Invalid data file.");
+        console.error(e);
       }
     }
 
@@ -141,7 +141,7 @@ import { parseString } from 'xml2js'
     static treemlToTree(data: string, callback, originalTreeObject: Tree) {
       parseString(data, (err, result) => {
         if (err != null) {
-          console.log("Invalid data file");
+          console.error("Invalid data file");
           return null;
         }
 
@@ -159,8 +159,8 @@ import { parseString } from 'xml2js'
           originalTreeObject.setTree(tree);
           callback(tree);
         } catch (e) {
-          console.log(e);
-          console.log(e.stack);
+          console.error(e);
+          console.error(e.stack);
         }
       })
     }
@@ -220,7 +220,7 @@ import { parseString } from 'xml2js'
     static skosToTree(data: string, callback, originalTreeObject: Tree) {
       parseString(data, (err, result) => {
         if (err != null) {
-          console.log("Invalid data file", err);
+          console.error("Invalid data file", err);
           return null;
         }
         try {
@@ -252,8 +252,8 @@ import { parseString } from 'xml2js'
           originalTreeObject.setTree(rootNode);
           callback(rootNode);
         } catch (e) {
-          console.log(e);
-          console.log(e.stack);
+          console.error(e);
+          console.error(e.stack);
         }
 
       })
@@ -493,8 +493,8 @@ import { parseString } from 'xml2js'
             try {
               InputSkos.skosToTree(content, ok, this);
                       } catch(e) {
-              console.log(e);
-              console.log(e.stack);
+              console.error(e);
+              console.error(e.stack);
             }
           } else if (fileType == InputFile.treeML) {
             InputTreeML.treemlToTree(content, ok, this);

@@ -133,8 +133,10 @@ A bug or feature counts as done when its expected-to-fail test becomes a normal 
        interfaces (`fill`, `stroke`, `color`, `background`, ...), `console.assert`
        with non-boolean values, the Materialize global `M` in the meta views, wrong
        signatures. Done: no type errors; the build fails on type errors.
-2. [ ] **Debug output** removed (41 places, e.g. `console.log` on every layer stack
-       update, `console.debug` on every configuration merge)
+2. [x] **Debug output** removed (`console.log` on every layer stack update,
+       `console.debug` on every configuration merge, traces in a layout, ...). The
+       file loaders report errors with `console.error`. A test checks that loading
+       and interacting print nothing.
 3. [ ] **Known bugs**:
        - hover highlight stays after the pointer leaves the tree (analyze first)
        - `goto(p, λ)` ignores the zoom

@@ -93,8 +93,6 @@ export function layoutBuchheim(root) {
 
 export function layoutLamping(n, wedge = { p:{ re:0, im:0 }, m:{ re:0, im:1 }, α:Math.PI }) {
 
-    console.log('--------------------------------------------------------', n.depth)
-    console.log(wedge.p, wedge.m, wedge.α)
 
     setZ(n, wedge.p)
 
@@ -103,21 +101,19 @@ export function layoutLamping(n, wedge = { p:{ re:0, im:0 }, m:{ re:0, im:1 }, �
 
             const cα = wedge.α / n.children.length * (i+1)
             console.assert(isFinite(cα))
-            console.log('cα', cα)
 
             const s = .1
-            const it = ((1-s*s) * Math.sin(cα)) / (2*s);              console.log('it',it)
+            const it = ((1-s*s) * Math.sin(cα)) / (2*s);
             const d = (Math.sqrt(Math.pow(it,2)+1) - it) * .5
             
             console.assert(isFinite(d))
-            console.log('d',d)
 
             const p1 = makeT(wedge.p, one)
-            const np = h2e(p1, CmulR(wedge.m, d));                    console.log('np',np)
+            const np = h2e(p1, CmulR(wedge.m, d));
 
             const npp1 = makeT(Cneg(np), one)
             const nd1 = makeT({ re:-d, im:0 }, one)
-            const nm = h2e(npp1, h2e(p1, wedge.m));                   console.log('nm',nm)
+            const nm = h2e(npp1, h2e(p1, wedge.m));
             const nα = Clog(h2e(nd1, Cpow(cα))).im;                   console.assert(isFinite(nα))
 
             layoutLamping(n.children[i], { p:np, m:nm, α:nα })

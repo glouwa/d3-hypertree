@@ -390,7 +390,6 @@ export class InteractionLayer2 implements ILayer
     private click(m:C) {
         const q = this.view.unitdisk.cache.voronoiDiagram.find(m.re, m.im)
         const n = q ? q.data : undefined
-        console.log('click', this.dist(this.panStart, m), n, this.view.unitdisk.args.transformation.cache.centerNode)
 
         if (!this.view.hypertree.isAnimationRunning())
                 this.view.hypertree.args.interaction.onNodeClick(n, m, this)

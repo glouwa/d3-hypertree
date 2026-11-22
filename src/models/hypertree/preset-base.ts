@@ -249,8 +249,8 @@ export const presets : { [key: string]:()=> any } =
                 nodeFilter: n=> true,
             },            
             interaction: {
-                onNodeSelect: s=> { console.log('###########', s) },
-                onNodeHover: s=> { console.log('########onnodehover', s)},
+                onNodeSelect: s=> {},
+                onNodeHover: s=> {},
                 λbounds: [.25, .6],
             },            
             langInitBFS: (ht:Hypertree, n:N)=> {
@@ -268,7 +268,6 @@ export const presets : { [key: string]:()=> any } =
                 }                
             }
         }
-        console.log('merging otol to main model')
         return mergeDeep(model, diff)
     }
 }

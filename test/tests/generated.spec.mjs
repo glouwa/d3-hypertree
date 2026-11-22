@@ -263,3 +263,24 @@ test.describe('layers', () => {
         expectNoErrors(errors)
     })
 })
+
+test.describe('console', () => {
+    // Regression: the library logged on every update (layer stack, voronoi, merges).
+    // Only real problems may appear (console.warn / console.error).
+    test('loading and interacting print nothing to the console', async ({ page }) => {
+        const messages = []
+        page.on('console', m => { if (['log', 'debug', 'info', 'startGroup', 'startGroupCollapsed'].includes(m.type())) messages.push(m.type() + ' ' + m.text()) })
+        await openTree(page, 'gen=nTree&depth=8&childs=2&labels=1&icons=1')
+        const box = await diskBox(page)
+        await page.mouse.move(box.x + box.width * 0.6, box.y + box.height * 0.45)
+        await page.mouse.down()
+        await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.5, { steps: 6 })
+        await page.mouse.up()
+        await page.mouse.wheel(0, 100)
+        await page.mouse.move(box.x + box.width * 0.3, box.y + box.height * 0.3)
+        await waitForStable(page)
+        await page.evaluate(() => harness.ht.api.gotoNode(harness.ht.data.children[0]))
+        await page.waitForTimeout(1200)
+        expect(messages).toEqual([])
+    })
+})
