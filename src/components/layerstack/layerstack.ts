@@ -2,7 +2,7 @@ import * as d3       from 'd3'
 import { N }         from '../../models/n/n'
 import { IUnitDisk } from '../unitdisk/unitdisk'
 import { ILayer }    from './layer'
-import { mergeDeep } from 'ducd'
+import { mergeDeep } from '../../ducd'
 
 export interface LayerStackArgs
 {

@@ -4,7 +4,7 @@ import { CmulR, CsubC, CaddC } from '../../models/transformation/hyperbolic-math
 import { πify }                from '../../models/transformation/hyperbolic-math'
 import { CtoStr }              from '../../models/transformation/hyperbolic-math'
 import { lengthDilledation }   from '../../models/transformation/hyperbolic-math'
-import { bboxCenter }          from '../layerstack/d3updatePattern'
+import { bboxCenter }          from '../layers/label-layer'
 import { ILayer }              from '../layerstack/layer'
 import { NodeLayer }           from '../layers/node-layer'
 import { CellLayer }           from '../layers/cell-layer'

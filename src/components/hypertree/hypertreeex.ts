@@ -1,5 +1,5 @@
 import * as d3                 from 'd3'
-import { HTML }                from 'ducd'
+import { HTML }                from '../../ducd'
 import { HypertreeArgs }       from '../../models/hypertree/model'
 import { N }                   from '../../models/n/n'
 import { Path }                from '../../models/path/path'

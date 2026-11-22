@@ -1,6 +1,6 @@
 export { Hypertree }     from "./components/hypertree/hypertree"
 export { HypertreeEx }   from "./components/hypertree/hypertreeex"
-export { HypertreeArgs } from "./models/hypertree/model"
+export type { HypertreeArgs } from "./models/hypertree/model"
 
 export * from './models/transformation/hyperbolic-math'
 export * from './models/transformation/hyperbolic-transformation'
@@ -26,27 +26,27 @@ import * as int2  from './components/layers/interaction-layer-2'
 
 export namespace layers
 {
-    export var  CellLayer            = cell.CellLayer
+    export const CellLayer = cell.CellLayer
     export type CellLayerArgs        = cell.CellLayerArgs
-    export var  ArcLayer             = arc.ArcLayer
+    export const ArcLayer = arc.ArcLayer
     export type ArcLayerArgs         = arc.ArcLayerArgs
-    export var  NodeLayer            = node.NodeLayer
+    export const NodeLayer = node.NodeLayer
     export type NodeLayerArgs        = node.NodeLayerArgs
-    export var  ImageLayer           = img.ImageLayer
+    export const ImageLayer = img.ImageLayer
     export type ImageLayerArgs       = img.ImageLayerArgs
-    export var  SymbolLayer          = sym.SymbolLayer
+    export const SymbolLayer = sym.SymbolLayer
     export type SymbolLayerArgs      = sym.SymbolLayerArgs
-    export var  LabelLayer           = text.LabelLayer
+    export const LabelLayer = text.LabelLayer
     export type LabelLayerArgs       = text.LabelLayerArgs 
-    export var  LabelForceLayer      = textf.LabelForceLayer
+    export const LabelForceLayer = textf.LabelForceLayer
     export type LabelForceLayerArgs  = textf.LabelForceLayerArgs 
-    export var  BackgroundLayer      = bg.BackgroundLayer
+    export const BackgroundLayer = bg.BackgroundLayer
     export type BackgroundLayerArgs  = bg.BackgroundLayerArgs 
-    export var  FocusLayer           = foc.FocusLayer
+    export const FocusLayer = foc.FocusLayer
     export type FocusLayerArgs       = foc.FocusLayerArgs
-    export var  InteractionLayer     = int.InteractionLayer
+    export const InteractionLayer = int.InteractionLayer
     export type InteractionLayerArgs = int.InteractionLayerArgs
-    export var  InteractionLayer2     = int2.InteractionLayer2
+    export const InteractionLayer2 = int2.InteractionLayer2
     export type InteractionLayer2Args = int2.InteractionLayer2Args
 }
 

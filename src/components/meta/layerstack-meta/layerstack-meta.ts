@@ -1,7 +1,7 @@
 import * as d3              from 'd3'
-import { HTML }             from 'ducd'
-import { stringhash }       from 'ducd'
-import { googlePalette }    from 'ducd'
+import { HTML }             from '../../../ducd'
+import { stringhash }       from '../../../ducd'
+import { googlePalette }    from '../../../ducd'
 import { ILayer }           from '../../layerstack/layer'
 import { IUnitDisk }        from '../../unitdisk/unitdisk'
 

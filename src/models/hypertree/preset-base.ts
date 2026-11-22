@@ -1,4 +1,4 @@
-import { tosub }                    from 'ducd'
+import { tosub }                    from '../../ducd'
 import { N }                        from '../n/n'
 
 import { loaders }                  from '../../d3-hypertree'
@@ -17,7 +17,7 @@ import { Hypertree }                from '../../components/hypertree/hypertree'
 
 import { layerSrc, labeloffsets }   from './preset-layers'
 import { cacheUpdate }              from './magic-filter'
-import { mergeDeep }                from 'ducd'
+import { mergeDeep }                from '../../ducd'
 import { C, CmulR }                 from '../transformation/hyperbolic-math'
 
 const π =              Math.PI

@@ -1,4 +1,4 @@
-import { HTML }           from 'ducd'
+import { HTML }           from '../../../ducd'
 import { UnitdiskMeta }   from '../unitdisk-meta/unitdisk-meta'
 import { LayerStackMeta } from '../layerstack-meta/layerstack-meta'
 import { Hypertree }      from '../../hypertree/hypertree'

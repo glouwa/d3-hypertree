@@ -24,7 +24,7 @@ local Edge through Playwright; no browser download).
 
 ```bash
 # 1. build the library: the benchmarks load dist/d3-hypertree.js
-npx gulp build            # legacy build, Node 10 (until phase 1 of the plan)
+npm run build
 
 # 2. run
 cd test
@@ -174,6 +174,22 @@ dragging, CPU 1×.
    (measured in the application).
 
 What to do about each of these is planned in [MODERNIZATION.md](MODERNIZATION.md), phase 3.
+
+## Phase 1 check: Vite build (2026-11-22)
+
+Old (Gulp/Webpack/TypeScript 2.9) and new (Vite 8, TypeScript 6) bundle of the
+same source, measured back to back:
+
+- **Interaction pipeline** (`bench-interaction.mjs`): the new bundle is as fast
+  or faster in 17 of 18 cases (e.g. wide 8⁵ wheel, 4× CPU: 147 → 122 ms per
+  update); only large 6⁶ drag at 4× CPU was slower (47 → 54 ms), within the noise.
+- **Render cost per layer** (`bench-layers.mjs`): equal within the noise (all
+  layers 2175 → 2241 ms per update, emojis 2552 → 2543 ms).
+
+Absolute layer times were about 4× higher than the phase 0 baseline above for
+*both* bundles: emoji rendering on this machine got slower between the two days,
+not the code. So compare only runs from the same session; the baseline JSON
+files are kept as they were.
 
 ## Comparing after a change
 

@@ -109,10 +109,20 @@ changing for a few frames after loading and after each interaction;
 
 ### Phase 1: Modern build
 
-- [ ] Vite library build (ESM + UMD), TypeScript 5, dart-sass; drop Gulp and Webpack
-- [ ] Current Node LTS
-- [ ] Internal copy of the used ducd helpers
-- [ ] Done when: tests and screenshots unchanged
+- [x] Vite library build (ESM + UMD), dart-sass; Gulp and Webpack removed.
+      TypeScript 6 instead of 5 (current at the time; 7 is the native compiler).
+      Oxc only supports `const` exports in namespaces: `layers` and `generators`
+      export `const` instead of `var`. Two imports the old build tolerated were
+      fixed (`HypertreeArgs` as a type export, `bboxCenter` from the right module).
+- [x] Current Node LTS (Node 26; `engines: >= 20.19`)
+- [x] Internal copy of the used ducd helpers (`src/ducd.ts`), ducd dependency removed
+- [x] `package.json`: `main` (UMD), `module` (ESM), `types` (was `.d.js`), `exports`
+- [x] Done when: tests and screenshots unchanged: all 152 library tests pass with
+      the unchanged references; benchmarks equal (see PERFORMANCE.md); the
+      application builds and its smoke tests pass.
+- Note: the declarations are written by TypeScript 6 and use syntax older
+  TypeScript versions can't read (`export type`, `unknown`, accessors; TS < 3.8).
+  Fine for v2; the application gets TypeScript 6 in its own phase 1.
 
 ### Phase 2: Bugs and code quality
 
@@ -277,6 +287,22 @@ Fix options, depending on the cause:
 ## Performance measurements
 
 Benchmarks, method, current numbers and findings: [PERFORMANCE.md](PERFORMANCE.md).
+
+## Building
+
+Node ≥ 20.19 (developed with Node 26 LTS).
+
+```bash
+npm install
+npm run build            # dist/: d3-hypertree.js (UMD, global hyt), d3-hypertree.mjs (ESM),
+                         # d3-hypertree-light.css, d3-hypertree-dark.css, d/ (type declarations)
+npm run dev              # rebuild on every change + playground on http://localhost:3100/playground/
+npm run watch            # rebuild on every change only
+npm run typecheck        # TypeScript errors (known ones are fixed in Phase 2)
+```
+
+The JavaScript is built by Vite (`vite.config.mjs`), the theme CSS by
+`build/css.mjs` (dart-sass), the declarations by `build/types.mjs` (tsc).
 
 ## Running the tests
 

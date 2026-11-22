@@ -1,7 +1,7 @@
 import * as d3                 from 'd3'
-import { HTML }                from 'ducd'
-import { clone, stringhash }   from 'ducd'
-import { googlePalette }       from 'ducd'
+import { HTML }                from '../../ducd'
+import { clone, stringhash }   from '../../ducd'
+import { googlePalette }       from '../../ducd'
 import { HypertreeArgs }       from '../../models/hypertree/model'
 import { N }                   from '../../models/n/n'
 import { Path }                from '../../models/path/path'
@@ -13,7 +13,7 @@ import { CaddC, CsubC, CmulR } from '../../models/transformation/hyperbolic-math
 import { sigmoid }             from '../../models/transformation/hyperbolic-math'
 import { IUnitDisk }           from '../unitdisk/unitdisk'
 import { presets }             from '../../models/hypertree/preset-base'
-import { mergeDeep }           from 'ducd'
+import { mergeDeep }           from '../../ducd'
 
 let globelhtid = 0
  
