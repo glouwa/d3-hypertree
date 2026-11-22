@@ -118,7 +118,6 @@ export class LayerStack
             Δ:[t1-t0, t2-t1, t3-t2], 
             names:['path-arcs', 'link-arcs-focus', 'labels'] 
         }
-        //if (this.layers['link-lines']) this.layers['link-lines'].update.style()            
 
     }
 }

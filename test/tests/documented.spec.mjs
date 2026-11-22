@@ -70,13 +70,15 @@ test('readme: filter.weightFilter null disables weight culling', async ({ page }
 
 // --- docs/readme.md (API reference) ---------------------------------------------
 
-// "Available Layers": link-lines and path-lines
-for (const layer of ['link-lines', 'path-lines']) {
-    test(`docs: layer "${layer}" is available`, async ({ page }) => {
-        await openTree(page, tree)
-        expect(await page.evaluate(() => harness.layerNames())).toContain(layer)
-    })
-}
+// v1 docs "Available Layers": link-lines and path-lines, removed in v2. addLayer with
+// the old names shows the arc layers with straight lines (linkCurvature 'l').
+test('docs v1: addLayer link-lines gives straight links', async ({ page }) => {
+    await openTree(page, `${tree}&${m({ geometry: { addLayer: ['link-lines', 'path-lines'] } })}`)
+    const names = await page.evaluate(() => harness.layerNames())
+    expect(names).not.toContain('link-lines')
+    expect(names).not.toContain('path-lines')
+    expect(await page.evaluate(() => document.querySelectorAll('[id="link-arcs"] line').length)).toBeGreaterThan(0)
+})
 
 // "Geometry and Layer Options": addLayer / removeLayer
 test('docs: geometry.removeLayer removes a default layer', async ({ page }) => {

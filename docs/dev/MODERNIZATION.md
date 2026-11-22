@@ -187,7 +187,8 @@ A bug or feature counts as done when its expected-to-fail test becomes a normal 
        - renamed, alias with a deprecation warning: `nodeColor`/`linkColor`
          (→ `fill`/`stroke`), `interaction.wheelSensitivity` (→ `wheelFactor`),
          layers `link-lines`/`path-lines` (→ `link-arcs`/`path-arcs` with straight
-         lines), `geometry.animateUpRadius` (→ `layout.initSize`),
+         lines; first restored as layers, then removed: copies and slower, see
+         CHANGELOG), `geometry.animateUpRadius` (→ `layout.initSize`),
          `filter.cullingWeight` (→ `weightFilter.rangeNodes`),
          `filter.transformation.P` (→ start position)
        - new: `filter.weightFilter: null` (no weight culling), `geometry.addLayer` /

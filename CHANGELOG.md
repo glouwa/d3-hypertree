@@ -56,8 +56,8 @@ are listed first.
 - **`geometry.startPosition`**: initial translation.
 - **Model options from the documentation that were missing:**
   `filter.weightFilter: null` (no culling by weight), `geometry.addLayer` /
-  `removeLayer` (layer names), layers `link-lines` and `path-lines` (off by
-  default), `iconmap` and `langmap` (applied once at initialization).
+  `removeLayer` (layer names), `iconmap` and `langmap` (applied once at
+  initialization).
 - **Playground** (`playground/`, `npm run dev`): every data source and option in
   a UI, with a callback log; the configuration lives in the URL.
 
@@ -85,10 +85,14 @@ are listed first.
 | `geometry.animateUpRadius` | `layout.initSize` |
 | `filter.cullingWeight` | `filter.weightFilter.rangeNodes` |
 | `filter.transformation.P` | `geometry.startPosition` |
+| `geometry.addLayer: ['link-lines' / 'path-lines']` | `link-arcs` / `path-arcs` with `geometry.linkCurvature: 'l'` |
 
 ### Removed
 
 - Layer `labels2` (an unfinished copy of `labels`); use multi-line labels.
+- Layers `link-lines` and `path-lines` (copies of `link-arcs` / `path-arcs` with
+  straight lines, and slower). Use `geometry.linkCurvature: 'l'` or `'0'`;
+  `addLayer` with the old names does that, with a warning.
 - `layout.linklen` from the documentation (never implemented; the zoom λ is the
   link length in this layout).
 - The dependency on `ducd` (fixes "Can't resolve 'ducd'", #28).

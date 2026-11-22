@@ -366,7 +366,7 @@ new hyt.Hypertree(
             nodeRadius:        (ud:IUnitDisk, n:N)=> number
             nodeScale:         (n:N)=> number
             nodeFilter:        (n:N)=> boolean
-            addLayer:          string[]                    // layer names to show, e.g. ['traces', 'link-lines']
+            addLayer:          string[]                    // layer names to show, e.g. ['traces', 'labels']
             removeLayer:       string[]                    // layer names to remove, e.g. ['stem-arc']
             startPosition:     C                           // initial translation, e.g. { re:.3, im:0 }
         }

@@ -9,6 +9,9 @@ function deprecated(old:string, now:string) {
     console.warn(`d3-hypertree: ${old} is deprecated, use ${now}`)
 }
 
+// removed in v2 (copies of the arc layers with straight lines, and slower)
+const removedLineLayers:{ [name:string]: string } = { 'link-lines': 'link-arcs', 'path-lines': 'path-arcs' }
+
 export interface CompatResult {
     model:              any
     weightFilterNull:   boolean    // filter.weightFilter: null = no weight culling
@@ -22,7 +25,8 @@ export interface CompatResult {
  *   geometry.animateUpRadius -> layout.initSize,
  *   filter.cullingWeight -> filter.weightFilter.rangeNodes,
  *   filter.transformation.P -> geometry.startPosition
- * - geometry.addLayer / removeLayer (layer names) as layerOptions
+ * - geometry.addLayer / removeLayer (layer names) as layerOptions; the removed
+ *   layers link-lines / path-lines become link-arcs / path-arcs with linkCurvature 'l'
  * - langmap as the language loader's result (unless a langloader is given)
  * - filter.weightFilter: null taken out (merging can't express null); reported
  *   in the result and applied after the merge
@@ -61,7 +65,16 @@ export function applyDocumentedOptions(input:any) : CompatResult {
                     const l = layer(name); if (l.stroke === undefined) l.stroke = l.linkColor; delete l.linkColor
                 }
             }
-            for (const name of g.addLayer || []) layer(name).invisible = false
+            for (const name of g.addLayer || []) {
+                const arcs = removedLineLayers[name]
+                if (arcs) {
+                    // v1 layers link-lines / path-lines: the arc layers with straight lines
+                    deprecated(`layer ${name}`, `${arcs} with geometry.linkCurvature: 'l'`)
+                    if (geometry.linkCurvature === undefined) geometry.linkCurvature = 'l'
+                    layer(arcs).invisible = false
+                }
+                else layer(name).invisible = false
+            }
             for (const name of g.removeLayer || []) layer(name).removed = true
             delete geometry.addLayer
             delete geometry.removeLayer

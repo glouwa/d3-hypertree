@@ -243,9 +243,7 @@ Note that filter, geometry and interaction can be omitted if default configurati
 | cell-layer      |         | Renders voronoi cells of nodes. Cell defines mouse area of a node. |
 | center-node     |    ✓    | Gray circle background for node next to 0,0    |
 | path-arcs       |    ✓    | Hyperbolic arc links for pathes                |
-| path-lines      |         | Straight line links for pathes                 |
 | link-arcs       |    ✓    | Hyperbolic arc links                           |
-| link-lines      |         | Straight line links                            |
 | nodes           |    ✓    | Circle nodes                                   |
 | images          |         | Renders a image for each node with a imgref member. Imgref must be a valid image url. The image is centered at the node position |
 | emojis          |    ✓    | Renders a emoji for each node occurring in iconmap |
