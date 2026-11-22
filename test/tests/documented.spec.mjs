@@ -100,7 +100,7 @@ test('docs: geometry.animateUpRadius fits the initial tree into that radius', as
 // "Data Model": iconmap (unicode emojis by node id) and langmap (translations)
 test('docs: iconmap assigns emojis to nodes', async ({ page }) => {
     await openTree(page, `${tree}&${m({ iconmap: { a: '🐱', b: '🐶' } })}`)
-    expect(await page.evaluate(() => document.querySelectorAll('#emojis text').length)).toBeGreaterThan(0)
+    expect(await page.evaluate(() => document.querySelectorAll('#emojis > text, #emojis > image').length)).toBeGreaterThan(0)
 })
 
 test('docs: langmap translates node labels', async ({ page }) => {

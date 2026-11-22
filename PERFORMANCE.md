@@ -222,6 +222,21 @@ JavaScript time in those phases.
   the wedge translation for leaves didn't show, most visible nodes are inner
   nodes with hidden children. A faster layout for zoom changes is still open.
 
+## Phase 3: rendering (2026-11-22)
+
+ (wide 8⁵ tree with labels and 586 emojis), before and after
+drawing emojis as cached bitmaps, back to back from snapshots:
+
+| | before | after |
+|---|---:|---:|
+| all layers, ms per update | 2302 | 16.9 |
+| emoji layer alone | 2329 | 6.9 |
+| browser layout (in all layers) | 374 | 0.6 |
+| browser paint (in all layers) | 267 | 1.3 |
+
+SVG text emojis were laid out and rasterized again on every update; as with a data URL the browser only moves finished bitmaps. The other layers moved
+within the noise.
+
 ## Comparing after a change
 
 1. Rebuild `dist/`, run the benchmark, commit nothing yet.

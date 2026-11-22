@@ -286,6 +286,9 @@ export const layerSrc = [
         //hideOnDrag: true,
         name:       'emojis',  
         className:  'caption',                          
+        // each distinct emoji drawn once as a bitmap: emoji glyphs as SVG text were
+        // re-rasterized on every update (the most expensive layer by far)
+        asImage:    true,
         data:       ()=> ud.cache.emojis,
         text:       (d)=> d.precalc.icon,
         delta:      labeloffsets.centerOffset('emojislen'), 

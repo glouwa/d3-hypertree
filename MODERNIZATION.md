@@ -252,14 +252,20 @@ Update pipeline (layout, filter):
 
 Rendering (DOM, browser), in order of expected gain:
 
-- [ ] **Emoji layer.** Emojis drawn as SVG `<text>` are by far the most
+- [x] **Emoji layer.** Emojis drawn as SVG `<text>` are by far the most
       expensive layer: their glyphs get re-rasterized on every update. Render
       each distinct emoji once into a bitmap and reuse it (SVG `<image>` with
-      a cached data URL, or canvas)
-- [ ] **Text layers.** Same problem on a smaller scale (text shaping on every update)
-- [ ] **Redundant DOM writes.** `updateColor`/`updateTransform` run on every
+      a cached data URL, or canvas). Done: layer option `asImage` (emoji layer
+      default): each distinct emoji measured once as SVG text, drawn once on a
+      canvas, reused as `<image>`. All layers of the wide test tree with 586 emojis:
+      2302 → 16.9 ms per update (PERFORMANCE.md)
+- [x] **Text layers.** Same problem on a smaller scale (text shaping on every update).
+      Done: `labels-force` set every text again on every update; now only when it changed
+- [x] **Redundant DOM writes.** `updateColor`/`updateTransform` run on every
       element on every update; ~65% of attribute writes set an unchanged value
-      (`class`, `r`, `stroke-linecap`). Write only on enter or on change
+      (`class`, `r`, `stroke-linecap`). Write only on enter or on change. Done for
+      `stroke-linecap` (on enter) and the node radius (on change); `class` toggles are
+      cheap class list operations and stay
 - [ ] **Compositor layers.** Every layer group has `transform: translateZ(0)`,
       so every layer is its own compositor layer. Measured (default tree with
       labels): 23 groups carry the hint, 9 of them have content; Edge builds 15
@@ -273,8 +279,9 @@ Rendering (DOM, browser), in order of expected gain:
       `disk` (background, disk border, indicators), `content` (cells, links,
       nodes, symbols, images, emojis, labels), `overlay` (traces, interaction).
       Compare per layer (today) / three planes / none with the benchmarks
-- [ ] Coalesce interaction updates to one per animation frame (today every
-      mousemove schedules its own full update)
+- [x] Coalesce interaction updates to one per animation frame (today every
+      mousemove schedules its own full update). Done: a pointer event queue, flushed
+      once per frame in order; consecutive moves of a pointer collapse to the latest
 - [ ] Canvas renderer for nodes and links if SVG stays the bottleneck after the above
 - [ ] Upgrade d3 v4 → v7
 

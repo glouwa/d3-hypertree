@@ -154,7 +154,7 @@ export async function counts(page) {
     return page.evaluate(() => ({
         nodes:  document.querySelectorAll('#nodes circle').length,
         links:  document.querySelectorAll('#link-arcs path').length,
-        emojis: document.querySelectorAll('#emojis text').length,
+        emojis: document.querySelectorAll('#emojis > text, #emojis > image').length,
         labels: document.querySelectorAll('#labels text, #labels-force text').length,
     }))
 }

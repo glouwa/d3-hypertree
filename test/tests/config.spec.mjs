@@ -200,7 +200,7 @@ test.describe('node layer option show', () => {
 // Layer option shrinkAtRim (labels, labels-force, emojis): scale with the distance to
 // the center like the links instead of the damped scale (or none for labels-force).
 test.describe('shrinkAtRim', () => {
-    const scales = (page, layer) => page.evaluate(layer => [...document.querySelectorAll(`[id="${layer}"] text`)].map(t => {
+    const scales = (page, layer) => page.evaluate(layer => [...document.querySelectorAll(`[id="${layer}"] > text, [id="${layer}"] > image`)].map(t => {
         const m = /scale\(([^)]+)\)/.exec(t.getAttribute('transform') || '')
         return { s: m ? +m[1] : 1, r: t.__data__.cachep.r, k: t.__data__.distScale }
     }), layer)

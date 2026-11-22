@@ -143,10 +143,30 @@ export class InteractionLayer2 implements ILayer
     private fireMouseEvent(eventName:string) {
         d3.event.stopPropagation()
         d3.event.preventDefault()
-        
-        const m = this.currMousePosAsC()
-        requestAnimationFrame(()=> {            
-            if (this[eventName]('mouse', m))
+        this.enqueuePointerEvent(eventName, 'mouse', this.currMousePosAsC())
+    }
+
+    // Pointer events are processed once per animation frame, in order; consecutive
+    // moves of the same pointer collapse to the latest position. One update per
+    // frame instead of one per event (several mouse or touch moves can arrive per frame).
+    private pointerQueue : { name:string, pid, m:C }[] = []
+    private pointerFlushScheduled = false
+    private enqueuePointerEvent(name:string, pid, m:C) {
+        const last = this.pointerQueue[this.pointerQueue.length - 1]
+        if (name === 'onPointerMove' && last && last.name === name && last.pid === pid)
+            last.m = m
+        else
+            this.pointerQueue.push({ name, pid, m })
+        if (this.pointerFlushScheduled) return
+        this.pointerFlushScheduled = true
+        requestAnimationFrame(()=> {
+            this.pointerFlushScheduled = false
+            const queue = this.pointerQueue
+            this.pointerQueue = []
+            let update = false
+            for (const e of queue)
+                update = this[e.name](e.pid, e.m) || update
+            if (update)
                 this.view.hypertree.update.transformation()
         })
     }
@@ -195,19 +215,9 @@ export class InteractionLayer2 implements ILayer
         d3.event.preventDefault()
 
         const changedTouches = d3.event.changedTouches
-        let update = false
-        for (let i=0; i < changedTouches.length; ++i) 
-        {
-            const t = changedTouches[i]
-            const pid = t.identifier   
-            const m = ArrtoC(d3.touches(this.view.parent.node(), changedTouches)[i])
-         
-            update = this[eventName](pid, m) || update
-        }
-        requestAnimationFrame(()=> {
-            if (update)
-                this.view.hypertree.update.transformation()            
-        })
+        const positions = d3.touches(this.view.parent.node(), changedTouches)
+        for (let i=0; i < changedTouches.length; ++i)
+            this.enqueuePointerEvent(eventName, changedTouches[i].identifier, ArrtoC(positions[i]))
     }
   
     //-----------------------------------------------------------------------------------------

@@ -23,7 +23,7 @@ test('loads with the defaults and renders the tree', async ({ page }) => {
     expect(await page.locator('summary .badge').evaluateAll(b => b.map(e => e.textContent).filter(Boolean))).toEqual([])
     expect(await page.locator('table.layers tr.changed').count()).toBe(0)
     // icons are off by default: the emoji layer is the slowest one
-    expect(await page.evaluate(() => document.querySelectorAll('#tree #emojis text').length)).toBe(0)
+    expect(await page.evaluate(() => document.querySelectorAll('#tree #emojis > text, #tree #emojis > image').length)).toBe(0)
     expectNoErrors(errors)
 })
 
@@ -137,15 +137,15 @@ test('the emoji layer is off by default; turned on it shows the icons, also afte
     const box = () => page.locator('tr[data-layer="emojis"] input[type=checkbox]').first()
     expect(await box().isChecked()).toBe(false)
     await box().check()
-    await page.waitForFunction(() => document.querySelectorAll('#tree #emojis text').length > 3)
+    await page.waitForFunction(() => document.querySelectorAll('#tree #emojis > text, #tree #emojis > image').length > 3)
     await page.reload()
     await ready(page)
-    await page.waitForFunction(() => document.querySelectorAll('#tree #emojis text').length > 3)
+    await page.waitForFunction(() => document.querySelectorAll('#tree #emojis > text, #tree #emojis > image').length > 3)
     // labels off: icons without labels used to crash
     await page.locator('summary').filter({ hasText: /^Initialization/ }).click()
     await page.locator('.init-steps .check', { hasText: /^Labels$/ }).locator('input').uncheck()
     await page.waitForTimeout(800)
-    expect(await page.evaluate(() => document.querySelectorAll('#tree #emojis text').length)).toBeGreaterThan(3)
+    expect(await page.evaluate(() => document.querySelectorAll('#tree #emojis > text, #tree #emojis > image').length)).toBeGreaterThan(3)
     expectNoErrors(errors)
 })
 

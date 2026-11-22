@@ -62,7 +62,7 @@ export class StemLayer implements ILayer
             name:              'stem-link', 
             className:         this.args.className,
             elementType:       straincurvature === 'l' ? 'line' : 'path',
-            create:            s=> {},
+            create:            s=> s.attr("stroke-linecap", "round"),   // constant: set once
             updateColor:       s=> this.args.classed(s, this.args.width),
             updateTransform:   s=> {                
                 if (straincurvature === 'l')
@@ -71,11 +71,9 @@ export class StemLayer implements ILayer
                      .attr('x2',             d=> this.args.nodePos(d).re)
                      .attr('y2',             d=> 1)
                      .attr("stroke-width",   d=> this.args.width(d)+.01)
-                     .attr("stroke-linecap", d=> "round")
                 else 
                     s.attr("d",              d=> this.arcOptions[this.args.curvature](d))
                      .attr("stroke-width",   d=> this.args.width(d)+.015)
-                     .attr("stroke-linecap", d=> "round")
             },
         })
         this.d3updatePattern2 = new D3UpdatePattern({
@@ -86,7 +84,7 @@ export class StemLayer implements ILayer
             name:              'stem-path',
             className:         this.args.className,
             elementType:       straincurvature === 'l' ? 'line' : 'path',
-            create:            s=> {},
+            create:            s=> s.attr("stroke-linecap", "round"),   // constant: set once
             updateColor:       s=> this.args.classed2(s, this.args.width),
             updateTransform:   s=> {                
                 if (straincurvature === 'l')
@@ -95,11 +93,9 @@ export class StemLayer implements ILayer
                      .attr('x2',             d=> this.args.nodePos(d).re)
                      .attr('y2',             d=> 1)
                      .attr("stroke-width",   d=> this.args.width(d)+.01)
-                     .attr("stroke-linecap", d=> "round")
                 else 
                     s.attr("d",              d=> this.arcOptions[this.args.curvature](d))
                      .attr("stroke-width",   d=> this.args.width(d)+.015)
-                     .attr("stroke-linecap", d=> "round")
             },
         })
     }

@@ -41,6 +41,7 @@ export class NodeLayer implements ILayer
     }
 
     private attach() {
+        const $this = this
         this.d3updatePattern = new D3UpdatePattern({
             parent:            this.view.parent, 
             layer:             this,
@@ -63,7 +64,11 @@ export class NodeLayer implements ILayer
                                     .style("fill",      d=> (d.pathes && d.pathes.labelcolor) || this.args.fill(d)),
 
             updateTransform:   s=> s.attr("transform",    d=> this.args.transform(d))
-                                    .attr("r",            d=> this.args.r(d)),
+                                    // r rarely changes: write it only when it does
+                                    .each(function(d) {
+                                        const r = $this.args.r(d)
+                                        if (this.__r !== r) { this.setAttribute('r', String(r)); this.__r = r }
+                                    }),
         })
     }
 }
