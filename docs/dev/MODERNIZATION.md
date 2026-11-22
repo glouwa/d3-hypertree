@@ -282,7 +282,10 @@ Rendering (DOM, browser), in order of expected gain:
 - [x] Coalesce interaction updates to one per animation frame (today every
       mousemove schedules its own full update). Done: a pointer event queue, flushed
       once per frame in order; consecutive moves of a pointer collapse to the latest
-- [ ] Canvas renderer for nodes and links if SVG stays the bottleneck after the above
+- [ ] Canvas renderer for nodes and links if SVG stays the bottleneck after the above.
+      **Only as an option next to SVG, never replacing it:** SVG stays the default
+      and keeps every feature (styling with CSS, DOM events, tests on the DOM);
+      a canvas renderer would be chosen per layer or per view
 - [ ] Upgrade d3 v4 → v7
 
 ### Future features
