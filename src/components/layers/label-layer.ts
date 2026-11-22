@@ -15,7 +15,7 @@ export interface LabelLayerArgs extends ILayerArgs
     text,
     clip?:       string,
     color?:      (d)=> any,
-    background?: any,          // falsy, or a function of the node: draw a background rect
+    background?: any,          // falsy, true (every label, CSS color) or a function of the node: falsy, true or a color
     scale?:       number | ((n)=> number),   // size bound to the data (default 1), times geometry.shrinkAtRim (preset-layers.ts)
     maxLabels?:   number,      // at most this many labels (default filter.maxlabels; preset-layers.ts)
     asImage?:    boolean,      // draw each distinct text once as a bitmap and reuse it (emoji layer default: true)
@@ -39,7 +39,8 @@ export class LabelLayer implements ILayer
                     paddingLeftRight, 
                     paddingTopBottom,
                     .05,
-                    this.args.name)
+                    this.args.name,
+                    this.args.background)
             //this.d3updatePattern2.update.data()
         },
         transformation: ()=> {            

@@ -19,6 +19,7 @@ import { layerSrc, labeloffsets }   from './preset-layers'
 import { cacheUpdate }              from './magic-filter'
 import { mergeDeep }                from '../../ducd'
 import { C, CmulR }                 from '../transformation/hyperbolic-math'
+import { infovisModel, infovisEmojiModel, InfovisOptions } from './preset-infovis'
 
 const π =              Math.PI
 const hasLazy =        n=> (n.hasOutChildren && n.isOutλ)
@@ -129,11 +130,69 @@ const modelBase : ()=> HypertreeArgs = ()=>
     }
 })
 
-export const presets : { [key: string]:()=> any } = 
-{
-    modelBase: ()=> modelBase(),
+// Tree of Life (hypertree-of-life): wiki labels (𝐖 = has a Wikipedia article, only
+// those are clickable), emojis and force labels without background
+const treeOfLifeLabels = (ht:Hypertree, n:N)=> {
+    const id = n.data && n.data.name
+    const l  = ht.langMap && ht.langMap[id] && '𝐖 ' + ht.langMap[id]
+    n.precalc.wiki = l
+    n.precalc.label = l || id
+    n.precalc.clickable = Boolean(l)
+}
 
-    otolModel: ()=> ({
+// a branch page (otol.html): one branch of the tree, wiki panel next to it
+const treeOfLife = ()=> ({
+    langInitBFS: treeOfLifeLabels,
+    layout: {
+        weight:     (n:N)=> (isLeaf(n)?1:0),
+        rootWedge:  { orientation: 3*π/2, angle: 1.8*π/2 }
+    },
+    filter: {
+        weightFilter: { rangeNodes: { min:320, max:500 } }
+    },
+    geometry: {
+        nodeRadius:  nodeInitR(.0075),
+        captionFont: '8px Roboto',
+        captionHeight: .05,
+        layerOptions: {
+            'emojis': { invisible: false },
+            'labels': { background: false },
+        }
+    },
+    interaction: {
+        λbounds: [1/40, .55],
+    }
+})
+
+// the main page (index.html): the overview of all branches, force labels, voronoi
+// cells as the click areas
+const treeOfLifeMain = ()=> mergeDeep(treeOfLife(), {
+    layout: {
+        rootWedge:  { orientation: 3*π/2, angle: .7*π/2 }
+    },
+    filter: {
+        weightFilter: { rangeNodes: { min:350, max:650 } }
+    },
+    geometry: {
+        layerOptions: {
+            'cells':        { invisible: false, hideOnDrag: false, strokeWidth: n=> 0 },
+            'labels':       { invisible: true,  hideOnDrag: true },
+            'labels-force': { invisible: false, hideOnDrag: false },
+        }
+    },
+    interaction: {
+        λbounds: [1/40, 1/10],
+    }
+})
+
+// the presets until v1, used by the hypertree-of-life demo pages: deprecated
+const warned = new Set<string>()
+const deprecatedPreset = (name:string, use:string, f:()=> any)=> ()=> {
+    if (!warned.has(name)) { warned.add(name); console.warn(`d3-hypertree: presets.${name} is deprecated, use ${use}`) }
+    return f()
+}
+
+const otolModel = ()=> ({
         langInitBFS: (ht:Hypertree, n:N)=> {                
             const id = n.data && n.data.name
             const l  = ht.langMap && ht.langMap[id] && '𝐖 ' + ht.langMap[id] 
@@ -160,10 +219,11 @@ export const presets : { [key: string]:()=> any } =
                     l.view.hypertree.api.goto(CmulR({ re:n.layout.z.re, im:n.layout.z.im }, -1), null)
                         .then(()=> l.view.hypertree.drawDetailFrame())
                 }
-            }*/      
-        }    
-    }),
+            }*/
+        }
+    })
 
+const oldPresets = {
     generatorModel: ()=> ({                        
         interaction: {
             λbounds: [1/10, .6],
@@ -227,7 +287,7 @@ export const presets : { [key: string]:()=> any } =
 
     mainModel: ()=> 
     {
-        const model = presets.otolModel()
+        const model = otolModel()
         const diff = {
             filter: {
                 focusExtension: 2.5,
@@ -280,6 +340,29 @@ export const presets : { [key: string]:()=> any } =
         }
         return mergeDeep(model, diff)
     }
+}
+
+export const presets : { [key: string]:(options?:any)=> any } =
+{
+    modelBase:      ()=> modelBase(),
+
+    // hypertree-of-life: the main page and a branch page
+    treeOfLifeMain: ()=> treeOfLifeMain(),
+    treeOfLife:     ()=> treeOfLife(),
+
+    // information visualization with d3-scales (options: value, colorValue,
+    // interpolator; see preset-infovis.ts)
+    infovis:        (o?:InfovisOptions)=> infovisModel(o),
+    infovisEmoji:   (o?:InfovisOptions)=> infovisEmojiModel(o),
+
+    // until v1, deprecated (the hypertree-of-life demo pages still use them)
+    otolModel:            deprecatedPreset('otolModel', 'presets.treeOfLife', otolModel),
+    mainModel:            deprecatedPreset('mainModel', 'presets.treeOfLifeMain', oldPresets.mainModel),
+    generatorModel:       deprecatedPreset('generatorModel', 'presets.modelBase', oldPresets.generatorModel),
+    generatorSpiralModel: deprecatedPreset('generatorSpiralModel', 'presets.modelBase with layout.type', oldPresets.generatorSpiralModel),
+    stackoverflowModel:   deprecatedPreset('stackoverflowModel', 'presets.modelBase', oldPresets.stackoverflowModel),
+    acmflareModel:        deprecatedPreset('acmflareModel', 'presets.infovis', oldPresets.acmflareModel),
+    fsModel:              deprecatedPreset('fsModel', 'presets.infovis', oldPresets.fsModel),
 }
 
 

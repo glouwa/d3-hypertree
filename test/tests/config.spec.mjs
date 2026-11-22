@@ -158,16 +158,54 @@ test.describe('layout', () => {
 })
 
 test.describe('presets', () => {
-    for (const preset of ['modelBase', 'otolModel', 'generatorModel', 'generatorSpiralModel', 'stackoverflowModel', 'acmflareModel', 'fsModel']) {
+    for (const preset of ['modelBase', 'treeOfLifeMain', 'treeOfLife', 'infovis', 'infovisEmoji',
+                          'otolModel', 'generatorModel', 'generatorSpiralModel', 'stackoverflowModel', 'acmflareModel', 'fsModel']) {
         test(`preset ${preset}`, async ({ page }, testInfo) => {
             const errors = collectErrors(page)
-            await openTree(page, `gen=nTree&depth=4&childs=3&preset=${preset}`)
+            // the new presets with labels and icons (the old ones as their references were made)
+            const content = ['treeOfLifeMain', 'treeOfLife', 'infovis', 'infovisEmoji'].includes(preset) ? '&labels=1&icons=1' : ''
+            await openTree(page, `gen=nTree&depth=4&childs=3${content}&preset=${preset}`)
             expect((await page.evaluate(() => harness.scene())).nodes.length).toBeGreaterThan(5)
             await expectPlausibleScene(page)
             await expectScene(page, testInfo, `preset-${preset}`)
             expectNoErrors(errors)
         })
     }
+
+    test('the presets until v1 warn that they are deprecated', async ({ page }) => {
+        const warnings = []
+        page.on('console', m => { if (m.type() === 'warning') warnings.push(m.text()) })
+        await openTree(page, 'gen=nTree&depth=3&childs=2&preset=otolModel')
+        expect(warnings.some(w => /presets\.otolModel is deprecated, use presets\.treeOfLife/.test(w))).toBe(true)
+    })
+
+    // infovis: values mapped with d3-scales to sizes and colors
+    test('infovis: own values as size and color of nodes, links, cells and label backgrounds', async ({ page }) => {
+        const opt = encodeURIComponent(JSON.stringify({ value: 'value', colorValue: 'depth' }))
+        await openTree(page, `gen=nTree&depth=4&childs=3&labels=1&filter=off&values=1&preset=infovis&presetOpt=${opt}`)
+        await waitForStable(page)
+        const r = await page.evaluate(() => {
+            const nodes = [...document.querySelectorAll('#nodes circle')]
+            const byDepth = {}
+            for (const c of nodes) (byDepth[c.__data__.depth] = byDepth[c.__data__.depth] || new Set()).add(c.style.fill)
+            return {
+                inner: nodes.some(c => c.__data__.children),                              // show: 'all'
+                radii: new Set(nodes.map(c => c.getAttribute('r'))).size,                 // radius from the value
+                colorsPerDepth: Object.values(byDepth).map(s => s.size),                  // color from the depth
+                depthColors: new Set(Object.values(byDepth).map(s => [...s][0])).size,
+                links: new Set([...document.querySelectorAll('[id="link-arcs"] > *')].map(l => l.style.stroke)).size,
+                cells: [...document.querySelectorAll('[id="cells"] polygon')].filter(p => p.style.fill).length,
+                backgrounds: [...document.querySelectorAll('[id="labels"] rect')].filter(r => r.style.fill).length,
+            }
+        })
+        expect(r.inner).toBe(true)
+        expect(r.radii).toBeGreaterThan(10)
+        expect(r.colorsPerDepth.every(n => n === 1)).toBe(true)
+        expect(r.depthColors).toBeGreaterThan(3)
+        expect(r.links).toBeGreaterThan(3)
+        expect(r.cells).toBeGreaterThan(10)
+        expect(r.backgrounds).toBeGreaterThan(3)
+    })
 })
 
 test.describe('node layer option show', () => {

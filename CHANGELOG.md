@@ -53,6 +53,16 @@ are listed first.
 
 ### Added
 
+- **Presets** `treeOfLifeMain` and `treeOfLife` (the hypertree-of-life main and
+  branch pages), `infovis` and `infovisEmoji`: a value per node (structure:
+  `weight`, `depth`, `height`, or own data `n.data.value` / a function) mapped with
+  d3-scales to node radius, link width, emoji size and to the colors of links,
+  node disks, voronoi cells and label backgrounds (options `value`, `colorValue`,
+  `interpolator`). The presets until v1 (`otolModel`, `mainModel`, `fsModel`,
+  `acmflareModel`, `stackoverflowModel`, `generatorModel`,
+  `generatorSpiralModel`) still work and warn that they are deprecated.
+- **Label backgrounds in color:** the layer option `background` may be a function
+  of the node returning a color.
 - **Interaction strategies** (`model.interaction`): `hover` (`'pointer'` | `'none'`),
   `selection` (`'none'` | `'single'` | `'multi'`), `maxSelections` (default 10),
   `clickAction` (`'select'` | `'goto'` | `'none'`). Node state `n.hovered`,

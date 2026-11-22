@@ -83,7 +83,9 @@ export class D3UpdatePattern
                 .call(this.args.updateColor)        
     }
 
-    public addTextBackgroundRects(paddingLeftRight, paddingTopBottom, height, layername)
+    // background: true (every label, color from the CSS) or a function of the node:
+    // falsy = no background, a color string = filled with it, true = CSS color
+    public addTextBackgroundRects(paddingLeftRight, paddingTopBottom, height, layername, background:any = true)
     { 
         this.mainSvgGroup.selectAll('rect').remove()
         var svgRootHere = this.mainSvgGroup
@@ -102,7 +104,8 @@ export class D3UpdatePattern
                     var lines = view.childElementCount || 1          // multi-line labels: one tspan per line
                     var h = geometry.captionHeight * lines
                     
-                    if (w)   // nodes without a measured label get no background
+                    const b = typeof background === 'function' ? background(d) : background
+                    if (w && b)   // nodes without a measured label get no background
                         svgRootHere.insert('rect', d=> this)
                             .attr("x",         x=> -paddingLeftRight/2)
                             .attr("y",         x=> -paddingTopBottom-geometry.captionHeight/2)   // top of the first line
@@ -111,7 +114,8 @@ export class D3UpdatePattern
                             .attr("width",     x=> w + paddingLeftRight)
                             .attr("height",    x=> h + paddingTopBottom)
                             .attr("transform", x=> view.attributes.transform.value)//d.transformStrCache + d.scaleStrText)
-                            .classed('caption-background', true)                    
+                            .classed('caption-background', true)
+                            .style('fill', typeof b === 'string' ? b : null)
                 }
             })
         }

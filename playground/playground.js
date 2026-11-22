@@ -28,6 +28,8 @@
     const DEFAULTS = {
         source: 'gen:nTree', depth: 10, childs: 2, n: 250, arms: 4, armDepth: 30,
         lang: false, labels: true, multiline: false, iconPercent: 10, preset: '', theme: 'light',
+        // infovis presets: the value for sizes and for colors ('' = the same), example data
+        presetValue: 'weight', presetColorValue: '', values: false,
         // geometry: options that apply to several layers
         linkCurvature: base.geometry.linkCurvature,
         shrinkAtRim: base.geometry.shrinkAtRim,
@@ -63,6 +65,8 @@
     }
     const LIB_RANGE_NODES = base.filter.weightFilter.rangeNodes
     const PRESETS = Object.keys(hyt.presets).filter(p => p !== 'modelBase')
+    const DEPRECATED_PRESETS = ['otolModel', 'mainModel', 'generatorModel', 'generatorSpiralModel', 'stackoverflowModel', 'acmflareModel', 'fsModel']
+    const isInfovis = c => /^infovis/.test(c.preset)
     const SOURCES = [
         ['gen:nTree', 'Generator: n-ary tree'],
         ['gen:star', 'Generator: star'],
@@ -146,6 +150,12 @@
         if (c.multiline && (c.labels || c.lang)) p.set('multiline', '1')
         if (c.iconPercent > 0) { p.set('icons', '1'); if (c.iconPercent !== 100) p.set('iconPercent', c.iconPercent) }
         if (c.preset) p.set('preset', c.preset)
+        if (isInfovis(c) && (c.presetValue !== DEFAULTS.presetValue || c.presetColorValue)) {
+            const o = { value: c.presetValue }
+            if (c.presetColorValue) o.colorValue = c.presetColorValue
+            p.set('presetOpt', JSON.stringify(o))
+        }
+        if (c.values) p.set('values', '1')
         if (c.theme !== 'light') p.set('theme', c.theme)
         if (c.layoutType !== 'berge') p.set('layoutType', c.layoutType)
         if (c.wedgeOrientation !== DEFAULTS.wedgeOrientation || c.wedgeAngle !== DEFAULTS.wedgeAngle)
@@ -209,6 +219,8 @@
         c.lang = p.has('lang')
         c.labels = p.get('labels') === '1' || p.get('labels') === 'name'
         c.preset = p.get('preset') || ''
+        if (p.get('presetOpt')) { const o = JSON.parse(p.get('presetOpt')); c.presetValue = o.value || DEFAULTS.presetValue; c.presetColorValue = o.colorValue || '' }
+        c.values = p.get('values') === '1'
         c.theme = p.get('theme') || 'light'
         c.layoutType = p.get('layoutType') || 'berge'
         if (p.get('layout')) {
@@ -443,14 +455,19 @@
     function buildControls() {
         const isGen = g => () => cfg.source === 'gen:' + g
 
-        let g = section('Data', ['source', 'depth', 'childs', 'n', 'arms', 'armDepth', 'preset'], true)
+        let g = section('Data', ['source', 'depth', 'childs', 'n', 'arms', 'armDepth', 'preset', 'presetValue', 'presetColorValue', 'values'], true)
         select(g, 'Source', 'source', SOURCES)
         number(g, 'Depth', 'depth', 1, 16, 1, isGen('nTree'))
         number(g, 'Children', 'childs', 1, 20, 1, isGen('nTree'))
         number(g, 'Nodes', 'n', 2, 2000, 1, () => cfg.source === 'gen:star' || cfg.source === 'gen:path')
         number(g, 'Arms', 'arms', 1, 20, 1, isGen('deepStar'))
         number(g, 'Arm depth', 'armDepth', 1, 200, 1, isGen('deepStar'))
-        select(g, 'Preset', 'preset', [['', 'none (library defaults)'], ...PRESETS.map(p => [p, p])])
+        select(g, 'Preset', 'preset', [['', 'none (library defaults)'], ...PRESETS.filter(p => !DEPRECATED_PRESETS.includes(p)).map(p => [p, p]),
+            ...PRESETS.filter(p => DEPRECATED_PRESETS.includes(p)).map(p => [p, p + ' (deprecated)'])])
+        const VALUES = [['weight', 'weight (leaves below)'], ['depth', 'depth'], ['height', 'height'], ['value', 'n.data.value (own data)']]
+        select(g, 'Size value', 'presetValue', VALUES, () => isInfovis(cfg))
+        select(g, 'Color value', 'presetColorValue', [['', 'same as size'], ...VALUES], () => isInfovis(cfg))
+        check(g, 'Example values (n.data.value 1..100)', 'values', null, 'Generated trees have no data of their own; this gives every node a value for the infovis presets.')
         hint(g, 'Deep trees (e.g. deep star with arm depth > 40) show the known deep-tree bug when navigating far down.')
 
         // What the library does when a model is set, in this order (hypertree.ts: setModel,

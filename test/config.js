@@ -31,7 +31,9 @@
 //   geometry={"linkCurvature":"+"}            -> model.geometry (options for all layers)
 //   interaction={"wheelFactor":1.5}           -> model.interaction
 //   model={"iconmap":{}}                      -> the whole model (any documented option)
-//   preset=otolModel              start from hyt.presets[preset]() instead of the defaults
+//   preset=treeOfLife             start from hyt.presets[preset]() instead of the defaults
+//   presetOpt={...}               options of the preset (JSON), e.g. for infovis
+//   values=1                      example data: n.data.value 1..100 (infovis presets)
 //   weight=uniform                every node weighs 1 in the culling filter
 //   theme=dark                    (applied by the page, not part of the model)
 (function () {
@@ -114,7 +116,8 @@
 
         let model
         if (q.get('preset')) {
-            model = hyt.presets[q.get('preset')]()
+            // presetOpt: options of the preset (JSON), e.g. infovis {"value":"value","colorValue":"depth"}
+            model = hyt.presets[q.get('preset')](q.get('presetOpt') ? JSON.parse(q.get('presetOpt')) : undefined)
             model.dataloader = dataloader
             if (!q.get('lang')) model.langloader = ok => ok({})   // presets may point to app files
             model.interaction = Object.assign({}, model.interaction, callbacks)
@@ -156,6 +159,16 @@
                 const has = Math.floor((i + 1) * p) > Math.floor(i * p)
                 i++
                 n.precalc.icon = has ? emojis[(k++) % emojis.length] : undefined
+            }
+        }
+        if (q.get('values') === '1') {
+            // example data for the infovis presets: n.data.value 1..100, the same on every run
+            const prev = model.dataInitBFS
+            let vi = 0
+            model.dataInitBFS = (ht, n) => {
+                if (prev) prev(ht, n)
+                n.data = n.data || {}
+                if (typeof n.data.value !== 'number') n.data.value = 1 + (Math.imul(vi++ + 1, 2654435761) >>> 0) % 100
             }
         }
         if (q.get('filter') === 'off') {
