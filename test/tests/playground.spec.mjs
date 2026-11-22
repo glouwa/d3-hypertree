@@ -264,3 +264,14 @@ test('cells: hover and selection highlighting are layer options', async ({ page 
         && window.ht.unitdisk.layerStack.layers.cells.args.selection === false)
     expect(decodeURIComponent(await page.evaluate(() => location.search))).toContain('"hover":false,"selection":false')
 })
+
+test('nodes: option show offers leaves and all', async ({ page }) => {
+    await page.goto('../playground/?gen=nTree&depth=6&childs=2&labels=1&filter=off')
+    await ready(page)
+    await page.locator('summary').filter({ hasText: /^Layers/ }).click()
+    await page.click('tr[data-layer="nodes"] button.expander')
+    const sel = page.locator('tr[data-layer-options="nodes"] .row').filter({ has: page.locator('label', { hasText: /^show$/ }) }).locator('select')
+    await sel.selectOption('all')
+    await page.waitForFunction(() => [...document.querySelectorAll('#tree #nodes circle')].some(c => c.__data__ && c.__data__.children && c.__data__.parent))
+    expect(decodeURIComponent(await page.evaluate(() => location.search))).toContain('"nodes":{"show":"all"}')
+})

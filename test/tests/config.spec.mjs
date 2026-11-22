@@ -169,3 +169,30 @@ test.describe('presets', () => {
         })
     }
 })
+
+test.describe('node layer option show', () => {
+    const circles = page => page.evaluate(() => [...document.querySelectorAll('#nodes circle')].map(c => c.__data__))
+    test('default "leaves": leaves, root and nodes with hidden children only', async ({ page }) => {
+        await openTree(page, 'gen=nTree&depth=6&childs=2&filter=off')
+        const ds = await page.evaluate(() => [...document.querySelectorAll('#nodes circle')].map(c => !!(c.__data__.children && c.__data__.parent)))
+        expect(ds.length).toBeGreaterThan(10)
+        expect(ds.some(inner => inner)).toBe(false)
+    })
+    test('"all": a disk for every visible node, inner nodes included', async ({ page }) => {
+        const errors = collectErrors(page)
+        await openTree(page, `gen=nTree&depth=6&childs=2&filter=off&layers=${encodeURIComponent('{"nodes":{"show":"all"}}')}`)
+        const r = await page.evaluate(() => ({
+            circles: document.querySelectorAll('#nodes circle').length,
+            visible: harness.ht.unitdisk.cache.unculledNodes.length,
+            inner: [...document.querySelectorAll('#nodes circle')].filter(c => c.__data__.children && c.__data__.parent).length }))
+        expect(r.circles).toBe(r.visible)
+        expect(r.inner).toBeGreaterThan(10)
+        expectNoErrors(errors)
+    })
+    test('a function chooses the nodes', async ({ page }) => {
+        await openTree(page, 'gen=nTree&depth=6&childs=2&filter=off')
+        await page.evaluate(() => { harness.layer('nodes').args.show = n => n.depth === 3; harness.ht.update.data() })
+        await page.waitForTimeout(200)
+        expect(await page.evaluate(() => [...new Set([...document.querySelectorAll('#nodes circle')].map(c => c.__data__.depth))])).toEqual([3])
+    })
+})

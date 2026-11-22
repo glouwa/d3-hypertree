@@ -240,8 +240,16 @@ export const layerSrc = [
         invisible:   false,
         hideOnDrag:  false,
         name:        'nodes',
-        className:   'node',        
-        data:        ()=> ud.cache.leafOrLazy,
+        className:   'node',
+        // option show: 'leaves' (default: leaves, root and nodes with hidden children,
+        // see geometry.nodeFilter), 'all' (every visible node) or a function n => boolean
+        data:        ()=> {
+                        const layer = ud.layerStack && ud.layerStack.layers['nodes']
+                        const show = layer && (<any>layer.args).show
+                        if (!show || show === 'leaves') return ud.cache.leafOrLazy
+                        if (show === 'all') return ud.cache.unculledNodes
+                        return ud.cache.unculledNodes.filter(show)
+                     },
         fill:        n=> undefined,
         stroke:      n=> undefined,
         strokeWidth: n=> undefined,

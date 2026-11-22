@@ -79,7 +79,7 @@
         'path-arcs':   [['curvature', 'curvature'], ['stroke', 'color'], ['strokeWidth', 'number', 0.001, 0.05, 0.0005]],
         'link-arcs':   [['curvature', 'curvature'], ['stroke', 'color'], ['strokeWidth', 'number', 0.001, 0.05, 0.0005]],
         'stem-arc':    [['curvature', 'curvature'], ['width', 'number', 0.001, 0.05, 0.0005]],
-        'nodes':       [['fill', 'color'], ['stroke', 'color'], ['strokeWidth', 'number', 0, 0.02, 0.0005], ['r', 'number', 0.002, 0.06, 0.001]],
+        'nodes':       [['show', 'choice', ['leaves', 'all']], ['fill', 'color'], ['stroke', 'color'], ['strokeWidth', 'number', 0, 0.02, 0.0005], ['r', 'number', 0.002, 0.06, 0.001]],
         'images':      [['width', 'number', 0.01, 0.3, 0.005], ['height', 'number', 0.01, 0.3, 0.005]],
         'emojis':      [['color', 'color'], ['background', 'bool']],
         'labels':      [['color', 'color'], ['background', 'bool']],
@@ -404,6 +404,11 @@
             const sel = el('select', { onchange: e => setLayer(key, e.target.value === '' ? undefined : e.target.value === 'on') },
                 el('option', { value: '' }, 'default'), el('option', { value: 'on' }, 'on'), el('option', { value: 'off' }, 'off'))
             controls.push({ refresh: () => { const v = cur(); sel.value = v === undefined ? '' : v ? 'on' : 'off' } })
+            input = sel
+        } else if (type === 'choice') {   // min = list of values
+            const sel = el('select', { onchange: e => setLayer(key, e.target.value || undefined) },
+                el('option', { value: '' }, 'default'), ...min.map(v => el('option', { value: v }, v)))
+            controls.push({ refresh: () => { sel.value = cur() || '' } })
             input = sel
         }
         return el('div', { class: 'row two' }, label, input)

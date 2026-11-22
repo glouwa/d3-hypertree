@@ -14,6 +14,7 @@ export interface NodeLayerArgs extends ILayerArgs
     fill?:       (d)=> any,
     stroke?:     (d)=> any,
     strokeWidth?:(d)=> any,
+    show?:       'leaves' | 'all' | ((n)=> boolean),   // which nodes get a disk (default 'leaves')
 }
 
 export class NodeLayer implements ILayer

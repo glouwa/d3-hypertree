@@ -196,7 +196,7 @@ A bug or feature counts as done when its expected-to-fail test becomes a normal 
          initialization into `precalc.icon` / `precalc.label` (no lookup per frame)
        - `layout.linklen`: left out for now (the zoom λ is the link length in this
          layout); removed from the docs, mentioned in the migration guide
-6. [ ] **Node layer option `show`**: `'leaves'` (default as today: leaves, root,
+6. [x] **Node layer option `show`**: `'leaves'` (default as today: leaves, root,
        nodes with hidden children), `'all'` (a small disk for every visible node,
        inner nodes scaled by weight) or a function `n => boolean`.
        `geometry.nodeFilter` stays as an alias. Playground: option of the nodes layer.
