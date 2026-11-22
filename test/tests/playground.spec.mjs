@@ -7,6 +7,8 @@ import { collectErrors, expectNoErrors } from './helpers.mjs'
 
 test.use({ viewport: { width: 1400, height: 900 } })
 
+// opens a collapsed group of the layer list (Indicators, Labels, Links, Nodes)
+const openGroup = (page, name) => page.locator(`tr[data-group="${name}"]`).click({ position: { x: 20, y: 8 } })
 const ready = page => page.waitForFunction(() => window.ht && window.ht.data && document.querySelector('#tree #link-arcs'), null, { timeout: 15000 })
 
 test('loads with the defaults and renders the tree', async ({ page }) => {
@@ -90,6 +92,8 @@ test('each layer has its own options; geometry applies to several layers', async
     const opt = (layer, key) => page.locator(`tr[data-layer-options="${layer}"] .row`)
         .filter({ has: page.locator('label', { hasText: new RegExp(`^${key}$`) }) })
     await page.locator('summary').filter({ hasText: /^Layers/ }).click()
+    await openGroup(page, 'Nodes')
+    await openGroup(page, 'Links')
 
     // nodes: fill (constant color)
     await page.click('tr[data-layer="nodes"] button.expander')
@@ -97,18 +101,18 @@ test('each layer has its own options; geometry applies to several layers', async
     await opt('nodes', 'fill').locator('input[type=color]').fill('#ff0000')
     await page.waitForFunction(() => document.querySelector('#tree #nodes circle') && document.querySelector('#tree #nodes circle').style.fill === 'rgb(255, 0, 0)')
 
-    // geometry.linkCurvature 'l' turns both arc layers into lines...
+    // geometry.linkCurvature '0' turns both arc layers into straight lines...
     await page.locator('summary').filter({ hasText: /^Geometry/ }).click()
-    await page.locator('.row', { has: page.locator('label', { hasText: /^linkCurvature$/ }) }).locator('select').selectOption('l')
-    await page.waitForFunction(() => document.querySelector('#tree #link-arcs > *') && document.querySelector('#tree #link-arcs > *').tagName === 'line')
+    await page.locator('.row', { has: page.locator('label', { hasText: /^linkCurvature$/ }) }).locator('select').selectOption('0')
+    await page.waitForFunction(() => { const l = document.querySelector('#tree #link-arcs > *'); return l && !/A/.test(l.getAttribute('d')) })
 
     // ...unless a layer overrides it
     await page.click('tr[data-layer="link-arcs"] button.expander')
     await opt('link-arcs', 'curvature').locator('select').selectOption('+')
-    await page.waitForFunction(() => document.querySelector('#tree #link-arcs > *') && document.querySelector('#tree #link-arcs > *').tagName === 'path')
+    await page.waitForFunction(() => { const l = document.querySelector('#tree #link-arcs > *'); return l && /A/.test(l.getAttribute('d')) })
 
     const url = decodeURIComponent(await page.evaluate(() => location.search))
-    expect(url).toContain('geometry={"linkCurvature":"l"}')
+    expect(url).toContain('geometry={"linkCurvature":"0"}')
     expect(url).toContain('"nodes":{"fill":"#ff0000"}')
     expect(url).toContain('"link-arcs":{"curvature":"+"}')
     expectNoErrors(errors)
@@ -117,6 +121,7 @@ test('each layer has its own options; geometry applies to several layers', async
 test('a click anywhere on a layer row toggles its options, its checkboxes do not', async ({ page }) => {
     await page.goto('../playground/?gen=nTree&depth=4')
     await page.locator('summary').filter({ hasText: /^Layers/ }).click()
+    await openGroup(page, 'Nodes')
     const opts = page.locator('tr[data-layer-options="nodes"]')
     await expect(opts).toBeHidden()
     await page.locator('tr[data-layer="nodes"] td').nth(0).click({ position: { x: 150, y: 5 } })
@@ -134,6 +139,7 @@ test('the emoji layer is off by default; turned on it shows the icons, also afte
     await page.goto('../playground/')
     await ready(page)
     await page.locator('summary').filter({ hasText: /^Layers/ }).click()
+    await openGroup(page, 'Nodes')
     const box = () => page.locator('tr[data-layer="emojis"] input[type=checkbox]').first()
     expect(await box().isChecked()).toBe(false)
     await box().check()
@@ -269,6 +275,7 @@ test('nodes: option show offers leaves and all', async ({ page }) => {
     await page.goto('../playground/?gen=nTree&depth=6&childs=2&labels=1&filter=off')
     await ready(page)
     await page.locator('summary').filter({ hasText: /^Layers/ }).click()
+    await openGroup(page, 'Nodes')
     await page.click('tr[data-layer="nodes"] button.expander')
     const sel = page.locator('tr[data-layer-options="nodes"] .row').filter({ has: page.locator('label', { hasText: /^show$/ }) }).locator('select')
     await sel.selectOption('all')
@@ -291,4 +298,78 @@ test('interaction strategies: selection "single" replaces, hover "none" hovers n
         return window.ht.args.objects.selections.map(n => n.mergeId).concat([b.mergeId])
     })
     expect(ids[0]).toBe(ids[1])
+})
+
+test('the groups Links and Nodes', async ({ page }) => {
+    await page.goto('../playground/?gen=nTree&depth=4')
+    await ready(page)
+    await page.locator('summary').filter({ hasText: /^Layers/ }).click()
+    const groups = { Links: ['path-arcs', 'link-arcs', 'stem-arc'], Nodes: ['nodes', 'symbols', 'images', 'emojis'] }
+    for (const [name, members] of Object.entries(groups)) {
+        await expect(page.locator(`tr[data-group="${name}"]`)).toContainText(`${members.length} layers`)
+        for (const m of members) await expect(page.locator(`tr[data-layer="${m}"]`)).toBeHidden()
+        await openGroup(page, name)
+        for (const m of members) await expect(page.locator(`tr[data-layer="${m}"]`)).toBeVisible()
+    }
+    await expect(page.locator('tr[data-layer="center-node"]')).toBeVisible()
+})
+
+test('interaction: hover path and hover cell switch independently', async ({ page }) => {
+    await page.goto('../playground/?gen=nTree&depth=6&childs=2&filter=off')
+    await ready(page)
+    await page.locator('summary').filter({ hasText: /^Interaction/ }).click()
+    const box = label => page.locator('label.check', { hasText: new RegExp(`^${label}$`) }).locator('input')
+    const hoverMiddle = async () => {
+        const b = await page.locator('#tree svg').first().boundingBox()
+        await page.mouse.move(b.x + b.width * 0.3, b.y + b.height * 0.3)
+        await page.mouse.move(b.x + b.width * 0.55, b.y + b.height * 0.4, { steps: 3 })
+        await page.waitForTimeout(300)
+        return page.evaluate(() => ({
+            path: document.querySelectorAll('#tree [id="path-arcs"] > *').length > 0,
+            cell: document.querySelectorAll('#tree [id="cells"] .hovered').length > 0 }))
+    }
+    expect(await box('Hover path').isChecked()).toBe(true)
+    expect(await box('Hover cell').isChecked()).toBe(false)
+    expect(await hoverMiddle()).toEqual({ path: true, cell: false })
+
+    await box('Hover cell').check()
+    await page.waitForFunction(() => decodeURIComponent(location.search).includes('"cells":{"invisible":false}'))
+    await ready(page)
+    expect(await hoverMiddle()).toEqual({ path: true, cell: true })
+
+    await box('Hover path').uncheck()
+    await page.waitForFunction(() => decodeURIComponent(location.search).includes('"path-arcs":{"hover":"none"}'))
+    await ready(page)
+    expect(await hoverMiddle()).toEqual({ path: false, cell: true })
+})
+
+test('click: goto or select, ripple in addition', async ({ page }) => {
+    await page.goto('../playground/?gen=nTree&depth=4')
+    await ready(page)
+    await page.locator('summary').filter({ hasText: /^Interaction/ }).click()
+    const sel = page.locator('.row', { has: page.locator('label', { hasText: /^Click on a node$/ }) }).locator('select')
+    expect(await sel.locator('option').evaluateAll(o => o.map(x => x.value))).toEqual(['goto', 'select', 'none'])
+    await sel.selectOption('select')
+    await page.locator('label.check', { hasText: /^Ripple on click/ }).locator('input').check()
+    await page.waitForFunction(() => /click=select/.test(location.search) && /ripple=1/.test(location.search))
+    // older links: click=ripple
+    await page.goto('../playground/?gen=nTree&depth=4&click=ripple')
+    await ready(page)
+    expect(await sel.inputValue()).toBe('none')
+    expect(await page.locator('label.check', { hasText: /^Ripple on click/ }).locator('input').isChecked()).toBe(true)
+})
+
+test('initialization: multi-line labels', async ({ page }) => {
+    await page.goto('../playground/?gen=nTree&depth=3&childs=2&labels=1&filter=off')
+    await ready(page)
+    await page.locator('summary').filter({ hasText: /^Initialization/ }).click()
+    await page.locator('label.check', { hasText: /^Multi-line labels$/ }).locator('input').check()
+    await page.waitForFunction(() => /multiline=1/.test(location.search))
+    await page.waitForFunction(() => window.ht && window.ht.data && window.ht.data.descendants().every(n => !n.precalc.label || n.precalc.label.includes('\n')))
+})
+
+test('filter: rangeNodes max defaults to 750 in the playground', async ({ page }) => {
+    await page.goto('../playground/?gen=nTree&depth=4')
+    await ready(page)
+    expect(await page.evaluate(() => window.ht.args.filter.weightFilter.rangeNodes.max)).toBe(750)
 })

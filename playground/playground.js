@@ -27,7 +27,7 @@
     const base = hyt.presets.modelBase()
     const DEFAULTS = {
         source: 'gen:nTree', depth: 10, childs: 2, n: 250, arms: 4, armDepth: 30,
-        lang: false, labels: true, iconPercent: 10, preset: '', theme: 'light',
+        lang: false, labels: true, multiline: false, iconPercent: 10, preset: '', theme: 'light',
         // geometry: options that apply to several layers
         linkCurvature: base.geometry.linkCurvature,
         captionFontPx: parseFloat(base.geometry.captionFont),
@@ -40,7 +40,7 @@
         filterOff: false, weightUniform: false,
         cullingRadius: base.filter.cullingRadius,
         rangeNodesMin: base.filter.weightFilter.rangeNodes.min,
-        rangeNodesMax: base.filter.weightFilter.rangeNodes.max,
+        rangeNodesMax: 750,   // playground default; the library's is base.filter.weightFilter.rangeNodes.max
         rcwMin: base.filter.weightFilter.rangeCullingWeight.min,
         rcwMax: base.filter.weightFilter.rangeCullingWeight.max,
         focusExtension: base.filter.focusExtension,
@@ -55,8 +55,10 @@
         // overrides: name -> { invisible, hideOnDrag, <layer options> }. The emoji layer is the
         // slowest one: off by default here (generating icons is a one-off, see iconPercent).
         layers: { emojis: { invisible: true } },
-        click: 'goto',        // playground only: what a click on a node does
+        click: 'goto',        // playground only: what a click on a node does ('goto', 'select', 'none')
+        clickRipple: false,   // playground only: ripple on click, in addition to the above
     }
+    const LIB_RANGE_NODES = base.filter.weightFilter.rangeNodes
     const PRESETS = Object.keys(hyt.presets).filter(p => p !== 'modelBase')
     const SOURCES = [
         ['gen:nTree', 'Generator: n-ary tree'],
@@ -77,7 +79,7 @@
     const LAYER_OPTIONS = {
         'cells':       [['hover', 'bool'], ['selection', 'bool'], ['fill', 'color'], ['stroke', 'color'], ['strokeWidth', 'number', 0, 0.02, 0.0005]],
         'center-node': [['fill', 'color'], ['stroke', 'color'], ['strokeWidth', 'number', 0, 0.02, 0.0005], ['r', 'number', 0.01, 0.3, 0.005]],
-        'path-arcs':   [['curvature', 'curvature'], ['stroke', 'color'], ['strokeWidth', 'number', 0.001, 0.05, 0.0005]],
+        'path-arcs':   [['curvature', 'curvature'], ['hover', 'choice', ['path', 'none']], ['selection', 'choice', ['path', 'none']], ['stroke', 'color'], ['strokeWidth', 'number', 0.001, 0.05, 0.0005]],
         'link-arcs':   [['curvature', 'curvature'], ['hover', 'choice', ['path', 'node', 'none']], ['selection', 'choice', ['path', 'node', 'none']], ['stroke', 'color'], ['strokeWidth', 'number', 0.001, 0.05, 0.0005]],
         'stem-arc':    [['curvature', 'curvature'], ['width', 'number', 0.001, 0.05, 0.0005]],
         'nodes':       [['show', 'choice', ['leaves', 'all']], ['hover', 'choice', ['path', 'node', 'none']], ['selection', 'choice', ['path', 'node', 'none']], ['fill', 'color'], ['stroke', 'color'], ['strokeWidth', 'number', 0, 0.02, 0.0005], ['r', 'number', 0.002, 0.06, 0.001]],
@@ -138,6 +140,7 @@
         if (c.lang && c.source === 'file:fixtures/small.d3.json') p.set('lang', 'fixtures/small.lang.json')
         // generated trees have no names: number them; data with names shows its names
         if (c.labels && !c.lang) p.set('labels', kind === 'gen' && value !== 'data' ? '1' : 'name')
+        if (c.multiline && (c.labels || c.lang)) p.set('multiline', '1')
         if (c.iconPercent > 0) { p.set('icons', '1'); if (c.iconPercent !== 100) p.set('iconPercent', c.iconPercent) }
         if (c.preset) p.set('preset', c.preset)
         if (c.theme !== 'light') p.set('theme', c.theme)
@@ -152,7 +155,11 @@
         if (c.focusExtension !== DEFAULTS.focusExtension) f.focusExtension = c.focusExtension
         if (c.maxFocusRadius !== DEFAULTS.maxFocusRadius) f.maxFocusRadius = c.maxFocusRadius
         if (c.maxlabels !== DEFAULTS.maxlabels) f.maxlabels = c.maxlabels
-        if (c.rangeNodesMin !== DEFAULTS.rangeNodesMin || c.rangeNodesMax !== DEFAULTS.rangeNodesMax)
+        // written when different from the playground or from the library default
+        // (they differ), so the link and "Open as test" give the same range
+        const sameRange = (r1, r2) => r1.min === r2.min && r1.max === r2.max
+        const rn = { min: c.rangeNodesMin, max: c.rangeNodesMax }
+        if (!sameRange(rn, LIB_RANGE_NODES) || !sameRange(rn, { min: DEFAULTS.rangeNodesMin, max: DEFAULTS.rangeNodesMax }))
             wf.rangeNodes = { min: c.rangeNodesMin, max: c.rangeNodesMax }
         if (c.rcwMin !== DEFAULTS.rcwMin || c.rcwMax !== DEFAULTS.rcwMax)
             wf.rangeCullingWeight = { min: c.rcwMin, max: c.rcwMax }
@@ -179,6 +186,7 @@
         if (Object.keys(c.layers).length || JSON.stringify(c.layers) !== JSON.stringify(DEFAULTS.layers)) p.set('layers', JSON.stringify(c.layers))
 
         if (!forHarness && c.click !== DEFAULTS.click) p.set('click', c.click)
+        if (!forHarness && c.clickRipple) p.set('ripple', '1')
         return p
     }
 
@@ -232,6 +240,9 @@
         // icons: share of the nodes with an icon; a link without icons has none
         c.iconPercent = p.get('icons') === '1' ? num('iconPercent', 100) : ([...p.keys()].length ? 0 : DEFAULTS.iconPercent)
         c.click = p.get('click') || DEFAULTS.click
+        c.clickRipple = p.get('ripple') === '1'
+        if (c.click === 'ripple') { c.click = 'none'; c.clickRipple = true }   // older links
+        c.multiline = p.get('multiline') === '1'
         // a URL without any parameter shows the defaults with labels
         if (![...p.keys()].length) c.labels = DEFAULTS.labels
         return c
@@ -256,7 +267,7 @@
             if (!n) return
             if (cfg.click === 'goto') ht.api.goto({ re: -n.layout.z.re, im: -n.layout.z.im }, null).then(() => ht.drawDetailFrame())
             if (cfg.click === 'select') ht.api.toggleSelection(n)
-            if (cfg.click === 'ripple') layer.ripple(n, m, () => {})
+            if (cfg.clickRipple) layer.ripple(n, m, () => {})
         },
         onNodeHold:         n => addLog('onNodeHold', nodeName(n)),
         onNodeHover:        n => addLog('onNodeHover', nodeName(n)),
@@ -397,7 +408,7 @@
             input = el('div', { class: 'check' }, on, r, out)
         } else if (type === 'curvature') {
             const sel = el('select', { onchange: e => setLayer(key, e.target.value || undefined) },
-                el('option', { value: '' }, 'default (geometry)'), el('option', { value: '-' }, '−'), el('option', { value: '+' }, '+'), el('option', { value: '0' }, '0 (straight, path)'), el('option', { value: 'l' }, 'l (straight, line)'))
+                el('option', { value: '' }, 'default (geometry)'), el('option', { value: '-' }, '−'), el('option', { value: '+' }, '+'), el('option', { value: '0' }, '0 (straight)'))
             controls.push({ refresh: () => { sel.value = cur() || '' } })
             input = sel
         } else if (type === 'bool') {
@@ -429,7 +440,7 @@
 
         // What the library does when a model is set, in this order (hypertree.ts: setModel,
         // initData, findInitλ_), with the option that controls each step and its current value.
-        g = section('Initialization', ['lang', 'labels', 'weightUniform', 'iconPercent'])
+        g = section('Initialization', ['lang', 'labels', 'multiline', 'weightUniform', 'iconPercent'])
         hint(g, 'What happens when the tree is set up, in this order. Steps with an option can be configured by the application.')
         const steps = el('ol', { class: 'init-steps' })
         g.append(steps)
@@ -471,6 +482,8 @@
                 : !cfg.labels ? 'none (library default: no labels)'
                 : gen()[0] === 'gen' && gen()[1] !== 'data' ? 'label: Node 0, Node 1, … (generated trees have no names)' : 'label: the node name')
         check(labelStep, 'Labels', 'labels', () => !cfg.lang)
+        check(labelStep, 'Multi-line labels', 'multiline', () => cfg.labels || cfg.lang,
+            'Puts a \\n into each label (at the first space, long words in the middle); the label layers draw one line per \\n.')
         step('Measure the texts', null,
             'Internal: width of every label and icon in geometry.captionFont, for placing captions.')
         step('Find the start zoom', 'layout.initSize, interaction.λbounds',
@@ -498,8 +511,8 @@
 
         g = section('Geometry', ['linkCurvature', 'captionFontPx', 'captionHeight', 'nodeRadius', 'linkWidth', 'theme'])
         hint(g, 'Options that apply to several layers (model.geometry). Options of a single layer are in the layer list below (▸).')
-        select(g, 'linkCurvature', 'linkCurvature', [['-', '− (default, hyperbolic geodesic)'], ['+', '+ (arc to the other side)'], ['0', '0 (straight, SVG path)'], ['l', 'l (straight, SVG line)']])
-        hint(g, 'Default curvature of link-arcs and path-arcs; a layer can override it. 0 and l look the same (straight lines); 0 needs a little less JavaScript per frame, overall about the same.')
+        select(g, 'linkCurvature', 'linkCurvature', [['-', '− (default, hyperbolic geodesic)'], ['+', '+ (arc to the other side)'], ['0', '0 (straight)']])
+        hint(g, 'Default curvature of link-arcs and path-arcs; a layer can override it. The library also accepts l (straight, as SVG lines): looks like 0 and needs a little more JavaScript per frame.')
         range(g, 'caption font', 'captionFontPx', 3, 16, 0.5, null, v => `${v}px`)
         range(g, 'captionHeight', 'captionHeight', 0.01, 0.12, 0.005)
         optionalNumber(g, 'nodeRadius', 'nodeRadius', 0.002, 0.05, 0.001, 0.01)
@@ -521,7 +534,11 @@
             { name: 'Indicators', test: n => /-r(-|$)/.test(n) || n === 'λ',
               note: 'circles that show radii of the filter and the interaction, and the zoom λ' },
             { name: 'Labels', test: n => /^labels/.test(n),
-              note: 'the label layers: labels, a second label set, and force-placed labels' },
+              note: 'the label layers: labels and force-placed labels' },
+            { name: 'Links', test: n => /-arcs?$/.test(n),
+              note: 'the edges between nodes: all links, the hover and selection paths, and the stem to the root' },
+            { name: 'Nodes', test: n => ['nodes', 'symbols', 'images', 'emojis'].includes(n),
+              note: 'what is drawn at a node: disk, symbol, image and emoji' },
         ]
         const groupOf = name => GROUPS.find(gr => gr.test(name))
         const groupRows = {}   // group name -> { rows: member rows, open }
@@ -605,12 +622,34 @@
         }
         hint(g, '▸ shows the options of a layer. "hide on drag" hides a layer while dragging, pinching or animating.')
 
-        g = section('Interaction', ['λmin', 'λmax', 'wheelFactor', 'holdDuration', 'mouseRadius', 'click', 'hover', 'selection', 'maxSelections'])
+        g = section('Interaction', ['λmin', 'λmax', 'wheelFactor', 'holdDuration', 'mouseRadius', 'click', 'clickRipple', 'hover', 'selection', 'maxSelections'])
         hint(g, 'Strategies set the node state (hovered, selected); the layers only decide how they show it (e.g. cells › hover, selection).')
         select(g, 'Hover', 'hover', [['pointer', 'pointer: the node under the mouse'], ['none', 'none']])
+        // shortcuts for the layer display options (they change the layer list below)
+        const HOVER_PATH_LAYERS = ['path-arcs', 'link-arcs', 'nodes', 'symbols']
+        const layerOpt = (n, k) => (cfg.layers[n] || {})[k]
+        const setLayerOpt = (n, k, v) => {
+            const o = Object.assign({}, cfg.layers[n] || {}, { [k]: v })
+            for (const kk of Object.keys(o)) if (o[kk] === undefined || ((kk === 'invisible' || kk === 'hideOnDrag') && o[kk] === LAYER_DEFAULTS[n][kk])) delete o[kk]
+            if (Object.keys(o).length) cfg.layers[n] = o; else delete cfg.layers[n]
+        }
+        const pointer = () => cfg.hover === 'pointer'
+        layerCheck(g, 'Hover path', 'the path from the hovered node to the root (layers path-arcs, link-arcs, nodes, symbols: option hover)',
+            () => HOVER_PATH_LAYERS.every(n => layerOpt(n, 'hover') !== 'none'),
+            on => HOVER_PATH_LAYERS.forEach(n => setLayerOpt(n, 'hover', on ? undefined : 'none')), pointer)
+        layerCheck(g, 'Hover cell', 'the voronoi cell under the mouse (layer cells: visible, option hover)',
+            () => !Object.assign({}, LAYER_DEFAULTS.cells, cfg.layers.cells).invisible && layerOpt('cells', 'hover') !== false,
+            on => { if (on) setLayerOpt('cells', 'invisible', false); setLayerOpt('cells', 'hover', on ? undefined : false) }, pointer)
+        function layerCheck(group, label, title, isOn, apply, when) {
+            const c = el('input', { type: 'checkbox', onchange: e => { apply(e.target.checked); scheduleRebuild() } })
+            const wrap = el('div', { title }, el('label', { class: 'check' }, c, label))
+            group.append(wrap)
+            controls.push({ refresh: () => { c.checked = isOn(); wrap.style.display = when() ? '' : 'none' } })
+        }
         select(g, 'Selection', 'selection', [['multi', 'multi'], ['single', 'single: replaces the old one'], ['none', 'none']])
         number(g, 'maxSelections', 'maxSelections', 1, 100, 1, () => cfg.selection === 'multi')
-        select(g, 'Click on a node', 'click', [['goto', 'animate it to the center'], ['select', 'toggle selection'], ['ripple', 'ripple'], ['none', 'nothing (log only)']])
+        select(g, 'Click on a node', 'click', [['goto', 'animate it to the center'], ['select', 'toggle selection'], ['none', 'nothing (log only)']])
+        check(g, 'Ripple on click (in addition)', 'clickRipple')
         number(g, 'λbounds min', 'λmin', 0.001, 1, 0.005)
         number(g, 'λbounds max', 'λmax', 0.01, 1, 0.01)
         range(g, 'wheelFactor', 'wheelFactor', 1.01, 2, 0.005)

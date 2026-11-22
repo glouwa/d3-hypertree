@@ -6,6 +6,7 @@ import { ILayer }          from '../layerstack/layer'
 import { ILayerView }      from '../layerstack/layer'
 import { ILayerArgs }      from '../layerstack/layer'
 import { D3UpdatePattern } from '../layerstack/d3updatePattern'
+import { StateDisplay }    from './state-display'
 
 export type ArcCurvature = '+' | '0' | '-' | 'l'
 export interface ArcLayerArgs extends ILayerArgs
@@ -21,6 +22,8 @@ export interface ArcLayerArgs extends ILayerArgs
     clip?:      string,
     stroke?:     (d)=> any,
     strokeWidth?:(d)=> any,
+    hover?:      StateDisplay,   // link-arcs: how hover is shown; path-arcs: false / 'none' leaves out the hover path
+    selection?:  StateDisplay,   // same for the selection
 }
 
 export class ArcLayer implements ILayer

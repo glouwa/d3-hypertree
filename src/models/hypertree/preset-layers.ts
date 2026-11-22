@@ -149,8 +149,17 @@ export const layerSrc = [
         hideOnDrag: false,
         name:       'path-arcs',
         className:  'arc',
-        curvature:  ud.view.hypertree.args.geometry.linkCurvature, // + - 0 l        
-        data:       ()=> ud.cache.paths,                            
+        curvature:  ud.view.hypertree.args.geometry.linkCurvature, // + - 0 l
+        // layer options hover / selection: false or 'none' leaves out the hover path or
+        // the selection paths (other paths, e.g. a query, are always drawn)
+        data:       ()=> {
+                        const a = layerArgs(ud, 'path-arcs')
+                        const off = m=> m === false || m === 'none'
+                        if (!off(a.hover) && !off(a.selection)) return ud.cache.paths
+                        return ud.cache.paths.filter(d=> d.pathes.partof.some(p=>
+                            p.type === 'HoverPath'     ? !off(a.hover) :
+                            p.type === 'SelectionPath' ? !off(a.selection) : true))
+                    },
         nodePos:    n=> n.cache,
         nodePosStr: n=> n.strCache,
         stroke:     n=> undefined,

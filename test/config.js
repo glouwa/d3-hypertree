@@ -14,6 +14,7 @@
 //
 // Node content:
 //   labels=1   deterministic label per node     labels=name  the node's own name
+//   multiline=1  labels on two lines (break at the first space or in the middle)
 //   icons=1   emoji per node     iconPercent=25  only that share of the nodes gets one
 //             (spread evenly in breadth-first order; default 100)
 //   colors=1   color callbacks for nodes and links (by depth)
@@ -126,6 +127,15 @@
                 const d = n.data || {}
                 n.precalc.label = d.name || (d.id !== undefined ? String(d.id).split('.').pop() : undefined)
             }
+        }
+        if (q.get('multiline') === '1' && model.langInitBFS) {
+            // two-line labels: break at the first space, long single words in the middle
+            const init = model.langInitBFS
+            const twoLines = s => !s ? s
+                : s.includes(' ') ? s.replace(' ', '\n')
+                : s.length >= 8 ? s.slice(0, Math.ceil(s.length / 2)) + '\n' + s.slice(Math.ceil(s.length / 2))
+                : s
+            model.langInitBFS = (ht, n) => { init(ht, n); n.precalc.label = twoLines(n.precalc.label) }
         }
         if (q.get('icons') === '1') {
             const emojis = ['🌳', '🐟', '🐦', '🦎', '🐸', '🐭', '🦋', '🌸']

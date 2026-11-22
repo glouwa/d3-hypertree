@@ -42,7 +42,8 @@ are listed first.
   (and `api.toggleSelection(n)`), all through the selection strategy.
 - **Layer options:**
   - `hover` / `selection` on `nodes`, `symbols`, `link-arcs` (`'path'` default,
-    `'node'`, `'none'`) and on `cells` (`true` / `false`): how a layer shows the
+    `'node'`, `'none'`), on `path-arcs` (`'none'` leaves out the hover path or the
+    selection paths) and on `cells` (`true` / `false`): how a layer shows the
     state, independent of the events;
   - `show` on `nodes`: `'leaves'` (default), `'all'` (a disk for every visible
     node) or a function `n => boolean`;

@@ -136,4 +136,11 @@ test.describe('layers show the state as configured', () => {
         expect(r).toEqual({ nodes: 0, links: 0 })
         expect(await page.evaluate(() => harness.ht.args.objects.selections.length)).toBe(1)
     })
+    test('path-arcs: "none" leaves out the selection path, the default draws it', async ({ page }) => {
+        const pathArcs = () => page.evaluate(() => document.querySelectorAll('[id="path-arcs"] path, [id="path-arcs"] line').length)
+        await run(page, {})
+        expect(await pathArcs()).toBe(6)
+        await run(page, { 'path-arcs': { selection: 'none' } })
+        expect(await pathArcs()).toBe(0)
+    })
 })
