@@ -160,7 +160,9 @@ const treeOfLife = ()=> ({
         }
     },
     interaction: {
-        λbounds: [1/40, .55],
+        λbounds:     [1/40, .55],
+        clickAction: 'goto',      // a click moves the node to the center
+        selection:   'none',
     }
 })
 
@@ -177,11 +179,12 @@ const treeOfLifeMain = ()=> mergeDeep(treeOfLife(), {
         layerOptions: {
             'cells':        { invisible: false, hideOnDrag: false, strokeWidth: n=> 0 },
             'labels':       { invisible: true,  hideOnDrag: true },
-            'labels-force': { invisible: false, hideOnDrag: false },
+            'labels-force': { invisible: false, hideOnDrag: false, maxLabels: 30 },
         }
     },
     interaction: {
-        λbounds: [1/40, 1/10],
+        λbounds:     [1/40, 1/10],
+        clickAction: 'none',      // the application opens the branch page (onNodeClick)
     }
 })
 

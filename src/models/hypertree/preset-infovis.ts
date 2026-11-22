@@ -91,12 +91,18 @@ export function infovisModel(o:InfovisOptions = {}) : any {
         geometry: {
             nodeRadius: (ud, n:N)=> radius(n),
             linkWidth:  (n:N)=> width(n) * n.distScale,
+            shrinkAtRim: 'full',     // labels shrink like the links and disks
             layerOptions: {
-                'nodes':     { show: 'all', fill: color },
+                'nodes':     { show: 'all', fill: color, hover: 'node' },
                 'link-arcs': { stroke: color },
                 'cells':     { invisible: false, fill: (p)=> tint(p && p.data) },
                 'labels':    { background: tint },
             }
+        },
+        interaction: {
+            clickAction:   'select',   // a click toggles the selection
+            selection:     'multi',
+            maxSelections: 5,
         }
     }
 }
@@ -112,13 +118,21 @@ export function infovisEmojiModel(o:InfovisOptions = {}) : any {
     const width = sizeBy(value, widthRange)
     return {
         geometry: {
-            linkWidth:  (n:N)=> width(n) * n.distScale,
+            linkWidth:     (n:N)=> width(n) * n.distScale,
+            linkCurvature: '0',      // straight links
+            shrinkAtRim:   'none',   // the emoji size shows the value only, not the distance
             layerOptions: {
                 'nodes':     { fill: color },
                 'link-arcs': { stroke: color },
+                'path-arcs': { hover: 'none' },          // no hover path
                 'emojis':    { invisible: false, scale: sizeBy(value, [.7, 1.8]) },
+                'images':    { invisible: false },       // nodes with precalc.imageHref
                 'labels':    { background: false },
             }
+        },
+        interaction: {
+            clickAction:   'select',
+            selection:     'single',   // a new selection replaces the old one
         }
     }
 }
