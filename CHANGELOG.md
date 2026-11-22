@@ -129,6 +129,11 @@ and after on the same machine (see [docs/dev/PERFORMANCE.md](docs/dev/PERFORMANC
   `dist/d3-hypertree.mjs` (ESM), `dist/d/` type declarations (`types` pointed to
   a wrong file before), theme CSS unchanged.
 - The type declarations use TypeScript ≥ 3.8 syntax.
+- **d3 v7** (was v4), bundled as before, so the d3 version of an application
+  does not matter. The voronoi cells use d3-delaunay (d3 v7 has no `d3.voronoi`),
+  the file loaders use `fetch` (d3-request is gone); `cache.voronoiDiagram` keeps
+  its interface (`polygons()`, `find(x, y)`). Unused dependency
+  `d3-force-gravity` removed, `xml2js` 0.6.
 - Browser test suite (`test/`, Playwright), lint (`npm run lint`), CI on every push.
 
 ## 1.1.3 and earlier

@@ -1,6 +1,7 @@
 import * as d3                     from 'd3'
 import { N }                       from '../../models/n/n'
 import { navdata }                 from '../../models/n/n-loaders'
+import { voronoiLayout, VoronoiLayout } from '../../models/voronoi'
 import { C, CktoCp, CptoCk }       from '../../models/transformation/hyperbolic-math'
 import { CmulR, CsubC, CaddC }     from '../../models/transformation/hyperbolic-math'
 import { dfsFlat }                 from '../../models/transformation/hyperbolic-math'
@@ -26,7 +27,7 @@ export interface IUnitDisk
 
     cache
     cacheMeta?          // timings of the last cache update (magic-filter.ts)
-    voronoiLayout :     d3.VoronoiLayout<N>
+    voronoiLayout :     VoronoiLayout<N>
     layerStack:         LayerStack
     HypertreeMetaType
     navParameter?:      UnitDisk,
@@ -53,7 +54,7 @@ export class UnitDisk implements IUnitDisk
     public view          : UnitDiskView
     public args          : UnitDiskArgs        
     public cache         : TransformationCache // zeigt auf transformation.cache
-    public voronoiLayout : d3.VoronoiLayout<N>
+    public voronoiLayout : VoronoiLayout<N>
     
     public layerStack    : LayerStack    
     public pinchcenter   : C
@@ -104,12 +105,7 @@ export class UnitDisk implements IUnitDisk
             .append('circle')
                 .attr('r', this.args.clipRadius)       
 
-        this.voronoiLayout = d3.voronoi<N>()
-            .x(d=> { console.assert(typeof d.cache.re === 'number'); return d.cache.re})
-            .y(d=> { console.assert(typeof d.cache.re === 'number'); return d.cache.im})
-            //.x(d=> d.cache.re)
-            //.y(d=> d.cache.im)
-            .extent([[-2,-2], [2,2]])
+        this.voronoiLayout = voronoiLayout<N>(d=> d.cache.re, d=> d.cache.im, [[-2,-2], [2,2]])
        
         this.layerStack = new LayerStack({ 
             parent: this.mainsvg,
@@ -127,7 +123,7 @@ export class UnitDiskNav implements IUnitDisk
     public cache         // redircteds NOT xD to view.cache    
     public layerStack
     
-    get voronoiLayout() : d3.VoronoiLayout<N> {
+    get voronoiLayout() : VoronoiLayout<N> {
         return this.mainView.voronoiLayout;
     }
 

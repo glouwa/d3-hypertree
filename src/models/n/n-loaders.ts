@@ -1,7 +1,6 @@
 import { Tree } from "./n-tree"
 import { N } from './n'
-import { stratify } from 'd3-hierarchy'
-import { request, json, csv } from 'd3-request'
+import { stratify, csvParse } from 'd3'
 
 // todo loader MUSS ein generic sein
 export type LoaderFunction = (ok: (root:N, t0:number, dl:number)=>void)=> void
@@ -33,43 +32,35 @@ function star(ok, max) {
         ok(d)
     })
 }
+// Downloads a text file; ok gets the text, the time after the download and its length.
+// On an error the loader reports it and calls ok with undefined (as with d3-request).
+function loadText(file:string, ok:(text:string|undefined, t0:number, dl:number)=> void) {
+    fetch(file)
+        .then(r=> { if (!r.ok) throw new Error(`${r.status} ${r.statusText}`); return r.text() })
+        .then(text=> ok(text, performance.now(), text.length))
+        .catch(e=> { console.error(`d3-hypertree: could not load ${file}:`, e); ok(undefined, performance.now(), 0) })
+}
+
+const parseJson = (text:string|undefined)=> text === undefined ? undefined : JSON.parse(text)
+
 function loadFromLangFile(ok, file) {
-    //json(file, (error, langData) =>
-    var t0, dl
-    request(file)
-        .mimeType("application/json")
-        .response(xhr=> { 
-            t0 = performance.now()
-            dl = xhr.responseText.length
-            return JSON.parse(xhr.responseText)
-        })
-        .get((error, langData) => ok(langData, t0, dl))
+    loadText(file, (text, t0, dl)=> ok(parseJson(text), t0, dl))
 }
 
 function loadFromFile(ok, file) {
     if (file.endsWith('.xml') ||
         file.endsWith('.json') ||
         file.endsWith('.rdf'))
-        if (file.endsWith('.d3.json') || file == "data/upload/user-uploaded.xml") {
-            var t0, dl
-            request(file)
-                .mimeType("application/json")
-                .response(xhr=> { 
-                    t0 = performance.now()
-                    dl = xhr.responseText.length
-                    return JSON.parse(xhr.responseText)
-                })
-                .get((error, treeData) => ok(treeData, t0, dl))
-        }
+        if (file.endsWith('.d3.json') || file == "data/upload/user-uploaded.xml")
+            loadText(file, (text, t0, dl)=> ok(parseJson(text), t0, dl))
         else
             new Tree(ok, file)
     else
-        csv(file, function(error, data) {
-            if (error)
-                throw error;
+        loadText(file, text=> {
+            if (text === undefined) return
             ok(stratify()
-                .parentId((d:N)=> d.id.substring(0, d.id.lastIndexOf(".")))
-                (data))
+                .parentId((d:any)=> d.id.substring(0, d.id.lastIndexOf(".")))
+                (csvParse(text)))
         })
 }
 

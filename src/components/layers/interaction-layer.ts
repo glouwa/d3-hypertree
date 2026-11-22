@@ -32,7 +32,9 @@ export class InteractionLayer implements ILayer
         style:          ()=> {}
     }
 
-    currMousePosAsArr = ()=> d3.mouse(this.view.parent.node())
+    // d3 v7 passes the event to the handlers (no this.ev): the last one, for the helpers below
+    private ev:any = null
+    currMousePosAsArr = ()=> d3.pointer(this.ev, this.view.parent.node())
     currMousePosAsC = ()=> ArrtoC(this.currMousePosAsArr())
     findNodeByCell = ()=> {
         var m = this.currMousePosAsArr()
@@ -47,14 +49,14 @@ export class InteractionLayer implements ILayer
         let lasttransform = null
         var zoom = d3.zoom() // zoomevents: start, end, mulitiple, 
             //.scaleExtent([.51, 1.49])      
-            .on("zoom", ()=> {
-                console.assert(d3.event)
+            .on("zoom", e=> {
+                this.ev = e
 
-                if (d3.event && 
-                    d3.event.sourceEvent && 
-                    d3.event.sourceEvent.type === 'wheel')
+                if (this.ev && 
+                    this.ev.sourceEvent && 
+                    this.ev.sourceEvent.type === 'wheel')
                 {
-                    const mΔ = d3.event.sourceEvent.deltaY
+                    const mΔ = this.ev.sourceEvent.deltaY
                     const λΔ = mΔ/100*2*Math.PI/16                
                     const oldλp = this.view.unitdisk.args.transformation.state.λ
                     const newλp = oldλp - λΔ
@@ -66,14 +68,14 @@ export class InteractionLayer implements ILayer
                         this.onDragλ(newλp)
                 } 
                 //               
-                else if (d3.event && 
-                    d3.event.sourceEvent && 
-                    d3.event.sourceEvent.type === 'touchmove') {
+                else if (this.ev && 
+                    this.ev.sourceEvent && 
+                    this.ev.sourceEvent.type === 'touchmove') {
                     // :D                    
-                    if (d3.event.transform.k !== lasttransform) {
-                        lasttransform = d3.event.transform.k
+                    if (this.ev.transform.k !== lasttransform) {
+                        lasttransform = this.ev.transform.k
 
-                        const newλp = d3.event.transform.k+.5
+                        const newλp = this.ev.transform.k+.5
                         
                         const min = .1 * Math.PI
                         const max = .8 * Math.PI*2
@@ -98,12 +100,14 @@ export class InteractionLayer implements ILayer
                     )
                 }
             })
-            .on("start", ()=> {
+            .on("start", e=> {
+                this.ev = e
                 this.onDragStart(
                     dragStartElement = this.findNodeByCell(),
                     dragStartPoint = this.currMousePosAsC()
             )})
-            .on("end",   ()=> { 
+            .on("end",   e=> {
+                this.ev = e
                 this.onDragEnd(
                     dragStartElement,
                     dragStartPoint,
@@ -116,10 +120,10 @@ export class InteractionLayer implements ILayer
         this.view.parent.append('circle')
             .attr("class", "mouse-circle")
             .attr("r", this.args.mouseRadius)
-            .on("dblclick",  d=> this.onDblClick(this.findNodeByCell()))
+            .on("dblclick",  e=> { this.ev = e; this.onDblClick(this.findNodeByCell()) })
             //.on("click",     d=> this.onClick(findNodeByCell()))
-            .on("mousemove", d=> htapi.setPathHead(hoverpath, this.findNodeByCell()))
-            .on("mouseout",  d=> htapi.setPathHead(hoverpath, undefined))
+            .on("mousemove", e=> { this.ev = e; htapi.setPathHead(hoverpath, this.findNodeByCell()) })
+            .on("mouseout",  e=> htapi.setPathHead(hoverpath, undefined))
             //.call(drag)
             .call(zoom)
             .on("dblclick.zoom", null)
@@ -217,8 +221,8 @@ export class InteractionLayer implements ILayer
         clearTimeout(this.dblClickTimer); this.dblClickTimer = null 
     }
     private onClick = (n:N, m) => {
-        if (d3.event && d3.event.preventDefault) 
-            d3.event.preventDefault()
+        if (this.ev && this.ev.preventDefault) 
+            this.ev.preventDefault()
             
         m = m || this.currMousePosAsC()
 
@@ -237,7 +241,7 @@ export class InteractionLayer implements ILayer
     }
 
     private onDblClick = (n:N) => {
-        d3.event.preventDefault()
+        this.ev.preventDefault()
         var m = this.currMousePosAsC()
 
         this.cancelClickTimer()

@@ -5,6 +5,7 @@ import {Ck }                                     from './hyperbolic-math'
 import {CaddC, CsubC, CmulR, CdivR }             from './hyperbolic-math'
 import {h2e, compose, shift, lengthDilledation } from './hyperbolic-math'
 import {dfs, clone, πify, setR, maxR }           from './hyperbolic-math'
+import { VoronoiDiagram, VoronoiPolygon }       from '../voronoi'
 
 export interface Transformation<OT>
 {    
@@ -116,7 +117,7 @@ export class TransformationCache
     emojis:         N[]
     images:         N[]
         
-    voronoiDiagram: d3.VoronoiDiagram<N>    
-    cells:          d3.VoronoiPolygon<N>[] = []
+    voronoiDiagram: VoronoiDiagram<N>    
+    cells:          VoronoiPolygon<N>[] = []
 }
 

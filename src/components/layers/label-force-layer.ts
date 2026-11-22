@@ -1,5 +1,4 @@
 import * as d3             from 'd3'
-import * as d3f            from 'd3-force-gravity'
 import { N }               from '../../models/n/n'
 import { ILayer }          from '../layerstack/layer'
 import { ILayerView }      from '../layerstack/layer'

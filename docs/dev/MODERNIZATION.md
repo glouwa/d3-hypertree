@@ -289,7 +289,12 @@ Rendering (DOM, browser), in order of expected gain:
       **Only as an option next to SVG, never replacing it:** SVG stays the default
       and keeps every feature (styling with CSS, DOM events, tests on the DOM);
       a canvas renderer would be chosen per layer or per view
-- [ ] Upgrade d3 v4 → v7
+- [x] Upgrade d3 v4 → v7. Done 2026-11-22: events as handler parameters
+      (`d3.event`, `d3.mouse`, `d3.touches` → `d3.pointer`), voronoi with
+      d3-delaunay behind the old interface (`src/models/voronoi.ts`), loaders with
+      `fetch`; all tests unchanged. Other dependencies updated to the latest
+      stable versions, except TypeScript: stays 6.0 because typescript-eslint
+      supports at most 6.0 (TypeScript 7 is out)
 - [ ] **Rework the force labels** (`labels-force`). Details later.
       Related: since 2026-11-22 the labels are chosen by subtree weight × display
       scale² (no focus radius any more, `maxLabels` per layer); known weak spots:

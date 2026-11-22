@@ -1,4 +1,4 @@
-import { tree }                from 'd3-hierarchy'
+import { tree }                from 'd3'
 import { N }                   from './n'
 import { T, makeT, one }       from '../transformation/hyperbolic-math'
 import { C, CktoCp, CptoCk }   from '../transformation/hyperbolic-math'

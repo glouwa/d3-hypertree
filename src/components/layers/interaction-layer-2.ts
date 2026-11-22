@@ -50,17 +50,17 @@ export class InteractionLayer2 implements ILayer
     
     private updateParent() {
         const mousehandlers = de=> de
-            .on('wheel',        e=> this.fireMouseWheelEvent())
+            .on('wheel',        e=> this.fireMouseWheelEvent(e))
 
-            .on('mousedown',    e=> this.fireMouseDown())
-            .on('mousemove',    e=> this.fireMouseMove())
-            .on('mouseup',      e=> this.fireMouseUp())
+            .on('mousedown',    e=> this.fireMouseDown(e))
+            .on('mousemove',    e=> this.fireMouseMove(e))
+            .on('mouseup',      e=> this.fireMouseUp(e))
             .on('mouseout',     e=> { this.setHoverNode(undefined); this.htapi.setPathHead(this.hoverpath, undefined) })
             
-            .on('touchstart',   e=> this.fireTouchEvent('onPointerStart'))
-            .on('touchmove',    e=> this.fireTouchEvent('onPointerMove'))
-            .on('touchend',     e=> this.fireTouchEvent('onPointerEnd'))
-            .on('touchcancel',  e=> this.fireTouchEvent('onPointerEnd'))
+            .on('touchstart',   e=> this.fireTouchEvent(e, 'onPointerStart'))
+            .on('touchmove',    e=> this.fireTouchEvent(e, 'onPointerMove'))
+            .on('touchend',     e=> this.fireTouchEvent(e, 'onPointerEnd'))
+            .on('touchcancel',  e=> this.fireTouchEvent(e, 'onPointerEnd'))
         
         this.view.parent
             .append('circle')
@@ -77,23 +77,23 @@ export class InteractionLayer2 implements ILayer
 
     // just to keep the list above clear
 
-    private fireMouseDown() {
+    private fireMouseDown(e:MouseEvent) {
         this.mousedown = true
-        this.fireMouseEvent('onPointerStart')
+        this.fireMouseEvent(e, 'onPointerStart')
     }
     
-    private fireMouseMove() {
+    private fireMouseMove(e:MouseEvent) {
         if (this.mousedown) 
-            this.fireMouseEvent('onPointerMove')                    
+            this.fireMouseEvent(e, 'onPointerMove')                    
         else {
             if (!this.view.hypertree.isInitializing
              && !this.view.hypertree.isAnimationRunning()) {
                 // The capture circle (r = 5) reaches far beyond the disk, and the voronoi
                 // cells are unbounded: outside the disk no node is hovered.
                 // hover strategy: 'pointer' (default) = the node under the mouse, 'none' = no hover
-                const m = this.currMousePosAsC()
+                const m = this.mousePosAsC(e)
                 const pointer = this.view.hypertree.args.interaction.hover !== 'none'
-                const n = pointer && (m.re * m.re + m.im * m.im) <= 1 ? this.findNodeByCell() : undefined
+                const n = pointer && (m.re * m.re + m.im * m.im) <= 1 ? this.findNodeAt(m) : undefined
                 this.setHoverNode(n)
                 this.htapi.setPathHead(this.hoverpath, n)
             }
@@ -133,17 +133,17 @@ export class InteractionLayer2 implements ILayer
         this.holdTimer = null
     }
 
-    private fireMouseUp() {
+    private fireMouseUp(e:MouseEvent) {
         this.mousedown = false
-        this.fireMouseEvent('onPointerEnd')
+        this.fireMouseEvent(e, 'onPointerEnd')
     }
 
     //-----------------------------------------------------------------------------------------
 
-    private fireMouseEvent(eventName:string) {
-        d3.event.stopPropagation()
-        d3.event.preventDefault()
-        this.enqueuePointerEvent(eventName, 'mouse', this.currMousePosAsC())
+    private fireMouseEvent(e:MouseEvent, eventName:string) {
+        e.stopPropagation()
+        e.preventDefault()
+        this.enqueuePointerEvent(eventName, 'mouse', this.mousePosAsC(e))
     }
 
     // Pointer events are processed once per animation frame, in order; consecutive
@@ -171,12 +171,12 @@ export class InteractionLayer2 implements ILayer
         })
     }
 
-    private fireMouseWheelEvent()
+    private fireMouseWheelEvent(e:WheelEvent)
     {
-        d3.event.stopPropagation()
-        d3.event.preventDefault()
+        e.stopPropagation()
+        e.preventDefault()
         
-        const mΔ = d3.event.deltaY
+        const mΔ = e.deltaY
         const oldλp = this.view.unitdisk.args.transformation.state.λ
         const Δsens = this.view.hypertree.args.interaction.wheelFactor
         // zoom stops at interaction.λbounds
@@ -184,7 +184,7 @@ export class InteractionLayer2 implements ILayer
 
         if (newλp !== oldλp)
         {
-            const m = this.currMousePosAsArr()
+            const m = this.mousePosAsC(e)
 
             // A wheel burst is an interaction like dragging: low detail (no voronoi,
             // no labels, hideOnDrag layers hidden) until no wheel event came for
@@ -199,7 +199,7 @@ export class InteractionLayer2 implements ILayer
 
             requestAnimationFrame(()=> {
                 const t = this.view.unitdisk.args.transformation            
-                const preservingNode = this.findUnculledNodeByCell(ArrtoC(m))
+                const preservingNode = this.findUnculledNodeByCell(m)
                 t.onDragλ(newλp)
                 this.view.hypertree.updateLayoutPath_(preservingNode) // only path to center
                 t.state.P = compose(t.state, shift(t.state, { re:0, im:0 }, preservingNode.cache)).P
@@ -210,14 +210,13 @@ export class InteractionLayer2 implements ILayer
         }
     }
     
-    private fireTouchEvent(eventName:string) {
-        d3.event.stopPropagation()
-        d3.event.preventDefault()
+    private fireTouchEvent(e:TouchEvent, eventName:string) {
+        e.stopPropagation()
+        e.preventDefault()
 
-        const changedTouches = d3.event.changedTouches
-        const positions = d3.touches(this.view.parent.node(), changedTouches)
+        const changedTouches = e.changedTouches
         for (let i=0; i < changedTouches.length; ++i)
-            this.enqueuePointerEvent(eventName, changedTouches[i].identifier, ArrtoC(positions[i]))
+            this.enqueuePointerEvent(eventName, changedTouches[i].identifier, this.mousePosAsC(changedTouches[i]))
     }
   
     //-----------------------------------------------------------------------------------------
@@ -425,11 +424,10 @@ export class InteractionLayer2 implements ILayer
         return this.view.hypertree.args.objects.traces.find(e=> e.id === pid)        
     }
 
-    private currMousePosAsArr = ()=> d3.mouse(this.view.parent.node())
-    private currMousePosAsC = ()=> ArrtoC(this.currMousePosAsArr())
-    private findNodeByCell = ()=> {
-        var m = this.currMousePosAsArr()
-        var find = this.view.unitdisk.cache.voronoiDiagram.find(m[0], m[1])
+    // position of a mouse event or a touch in the coordinates of the disk
+    private mousePosAsC = (e:MouseEvent | Touch)=> ArrtoC(d3.pointer(e, this.view.parent.node()))
+    private findNodeAt = (m:C)=> {
+        var find = this.view.unitdisk.cache.voronoiDiagram.find(m.re, m.im)
         return find ? find.data : undefined
     }
 
