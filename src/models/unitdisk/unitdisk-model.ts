@@ -45,4 +45,8 @@ export interface UnitDiskArgs
 
     linkWidth:         (n:N)=> number
     linkCurvature:     ArcCurvature
+
+    startPosition?:    C                    // initial translation (documented as filter.transformation.P)
+    addLayer?:         string[]             // layer names to show (layerOptions[name].invisible = false)
+    removeLayer?:      string[]             // layer names to remove from the layer stack
 }

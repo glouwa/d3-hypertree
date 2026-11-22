@@ -45,7 +45,8 @@ const modelBase : ()=> HypertreeArgs = ()=>
         n.precalc.cell = true      
     },    
     langInitBFS: (ht:Hypertree, n:N)=> {
-        n.precalc.label = undefined
+        // the language map's text for the node name (langmap or langloader), set once
+        n.precalc.label = ht.langMap && n.data ? ht.langMap[n.data.name] : undefined
         n.precalc.wiki = undefined
     },
 
@@ -290,7 +291,8 @@ export const presets : { [key: string]:()=> any } =
         n.precalc.cell = true      
     },    
     langInitBFS: (ht:Hypertree, n:N)=> {
-        n.precalc.label = undefined
+        // the language map's text for the node name (langmap or langloader), set once
+        n.precalc.label = ht.langMap && n.data ? ht.langMap[n.data.name] : undefined
         n.precalc.wiki = undefined
     },
 

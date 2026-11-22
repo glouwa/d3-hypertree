@@ -172,8 +172,42 @@ export const layerSrc = [
                          .style("stroke",      d=> ((d.pathes && d.pathes.isPartOfAnyHoverPath)?d.pathes && d.pathes.finalcolor:d.pathes && d.pathes.finalcolor) || c(d) )
                          .classed("hovered",   d=> d.pathes && d.pathes.isPartOfAnyHoverPath)
                          .classed("selected",  d=> d.pathes && d.pathes.isPartOfAnySelectionPath)
-                         
+
                          //.attr("stroke-width", d=> w(d))
+    }),
+    // documented layers: path-arcs and link-arcs with straight lines, off by default
+    // (same as linkCurvature 'l' on the arc layers)
+    (v, ud:UnitDisk)=> new ArcLayer(v, {
+        invisible:  true,
+        hideOnDrag: false,
+        name:       'path-lines',
+        className:  'arc',
+        curvature:  'l',
+        data:       ()=> ud.cache.paths,
+        nodePos:    n=> n.cache,
+        nodePosStr: n=> n.strCache,
+        stroke:     n=> undefined,
+        strokeWidth:d=> ud.args.linkWidth(d) + (.013 * d.dampedDistScale),
+        classed:    s=> s.classed("hovered-path",  d=> d.pathes && d.pathes.isPartOfAnyHoverPath)
+                         .classed("selected-path", d=> d.pathes && d.pathes.isPartOfAnySelectionPath)
+                         .style("stroke",          d=> d.pathes && d.pathes.finalcolor)
+    }),
+    (v, ud:UnitDisk)=> new ArcLayer(v, {
+        invisible:  true,
+        hideOnDrag: false,
+        name:       'link-lines',
+        className:  'arc',
+        curvature:  'l',
+        clip:       '#circle-clip' + ud.args.clipRadius,
+        data:       ()=> ud.cache.links,
+        nodePos:    n=> n.cache,
+        nodePosStr: n=> n.strCache,
+        stroke:     n=> undefined,
+        strokeWidth:d=> ud.args.linkWidth(d),
+        classed:    (s, w, c)=> s
+                         .style("stroke",      d=> (d.pathes && d.pathes.finalcolor) || c(d))
+                         .classed("hovered",   d=> d.pathes && d.pathes.isPartOfAnyHoverPath)
+                         .classed("selected",  d=> d.pathes && d.pathes.isPartOfAnySelectionPath)
     }),
     (v, ud:UnitDisk)=> new StemLayer(v, {
         invisible:  false,

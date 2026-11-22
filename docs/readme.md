@@ -119,8 +119,8 @@ export interface HierarchyModel
 | Name            | Default       | Description            |         
 |-----------------|---------------|------------------------|
 | data            | -             | `N` is derived from d3-hierarchy node. See [D3 documentation](https://github.com/d3/d3-hierarchy/blob/master/README.md#hierarchy). It requirres an additional member id, which is used as key in iconmap and langmap to identify a node. d3.hierarchy and d3.stratify can be used if their input data contains such a member. |
-| langmap         | `{}`          | If data files should be language independant this translatino map may be used to translate node labels. |
-| iconmap         | `{}`          | Supports only unicode emojis |
+| langmap         | `{}`          | If data files should be language independant this translatino map may be used to translate node labels. Applied once at initialization (the default `langInitBFS` uses it as label). |
+| iconmap         | `{}`          | Supports only unicode emojis Node name (or id) → emoji, applied once at initialization. |
 | objects.pathes  | `[]`          | This array specifys highlighted pathes within the tree. The used nodes must be references to nodes within data. |
 | objects.selections | `[]`          | This array specifys highlighted nodes within the tree. The used nodes must be references to nodes within data. |
 
@@ -144,10 +144,10 @@ export interface Filter
 | Name            | Default       | Description            |         
 |-----------------|---------------|------------------------|
 | cullingRadius   | `.98`         | Nodes outside the circle with center 0,0 and radius `cullingRadius` will be hidden. |
-| cullingWeight   | `{ min:200, max:400 }` | Culling weight can be specified as constant weight, or as a range which defined the minimun and maximum number of visible nodes. If so, the culling weight will be calculated automatically. |
+| cullingWeight   | `{ min:200, max:400 }` | Culling weight can be specified as constant weight, or as a range which defined the minimun and maximum number of visible nodes. If so, the culling weight will be calculated automatically. **Deprecated name** of `weightFilter.rangeNodes` (still works, with a warning). |
 | weights         | `d=> d.value?1:0` | Will be used as argument for d3 node.sum. See [D3 documentation](https://github.com/d3/d3-hierarchy/blob/master/README.md#hierarchy). |
 | layout          | `layouts.bergè` | Bergé layout implementation. Currently the only one which supports efficient node culling. |
-| transformation.P | { re:0, im:0 } | Initial hyperbolic translation. Use P to define the initial root node position. |
+| transformation.P | { re:0, im:0 } | Initial hyperbolic translation. Use P to define the initial root node position. **Deprecated name** of `geometry.startPosition` (still works, with a warning). |
 | transformation.λ | `undefined`     | Defines the initial link lenght. Valid values are  in intervall (0,1). This parameter is not used if geometry.animateUpRadius is defined. |
 
 
@@ -174,7 +174,7 @@ export interface Geometry
 | arcWidth        | `d=> acosh(d.pos.r)*.015` | Define link width for a node  |
 | clipRadius      | `1`           | Component clipping circle radius. Circle center at 0,0 |
 | labelRadius     | `.005`        | Distance between label center and node center. Not applied on force dirceted label layout. |
-| animateUpRadius | `.8`       | If specified, transformation.λ will be set to a value such that the initial tree will fit within a circle with radius `animateUpRadius`. This circle is centered at transformation.P. |
+| animateUpRadius | `.8`       | If specified, transformation.λ will be set to a value such that the initial tree will fit within a circle with radius `animateUpRadius`. This circle is centered at transformation.P. **Deprecated name** of `layout.initSize` (still works, with a warning). |
 
 ### <a name="interaction"></a> Interaction Options
 

@@ -93,8 +93,8 @@ Tests for all existing features, following the test strategy above:
 
 - [x] Playground ([`playground/`](playground)): every data source and option in a UI, callback log, live stats; the configuration lives in the URL in the test harness format, so "Open as test" reproduces it in `test/harness.html` (shared model building in `test/config.js`). Run `npm run playground` (Node 10 for now) → http://localhost:3100/playground/. Smoke-tested in `playground.spec.mjs`. Later: publish on GitHub Pages as the public demo
 
-**Documented features that no longer work** (to restore in v2, each has an
-expected-to-fail test): `nodeColor`/`linkColor` (readme example; the code reads
+**Documented features that no longer worked** (restored in phase 2 step 5;
+each had an expected-to-fail test, now normal tests): `nodeColor`/`linkColor` (readme example; the code reads
 `fill`/`stroke`), `interaction.wheelSensitivity` (now `wheelFactor`),
 `layout.linklen`, `filter.weightFilter: null`, layers `link-lines` and
 `path-lines` (partly replaced by `linkCurvature: 'l'`), `geometry.addLayer` /
@@ -183,7 +183,7 @@ A bug or feature counts as done when its expected-to-fail test becomes a normal 
        nodes is within `rangeNodes` from the first frame (no settling over several
        frames). A configured `magic` is ignored with a warning. How the start value
        is computed: see "How the start value of magic is computed" below.
-5. [ ] **Documented features back** (expected-to-fail tests in `documented.spec.mjs`):
+5. [x] **Documented features back** (expected-to-fail tests in `documented.spec.mjs`):
        - renamed, alias with a deprecation warning: `nodeColor`/`linkColor`
          (→ `fill`/`stroke`), `interaction.wheelSensitivity` (→ `wheelFactor`),
          layers `link-lines`/`path-lines` (→ `link-arcs`/`path-arcs` with straight
@@ -279,6 +279,7 @@ Rendering (DOM, browser), in order of expected gain:
 | **Crash when nodes have an icon but no label.** `preset-process.ts` calls `precalc.label.startsWith(...)` without checking that a label exists. | **Fixed:** checks the label first; covered by `data.spec.mjs` and the playground test |
 | **Invisible layers appear while dragging.** `d3updatePattern.ts` and `label-force-layer.ts` only checked `hideOnDrag` during drags and animations, so a layer with `invisible: true, hideOnDrag: false` was drawn while dragging. No default layer has this combination; found in the playground. | **Fixed:** `invisible` always hides, `hideOnDrag` additionally while dragging; covered by `interaction.spec.mjs` |
 | **Hover and selection highlight of the cells could not be turned off.** The cell layer always showed the interaction state. | **Added:** layer options `hover` and `selection` (default true) on `cells`; events, callbacks and the hover path are unaffected. Same pattern possible for `nodes`, arcs and symbols |
+| **The start zoom overshot `layout.initSize`.** The search for the start zoom stopped at the first of 50 coarse steps beyond `initSize`, so the tree didn't fit (e.g. radius 0.566 for 0.5). Found while restoring `animateUpRadius`. | **Fixed:** bisection between the last fitting and the first too large step; trees below the `λbounds` maximum start slightly smaller (e.g. λ 0.377 instead of 0.395) |
 
 ### Design: hover and selection (for Phase 2)
 

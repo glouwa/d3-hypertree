@@ -14,6 +14,7 @@ import { sigmoid, sigmoid01 }  from '../../models/transformation/hyperbolic-math
 import { IUnitDisk }           from '../unitdisk/unitdisk'
 import { presets }             from '../../models/hypertree/preset-base'
 import { settleMagic }         from '../../models/hypertree/magic-filter'
+import { applyDocumentedOptions } from '../../models/hypertree/model-compat'
 import { mergeDeep }           from '../../ducd'
 
 let globelhtid = 0
@@ -98,8 +99,11 @@ export class Hypertree
                 console.warn('d3-hypertree: filter.weightFilter.magic is set internally and ignored; '
                            + 'configure the number of visible nodes with filter.weightFilter.rangeNodes')
 
-            //this.args = mergeDeep(model, base)
-            this.args = mergeDeep(base, model)
+            // documented option names (deprecated aliases, addLayer/removeLayer, langmap, ...)
+            const compat = applyDocumentedOptions(model)
+            this.args = mergeDeep(base, compat.model)
+            if (compat.weightFilterNull)
+                this.args.filter.weightFilter = null   // no weight culling
 
             // wenn parent updatedated hat wraum ist da nich eine alte transformations in der disk            
             this.update.view.parent()
@@ -269,7 +273,7 @@ export class Hypertree
         this.args.geometry.transformation.state.λ = .001
         this.args.geometry.transformation.state.P.re = 0
         this.args.geometry.transformation.state.P.im = 0        
-        this.args.filter.weightFilter.magic = 20
+        if (this.args.filter.weightFilter) this.args.filter.weightFilter.magic = 20
         this.args.geometry.transformation.cache.centerNode = undefined
         //this.args.geometry.transformation.cache.hoverNode = undefined
 
@@ -318,7 +322,13 @@ export class Hypertree
         // dataInitBFS:
         // - emoji*
         // - img*
-        this.data.each(n=> this.args.dataInitBFS(this, n))        
+        this.data.each(n=> this.args.dataInitBFS(this, n))
+        // iconmap: an emoji per node name (or id), applied once
+        const iconmap = this.args.iconmap
+        if (iconmap) this.data.each(n=> {
+            const icon = iconmap[n.data.name] !== undefined ? iconmap[n.data.name] : iconmap[n.data.id]
+            if (icon !== undefined) n.precalc.icon = icon
+        })
         this.modelMeta = { 
             Δ: [t1-t0, t2-t1, t3-t2, performance.now()-t3], 
             filesize: dl,
@@ -342,7 +352,8 @@ export class Hypertree
     protected updateWeights_() : void {
         // sum dinger
         this.sum(this.data, this.args.layout.weight, 'layoutWeight')
-        this.sum(this.data, this.args.filter.weightFilter.weight, 'cullingWeight')
+        // without a weight filter every node weighs 1 (used for label sizes, not culling)
+        this.sum(this.data, this.args.filter.weightFilter ? this.args.filter.weightFilter.weight : (n=> 1), 'cullingWeight')
         this.sum(this.data, this.args.layout.weight, 'visWeight')
         //this.sum(this.data, this.args.geometry.weight[0], (n, s)=> n.visprop[0] = s)
 
@@ -378,21 +389,31 @@ export class Hypertree
     }
 
     protected findInitλ_() : void {
-
-        for (let i=0; i<50; i++)
-        {
-            const progress01 = i/50            
-            const λ = .02 + sigmoid(progress01) * .75
-            //console.log('#'+progress01, λ)
+        // the largest λ (zoom) at which the outermost visible node stays within
+        // layout.initSize of the disk radius
+        const initSize = this.args.layout.initSize || .95
+        const maxRAt = (λ:number)=> {
             this.args.geometry.transformation.state.λ = λ
             this.updateLayoutPath_(this.data)
             this.unitdisk.args.cacheUpdate(this.unitdisk, this.unitdisk.cache)
             const unculledNodes = this.args.geometry.transformation.cache.unculledNodes
-            const maxR = unculledNodes.reduce((max, n)=> Math.max(max, n.layout.zp.r), 0)           
-                
-            if (maxR > (this.args.layout.initSize || .95)) {
-                break
+            return unculledNodes.reduce((max, n)=> Math.max(max, n.layout.zp.r), 0)
+        }
+        let fitting:number = undefined, tooLarge:number = undefined
+        for (let i=0; i<50; i++) {
+            const λ = .02 + sigmoid(i/50) * .75
+            if (maxRAt(λ) > initSize) { tooLarge = λ; break }
+            fitting = λ
+        }
+        // the coarse steps used to stop at the first λ beyond initSize: refine
+        // between the last fitting and the first too large step (bisection)
+        if (fitting !== undefined && tooLarge !== undefined) {
+            let lo = fitting, hi = tooLarge
+            for (let i=0; i<12; i++) {
+                const mid = (lo + hi) / 2
+                if (maxRAt(mid) <= initSize) lo = mid; else hi = mid
             }
+            maxRAt(lo)
         }
         // the start zoom obeys interaction.λbounds like every other zoom
         const fitλ = this.args.geometry.transformation.state.λ
@@ -400,6 +421,12 @@ export class Hypertree
         if (startλ !== fitλ) {
             this.args.geometry.transformation.state.λ = startλ
             this.updateLayoutPath_(this.data)
+            this.unitdisk.args.cacheUpdate(this.unitdisk, this.unitdisk.cache)
+        }
+        // geometry.startPosition: initial translation (documented as filter.transformation.P)
+        const start = this.args.geometry.startPosition
+        if (start) {
+            this.args.geometry.transformation.state.P = { re: start.re, im: start.im }
             this.unitdisk.args.cacheUpdate(this.unitdisk, this.unitdisk.cache)
         }
         // the filter's magic settles now, so the first frame shows the final visible set

@@ -351,7 +351,7 @@ export class InteractionLayer2 implements ILayer
     //-----------------------------------------------------------------------------------------
  
     public ripple(n:N, m:C, ok, useClip=true) { 
-        if (useClip && !this.view.unitdisk.layerStack.layers['cells'].args.invisible) {
+        if (useClip && this.view.unitdisk.layerStack.layers['cells'] && !this.view.unitdisk.layerStack.layers['cells'].args.invisible) {
             const rippleClip = this.view.parent
                 .append('clipPath')            
                 .attr('id', `cell-clip-${n.mergeId}`)

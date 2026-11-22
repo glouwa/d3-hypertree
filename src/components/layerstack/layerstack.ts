@@ -40,9 +40,12 @@ export class LayerStack
                 unitdisk:   this.args.unitdisk,
                 hypertree:  this.args.unitdisk.view.hypertree
             }
-            const layer = layerfactoryfunc(view, this.args.unitdisk)            
-            if (this.args.unitdisk.args.layerOptions)
-                mergeDeep(layer.args, this.args.unitdisk.args.layerOptions[layer.name] || {})
+            const layer = layerfactoryfunc(view, this.args.unitdisk)
+            const options = (this.args.unitdisk.args.layerOptions || {})[layer.name]
+            if (options && options.removed)   // geometry.removeLayer
+                continue
+            if (options)
+                mergeDeep(layer.args, options)
             this.layers[layer.name] = layer
         }
 

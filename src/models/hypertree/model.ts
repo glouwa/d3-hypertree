@@ -17,7 +17,8 @@ type Partial<T> = {
 export interface HypertreeArgs
 {
     //datasource: {
-        langmap?:               {} | null
+        langmap?:               {} | null                         // node name -> label text, applied once at initialization
+        iconmap?:               {} | null                         // node name (or id) -> emoji, applied once at initialization
         dataloader?:            LoaderFunction
         langloader?:            (lang)=> (ok)=> void    
         dataInitBFS:            (ht:Hypertree, n:N)=> void       // emoji, imghref

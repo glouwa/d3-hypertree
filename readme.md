@@ -121,7 +121,7 @@ named `n` in the following examples.
 
 A typical data driven property configuration looks like this:
 ```typescript
-    nodeColor: function(n, i, v) {
+    fill: function(n, i, v) {          // e.g. layerOptions.nodes.fill
         if (n.data.valueX>30) return 'red'
         else return 'blue'
     }
@@ -130,7 +130,7 @@ The given function is called by the renderer, for each frame, for each visible n
 JavaScript supports a shorter syntax for functions, called lambda expressions.
 Most code snippets will use this syntax equivalent to the function above.
 ```typescript
-    nodeColor: n=> (n.data.valueX>30 ? 'red' : 'blue')
+    fill: n=> (n.data.valueX>30 ? 'red' : 'blue')
 ```
 
 #### The Node objects `n`
@@ -197,13 +197,13 @@ const mytree = new hyt.Hypertree(
                 'cells':       { invisible: true, hideOnDrag: true },                
                 'images':      { width: .1, height: .1 },
                 'link-arcs':   { 
-                    linkColor: n=> {
+                    stroke: n=> {
                         if (n.mergeId == 12) return 'orange'
                         return undefined
                     }
                 }, 
                 'nodes': {                     
-                    nodeColor: n=> {
+                    fill: n=> {
                         if (n.mergeId == 12) return 'yellow'
                         if (!n.children) return 'red'
                         return '#a5d6a7'
@@ -301,10 +301,12 @@ new hyt.Hypertree(
         dataloader?:            (ok:(root:N, t0:number, dl:number)=>void, err:(err)=>void)=> void   
         dataInitBFS:            (ht:Hypertree, n:N)=> void
         langInitBFS:            (ht:Hypertree, n:N)=> void         
+        langmap:                { [name:string]: string }  // labels by node name, applied once at initialization
+        iconmap:                { [name:string]: string }  // emojis by node name (or id), applied once
         layout: {
             type:               (root:N, t?:number, noRecursion?:boolean) => void
             weight:             (n:N)=> number
-            linklen:            (n:N)=> number            
+            initSize:           number                     // the start zoom fits the tree into this radius (default .97)
             rootWedge: {
                 orientation:    number
                 angle:          number
@@ -312,11 +314,11 @@ new hyt.Hypertree(
         }
         filter: {
             cullingRadius:      number
-            weightFilter:       null | number | {            
+            weightFilter:       null | {                   // null: no culling by weight
                 weight:         (n)=> number
-                rangeWeight:    { min:number, max:number }
-                rangeNodes:     { min:number, max:number }
-                alpha:          number
+                rangeCullingWeight: { min:number, max:number }   // bounds of the internal factor
+                rangeNodes:     { min:number, max:number }       // number of visible nodes (target)
+                alpha:          number                           // adaptation step per update
             }
             focusExtension:     number
             maxFocusRadius:     number            
@@ -364,6 +366,9 @@ new hyt.Hypertree(
             nodeRadius:        (ud:IUnitDisk, n:N)=> number
             nodeScale:         (n:N)=> number
             nodeFilter:        (n:N)=> boolean
+            addLayer:          string[]                    // layer names to show, e.g. ['traces', 'link-lines']
+            removeLayer:       string[]                    // layer names to remove, e.g. ['stem-arc']
+            startPosition:     C                           // initial translation, e.g. { re:.3, im:0 }
         }
         interaction: {            
             onNodeClick:        (n:N, m:C, l:ILayer)=> void
@@ -374,7 +379,7 @@ new hyt.Hypertree(
             onNodeSelect:       (n:N, selected:boolean)=> void // called by api.toggleSelection
             onCenterNodeChange: (n:N)=> void 
             λbounds:            [ number, number ]           // [min, max] zoom; start zoom, wheel, pinch and gotoλ stay inside
-            wheelSensitivity:   number
+            wheelFactor:        number                       // zoom step per wheel notch (was wheelSensitivity)
             mouseRadius:        number
         }
     }

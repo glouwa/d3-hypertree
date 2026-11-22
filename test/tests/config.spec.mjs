@@ -10,13 +10,13 @@ const ALWAYS = ['interaction', 'interaction-2']
 test.describe('each layer on its own', () => {
     // layer names as configured by the default layer set
     const layers = ['background', 'cells', 'culling-r', 'mouse-r', 'focus-r', 'labels-r-𝐖', 'λ', '(0,0)',
-        'center-node', 'path-arcs', 'link-arcs', 'stem-arc', 'nodes', 'symbols', 'images', 'emojis',
+        'center-node', 'path-arcs', 'link-arcs', 'path-lines', 'link-lines', 'stem-arc', 'nodes', 'symbols', 'images', 'emojis',
         'labels', 'labels2', 'labels-force', 'traces']
     const safe = name => name.replace(/[^a-z0-9-]/gi, c => ({ '(': '', ')': '', ',': '-', 'λ': 'lambda', '𝐖': 'W' })[c] ?? '_')
 
     test('the default layer set is unchanged', async ({ page }) => {
         await openTree(page, base)
-        expect(await page.evaluate(() => harness.layerNames())).toEqual([...layers.slice(0, 19), ...ALWAYS, 'traces'])
+        expect(await page.evaluate(() => harness.layerNames())).toEqual([...layers.slice(0, 21), ...ALWAYS, 'traces'])
     })
 
     for (const layer of layers) {

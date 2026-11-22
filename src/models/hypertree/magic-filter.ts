@@ -45,8 +45,8 @@ class Culler {
 */
 function adjustMagic(ud:IUnitDisk, cache:TransformationCache) {
     const filter = ud.view.hypertree.args.filter.weightFilter
-    //if (filter === null)
-    //    return
+    if (filter === null)   // no weight culling
+        return
 
     const rangeNodes = filter.rangeNodes  //{ min:300, max:700 }
     const rangeMagic = filter.rangeCullingWeight  //{ min:4,   max:500 }
@@ -87,9 +87,9 @@ function collectNodesByWeight(ud:IUnitDisk, cache:TransformationCache, path:N[])
     const mf = ud.view.hypertree.isAnimationRunning() ? 1:1 // todo: make configurable
 
     function abortfilter(n, idx, highway) { // return false to abort
-        n.minWeight = highway[0].precalc.cullingWeight 
-                    / ud.view.hypertree.args.filter.weightFilter.magic 
-                    / mf
+        const wf = ud.view.hypertree.args.filter.weightFilter
+        n.minWeight = wf === null ? 0                     // no weight culling
+                    : highway[0].precalc.cullingWeight / wf.magic / mf
         peocessNodeTransformation(ud, cache, n)
         peocessNode(ud, cache, n, cache.focusR, n.minWeight)        
         return !n.isOut
@@ -185,8 +185,8 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
     const t3 = performance.now()
 
     if (!ud.view.hypertree.isAnimationRunning() ||
-        (ud.layerStack && !ud.layerStack.layers['labels-force'].args.hideOnDrag) ||
-        (ud.layerStack && !ud.layerStack.layers['labels'].args.hideOnDrag)) 
+        (ud.layerStack && ud.layerStack.layers['labels-force'] && !ud.layerStack.layers['labels-force'].args.hideOnDrag) ||
+        (ud.layerStack && ud.layerStack.layers['labels'] && !ud.layerStack.layers['labels'].args.hideOnDrag)) 
         doLabelStuff(ud, cache)        
 
     /*
@@ -196,7 +196,7 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
     - cellayer anitmation enabled        
     */
     if (!ud.view.hypertree.isAnimationRunning() || 
-        (ud.layerStack && !ud.layerStack.layers['cells'].args.hideOnDrag)) 
+        (ud.layerStack && ud.layerStack.layers['cells'] && !ud.layerStack.layers['cells'].args.hideOnDrag)) 
         doVoronoiStuff(ud, cache) 
 
     //if (!ud.view.hypertree.isAnimationRunning())
@@ -207,7 +207,8 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
 
     // only for meta view
     ud.cacheMeta = {
-        minWeight: path.map(n=> n.precalc.cullingWeight / ud.view.hypertree.args.filter.weightFilter.magic),
+        minWeight: path.map(n=> ud.view.hypertree.args.filter.weightFilter
+                                ? n.precalc.cullingWeight / ud.view.hypertree.args.filter.weightFilter.magic : 0),
         Δ: [t1-t0, t2-t1, t3-t2, performance.now()-t3]
     }
 
