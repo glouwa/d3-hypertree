@@ -107,7 +107,7 @@ export class StemLayer implements ILayer
     private arcOptions = {
         '+': this.svgArc('1', '0'),
         '-': this.svgArc('0', '1'),
-        '0': this.svgArcLine,
+        '0': (d:N)=> this.svgArcLine(d),   // straight line as a path (was called without this)
     }
 
     private svgArc(a:string, b:string) : (d:N)=> string {
@@ -133,7 +133,9 @@ export class StemLayer implements ILayer
 
     private svgArcLine(d:N) {
         var s = this.args.nodePosStr(d)
-        var e = this.args.nodePosStr(d.parent)
+        var e = d.parent                             // like svgArc: the root's stem goes down
+              ? this.args.nodePosStr(d.parent)
+              : `${this.args.nodePos(d).re} 1`
         return `M ${s} L ${e}`
     }
 }

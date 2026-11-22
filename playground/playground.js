@@ -72,7 +72,7 @@
     // Options each layer reads (from the default layer set in preset-layers.ts).
     // color: function of the node -> default / constant / by depth
     // number: constant (function options get a constant function)
-    // curvature: '+', '-', 'l'; default = geometry.linkCurvature
+    // curvature: '-', '+', '0', 'l'; default = geometry.linkCurvature
     const LAYER_OPTIONS = {
         'cells':       [['hover', 'bool'], ['selection', 'bool'], ['fill', 'color'], ['stroke', 'color'], ['strokeWidth', 'number', 0, 0.02, 0.0005]],
         'center-node': [['fill', 'color'], ['stroke', 'color'], ['strokeWidth', 'number', 0, 0.02, 0.0005], ['r', 'number', 0.01, 0.3, 0.005]],
@@ -397,7 +397,7 @@
             input = el('div', { class: 'check' }, on, r, out)
         } else if (type === 'curvature') {
             const sel = el('select', { onchange: e => setLayer(key, e.target.value || undefined) },
-                el('option', { value: '' }, 'default (geometry)'), el('option', { value: '-' }, '−'), el('option', { value: '+' }, '+'), el('option', { value: 'l' }, 'l (lines)'))
+                el('option', { value: '' }, 'default (geometry)'), el('option', { value: '-' }, '−'), el('option', { value: '+' }, '+'), el('option', { value: '0' }, '0 (straight, path)'), el('option', { value: 'l' }, 'l (straight, line)'))
             controls.push({ refresh: () => { sel.value = cur() || '' } })
             input = sel
         } else if (type === 'bool') {
@@ -493,8 +493,8 @@
 
         g = section('Geometry', ['linkCurvature', 'captionFontPx', 'captionHeight', 'nodeRadius', 'linkWidth', 'theme'])
         hint(g, 'Options that apply to several layers (model.geometry). Options of a single layer are in the layer list below (▸).')
-        select(g, 'linkCurvature', 'linkCurvature', [['-', '− (default)'], ['+', '+'], ['l', 'l (straight lines)']])
-        hint(g, 'Default curvature of link-arcs and path-arcs; a layer can override it.')
+        select(g, 'linkCurvature', 'linkCurvature', [['-', '− (default, hyperbolic geodesic)'], ['+', '+ (arc to the other side)'], ['0', '0 (straight, SVG path)'], ['l', 'l (straight, SVG line)']])
+        hint(g, 'Default curvature of link-arcs and path-arcs; a layer can override it. 0 and l look the same; l is a little faster to draw.')
         range(g, 'caption font', 'captionFontPx', 3, 16, 0.5, null, v => `${v}px`)
         range(g, 'captionHeight', 'captionHeight', 0.01, 0.12, 0.005)
         optionalNumber(g, 'nodeRadius', 'nodeRadius', 0.002, 0.05, 0.001, 0.01)

@@ -90,11 +90,23 @@ test.describe('layer options', () => {
 
     // Known bug: curvature '0' (mentioned in a comment in preset-layers.ts, not in the
     // docs) crashes with "Cannot read properties of undefined (reading 'nodePosStr')".
-    test.fail('link curvature "0" renders without errors', async ({ page }) => {
+    // Regression: curvature '0' crashed (the path function was called without `this`).
+    // '0' draws straight lines as SVG paths ('l' draws them as SVG lines).
+    test('link curvature "0" draws straight lines', async ({ page }) => {
         const errors = collectErrors(page)
         const layers = encodeURIComponent(JSON.stringify({ 'link-arcs': { curvature: '0' } }))
         await page.goto(`harness.html?gen=nTree&depth=6&childs=2&layers=${layers}`)
-        await page.waitForTimeout(1500)
+        await page.waitForFunction(() => window.harness && harness.ht.data && document.querySelectorAll('#link-arcs path').length > 10)
+        const ds = await page.evaluate(() => [...document.querySelectorAll('#link-arcs path')].map(p => p.getAttribute('d')))
+        expect(ds.every(d => /^M \S+ \S+ L \S+ \S+$/.test(d))).toBe(true)
+        expectNoErrors(errors)
+    })
+
+    test('geometry.linkCurvature "0" straightens both arc layers', async ({ page }) => {
+        const errors = collectErrors(page)
+        await page.goto(`harness.html?gen=nTree&depth=6&childs=2&geometry=${encodeURIComponent('{"linkCurvature":"0"}')}`)
+        await page.waitForFunction(() => window.harness && harness.ht.data && document.querySelectorAll('#link-arcs path').length > 10)
+        expect(await page.evaluate(() => [...document.querySelectorAll('#link-arcs path')].some(p => p.getAttribute('d').includes(' A ')))).toBe(false)
         expectNoErrors(errors)
     })
 

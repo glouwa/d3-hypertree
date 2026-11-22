@@ -339,7 +339,7 @@ new hyt.Hypertree(
                 links: {
                     stroke:            (n:N)=> color
                     strokeWidth:       (n:N)=> number
-                    linkCurvature:     '+' | '-' | 'l'
+                    linkCurvature:     '-' | '+' | '0' | 'l'   // '-' default (hyperbolic geodesic), '+' other side, '0' and 'l' straight
                 },
                 nodes: {
                     fill:              (n:N)=> color
