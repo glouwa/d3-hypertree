@@ -28,7 +28,7 @@ function build() {
     for (const theme of ['light', 'dark']) {
         const parts = files.filter(f => f.endsWith(`${theme}.scss`)).map(f =>
             `/* ${relative(src, f).replaceAll('\\', '/')} */\n` +
-            sass.compile(f, { style: 'expanded', silenceDeprecations }).css)
+            sass.compile(f, { style: 'expanded', charset: false, silenceDeprecations }).css)
         writeFileSync(join(dist, `d3-hypertree-${theme}.css`), parts.join('\n'))
     }
     console.log(`css: built in ${Math.round(performance.now() - t0)} ms`)
