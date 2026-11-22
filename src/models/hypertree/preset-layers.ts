@@ -16,6 +16,11 @@ import { ImageLayer }               from '../../components/layers/image-layer'
 import { FocusLayer }               from '../../components/layers/focus-layer'
 import { StemLayer }                from '../../components/layers/stem-layer'
 import { bboxCenter, bboxOval }     from '../../d3-hypertree'
+import { showsState }               from '../../components/layers/state-display'
+
+// the args of a layer in the stack (its options), {} while the stack is built
+const layerArgs = (ud:UnitDisk, name:string) : any =>
+    (ud.layerStack && ud.layerStack.layers[name] && ud.layerStack.layers[name].args) || {}
 
 export const labeloffsets = {
     centerOffset:       (cache:string)=> (d:N, i, v)=> bboxCenter(d, cache),
@@ -170,10 +175,9 @@ export const layerSrc = [
         strokeWidth:d=> ud.args.linkWidth(d),
         classed:    (s, w, c)=> s
                          .style("stroke",      d=> ((d.pathes && d.pathes.isPartOfAnyHoverPath)?d.pathes && d.pathes.finalcolor:d.pathes && d.pathes.finalcolor) || c(d) )
-                         .classed("hovered",   d=> d.pathes && d.pathes.isPartOfAnyHoverPath)
-                         .classed("selected",  d=> d.pathes && d.pathes.isPartOfAnySelectionPath)
-
-                         //.attr("stroke-width", d=> w(d))
+                         // layer options hover / selection: 'path' (default), 'node' or false
+                         .classed("hovered",   d=> showsState(layerArgs(ud, 'link-arcs').hover, d, 'hover'))
+                         .classed("selected",  d=> showsState(layerArgs(ud, 'link-arcs').selection, d, 'selection'))
     }),
     // documented layers: path-arcs and link-arcs with straight lines, off by default
     // (same as linkCurvature 'l' on the arc layers)

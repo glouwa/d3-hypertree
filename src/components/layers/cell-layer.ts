@@ -57,13 +57,11 @@ export class CellLayer implements ILayer
             // under the mouse is "hovered", and only cells of selected nodes are
             // "selected" (not every cell on the path to them).
             updateColor:       s=>  {
-                                    const objects = this.view.hypertree.args.objects
-                                    const hoverPath = objects.pathes.find(p=> p.type === 'HoverPath')
-                                    const hovered = hoverPath ? hoverPath.head : undefined
+                                    // the node state set by the interaction (n.hovered, n.selected)
                                     const showHover = this.args.hover !== false
                                     const showSelection = this.args.selection !== false
-                                    return s.classed("hovered",  d=> showHover && d.data === hovered)
-                                            .classed("selected", d=> showSelection && objects.selections.indexOf(d.data) !== -1)
+                                    return s.classed("hovered",  d=> showHover && !!d.data.hovered)
+                                            .classed("selected", d=> showSelection && !!d.data.selected)
                                             .style("fill",      d=> (d.pathes && d.pathes.labelcolor) || this.args.fill(d))
                                },
             updateTransform:   s=> s//.classed("lazy",      d=> d.data.hasOutChildren)                                 

@@ -79,7 +79,12 @@ export interface N extends NodeTransformation {
     sum,
 
     precalc:            NodePrecalulations
-    pathes:             NodePath    
+    pathes:             NodePath
+
+    // interaction state, set by the interaction (hover strategy, selection strategy);
+    // the layers only decide how they show it
+    hovered?:           boolean
+    selected?:          boolean
 
     minWeight:          number
 /*

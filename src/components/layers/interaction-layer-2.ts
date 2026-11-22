@@ -87,8 +87,10 @@ export class InteractionLayer2 implements ILayer
              && !this.view.hypertree.isAnimationRunning()) {
                 // The capture circle (r = 5) reaches far beyond the disk, and the voronoi
                 // cells are unbounded: outside the disk no node is hovered.
+                // hover strategy: 'pointer' (default) = the node under the mouse, 'none' = no hover
                 const m = this.currMousePosAsC()
-                const n = (m.re * m.re + m.im * m.im) <= 1 ? this.findNodeByCell() : undefined
+                const pointer = this.view.hypertree.args.interaction.hover !== 'none'
+                const n = pointer && (m.re * m.re + m.im * m.im) <= 1 ? this.findNodeByCell() : undefined
                 this.setHoverNode(n)
                 this.htapi.setPathHead(this.hoverpath, n)
             }
@@ -394,8 +396,12 @@ export class InteractionLayer2 implements ILayer
         const q = this.view.unitdisk.cache.voronoiDiagram.find(m.re, m.im)
         const n = q ? q.data : undefined
 
-        if (!this.view.hypertree.isAnimationRunning())
-                this.view.hypertree.args.interaction.onNodeClick(n, m, this)
+        if (!this.view.hypertree.isAnimationRunning()) {
+            const i = this.view.hypertree.args.interaction
+            if (n && i.clickAction === 'select') this.view.hypertree.api.toggleSelection(n)
+            if (n && i.clickAction === 'goto')   this.view.hypertree.api.gotoNode(n)
+            i.onNodeClick(n, m, this)
+        }
     }
 
     private findTrace(pid) {

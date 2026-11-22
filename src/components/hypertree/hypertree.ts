@@ -137,16 +137,15 @@ export class Hypertree
                 if (this.langMap) { this.update.data(); this.isInitializing=false;  ok() }
             })
         },
-        toggleSelection: (n:N)=> {
-            this.toggleSelection(n)
-            if (this.args.objects.pathes.length > 10+1) {
-                const toremove = this.args.objects.selections[0]
-                this.args.objects.selections = this.args.objects.selections.filter(e=> e !== toremove)
-                this.removePath('SelectionPath', toremove)
-            }
+        // Selection goes through the strategy interaction.selection ('none', 'single',
+        // 'multi' with interaction.maxSelections); it keeps objects.selections and the
+        // node state n.selected in sync and fires onNodeSelect for every change.
+        toggleSelection: (n:N)=> this.select_(n, !this.args.objects.selections.includes(n)),
+        select:          (n:N)=> this.select_(n, true),
+        deselect:        (n:N)=> this.select_(n, false),
+        clearSelection:  ()=> {
+            for (const s of [...this.args.objects.selections]) this.setSelected_(s, false)
             this.update.pathes()
-            if (this.args.interaction.onNodeSelect)
-                this.args.interaction.onNodeSelect(n, this.args.objects.selections.includes(n))
         },
         //addPath: (pathid, node:N)=> { this.addPath(pathid, node) },
         //removePath: (pathid, node:N)=> { this.removePath(pathid, node) },
@@ -498,18 +497,42 @@ export class Hypertree
     }
 
     protected toggleSelection(n:N) {
-        if (this.args.objects.selections.includes(n)) 
-        {
-            //const nidx = this.args.objects.selections.indexOf(n)
-            //delete this.args.objects.selections[nidx]
-            this.args.objects.selections = this.args.objects.selections.filter(e=> e !== n)
-            this.removePath('SelectionPath', n)
+        this.setSelected_(n, !this.args.objects.selections.includes(n))
+    }
+
+    /** Selects or deselects n according to interaction.selection, then redraws. */
+    protected select_(n:N, selected:boolean) {
+        const mode = this.args.interaction.selection || 'multi'
+        if (!n || mode === 'none') return
+        if (selected === this.args.objects.selections.includes(n)) return
+        if (selected) {
+            if (mode === 'single')
+                for (const s of [...this.args.objects.selections]) this.setSelected_(s, false)
+            this.setSelected_(n, true)
+            const max = this.args.interaction.maxSelections || 10
+            while (mode === 'multi' && this.args.objects.selections.length > max)
+                this.setSelected_(this.args.objects.selections[0], false)   // the oldest
         }
         else
-        {
-            this.args.objects.selections.push(n)
-            this.addPath('SelectionPath', n)            
-        }    
+            this.setSelected_(n, false)
+        this.update.pathes()
+    }
+
+    /** The single place that changes the selection state of a node. */
+    protected setSelected_(n:N, selected:boolean) {
+        const selections = this.args.objects.selections
+        if (selected === selections.includes(n)) return
+        if (selected) {
+            selections.push(n)
+            this.addPath('SelectionPath', n)
+        }
+        else {
+            this.args.objects.selections = selections.filter(e=> e !== n)
+            this.removePath('SelectionPath', n)
+        }
+        n.selected = selected
+        if (this.args.interaction.onNodeSelect)
+            this.args.interaction.onNodeSelect(n, selected)
     }
 
     // es kann nur einen pro id geben, gibt es bereits einen wird dieser entfernt 
@@ -520,10 +543,14 @@ export class Hypertree
         const oldPathId = this.btnPathId(pt, n)
         const oldPath = this.args.objects.pathes.find(e=> e.id === oldPathId)
 
-        if (oldPath)
+        if (oldPath) {
             this.removePath(pt, oldPath.head)
-        if (n)
+            if (pt === 'HoverPath') oldPath.head.hovered = false
+        }
+        if (n) {
             this.addPath(pt, n)
+            if (pt === 'HoverPath') n.hovered = true
+        }
     }
 
     protected addPath(pathType:string, n:N) {

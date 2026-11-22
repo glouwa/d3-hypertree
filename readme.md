@@ -371,12 +371,18 @@ new hyt.Hypertree(
             startPosition:     C                           // initial translation, e.g. { re:.3, im:0 }
         }
         interaction: {            
+            // strategies: they set the node state n.hovered / n.selected; layers only show it
+            // (layer options hover / selection: 'path' default, 'node' or 'none'; cells: true / false)
+            hover:              'pointer' | 'none'           // default 'pointer': the node under the mouse
+            selection:          'none' | 'single' | 'multi'  // default 'multi'; 'single' replaces the old selection
+            maxSelections:      number                       // 'multi': the oldest is dropped beyond this (default 10)
+            clickAction:        'select' | 'goto' | 'none'   // besides onNodeClick (default 'none')
             onNodeClick:        (n:N, m:C, l:ILayer)=> void
             onNodeHold:         (n:N, m:C, l:ILayer)=> void  // pressed for holdDuration ms without moving; no click follows
             holdDuration:       number                       // default 500
             onNodeHover:        (n:N)=> void                 // hovered node changed; undefined when leaving
             onHoverNodeChange:  (n:N)=> void                 // same as onNodeHover
-            onNodeSelect:       (n:N, selected:boolean)=> void // called by api.toggleSelection
+            onNodeSelect:       (n:N, selected:boolean)=> void // every selection change, also replaced or dropped ones
             onCenterNodeChange: (n:N)=> void 
             λbounds:            [ number, number ]           // [min, max] zoom; start zoom, wheel, pinch and gotoλ stay inside
             wheelFactor:        number                       // zoom step per wheel notch (was wheelSensitivity)
@@ -385,3 +391,6 @@ new hyt.Hypertree(
     }
 )
 ```
+
+Selection API (all go through `interaction.selection`): `api.toggleSelection(n)`,
+`api.select(n)`, `api.deselect(n)`, `api.clearSelection()`.

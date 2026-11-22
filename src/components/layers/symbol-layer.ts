@@ -3,6 +3,7 @@ import { ILayer }          from '../layerstack/layer'
 import { ILayerView }      from '../layerstack/layer'
 import { ILayerArgs }      from '../layerstack/layer'
 import { D3UpdatePattern } from '../layerstack/d3updatePattern'
+import { showsState, StateDisplay } from './state-display'
 
 export interface SymbolLayerArgs extends ILayerArgs
 {
@@ -11,6 +12,8 @@ export interface SymbolLayerArgs extends ILayerArgs
     transform,
     clip?:     string,
     r?:        (d)=> number,   // given by the navigation background, not read by this layer
+    hover?:    StateDisplay,   // how hover is shown: 'path' (default), 'node' or false
+    selection?:StateDisplay,   // how selection is shown: 'path' (default), 'node' or false
 }
 
 var symbol = d3.symbol().size(.0012)
@@ -51,8 +54,8 @@ export class SymbolLayer implements ILayer
                                     .classed("leaf",      d=> d.parent)
                                     .classed("exit",      d=> (!d.children || !d.children.length)
                                                               && d.data && d.data.numLeafs),
-            updateColor:       s=> s.classed("hovered",   d=> d.pathes && d.pathes.isPartOfAnyHoverPath && d.parent)
-                                    .classed("selected",  d=> d.pathes && d.pathes.isPartOfAnySelectionPath && d.parent),
+            updateColor:       s=> s.classed("hovered",   d=> showsState(this.args.hover, d, 'hover') && d.parent)
+                                    .classed("selected",  d=> showsState(this.args.selection, d, 'selection') && d.parent),
             updateTransform:   s=> s.attr("transform",    d=> this.args.transform(d))
                                     .attr("d",            d=> /*home*/d_star),
         })

@@ -2,6 +2,7 @@ import { ILayer }          from '../layerstack/layer'
 import { ILayerView }      from '../layerstack/layer'
 import { ILayerArgs }      from '../layerstack/layer'
 import { D3UpdatePattern } from '../layerstack/d3updatePattern'
+import { showsState, StateDisplay } from './state-display'
 
 export interface NodeLayerArgs extends ILayerArgs
 {
@@ -15,6 +16,8 @@ export interface NodeLayerArgs extends ILayerArgs
     stroke?:     (d)=> any,
     strokeWidth?:(d)=> any,
     show?:       'leaves' | 'all' | ((n)=> boolean),   // which nodes get a disk (default 'leaves')
+    hover?:      StateDisplay,     // how hover is shown: 'path' (default), 'node' or false
+    selection?:  StateDisplay,     // how selection is shown: 'path' (default), 'node' or false
 }
 
 export class NodeLayer implements ILayer
@@ -55,8 +58,8 @@ export class NodeLayer implements ILayer
                                     .style("stroke",       d=> (d.pathes && d.pathes.labelcolor) || this.args.stroke(d))
                                     .style("stroke-width", d=> (d.pathes && d.pathes.labelcolor) || this.args.strokeWidth(d)),
 
-            updateColor:       s=> s.classed("hovered",   d=> d.pathes && d.pathes.isPartOfAnyHoverPath)
-                                    .classed("selected",  d=> d.pathes && d.pathes.isPartOfAnySelectionPath)
+            updateColor:       s=> s.classed("hovered",   d=> showsState(this.args.hover, d, 'hover'))
+                                    .classed("selected",  d=> showsState(this.args.selection, d, 'selection'))
                                     .style("fill",      d=> (d.pathes && d.pathes.labelcolor) || this.args.fill(d)),
 
             //updateColor:       s=> s.classed("hovered",   d=> d.isPartOfAnyHoverPath && d.parent)

@@ -275,3 +275,20 @@ test('nodes: option show offers leaves and all', async ({ page }) => {
     await page.waitForFunction(() => [...document.querySelectorAll('#tree #nodes circle')].some(c => c.__data__ && c.__data__.children && c.__data__.parent))
     expect(decodeURIComponent(await page.evaluate(() => location.search))).toContain('"nodes":{"show":"all"}')
 })
+
+test('interaction strategies: selection "single" replaces, hover "none" hovers nothing', async ({ page }) => {
+    await page.goto('../playground/?gen=nTree&depth=6&childs=2&labels=1&filter=off')
+    await ready(page)
+    await page.locator('summary').filter({ hasText: /^Interaction/ }).click()
+    const row = label => page.locator('.row', { has: page.locator('label', { hasText: new RegExp(`^${label}$`) }) }).locator('select')
+    await row('Selection').selectOption('single')
+    await row('Hover').selectOption('none')
+    await page.waitForFunction(() => window.ht.args.interaction.selection === 'single' && window.ht.args.interaction.hover === 'none')
+    expect(decodeURIComponent(await page.evaluate(() => location.search))).toContain('"hover":"none","selection":"single"')
+    const ids = await page.evaluate(() => {
+        const [a, b] = window.ht.data.leaves()
+        window.ht.api.toggleSelection(a); window.ht.api.toggleSelection(b)
+        return window.ht.args.objects.selections.map(n => n.mergeId).concat([b.mergeId])
+    })
+    expect(ids[0]).toBe(ids[1])
+})

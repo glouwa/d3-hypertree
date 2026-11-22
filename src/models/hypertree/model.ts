@@ -65,10 +65,15 @@ export interface HypertreeArgs
     }       
     geometry:               UnitDiskArgs                      // layer -+
     interaction: {
-        //type:               'clickonly' | 'selction' | 'multiselection' | 'centernodeselectable'
         mouseRadius:        number,
+        // strategies that set the node state (n.hovered, n.selected); layers only show it
+        hover?:             'pointer' | 'none'               // default 'pointer': the node under the mouse
+        selection?:         'none' | 'single' | 'multi'      // default 'multi'; 'single': a new selection replaces the old one
+        maxSelections?:     number                           // 'multi': the oldest selection is dropped beyond this (default 10)
+        clickAction?:       'select' | 'goto' | 'none'       // what a click does besides onNodeClick (default 'none')
         onNodeClick?:       (n:N, m:C, l:ILayer)=> void
-        // called by api.toggleSelection; selected = state after the toggle
+        // every selection change (api.toggleSelection/select/deselect/clearSelection,
+        // clickAction 'select', replaced or dropped selections); selected = new state
         onNodeSelect:       (n:N, selected?:boolean)=> void
         // pointer pressed on a node for holdDuration ms without moving; no click follows
         onNodeHold:         (n:N, m:C, l:ILayer)=> void

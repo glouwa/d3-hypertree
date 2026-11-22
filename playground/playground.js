@@ -51,6 +51,7 @@
         wheelFactor: base.interaction.wheelFactor,
         holdDuration: base.interaction.holdDuration || 500,
         mouseRadius: base.interaction.mouseRadius,
+        hover: 'pointer', selection: 'multi', maxSelections: 10,   // interaction strategies
         // overrides: name -> { invisible, hideOnDrag, <layer options> }. The emoji layer is the
         // slowest one: off by default here (generating icons is a one-off, see iconPercent).
         layers: { emojis: { invisible: true } },
@@ -77,9 +78,9 @@
         'cells':       [['hover', 'bool'], ['selection', 'bool'], ['fill', 'color'], ['stroke', 'color'], ['strokeWidth', 'number', 0, 0.02, 0.0005]],
         'center-node': [['fill', 'color'], ['stroke', 'color'], ['strokeWidth', 'number', 0, 0.02, 0.0005], ['r', 'number', 0.01, 0.3, 0.005]],
         'path-arcs':   [['curvature', 'curvature'], ['stroke', 'color'], ['strokeWidth', 'number', 0.001, 0.05, 0.0005]],
-        'link-arcs':   [['curvature', 'curvature'], ['stroke', 'color'], ['strokeWidth', 'number', 0.001, 0.05, 0.0005]],
+        'link-arcs':   [['curvature', 'curvature'], ['hover', 'choice', ['path', 'node', 'none']], ['selection', 'choice', ['path', 'node', 'none']], ['stroke', 'color'], ['strokeWidth', 'number', 0.001, 0.05, 0.0005]],
         'stem-arc':    [['curvature', 'curvature'], ['width', 'number', 0.001, 0.05, 0.0005]],
-        'nodes':       [['show', 'choice', ['leaves', 'all']], ['fill', 'color'], ['stroke', 'color'], ['strokeWidth', 'number', 0, 0.02, 0.0005], ['r', 'number', 0.002, 0.06, 0.001]],
+        'nodes':       [['show', 'choice', ['leaves', 'all']], ['hover', 'choice', ['path', 'node', 'none']], ['selection', 'choice', ['path', 'node', 'none']], ['fill', 'color'], ['stroke', 'color'], ['strokeWidth', 'number', 0, 0.02, 0.0005], ['r', 'number', 0.002, 0.06, 0.001]],
         'images':      [['width', 'number', 0.01, 0.3, 0.005], ['height', 'number', 0.01, 0.3, 0.005]],
         'emojis':      [['color', 'color'], ['background', 'bool']],
         'labels':      [['color', 'color'], ['background', 'bool']],
@@ -164,6 +165,7 @@
         if (c.wheelFactor !== DEFAULTS.wheelFactor) i.wheelFactor = c.wheelFactor
         if (c.holdDuration !== DEFAULTS.holdDuration) i.holdDuration = c.holdDuration
         if (c.mouseRadius !== DEFAULTS.mouseRadius) i.mouseRadius = c.mouseRadius
+        for (const k of ['hover', 'selection', 'maxSelections']) if (c[k] !== DEFAULTS[k]) i[k] = c[k]
         if (Object.keys(i).length) p.set('interaction', JSON.stringify(i))
 
         const g = {}
@@ -209,7 +211,7 @@
         if (p.get('interaction')) {
             const i = JSON.parse(p.get('interaction'))
             if (i.λbounds) { c.λmin = i.λbounds[0]; c.λmax = i.λbounds[1] }
-            for (const k of ['wheelFactor', 'holdDuration', 'mouseRadius']) if (i[k] !== undefined) c[k] = i[k]
+            for (const k of ['wheelFactor', 'holdDuration', 'mouseRadius', 'hover', 'selection', 'maxSelections']) if (i[k] !== undefined) c[k] = i[k]
         }
         if (p.get('geometry')) {
             const g = JSON.parse(p.get('geometry'))
@@ -604,7 +606,11 @@
         }
         hint(g, '▸ shows the options of a layer. "hide on drag" hides a layer while dragging, pinching or animating.')
 
-        g = section('Interaction', ['λmin', 'λmax', 'wheelFactor', 'holdDuration', 'mouseRadius', 'click'])
+        g = section('Interaction', ['λmin', 'λmax', 'wheelFactor', 'holdDuration', 'mouseRadius', 'click', 'hover', 'selection', 'maxSelections'])
+        hint(g, 'Strategies set the node state (hovered, selected); the layers only decide how they show it (e.g. cells › hover, selection).')
+        select(g, 'Hover', 'hover', [['pointer', 'pointer: the node under the mouse'], ['none', 'none']])
+        select(g, 'Selection', 'selection', [['multi', 'multi'], ['single', 'single: replaces the old one'], ['none', 'none']])
+        number(g, 'maxSelections', 'maxSelections', 1, 100, 1, () => cfg.selection === 'multi')
         select(g, 'Click on a node', 'click', [['goto', 'animate it to the center'], ['select', 'toggle selection'], ['ripple', 'ripple'], ['none', 'nothing (log only)']])
         number(g, 'λbounds min', 'λmin', 0.001, 1, 0.005)
         number(g, 'λbounds max', 'λmax', 0.01, 1, 0.01)

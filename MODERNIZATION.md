@@ -203,7 +203,7 @@ A bug or feature counts as done when its expected-to-fail test becomes a normal 
 7. [x] **Multi-line labels**: a `\n` in `precalc.label` gives several lines (text
        measuring, offset, background, `labels-force`). The layer `labels2` (an
        unfinished copy of `labels`) is removed.
-8. [ ] **Hover and selection**: separate node state, interaction strategy and
+8. [x] **Hover and selection**: separate node state, interaction strategy and
        display (see "Design: hover and selection" below)
 9. [ ] **Dead code**: the old `InteractionLayer` (invisible in the default layer
        stack, but still handles events), commented-out blocks. Public exports stay
@@ -283,7 +283,13 @@ Rendering (DOM, browser), in order of expected gain:
 
 ### Design: hover and selection (for Phase 2)
 
-Agreed on 2026-11-22, to be implemented after Phase 1. Idea: every node has the
+Agreed on 2026-11-22, implemented in phase 2 step 8 (`selection.spec.mjs`): node
+state `n.hovered` / `n.selected`; `interaction.hover`, `selection`, `maxSelections`,
+`clickAction`; `api.select` / `deselect` / `clearSelection` / `toggleSelection` through
+one place that fires `onNodeSelect` for every change; layer options `hover` /
+`selection` (`'path'` default, `'node'`, `'none'`) on `nodes`, `symbols`, `link-arcs`,
+boolean on `cells`. The path flags (`isPartOfAnyHoverPath`, ...) stay for the path
+layers. What follows is the design as agreed. Idea: every node has the
 states *hovered* and *selected*; the interaction defines how they are set, the
 layers only define how they are shown.
 
