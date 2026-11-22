@@ -407,20 +407,64 @@
     function buildControls() {
         const isGen = g => () => cfg.source === 'gen:' + g
 
-        let g = section('Data', ['source', 'depth', 'childs', 'n', 'arms', 'armDepth', 'lang', 'preset'], true)
+        let g = section('Data', ['source', 'depth', 'childs', 'n', 'arms', 'armDepth', 'preset'], true)
         select(g, 'Source', 'source', SOURCES)
         number(g, 'Depth', 'depth', 1, 16, 1, isGen('nTree'))
         number(g, 'Children', 'childs', 1, 20, 1, isGen('nTree'))
         number(g, 'Nodes', 'n', 2, 2000, 1, () => cfg.source === 'gen:star' || cfg.source === 'gen:path')
         number(g, 'Arms', 'arms', 1, 20, 1, isGen('deepStar'))
         number(g, 'Arm depth', 'armDepth', 1, 200, 1, isGen('deepStar'))
-        check(g, 'Labels from language file (small.lang.json)', 'lang', () => cfg.source === 'file:fixtures/small.d3.json')
         select(g, 'Preset', 'preset', [['', 'none (library defaults)'], ...PRESETS.map(p => [p, p])])
         hint(g, 'Deep trees (e.g. deep star with arm depth > 40) show the known deep-tree bug when navigating far down.')
 
-        g = section('Node content', ['labels'])
-        check(g, 'Labels (langInitBFS): node names, or numbers for generated trees', 'labels', () => !cfg.lang)
-        hint(g, 'Icons (dataInitBFS) are always generated; turn on the emojis layer to show them.')
+        // What the library does when a model is set, in this order (hypertree.ts: setModel,
+        // initData, findInitλ_), with the option that controls each step and its current value.
+        g = section('Initialization', ['lang', 'labels', 'weightUniform'])
+        hint(g, 'What happens when the tree is set up, in this order. Steps with an option can be configured by the application.')
+        const steps = el('ol', { class: 'init-steps' })
+        g.append(steps)
+        const step = (title, option, text, current) => {
+            const now = el('p', { class: 'now' })
+            const li = el('li', {}, el('div', { class: 'step-title' }, title, option ? el('code', {}, option) : null), el('p', { class: 'hint' }, text), now)
+            steps.append(li)
+            if (current) controls.push({ refresh: () => { now.textContent = 'here: ' + current() } })
+            else now.remove()
+            return li
+        }
+        const gen = () => cfg.source.split(':')
+        step('Load the tree', 'dataloader',
+            'Loads the data and calls back with a d3 hierarchy (generators, fromData, fromFile for JSON, CSV, SKOS, TreeML).',
+            () => { const [k, v] = gen()
+                return k === 'file' ? `hyt.fromFile('${v}')`
+                    : v === 'nTree' ? `hyt.nTree(depth ${cfg.depth}, ${cfg.childs} children)`
+                    : v === 'star' || v === 'path' ? `hyt.${v}_(${cfg.n})`
+                    : v === 'deepStar' ? `hyt.deepStar(${cfg.arms} arms, depth ${cfg.armDepth})`
+                    : 'hyt.fromData(small inline tree)' })
+        const langStep = step('Load the language map', 'langloader',
+            'Loads a map from node names to display texts, used by langInitBFS. Runs in parallel to the data loader.',
+            () => cfg.lang ? "hyt.fromLangFile('fixtures/small.lang.json')" : 'none (empty map)')
+        check(langStep, 'Language file small.lang.json', 'lang', () => cfg.source === 'file:fixtures/small.d3.json')
+        step('Set up the nodes', null,
+            'Internal: ids, empty precalc, the root wedge from layout.rootWedge (see Layout).')
+        const weightStep = step('Sum the weights', 'layout.weight, filter.weightFilter.weight',
+            'Weights per node, summed over each subtree: layoutWeight shares the space among children, cullingWeight decides what the filter hides.',
+            () => 'layout: leaves 1; filter: ' + (cfg.weightUniform ? 'every node 1' : 'leaves 1, inner nodes height²'))
+        check(weightStep, 'Uniform filter weights', 'weightUniform', () => !cfg.filterOff)
+        step('Node data', 'dataInitBFS',
+            'Called for every node: icon (emoji), imageHref, clickable, cell. Default: clickable and cell true, no icon or image.',
+            () => 'icon: one emoji per node (always; the emojis layer is off by default)')
+        const labelStep = step('Node texts', 'langInitBFS',
+            'Called for every node after both loaders: label (and wiki). Called again when the language changes.',
+            () => cfg.lang ? 'label from the language map'
+                : !cfg.labels ? 'none (library default: no labels)'
+                : gen()[0] === 'gen' && gen()[1] !== 'data' ? 'label: Node 0, Node 1, … (generated trees have no names)' : 'label: the node name')
+        check(labelStep, 'Labels', 'labels', () => !cfg.lang)
+        step('Measure the texts', null,
+            'Internal: width of every label and icon in geometry.captionFont, for placing captions.')
+        step('Find the start zoom', 'layout.initSize, interaction.λbounds',
+            'Internal: grows λ until the outermost visible node reaches layout.initSize of the radius, then limits it to λbounds.',
+            () => `initSize ${base.layout.initSize}, λbounds [${+cfg.λmin.toFixed(3)}, ${+cfg.λmax.toFixed(3)}]`)
+        hint(g, 'A preset (Data) may replace these callbacks with its own.')
 
         g = section('Geometry', ['linkCurvature', 'captionFontPx', 'captionHeight', 'nodeRadius', 'linkWidth', 'theme'])
         hint(g, 'Options that apply to several layers (model.geometry). Options of a single layer are in the layer list below (▸).')
@@ -483,7 +527,7 @@
         range(g, 'Root wedge dir.', 'wedgeOrientation', 0, 360, 1, null, v => `${v}°`)
         range(g, 'Root wedge angle', 'wedgeAngle', 10, 360, 1, null, v => `${v}°`)
 
-        g = section('Filter', ['filterOff', 'weightUniform', 'cullingRadius', 'rangeNodesMin', 'rangeNodesMax', 'rcwMin', 'rcwMax', 'focusExtension', 'maxFocusRadius', 'maxlabels'])
+        g = section('Filter', ['filterOff', 'cullingRadius', 'rangeNodesMin', 'rangeNodesMax', 'rcwMin', 'rcwMax', 'focusExtension', 'maxFocusRadius', 'maxlabels'])
         check(g, 'Filter off (every node visible)', 'filterOff', null, 'Fine for small trees; large trees get slow.')
         const on = () => !cfg.filterOff
         range(g, 'cullingRadius', 'cullingRadius', 0.5, 1, 0.01, on)
@@ -494,7 +538,6 @@
         range(g, 'focusExtension', 'focusExtension', 0.5, 4, 0.05, on)
         range(g, 'maxFocusRadius', 'maxFocusRadius', 0.1, 0.99, 0.01, on)
         number(g, 'maxlabels', 'maxlabels', 0, 200, 1, on)
-        check(g, 'Uniform node weights', 'weightUniform', on)
         hint(g, 'The filter adapts its weight threshold a little on every update, so the visible set settles over a few frames after loading or interacting.')
 
         g = section('Interaction', ['λmin', 'λmax', 'wheelFactor', 'holdDuration', 'mouseRadius', 'click'])
