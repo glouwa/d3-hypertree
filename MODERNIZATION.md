@@ -126,13 +126,57 @@ changing for a few frames after loading and after each interaction;
 
 ### Phase 2: Bugs and code quality
 
-- [ ] Fix the ~20 type errors (e.g. `bboxCenter` imported from the wrong
-      module, implicit `M` (Materialize) global in the meta views)
-- [ ] Remove debug output (`console.log` in hot paths such as the layer stack)
-- [ ] Fix the known bugs below (the deep-tree bug comes after the modernization)
-- [ ] Triage the open GitHub issues (currently only Dependabot PRs)
-- [ ] Hover and selection: separate node state, interaction strategy and display
-      (see "Design: hover and selection" below)
+Planned on 2026-11-22. Small steps, one commit each, all tests green after each.
+A bug or feature counts as done when its expected-to-fail test becomes a normal test.
+
+1. [ ] **Type errors** (40 with TypeScript 6): missing options in the layer
+       interfaces (`fill`, `stroke`, `color`, `background`, ...), `console.assert`
+       with non-boolean values, the Materialize global `M` in the meta views, wrong
+       signatures. Afterwards the build fails on type errors.
+2. [ ] **Debug output** removed (41 places, e.g. `console.log` on every layer stack
+       update, `console.debug` on every configuration merge)
+3. [ ] **Known bugs**:
+       - hover highlight stays after the pointer leaves the tree (analyze first)
+       - `goto(p, λ)` ignores the zoom
+       - animations stop ~0.3% short of the target
+       - `linkCurvature: '0'` crashes; it means straight lines (SVG path), like `'l'`
+         (SVG line). Values: `'-'` (default, hyperbolic geodesic), `'+'` (arc
+         bending the other way), `'0'`, `'l'`
+4. [ ] **Filter: only the range is configured.** `weightFilter.magic` becomes
+       internal: the library picks the start value so that the number of visible
+       nodes is within `rangeNodes` from the first frame (no settling over several
+       frames). A configured `magic` is ignored with a warning.
+5. [ ] **Documented features back** (expected-to-fail tests in `documented.spec.mjs`):
+       - renamed, alias with a deprecation warning: `nodeColor`/`linkColor`
+         (→ `fill`/`stroke`), `interaction.wheelSensitivity` (→ `wheelFactor`),
+         layers `link-lines`/`path-lines` (→ `link-arcs`/`path-arcs` with straight
+         lines), `geometry.animateUpRadius` (→ `layout.initSize`),
+         `filter.cullingWeight` (→ `weightFilter.rangeNodes`),
+         `filter.transformation.P` (→ start position)
+       - new: `filter.weightFilter: null` (no weight culling), `geometry.addLayer` /
+         `removeLayer` (by name), `iconmap` (emoji per node name) and `langmap`
+         (translations) as objects in the model. Both are applied once at
+         initialization into `precalc.icon` / `precalc.label` (no lookup per frame)
+       - `layout.linklen`: left out for now (the zoom λ is the link length in this
+         layout); removed from the docs, mentioned in the migration guide
+6. [ ] **Node layer option `show`**: `'leaves'` (default as today: leaves, root,
+       nodes with hidden children), `'all'` (a small disk for every visible node,
+       inner nodes scaled by weight) or a function `n => boolean`.
+       `geometry.nodeFilter` stays as an alias. Playground: option of the nodes layer.
+7. [ ] **Multi-line labels**: a `\n` in `precalc.label` gives several lines (text
+       measuring, offset, background, `labels-force`). The layer `labels2` (an
+       unfinished copy of `labels`) is removed.
+8. [ ] **Hover and selection**: separate node state, interaction strategy and
+       display (see "Design: hover and selection" below)
+9. [ ] **Dead code**: the old `InteractionLayer` (invisible in the default layer
+       stack, but still handles events), commented-out blocks. Public exports stay
+       until the API review in phase 4.
+10. [ ] **ESLint** with a few useful rules (no mass reformatting)
+11. [ ] **GitHub Action**: build and all tests on every push (Windows runner, the
+        tests use Edge)
+12. [ ] Triage the open GitHub issues
+
+Not in phase 2: performance (phase 3), the deep-tree bug (after the modernization).
 
 ### Phase 3: Interaction performance (priority)
 
