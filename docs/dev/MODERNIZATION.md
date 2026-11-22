@@ -322,6 +322,34 @@ switches to the upper half-plane model, which fits a rectangular view.
 
 ### Phase 4: v2 release
 
+- [ ] **Folder structure by pipeline stage** (first step of phase 4, before the API
+      review). Today `components/` vs `models/` is blurry (`models/hypertree/` holds
+      the filter, label selection, voronoi and the default layer stack), the data
+      flow isn't visible, labels are spread over four files, `hypertree.ts` has
+      800 lines. Planned:
+      ```
+      src/
+      ├─ index.ts
+      ├─ README.md          the pipeline in two sentences
+      ├─ component/         Hypertree (split: api, init, animation), UnitDisk
+      ├─ config/            model types, presets, default layer stack, model-compat
+      ├─ core/              node type, hyperbolic math, transformation, path, trace
+      ├─ extras/meta/       HypertreeEx, meta views (optional)
+      ├─ interaction/       pointer queue, hover/selection strategies, gestures
+      └─ pipeline/
+         ├─ 1-data/         loaders, generators, formats/ (JSON, CSV, SKOS, TreeML)
+         ├─ 2-layout/       Bergé, Buchheim, spiral, … and the layout cache
+         ├─ 3-filter/       weight filter (magic), label selection, voronoi
+         └─ 4-render/       layer stack, planes, update pattern, layers/, text measuring, bitmaps
+      ```
+      Numbers only where the order means something (editors sort alphabetically);
+      the interaction acts on the pipeline from outside, so it isn't a stage.
+      Fits the planned features: the rectangular view maps the display in
+      `4-render/` and the input in `interaction/`; an optional canvas renderer
+      lives next to SVG in `4-render/`. Done as one commit with moves and import
+      changes only (git keeps the history, tests unchanged), then splitting
+      `hypertree.ts` in separate commits. The public API stays (re-exported by
+      `index.ts`)
 - [ ] API review, migration guide, updated docs and examples
 - [ ] Prereleases on npm `next`, then `latest`
 
