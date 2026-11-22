@@ -11,6 +11,9 @@ export interface NodeLayerArgs extends ILayerArgs
     r:         (d)=> any,
     transform,
     clip?:     string,
+    fill?:       (d)=> any,
+    stroke?:     (d)=> any,
+    strokeWidth?:(d)=> any,
 }
 
 export class NodeLayer implements ILayer

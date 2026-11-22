@@ -14,6 +14,8 @@ export interface LabelLayerArgs extends ILayerArgs
     transform,
     text,
     clip?:       string,
+    color?:      (d)=> any,
+    background?: any,          // falsy, or a function of the node: draw a background rect
 }
 
 export class LabelLayer implements ILayer
@@ -109,6 +111,6 @@ export var bboxOval = (d, cacheId='labelslen', θn=undefined)=> {
         re:(paddingLeftRight/2 + w/2) * Math.cos(θ) - w/2,
         im:(paddingTopBottom/2 + h/2) * Math.sin(θ) + h/3
     }
-    console.assert(result.re)
+    console.assert(!!result.re)
     return result
 }

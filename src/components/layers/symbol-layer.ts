@@ -10,6 +10,7 @@ export interface SymbolLayerArgs extends ILayerArgs
     data:      ()=> any,
     transform,
     clip?:     string,
+    r?:        (d)=> number,   // given by the navigation background, not read by this layer
 }
 
 var symbol = d3.symbol().size(.0012)

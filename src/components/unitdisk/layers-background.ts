@@ -27,11 +27,7 @@ const nodeRadiusOffset = (ud:UnitDisk)=> (d:N)=>
 const labelDelta = (ud:UnitDisk)=> (d:N, i:number, v:N[])=> 
     CaddC(
         nodeRadiusOffset(ud)(d),
-        bboxCenter(
-            d, 
-            'labellen-bg', 
-            d.layoutReference.zp || CktoCp(d.layout.z)
-        )
+        bboxCenter(d, 'labellen-bg')   // took a third argument once, which it ignores
     )
 
 export const navBackgroundLayers = [

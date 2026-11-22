@@ -11,7 +11,10 @@ export interface CellLayerArgs extends ILayerArgs
     // don't depend on it): the cell under the mouse, the cells of selected nodes
     hover?:      boolean,     // default true
     selection?:  boolean,     // default true
-} 
+    fill?:       (d)=> any,
+    stroke?:     (d)=> any,
+    strokeWidth?:(d)=> any,
+}
 
 export class CellLayer implements ILayer
 {    

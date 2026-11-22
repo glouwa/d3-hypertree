@@ -16,9 +16,11 @@ export interface ArcLayerArgs extends ILayerArgs
     curvature:  ArcCurvature,
     nodePos:    (n:N)=> C,
     nodePosStr: (n:N)=> string,
-    classed:    (s,w)=> void,
-    width,
+    classed:    (s, w, c?)=> void,
+    width?,
     clip?:      string,
+    stroke?:     (d)=> any,
+    strokeWidth?:(d)=> any,
 }
 
 export class ArcLayer implements ILayer
@@ -87,8 +89,8 @@ export class ArcLayer implements ILayer
             var arcP2 = d.parent 
                       ? $this.args.nodePos(d.parent)
                       : { re:arcP1.re, im:1 }
-            console.assert(arcP1)
-            console.assert(arcP2)
+            console.assert(!!arcP1)
+            console.assert(!!arcP2)
             var arcC = arcCenter(arcP1, arcP2)
 
             var r = CktoCp(CsubC(arcP2, arcC.c)).r; if (isNaN(r) || r > 1000) r = 0;            

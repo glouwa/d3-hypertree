@@ -144,8 +144,8 @@ export function LayerInfo_({ parent, onCheckChange, className })
                 const timeStr = d3format(time) 
                 layerViews.time.innerHTML = checker ? timeStr : ``
 
-                layerViews.bar.children[0].style.width = (time/maxTimeLayer*100*1000)+'%'
-                layerViews.bar.children[0].style.backgroundColor = color
+                ;(<HTMLElement>layerViews.bar.children[0]).style.width = (time/maxTimeLayer*100*1000)+'%'
+                ;(<HTMLElement>layerViews.bar.children[0]).style.backgroundColor = color
                 ping(layerViews.ping1, checker && !isIrrelevant(time))
                 ping(layerViews.ping2, checker && !isIrrelevant(time) && time*1000 > maxTimeLayer)
             }
@@ -199,13 +199,13 @@ export function LayerInfo_({ parent, onCheckChange, className })
             view:  HTML.parse<HTMLElement>(switchHtml(pos))(),            
             bar:   HTML.parse<HTMLElement>(barHtml(pos))(),
             updateCounts: () => {                
-                stateViews.count.innerHTML = sum
+                stateViews.count.innerHTML = String(sum)
 
-                const timeStr = d3format(sumtime) 
+                const timeStr = d3format(sumtime)
                 stateViews.time.innerHTML = timeStr
 
-                stateViews.bar.children[0].style.width = (sumtime/maxTimeLayerstack*100*1000)+'%'
-                stateViews.bar.children[0].style.backgroundColor = googlePalette(0)
+                ;(<HTMLElement>stateViews.bar.children[0]).style.width = (sumtime/maxTimeLayerstack*100*1000)+'%'
+                ;(<HTMLElement>stateViews.bar.children[0]).style.backgroundColor = googlePalette(0)
             }
         }
         switchRow = stateViews

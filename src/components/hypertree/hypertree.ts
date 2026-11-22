@@ -465,7 +465,7 @@ export class Hypertree
     public updateLayoutPath_(preservingnode:N) : void {
         const t = this.args.geometry.transformation
         //console.log("_updateLayoutPath_", t.state.λ)        
-        console.assert(preservingnode)
+        console.assert(!!preservingnode)
         const t0 = performance.now()        
 
         preservingnode.ancestors().reverse().forEach(n=> this.args.layout.type(n, t.state.λ, true))

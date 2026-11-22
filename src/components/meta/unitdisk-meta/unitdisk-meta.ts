@@ -119,7 +119,8 @@ interface UnitdiskMeta_UI {
     updateModel, 
     updateLang,
     updateTransformationInfo
-    updateLayout, 
+    updateTransformation?,
+    updateLayout,
     updateCachInfo,
     updateλω
 }
@@ -473,7 +474,7 @@ var updateBar = (view, vec, cvec)=> {
     var l = vec.map((e, i, v)=> { c+=e; return c-e; })
     var data = t([vec, cvec, l])
     var cursor = 0
-    var diff = d3.select(view).selectAll('div').data(data)
+    var diff = d3.select(view).selectAll<HTMLDivElement, any>('div').data(data)
     diff.enter().append('div')
         .attr('class', 'bar')
         .merge(diff)

@@ -15,10 +15,11 @@ export interface LabelForceLayerArgs extends ILayerArgs
     className:   string,
     invisible?:  boolean,
     hideOnDrag?: boolean,
-    data:        ()=> any,    
+    data:        ()=> any,
     transform,
     text,
     clip?:       string,
+    background?: any,          // falsy, or a function of the node: draw a background rect
 }
 
 

@@ -24,7 +24,8 @@ export interface IUnitDisk
     view:               UnitDiskView
     args:               UnitDiskArgs
 
-    cache    
+    cache
+    cacheMeta?          // timings of the last cache update (magic-filter.ts)
     voronoiLayout :     d3.VoronoiLayout<N>
     layerStack:         LayerStack
     HypertreeMetaType

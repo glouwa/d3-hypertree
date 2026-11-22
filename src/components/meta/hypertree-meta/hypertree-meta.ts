@@ -132,7 +132,8 @@ export class HypertreeMetaNav
         this.view.html2 = HTML.parse<HTMLElement>(this.htmlCarLs)()
         this.view.parent.appendChild(this.view.html2)
         
-        M.Carousel.init(document.querySelectorAll('.carousel'), { 
+        // Materialize, provided by the page
+        ;(<any>window).M.Carousel.init(document.querySelectorAll('.carousel'), {
             fullWidth:true, 
             noWrap:true
         })

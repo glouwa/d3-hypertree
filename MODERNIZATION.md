@@ -129,10 +129,10 @@ changing for a few frames after loading and after each interaction;
 Planned on 2026-11-22. Small steps, one commit each, all tests green after each.
 A bug or feature counts as done when its expected-to-fail test becomes a normal test.
 
-1. [ ] **Type errors** (40 with TypeScript 6): missing options in the layer
+1. [x] **Type errors** (40 with TypeScript 6): missing options in the layer
        interfaces (`fill`, `stroke`, `color`, `background`, ...), `console.assert`
        with non-boolean values, the Materialize global `M` in the meta views, wrong
-       signatures. Afterwards the build fails on type errors.
+       signatures. Done: no type errors; the build fails on type errors.
 2. [ ] **Debug output** removed (41 places, e.g. `console.log` on every layer stack
        update, `console.debug` on every configuration merge)
 3. [ ] **Known bugs**:
