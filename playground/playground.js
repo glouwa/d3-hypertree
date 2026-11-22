@@ -506,10 +506,10 @@
         const tbody = el('tbody')
         table.append(tbody)
         g.append(table)
-        // Playground only: the radius indicator circles (culling-r, mouse-r, focus-r,
-        // labels-r-𝐖) form one group, shown where its first layer is.
-        const GROUPS = [{ name: 'Indicators', test: n => /-r(-|$)/.test(n),
-            note: 'circles that show radii of the filter and the interaction' }]
+        // Playground only: the indicator circles (culling-r, mouse-r, focus-r, labels-r-𝐖
+        // and λ) form one group, shown where its first layer is.
+        const GROUPS = [{ name: 'Indicators', test: n => /-r(-|$)/.test(n) || n === 'λ',
+            note: 'circles that show radii of the filter and the interaction, and the zoom λ' }]
         const groupOf = name => GROUPS.find(gr => gr.test(name))
         const groupRows = {}   // group name -> { rows: member rows, open }
 

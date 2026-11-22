@@ -178,14 +178,14 @@ test('the voronoi cells are recognizable as a layer and can be turned on', async
     await page.waitForFunction(() => document.querySelectorAll('#tree #cells > *').length > 10)
 })
 
-test('the radius indicator layers form the group Indicators', async ({ page }) => {
+test('the indicator layers form the group Indicators', async ({ page }) => {
     const errors = collectErrors(page)
     await page.goto('../playground/?gen=nTree&depth=6&childs=2&labels=1')
     await ready(page)
     await page.locator('summary').filter({ hasText: /^Layers/ }).click()
     const group = page.locator('tr[data-group="Indicators"]')
-    const members = ['culling-r', 'mouse-r', 'focus-r', 'labels-r-𝐖']
-    await expect(group).toContainText('4 layers')
+    const members = ['culling-r', 'mouse-r', 'focus-r', 'labels-r-𝐖', 'λ']
+    await expect(group).toContainText('5 layers')
     for (const m of members) await expect(page.locator(`tr[data-layer="${m}"]`)).toBeHidden()
     // the group's checkbox switches all members on
     await group.locator('input[type=checkbox]').first().check()
