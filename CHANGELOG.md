@@ -9,6 +9,10 @@ are listed first.
 
 ### Changed behavior
 
+- **Default node radius** follows `geometry.linkWidth`: inner nodes half the width
+  of their link (the disk never sticks out of it), leaves 1.5 times (a disk three
+  times as wide as the link; they were nearly invisible at the end of their thin
+  links). Was a constant 0.01 (inner nodes times their weight scale).
 - **Which nodes get a label.** Until v1 only nodes inside the focus radius
   (λ × `focusExtension`, at most `maxFocusRadius`) were candidates, thinned out
   by weight, so `maxlabels` was often far from reached (a wide tree showed a

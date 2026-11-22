@@ -28,6 +28,15 @@ const hasCircle =      n=> hasLazy(n) || isRoot(n) || isLeaf(n)
 
 var nodeInitR =        (c:number)=> (ud:UnitDisk, d:N)=> c * ((d.children && d.parent) ? innerNodeScale(d) : 1)     
 var nodeInitRNoInner = (c:number)=> (ud:UnitDisk, d:N)=> c
+// default node radius, relative to the width of the node's link (follows
+// geometry.linkWidth; linkWidth includes the distance scale, the node layer scales
+// the radius with nodeScale): inner nodes half the link width, so the disk never
+// sticks out of the link; leaves 1.5 times (a disk three times as wide as the
+// link), else they would be invisible at the end of their thin links
+var nodeRadiusOfLink = (ud:UnitDisk, d:N)=> {
+    const linkWidth = ud.args.linkWidth(d) / (d.distScale > 1e-9 ? d.distScale : 1)
+    return linkWidth * (isLeaf(d) ? 1.5 : .5)
+}
 var nodeScale =        d=> d.distScale * (hasLazy(d) ? .8 : 1)    
 var nodeScaleNoInner = d=> d.distScale    
 var innerNodeScale =   d=> d.precalc.weightScale
@@ -86,7 +95,7 @@ const modelBase : ()=> HypertreeArgs = ()=>
         layers:             layerSrc,
         layerOptions:       {},
         clipRadius:         1,
-        nodeRadius:         nodeInitR(.01),
+        nodeRadius:         nodeRadiusOfLink,
         nodeScale:          nodeScale,
         nodeFilter:         hasCircle,
         offsetEmoji:        labeloffsets.labeloffset, //outwards,

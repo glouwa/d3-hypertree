@@ -9,35 +9,35 @@
    "id": 1,
    "x": 450,
    "y": 450,
-   "r": 4.3,
+   "r": 5.4,
    "fill": null
   },
   {
    "id": 4,
    "x": 198.6,
    "y": 472.1,
-   "r": 3.5,
+   "r": 6.6,
    "fill": null
   },
   {
    "id": 5,
    "x": 280,
    "y": 242.7,
-   "r": 3.4,
+   "r": 6.4,
    "fill": null
   },
   {
    "id": 6,
    "x": 612.2,
    "y": 256.6,
-   "r": 3.5,
+   "r": 6.6,
    "fill": null
   },
   {
    "id": 7,
    "x": 716.8,
    "y": 476.4,
-   "r": 3.4,
+   "r": 6.4,
    "fill": null
   }
  ],
@@ -59,9 +59,7 @@
   "images": 0,
   "emojis": 0,
   "labels": 0,
-  "labels2": 0,
   "labels-force": 0,
-  "interaction": 0,
   "interaction-2": 0,
   "traces": 0
  },

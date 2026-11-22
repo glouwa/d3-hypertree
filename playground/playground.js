@@ -32,7 +32,9 @@
         linkCurvature: base.geometry.linkCurvature,
         captionFontPx: parseFloat(base.geometry.captionFont),
         captionHeight: base.geometry.captionHeight,
-        nodeRadius: null,     // null: library default (a function of the node)
+        leafRadius: null,     // null: library default (1.5 x the link width)
+        innerRadius: null,    // null: library default (half the link width)
+        innerLikeLeaves: false,
         linkWidth: null,
         layoutType: 'berge',
         wedgeOrientation: deg(base.layout.rootWedge.orientation),
@@ -178,7 +180,12 @@
         if (c.linkCurvature !== DEFAULTS.linkCurvature) g.linkCurvature = c.linkCurvature
         if (c.captionFontPx !== DEFAULTS.captionFontPx) g.captionFont = `${c.captionFontPx}px Roboto`
         if (c.captionHeight !== DEFAULTS.captionHeight) g.captionHeight = c.captionHeight
-        if (c.nodeRadius !== null) g.nodeRadius = c.nodeRadius
+        // harness format: nodeRadius { leaves, inner } (test/config.js makes the function)
+        const nr = {}
+        if (c.leafRadius !== null) nr.leaves = c.leafRadius
+        if (c.innerLikeLeaves) nr.inner = 'leaves'
+        else if (c.innerRadius !== null) nr.inner = c.innerRadius
+        if (Object.keys(nr).length) g.nodeRadius = nr
         if (c.linkWidth !== null) g.linkWidth = c.linkWidth
         if (Object.keys(g).length) p.set('geometry', JSON.stringify(g))
 
@@ -225,7 +232,12 @@
             if (g.linkCurvature) c.linkCurvature = g.linkCurvature
             if (g.captionFont) c.captionFontPx = parseFloat(g.captionFont)
             if (g.captionHeight !== undefined) c.captionHeight = g.captionHeight
-            if (typeof g.nodeRadius === 'number') c.nodeRadius = g.nodeRadius
+            if (typeof g.nodeRadius === 'number') { c.leafRadius = g.nodeRadius; c.innerLikeLeaves = true }   // older links
+            if (g.nodeRadius && typeof g.nodeRadius === 'object') {
+                if (typeof g.nodeRadius.leaves === 'number') c.leafRadius = g.nodeRadius.leaves
+                if (g.nodeRadius.inner === 'leaves') c.innerLikeLeaves = true
+                else if (typeof g.nodeRadius.inner === 'number') c.innerRadius = g.nodeRadius.inner
+            }
             if (typeof g.linkWidth === 'number') c.linkWidth = g.linkWidth
         }
         if (p.get('layers')) {
@@ -358,7 +370,7 @@
     function hint(group, text) { group.append(el('p', { class: 'hint' }, text)) }
 
     // a number that is either the library default (null) or a custom constant
-    function optionalNumber(group, label, key, min, max, step, start) {
+    function optionalNumber(group, label, key, min, max, step, start, when) {
         const on = el('input', { type: 'checkbox', title: 'custom value' })
         const out = el('output')
         const r = el('input', { type: 'range', min, max, step })
@@ -370,7 +382,7 @@
             on.checked = v !== null; r.disabled = v === null
             r.value = v === null ? start : v; out.textContent = v === null ? 'default' : v
         } })
-        return row(group, label, wrap, out)
+        return row(group, label, wrap, out, when)
     }
 
     // one option of one layer, stored in cfg.layers[name][key]
@@ -510,15 +522,17 @@
         hint(g, 'maxlabels: at most this many labels in the label layers (highest subtree weight × display scale², big subtrees near the center first; the root always). A label layer can set its own limit (Layers › labels › maxLabels).')
         hint(g, 'The filter adapts its weight threshold a little on every update, so the visible set settles over a few frames after loading or interacting.')
 
-        g = section('Geometry', ['linkCurvature', 'captionFontPx', 'captionHeight', 'nodeRadius', 'linkWidth', 'theme'])
+        g = section('Geometry', ['linkCurvature', 'captionFontPx', 'captionHeight', 'leafRadius', 'innerRadius', 'innerLikeLeaves', 'linkWidth', 'theme'])
         hint(g, 'Options that apply to several layers (model.geometry). Options of a single layer are in the layer list below (▸).')
         select(g, 'linkCurvature', 'linkCurvature', [['-', '− (default, hyperbolic geodesic)'], ['+', '+ (arc to the other side)'], ['0', '0 (straight)']])
         hint(g, 'Default curvature of link-arcs and path-arcs; a layer can override it. The library also accepts l (straight, as SVG lines): looks like 0 and needs a little more JavaScript per frame.')
         range(g, 'caption font', 'captionFontPx', 3, 16, 0.5, null, v => `${v}px`)
         range(g, 'captionHeight', 'captionHeight', 0.01, 0.12, 0.005)
-        optionalNumber(g, 'nodeRadius', 'nodeRadius', 0.002, 0.05, 0.001, 0.01)
+        optionalNumber(g, 'radius: leaves', 'leafRadius', 0.002, 0.05, 0.001, 0.015)
+        optionalNumber(g, 'radius: inner', 'innerRadius', 0.002, 0.05, 0.001, 0.008, () => !cfg.innerLikeLeaves)
+        check(g, 'Inner nodes like the leaves', 'innerLikeLeaves')
         optionalNumber(g, 'linkWidth', 'linkWidth', 0.0005, 0.03, 0.0005, 0.005)
-        hint(g, 'nodeRadius, nodeScale, linkWidth and nodeFilter are functions of the node by default; here you can replace nodeRadius and linkWidth by a constant.')
+        hint(g, 'Node radius by default: leaves 1.5 × the width of their link (a disk three times as wide), inner nodes half of it (never wider than the link; shown with nodes › show all). Here each can be a constant. nodeScale, linkWidth and nodeFilter are functions of the node by default; linkWidth can be a constant.')
         select(g, 'Theme (CSS)', 'theme', [['light', 'light'], ['dark', 'dark']])
 
         // changed = different from the playground defaults (which hide the emoji layer)

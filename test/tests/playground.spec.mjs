@@ -373,3 +373,27 @@ test('filter: rangeNodes max defaults to 750 in the playground', async ({ page }
     await ready(page)
     expect(await page.evaluate(() => window.ht.args.filter.weightFilter.rangeNodes.max)).toBe(750)
 })
+
+test('geometry: node radius for leaves and inner nodes, inner like the leaves', async ({ page }) => {
+    const layers = encodeURIComponent(JSON.stringify({ nodes: { show: 'all' } }))
+    await page.goto(`../playground/?gen=nTree&depth=3&childs=3&filter=off&layers=${layers}`)
+    await ready(page)
+    await page.locator('summary').filter({ hasText: /^Geometry/ }).click()
+    const radiusRow = label => page.locator('.row', { has: page.locator('label', { hasText: new RegExp(`^${label}$`) }) })
+    const radii = () => page.evaluate(() => {
+        const r = c => +c.getAttribute('r')
+        const cs = [...document.querySelectorAll('#tree #nodes circle')].filter(c => c.__data__.parent)
+        return { leaves: [...new Set(cs.filter(c => !c.__data__.children).map(r))], inner: [...new Set(cs.filter(c => c.__data__.children).map(r))] }
+    })
+    await radiusRow('radius: leaves').locator('input[type=checkbox]').check()
+    await page.waitForFunction(() => decodeURIComponent(location.search).includes('"nodeRadius":{"leaves":0.015}'))
+    await ready(page)
+    await page.waitForFunction(() => [...document.querySelectorAll('#tree #nodes circle')].some(c => c.getAttribute('r') === '0.015'))
+    let r = await radii()
+    expect(r.leaves).toEqual([0.015])
+    expect(r.inner).not.toContain(0.015)
+    await page.locator('label.check', { hasText: /^Inner nodes like the leaves$/ }).locator('input').check()
+    await page.waitForFunction(() => decodeURIComponent(location.search).includes('"nodeRadius":{"leaves":0.015,"inner":"leaves"}'))
+    await expect(radiusRow('radius: inner')).toBeHidden()
+    await page.waitForFunction(() => [...document.querySelectorAll('#tree #nodes circle')].filter(c => c.__data__.parent).every(c => c.getAttribute('r') === '0.015'))
+})

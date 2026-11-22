@@ -239,3 +239,25 @@ test('label layers: maxLabels per layer', async ({ page }) => {
     expect(force).toBeGreaterThan(labels)
     expect(force).toBeLessThanOrEqual(8)
 })
+
+// default node radius, relative to the node's link: inner nodes half the link width
+// (the disk never sticks out of the link), leaves 1.5 times (disk three times as wide)
+test('nodes: default disks, inner nodes as wide as their link, leaves three times', async ({ page }) => {
+    const layers = { nodes: { show: 'all' } }
+    await openTree(page, `gen=nTree&depth=4&childs=3&filter=off&layers=${encodeURIComponent(JSON.stringify(layers))}`)
+    await waitForStable(page)
+    const r = await page.evaluate(() => {
+        const width = new Map([...document.querySelectorAll('[id="link-arcs"] > *')].map(l => [l.__data__, +l.getAttribute('stroke-width')]))
+        return [...document.querySelectorAll('#nodes circle')].filter(c => c.__data__.parent && width.has(c.__data__)).map(c => {
+            const s = /scale\(([^)]+)\)/.exec(c.getAttribute('transform'))
+            const d = c.__data__
+            return { leaf: !d.children || !d.children.length, ratio: +c.getAttribute('r') * (s ? +s[1] : 1) / width.get(d) }
+        })
+    })
+    const leaves = r.filter(x => x.leaf), inner = r.filter(x => !x.leaf)
+    expect(leaves.length).toBeGreaterThan(20)
+    expect(inner.length).toBeGreaterThan(5)
+    for (const { ratio } of leaves) expect(ratio).toBeCloseTo(1.5, 3)
+    // inner: at most half the link width (lazy nodes are drawn at 80 %)
+    for (const { ratio } of inner) { expect(ratio).toBeLessThanOrEqual(0.5001); expect(ratio).toBeGreaterThan(0.39) }
+})

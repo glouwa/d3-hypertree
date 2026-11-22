@@ -74,9 +74,18 @@
     }
     //   geometry={"linkCurvature":"+","nodeRadius":0.012,"linkWidth":0.004,
     //             "captionFont":"8px Roboto","captionHeight":0.05}
+    //   nodeRadius can also be {"leaves":0.012,"inner":0.004} (each optional: library
+    //   default) or {"leaves":0.012,"inner":"leaves"} (inner nodes like the leaves)
     function geometryOptions(g) {
         if (!g) return undefined
         if (typeof g.nodeRadius === 'number') { const r = g.nodeRadius; g.nodeRadius = (ud, n) => r }
+        else if (g.nodeRadius && typeof g.nodeRadius === 'object') {
+            const lib = hyt.presets.modelBase().geometry.nodeRadius
+            const { leaves, inner } = g.nodeRadius
+            const leafR = typeof leaves === 'number' ? () => leaves : (ud, n) => lib(ud, { ...n, children: null, distScale: n.distScale })
+            const innerR = inner === 'leaves' ? leafR : typeof inner === 'number' ? () => inner : lib
+            g.nodeRadius = (ud, n) => (n.children && n.children.length ? innerR : leafR)(ud, n)
+        }
         if (typeof g.linkWidth === 'number') { const w = g.linkWidth; g.linkWidth = n => w }
         return g
     }
