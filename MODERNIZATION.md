@@ -208,7 +208,10 @@ A bug or feature counts as done when its expected-to-fail test becomes a normal 
 9. [x] **Dead code**: the old `InteractionLayer` (invisible in the default layer
        stack, but still handles events), commented-out blocks. Public exports stay
        until the API review in phase 4.
-10. [ ] **ESLint** with a few useful rules (no mass reformatting)
+10. [x] **ESLint** with a few useful rules (no mass reformatting): `npm run lint`,
+        `eslint.config.mjs`. Errors for real problems (debug output, unreachable code,
+        constant conditions, ...); unused variables are warnings (116, mostly unused
+        imports, left for a later cleanup)
 11. [ ] **GitHub Action**: build and all tests on every push (Windows runner, the
         tests use Edge)
 12. [ ] Triage the open GitHub issues

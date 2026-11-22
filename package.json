@@ -22,7 +22,8 @@
     "watch": "node build/watch.mjs",
     "dev": "node build/watch.mjs --playground",
     "run": "node build/watch.mjs",
-    "playground": "browser-sync start --server --port 3100 --ui-port 3101 --startPath /playground/ --files \"dist/*.js\" \"dist/*.css\" \"playground/*\" \"test/config.js\" --no-open --no-notify"
+    "playground": "browser-sync start --server --port 3100 --ui-port 3101 --startPath /playground/ --files \"dist/*.js\" \"dist/*.css\" \"playground/*\" \"test/config.js\" --no-open --no-notify",
+    "lint": "eslint src"
   },
   "dependencies": {
     "d3": "^4.13.0",
@@ -30,12 +31,15 @@
     "xml2js": "^0.4.17"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/d3": "^4.13.2",
     "@types/node": "^26.6.6",
     "browser-sync": "^2.26.3",
+    "eslint": "^10.14.0",
     "events": "^3.3.0",
     "sass": "^1.108.1",
     "typescript": "^6.0.3",
+    "typescript-eslint": "^8.72.1",
     "vite": "^8.3.6"
   },
   "module": "dist/d3-hypertree.mjs",

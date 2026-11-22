@@ -91,8 +91,8 @@ export class D3UpdatePattern
             this.mainSvgGroup.selectAll("text")
             .each(function(d:N, i, v:SVGTextElement[]) 
             {
-                if (true ||   d === T.args.layer.view.unitdisk.cache.centerNode 
-                    || d.cachep.r < 0.6)
+                // every label gets a background (an older version limited it to the
+                // center node and nodes with r < 0.6)
                 {
                     var view:any = v[i]
                     var w = d.precalc[layername+'len'] || 0
