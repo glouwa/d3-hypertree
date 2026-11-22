@@ -461,7 +461,9 @@
                 tbody.append(optRow)
                 const open = () => { optRow.hidden = !optRow.hidden; toggle.textContent = optRow.hidden ? '▸' : '▾' }
                 toggle.textContent = '▸'
-                toggle.addEventListener('click', open)
+                // the whole row toggles, except its checkboxes
+                tr.classList.add('expandable')
+                tr.addEventListener('click', e => { if (!e.target.closest('input, label')) open() })
             }
             controls.push({ refresh: () => {
                 vis.checked = !eff().invisible; hod.checked = eff().hideOnDrag

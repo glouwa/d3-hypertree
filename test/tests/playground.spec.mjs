@@ -105,3 +105,18 @@ test('each layer has its own options; geometry applies to several layers', async
     expect(url).toContain('"link-arcs":{"curvature":"+"}')
     expectNoErrors(errors)
 })
+
+test('a click anywhere on a layer row toggles its options, its checkboxes do not', async ({ page }) => {
+    await page.goto('../playground/?gen=nTree&depth=4')
+    await page.locator('summary').filter({ hasText: /^Layers/ }).click()
+    const opts = page.locator('tr[data-layer-options="nodes"]')
+    await expect(opts).toBeHidden()
+    await page.locator('tr[data-layer="nodes"] td').nth(0).click({ position: { x: 150, y: 5 } })
+    await expect(opts).toBeVisible()
+    await page.locator('tr[data-layer="nodes"] td').nth(1).click({ position: { x: 5, y: 5 } })
+    await expect(opts).toBeHidden()
+    await page.locator('tr[data-layer="nodes"] input[type=checkbox]').first().click()
+    await expect(opts).toBeHidden()
+    await page.locator('tr[data-layer="nodes"] button.expander').click()
+    await expect(opts).toBeVisible()
+})

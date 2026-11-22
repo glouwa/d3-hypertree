@@ -138,3 +138,5 @@ table.layers tr.layer-options .row { grid-template-columns: 90px 1fr; margin: 2p
 table.layers tr.layer-options .hint { margin: 2px 0 4px; }
 input[type=color] { width: 32px; height: 24px; padding: 0; border: 1px solid var(--line); border-radius: 4px; background: none; }
 .check output { min-width: 52px; text-align: right; font-family: var(--mono); font-size: 12px; }
+table.layers tr.expandable { cursor: pointer; }
+table.layers tr.expandable:hover td { background: var(--accent-weak); }
