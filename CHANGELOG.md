@@ -45,6 +45,8 @@ are listed first.
     `'node'`, `'none'`), on `path-arcs` (`'none'` leaves out the hover path or the
     selection paths) and on `cells` (`true` / `false`): how a layer shows the
     state, independent of the events;
+  - `maxLabels` on `labels` and `labels-force`: a label limit per layer (default
+    `filter.maxlabels`);
   - `show` on `nodes`: `'leaves'` (default), `'all'` (a disk for every visible
     node) or a function `n => boolean`;
   - `shrinkAtRim` on `labels`, `labels-force`, `emojis`: scale with the distance

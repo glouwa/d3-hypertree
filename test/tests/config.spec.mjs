@@ -226,3 +226,16 @@ test.describe('shrinkAtRim', () => {
         })
     }
 })
+
+// layer option maxLabels: a limit per label layer (default filter.maxlabels)
+test('label layers: maxLabels per layer', async ({ page }) => {
+    const layers = { labels: { maxLabels: 3 }, 'labels-force': { invisible: false, hideOnDrag: false, maxLabels: 8 } }
+    await openTree(page, `gen=nTree&depth=6&childs=3&labels=1&filter=off&layers=${encodeURIComponent(JSON.stringify(layers))}`)
+    await waitForStable(page)
+    const count = id => page.evaluate(id => document.querySelectorAll(`[id="${id}"] text`).length, id)
+    const labels = await count('labels'), force = await count('labels-force')
+    expect(labels).toBeGreaterThan(0)
+    expect(labels).toBeLessThanOrEqual(3)
+    expect(force).toBeGreaterThan(labels)
+    expect(force).toBeLessThanOrEqual(8)
+})

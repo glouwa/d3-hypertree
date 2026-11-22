@@ -16,6 +16,7 @@ import { FocusLayer }               from '../../components/layers/focus-layer'
 import { StemLayer }                from '../../components/layers/stem-layer'
 import { bboxCenter, bboxOval }     from '../../d3-hypertree'
 import { showsState }               from '../../components/layers/state-display'
+import { labelsFor }                from './preset-process'
 
 // the args of a layer in the stack (its options), {} while the stack is built
 const layerArgs = (ud:UnitDisk, name:string) : any =>
@@ -284,7 +285,8 @@ export const layerSrc = [
         hideOnDrag: false,
         name:       'labels',
         className:  'caption',
-        data:       ()=> ud.cache.labels,
+        // option maxLabels: at most this many labels (default filter.maxlabels)
+        data:       ()=> labelsFor(ud, layerArgs(ud, 'labels').maxLabels),
         text:       (d)=> d.precalc.label,
         delta:      labeloffsets.labeloffset(ud),
         color:      ()=> undefined,
@@ -302,7 +304,7 @@ export const layerSrc = [
         hideOnDrag: true,                            
         name:       'labels-force',
         className:  'caption caption-label',
-        data:       ()=> ud.cache.labels,
+        data:       ()=> labelsFor(ud, layerArgs(ud, 'labels-force').maxLabels),
         text:       (d)=> d.precalc.label,        
         background: n=> !n.parent,
         transform:  (d, delta)=> 

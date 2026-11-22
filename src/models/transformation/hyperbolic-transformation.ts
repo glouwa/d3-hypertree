@@ -112,6 +112,7 @@ export class TransformationCache
     paths:          N[]
     weights:        N[]
     labels:         N[]
+    labelsByMax?:   { [max:number]: N[] }   // labels of layers with their own maxLabels
     emojis:         N[]
     images:         N[]
         

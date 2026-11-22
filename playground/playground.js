@@ -85,8 +85,8 @@
         'nodes':       [['show', 'choice', ['leaves', 'all']], ['hover', 'choice', ['path', 'node', 'none']], ['selection', 'choice', ['path', 'node', 'none']], ['fill', 'color'], ['stroke', 'color'], ['strokeWidth', 'number', 0, 0.02, 0.0005], ['r', 'number', 0.002, 0.06, 0.001]],
         'images':      [['width', 'number', 0.01, 0.3, 0.005], ['height', 'number', 0.01, 0.3, 0.005]],
         'emojis':      [['shrinkAtRim', 'bool'], ['color', 'color'], ['background', 'bool']],
-        'labels':      [['shrinkAtRim', 'bool'], ['color', 'color'], ['background', 'bool']],
-        'labels-force':[['shrinkAtRim', 'bool'], ['background', 'bool']],
+        'labels':      [['maxLabels', 'number', 0, 200, 1], ['shrinkAtRim', 'bool'], ['color', 'color'], ['background', 'bool']],
+        'labels-force':[['maxLabels', 'number', 0, 200, 1], ['shrinkAtRim', 'bool'], ['background', 'bool']],
     }
     // what a layer shows, when its name doesn't say it
     const LAYER_ALIASES = { 'cells': 'voronoi', 'λ': 'zoom', '(0,0)': 'origin' }
@@ -507,6 +507,7 @@
         range(g, 'focusExtension', 'focusExtension', 0.5, 4, 0.05, on)
         range(g, 'maxFocusRadius', 'maxFocusRadius', 0.1, 0.99, 0.01, on)
         number(g, 'maxlabels', 'maxlabels', 0, 200, 1, on)
+        hint(g, 'maxlabels: at most this many labels in the label layers (the nodes inside the λ circle with the biggest subtrees, and the root). A label layer can set its own limit (Layers › labels › maxLabels).')
         hint(g, 'The filter adapts its weight threshold a little on every update, so the visible set settles over a few frames after loading or interacting.')
 
         g = section('Geometry', ['linkCurvature', 'captionFontPx', 'captionHeight', 'nodeRadius', 'linkWidth', 'theme'])
@@ -539,6 +540,8 @@
               note: 'the edges between nodes: all links, the hover and selection paths, and the stem to the root' },
             { name: 'Nodes', test: n => ['nodes', 'symbols', 'images', 'emojis'].includes(n),
               note: 'what is drawn at a node: disk, symbol, image and emoji' },
+            { name: 'Root', test: n => n === '(0,0)' || n === 'center-node',
+              note: 'the origin (0,0) and the disk behind the node next to it' },
         ]
         const groupOf = name => GROUPS.find(gr => gr.test(name))
         const groupRows = {}   // group name -> { rows: member rows, open }

@@ -300,18 +300,18 @@ test('interaction strategies: selection "single" replaces, hover "none" hovers n
     expect(ids[0]).toBe(ids[1])
 })
 
-test('the groups Links and Nodes', async ({ page }) => {
+test('the groups Links, Nodes and Root', async ({ page }) => {
     await page.goto('../playground/?gen=nTree&depth=4')
     await ready(page)
     await page.locator('summary').filter({ hasText: /^Layers/ }).click()
-    const groups = { Links: ['path-arcs', 'link-arcs', 'stem-arc'], Nodes: ['nodes', 'symbols', 'images', 'emojis'] }
+    const groups = { Links: ['path-arcs', 'link-arcs', 'stem-arc'], Nodes: ['nodes', 'symbols', 'images', 'emojis'], Root: ['(0,0)', 'center-node'] }
     for (const [name, members] of Object.entries(groups)) {
         await expect(page.locator(`tr[data-group="${name}"]`)).toContainText(`${members.length} layers`)
         for (const m of members) await expect(page.locator(`tr[data-layer="${m}"]`)).toBeHidden()
         await openGroup(page, name)
         for (const m of members) await expect(page.locator(`tr[data-layer="${m}"]`)).toBeVisible()
     }
-    await expect(page.locator('tr[data-layer="center-node"]')).toBeVisible()
+    await expect(page.locator('tr[data-layer="cells"]')).toBeVisible()
 })
 
 test('interaction: hover path and hover cell switch independently', async ({ page }) => {

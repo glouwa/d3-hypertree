@@ -14,7 +14,26 @@ export function doVoronoiStuff(ud:IUnitDisk, cache:TransformationCache) {
         */
 }
 
-export function doLabelStuff(ud:IUnitDisk, cache:TransformationCache) {    
+export function doLabelStuff(ud:IUnitDisk, cache:TransformationCache) {
+    cache.labels = selectLabels(ud, cache, ud.view.hypertree.args.filter.maxlabels)
+    cache.labelsByMax = {}
+}
+
+/**
+ * The labels of a label layer with the layer option maxLabels (default:
+ * filter.maxlabels, which gives cache.labels). Computed once per update and limit.
+ */
+export function labelsFor(ud:IUnitDisk, max:number|undefined) : N[] {
+    const cache = ud.cache
+    if (max === undefined || max === null || max === ud.view.hypertree.args.filter.maxlabels) return cache.labels
+    if (!cache.labelsByMax) cache.labelsByMax = {}
+    return cache.labelsByMax[max] || (cache.labelsByMax[max] = selectLabels(ud, cache, max))
+}
+
+// Candidates: nodes inside the λ circle, the root, and 𝐖 labels inside wikiRadius.
+// While there are more than max, the weight threshold rises (the nodes with the
+// biggest subtrees stay; the root always stays).
+function selectLabels(ud:IUnitDisk, cache:TransformationCache, max:number) : N[] {
     var labels = cache.unculledNodes
         // the label layers draw precalc.label: nodes with only an icon are drawn by the emoji layer
         .filter((e:N)=> e.precalc.label)
@@ -29,7 +48,7 @@ export function doLabelStuff(ud:IUnitDisk, cache:TransformationCache) {
         })
         
     let damping = 1
-    while (stdlabels.length > ud.view.hypertree.args.filter.maxlabels) {
+    while (stdlabels.length > max) {
         stdlabels = stdlabels.filter(n=> 
                (n.precalc.cullingWeight > (n.minWeight * damping) )
             || !n.parent
@@ -37,7 +56,7 @@ export function doLabelStuff(ud:IUnitDisk, cache:TransformationCache) {
         damping /= .8
     }
 
-    cache.labels = stdlabels//.concat(pathLabels)
+    return stdlabels
 }
 
 export function doImageStuff(ud:IUnitDisk, cache:TransformationCache) {

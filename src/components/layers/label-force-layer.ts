@@ -21,6 +21,7 @@ export interface LabelForceLayerArgs extends ILayerArgs
     clip?:       string,
     background?: any,          // falsy, or a function of the node: draw a background rect
     shrinkAtRim?: boolean,     // scale with the distance to the center like the links (default false: constant size)
+    maxLabels?:   number,      // at most this many labels (default filter.maxlabels; preset-layers.ts)
 }
 
 
