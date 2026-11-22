@@ -359,7 +359,7 @@ new hyt.Hypertree(
                 'cells',
                 'culling-r', 'mouse-r', 'focus-r', 'labels-r-𝐖', 'λ', 'zerozero-circle',
                 'center-node', 'path-arcs', 'stem-arc', 'nodes', 'symbols', 'images', 'emojis',  
-                'labels', 'labels2', 'labels-force', 
+                'labels', 'labels-force', 
                 'traces',
                 */
             }

@@ -200,7 +200,7 @@ A bug or feature counts as done when its expected-to-fail test becomes a normal 
        nodes with hidden children), `'all'` (a small disk for every visible node,
        inner nodes scaled by weight) or a function `n => boolean`.
        `geometry.nodeFilter` stays as an alias. Playground: option of the nodes layer.
-7. [ ] **Multi-line labels**: a `\n` in `precalc.label` gives several lines (text
+7. [x] **Multi-line labels**: a `\n` in `precalc.label` gives several lines (text
        measuring, offset, background, `labels-force`). The layer `labels2` (an
        unfinished copy of `labels`) is removed.
 8. [ ] **Hover and selection**: separate node state, interaction strategy and

@@ -74,7 +74,7 @@ export class LabelLayer implements ILayer
                                     //.style("fill",           d=> d.pathes.finalcolor)
                                     .style("stroke",         d=> d.pathes && d.pathes.labelcolor)
                                     .style("fill",           d=> this.args.color(d) )
-                                    .text(                   this.args.text),
+                                    .call(s=> setLabelText(s, this.args.text)),
             updateColor:       s=> s.style("stroke",         d=> d.pathes && d.pathes.labelcolor)
                                     .style("fill",           d=> this.args.color(d) ),
             updateTransform:   s=> s.attr("transform",       offset)
@@ -85,6 +85,26 @@ export class LabelLayer implements ILayer
 
 var paddingLeftRight = .08
 var paddingTopBottom = .02
+
+/**
+ * Sets the text of label elements. A '\n' in the text gives several lines (tspans
+ * below each other, 1.2 em apart); the first line stays where a one-line label is.
+ */
+export function setLabelText(s, text:(d)=> string) {
+    return s.each(function(d) {
+        const t = text(d)
+        const lines = typeof t === 'string' ? t.split('\n') : [t]
+        if (lines.length === 1) { this.textContent = t === undefined || t === null ? '' : t; return }
+        this.textContent = ''
+        lines.forEach((line, i)=> {
+            const span = document.createElementNS('http://www.w3.org/2000/svg', 'tspan')
+            span.setAttribute('x', '0')
+            if (i > 0) span.setAttribute('dy', '1.2em')
+            span.textContent = line
+            this.appendChild(span)
+        })
+    })
+}
 
 export var bboxCenter = (d, cacheId='labelslen')=> {
     var w = d.precalc[cacheId]

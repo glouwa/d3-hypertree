@@ -208,18 +208,18 @@ test('the label layers form the group Labels', async ({ page }) => {
     await ready(page)
     await page.locator('summary').filter({ hasText: /^Layers/ }).click()
     const group = page.locator('tr[data-group="Labels"]')
-    await expect(group).toContainText('3 layers')
-    for (const m of ['labels', 'labels2', 'labels-force']) await expect(page.locator(`tr[data-layer="${m}"]`)).toBeHidden()
+    await expect(group).toContainText('2 layers')
+    for (const m of ['labels', 'labels-force']) await expect(page.locator(`tr[data-layer="${m}"]`)).toBeHidden()
     await group.click({ position: { x: 20, y: 8 } })
-    for (const m of ['labels', 'labels2', 'labels-force']) await expect(page.locator(`tr[data-layer="${m}"]`)).toBeVisible()
+    for (const m of ['labels', 'labels-force']) await expect(page.locator(`tr[data-layer="${m}"]`)).toBeVisible()
     // labels-r-𝐖 stays in Indicators
     await expect(page.locator('tr[data-layer="labels-r-𝐖"]')).toBeHidden()
-    // mixed at the start (labels on, labels2 and labels-force off): the group's checkbox
-    // turns all of them on, then all off
+    // mixed at the start (labels on, labels-force off): the group's checkbox
+    // turns both on, then both off
     const box = group.locator('input[type=checkbox]').first()
     expect(await box.evaluate(b => b.indeterminate)).toBe(true)
     await box.check()
-    await page.waitForFunction(() => document.querySelectorAll('#tree #labels2 > *').length > 0)
+    await page.waitForFunction(() => document.querySelectorAll('#tree [id="labels-force"] > *').length > 0)
     await box.uncheck()
     await page.waitForFunction(() => document.querySelectorAll('#tree #labels text').length === 0)
 })

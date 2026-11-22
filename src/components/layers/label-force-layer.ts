@@ -7,7 +7,7 @@ import { ILayerArgs }      from '../layerstack/layer'
 import { D3UpdatePattern } from '../layerstack/d3updatePattern'
 import { CptoCk, CktoCp }  from '../../models/transformation/hyperbolic-math'
 import { CmulR, CaddC }    from '../../models/transformation/hyperbolic-math'
-import { bboxCenter }      from '../layers/label-layer';
+import { bboxCenter, setLabelText } from '../layers/label-layer';
 
 export interface LabelForceLayerArgs extends ILayerArgs
 {
@@ -165,11 +165,11 @@ export class LabelForceLayer implements ILayer
                                     .classed("caption-icon", d=> d.precalc.icon && navigator.platform.includes('inux'))
                                     //.style("fill",           d=> d.pathes.finalcolor)
                                     .style("fill",         d=> d.pathes && d.pathes.labelcolor)
-                                    .text(                   this.args.text)
+                                    .call(s=> setLabelText(s, this.args.text))
                                     .attr("transform",       calctransform),
             updateColor:       s=> s.style("fill",         d=> d.pathes && d.pathes.labelcolor),
             updateTransform:   s=> s.attr("transform",       calctransform)
-                                    .text(                   this.args.text)
+                                    .call(s=> setLabelText(s, this.args.text))
         })
 
         function calcXY(d, xy, fp) {

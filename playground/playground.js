@@ -83,7 +83,6 @@
         'images':      [['width', 'number', 0.01, 0.3, 0.005], ['height', 'number', 0.01, 0.3, 0.005]],
         'emojis':      [['color', 'color'], ['background', 'bool']],
         'labels':      [['color', 'color'], ['background', 'bool']],
-        'labels2':     [['color', 'color']],
         'labels-force':[['background', 'bool']],
     }
     // what a layer shows, when its name doesn't say it

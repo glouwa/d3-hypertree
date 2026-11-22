@@ -96,7 +96,8 @@ export class D3UpdatePattern
                 {
                     var view:any = v[i]
                     var w = d.precalc[layername+'len'] || 0
-                    var h = geometry.captionHeight
+                    var lines = view.childElementCount || 1          // multi-line labels: one tspan per line
+                    var h = geometry.captionHeight * lines
                     
                     if (!w)
                         console.warn("labellen == 0", d)                    
@@ -104,7 +105,7 @@ export class D3UpdatePattern
                     else
                         svgRootHere.insert('rect', d=> this)
                             .attr("x",         x=> -paddingLeftRight/2)
-                            .attr("y",         x=> -paddingTopBottom-h/2)
+                            .attr("y",         x=> -paddingTopBottom-geometry.captionHeight/2)   // top of the first line
                             .attr("rx",        x=> .01) //.009
                             .attr("ry",        x=> .03) //.009
                             .attr("width",     x=> w + paddingLeftRight)

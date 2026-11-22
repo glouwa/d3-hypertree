@@ -83,3 +83,37 @@ test('iconPercent: only that share of the nodes gets an icon, evenly spread', as
     expect(quarter.icons).toBe(30)                                      // floor(121 * 0.25)
     expect(Math.abs(quarter.firstHalf - 15)).toBeLessThanOrEqual(1)     // spread, not the first 30
 })
+
+// Multi-line labels: a '\n' in precalc.label gives one tspan per line; the measured
+// width is the longest line; the background (labels-force) covers all lines.
+test('labels with \n render on several lines', async ({ page }) => {
+    const errors = collectErrors(page)
+    await page.goto('harness.html?gen=nTree&depth=3&childs=2&filter=off')
+    await page.waitForFunction(() => window.harness && harness.ht.data)
+    const r = await page.evaluate(async () => {
+        const ht = harness.ht
+        ht.args.langInitBFS = (ht, n) => { n.precalc.label = n.depth === 1 ? 'first line\nsecond, longer line\nthird' : 'one line' }
+        ht.updateLang_()
+        ht.update.data()
+        await new Promise(r => setTimeout(r, 300))
+        const multi = [...document.querySelectorAll('#labels text')].filter(t => t.__data__.depth === 1)
+        const single = [...document.querySelectorAll('#labels text')].filter(t => t.__data__.depth !== 1)
+        const n1 = ht.data.children[0]
+        return {
+            multiTspans: multi.map(t => t.querySelectorAll('tspan').length),
+            lines: multi.length ? [...multi[0].querySelectorAll('tspan')].map(s => s.textContent) : [],
+            singleTspans: single.map(t => t.querySelectorAll('tspan').length),
+            singleText: single.length ? single[0].textContent : null,
+            width: n1.precalc.labelslen,
+            widthOfLongest: (() => { const c = document.createElement('canvas').getContext('2d'); c.font = ht.args.geometry.captionFont
+                                     return c.measureText('second, longer line').width / 200 / window.devicePixelRatio })(),
+        }
+    })
+    expect(r.multiTspans.length).toBeGreaterThan(0)
+    expect(r.multiTspans.every(n => n === 3)).toBe(true)
+    expect(r.lines).toEqual(['first line', 'second, longer line', 'third'])
+    expect(r.singleTspans.every(n => n === 0)).toBe(true)
+    expect(r.singleText).toBe('one line')
+    expect(r.width).toBeCloseTo(r.widthOfLongest, 9)
+    expectNoErrors(errors)
+})

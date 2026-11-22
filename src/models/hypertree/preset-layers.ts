@@ -308,22 +308,6 @@ export const layerSrc = [
                         ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` 
                         + d.scaleStrText                            
     }),
-    (v, ud:UnitDisk)=> new LabelLayer(v, {
-        invisible:  true,
-        hideOnDrag: true,
-        name:       'labels2',
-        // a second label set: same text for now (precalc.label2 is measured but never set),
-        // drawn one line below and styled differently so both sets can be told apart
-        className:  'caption caption-second',
-        data:       ()=> ud.cache.labels,
-        text:       (d)=> d.precalc.label,
-        delta:      (d, i, v)=> CaddC(labeloffsets.labeloffset(ud)(d, i, v),
-                                      { re:0, im: ud.args.captionHeight * (d.dampedDistScale || 1) }),
-        color:      ()=> undefined,        
-        transform:  (d, delta)=> 
-                        ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` 
-                        + d.scaleStrText                            
-    }),
     (v, ud:UnitDisk)=> new LabelForceLayer(v, {                            
         invisible:  true,
         hideOnDrag: true,                            

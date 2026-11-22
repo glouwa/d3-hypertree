@@ -457,18 +457,19 @@ export class Hypertree
         {
             this.data.each(n=> {
                 if (n.precalc[txtprop]) {
-                    const metrics = context.measureText(n.precalc[txtprop])
-                    n.precalc[lenprop] = metrics.width/200/window.devicePixelRatio
+                    // multi-line labels ('\n'): the width of the longest line
+                    const lines = String(n.precalc[txtprop]).split('\n')
+                    const width = Math.max(...lines.map(l=> context.measureText(l).width))
+                    n.precalc[lenprop] = width/200/window.devicePixelRatio
                     console.assert(typeof n.precalc[lenprop] === 'number')
                 }
                 else
-                    n.precalc[lenprop] = undefined 
-            })    
+                    n.precalc[lenprop] = undefined
+            })
         }
         updateLabelLen_('label', 'labels-forcelen')
         updateLabelLen_('label', 'labelslen')
-        updateLabelLen_('label2', 'labels2len')
-        updateLabelLen_('icon', 'emojislen')      
+        updateLabelLen_('icon', 'emojislen')
     }
 
     public updateLayoutPath_(preservingnode:N) : void {
