@@ -62,10 +62,7 @@ export class NodeLayer implements ILayer
                                     .classed("selected",  d=> showsState(this.args.selection, d, 'selection'))
                                     .style("fill",      d=> (d.pathes && d.pathes.labelcolor) || this.args.fill(d)),
 
-            //updateColor:       s=> s.classed("hovered",   d=> d.isPartOfAnyHoverPath && d.parent)
-            //                        .classed("selected",  d=> d.isPartOfAnySelectionPath && d.parent),
             updateTransform:   s=> s.attr("transform",    d=> this.args.transform(d))
-                                    //.style("stroke",      d=> d.pathes && d.pathes.labelcolor)
                                     .attr("r",            d=> this.args.r(d)),
         })
     }

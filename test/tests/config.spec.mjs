@@ -5,7 +5,7 @@ import { collectErrors, expectNoErrors, openTree, waitForStable, diskBox, expect
 // own against the defaults and checked by state and scene snapshot.
 
 const base = 'gen=nTree&depth=4&childs=3&labels=1&icons=1'
-const ALWAYS = ['interaction', 'interaction-2']
+const ALWAYS = ['interaction-2']
 
 test.describe('each layer on its own', () => {
     // layer names as configured by the default layer set

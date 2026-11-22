@@ -100,7 +100,6 @@
         'emojis': 'the icons (share of nodes set in Initialization › Node data); off by default, the slowest layer to render',
         'images': 'needs n.precalc.imageHref (not set by the playground data)',
         'traces': 'touch traces while touching',
-        'interaction': 'old interaction layer (click selects)',
         'interaction-2': 'active interaction layer: mouse, touch, wheel',
     }
 

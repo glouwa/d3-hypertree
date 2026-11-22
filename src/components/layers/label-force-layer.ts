@@ -66,7 +66,6 @@ export class LabelForceLayer implements ILayer
             this.d3updatePattern2.update.transformation()
         },
         style:          ()=> { 
-            //this.update.force()
             this.d3updatePattern.update.style()
             this.d3updatePattern2.update.style()
         }
@@ -127,7 +126,6 @@ export class LabelForceLayer implements ILayer
         
         this.simulation
             .nodes(labelpoints) // labels aka this.args.data
-            //.restart() 
            
         this.simulation.force("link")
             .links(labellinks)
@@ -146,7 +144,6 @@ export class LabelForceLayer implements ILayer
     private attach() {
         const T = this
         function calctransform(d, i, v) {
-            //bboxCenter(d)(v[i])
             if (!d.forcepoints)
                 return ` translate(${d.cache.re} ${d.cache.im})` 
             console.assert(d.forcepoints.x || d.depth === 0)            

@@ -35,7 +35,6 @@ function star(ok, max) {
 }
 function loadFromLangFile(ok, file) {
     //json(file, (error, langData) =>
-    //    ok(langData))
     var t0, dl
     request(file)
         .mimeType("application/json")
@@ -148,7 +147,6 @@ export function obj2data(o)
         newN.mergeId = mergeId++
         newN.precalc = {}
         newN.name = name
-        //newN.parent = cur
         newN.children = []
 
         if (cur)

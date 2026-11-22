@@ -23,7 +23,6 @@ export interface HypertreeArgs
         langloader?:            (lang)=> (ok)=> void    
         dataInitBFS:            (ht:Hypertree, n:N)=> void       // emoji, imghref
         langInitBFS:            (ht:Hypertree, n:N)=> void       // text, wiki, clickable, cell, :  auto--> textlen
-    // }
     objects: {
         //roots:              N[]
         pathes:             Path[]

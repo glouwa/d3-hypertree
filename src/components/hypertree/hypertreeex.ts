@@ -176,7 +176,6 @@ export class HypertreeEx extends Hypertree
                 .ancestors()
                 .reduce((a, e)=> `${e.precalc.label?("  "+e.precalc.label+"  "):''}${a?"›":""}${a}`, '') 
 
-            //this.view_.path.innerText = pathStr // todo: html m frame?
             if (this.args.interaction.onCenterNodeChange)
                 this.args.interaction.onCenterNodeChange(centerNode, pathStr)
 
@@ -193,7 +192,6 @@ export class HypertreeEx extends Hypertree
             if (!this.isAnimationRunning() && centerNode.data.name !== 'Root') {                
                 const find = this.unitdisk.cache.voronoiDiagram.find(0, 0)
                 if (find) {
-                    //console.log('found centernode by voro', pathStr, find.data)
                     this.args.interaction.onNodeSelect(find.data)
                 }
             }
@@ -252,7 +250,6 @@ export class HypertreeEx extends Hypertree
         this.view_.queryDiv    = <HTMLElement>this.view_.html.querySelector('#query-input')
         this.view_.inputQuery  = <HTMLInputElement>this.view_.html.querySelector('#query-input > input')
                 
-        //this.view_.btnSize     = <HTMLButtonElement>this.view_.html.querySelector('#btnsize')
         
         this.view_.btnHome.onclick     = ()=> this.api.gotoHome()
         this.view_.btnMeta.onclick     = ()=> this.api['toggleMeta']()

@@ -92,7 +92,6 @@ export class Hypertree
     */    
     public api = {
         setModel: (model: HypertreeArgs)=> new Promise<void>((ok, err)=> {            
-            //model = mergeDeep_(presets[model.baseCfg], model)
             this.isInitializing = true
             const base = presets.modelBase()
             if (model && model.filter && model.filter.weightFilter && model.filter.weightFilter.magic !== undefined)
@@ -116,7 +115,6 @@ export class Hypertree
             this.args.langloader((langMap, t1, dl)=> {
                 this.langMap = langMap || {}
                 this.updateLang_(dl)                
-                //requestAnimationFrame(()=> this.update.data())
                 this.update.data()
                 
                 if (this.data) { this.isInitializing=false;  ok() }
@@ -204,7 +202,6 @@ export class Hypertree
                 .ancestors()
                 .reduce((a, e)=> `${e.precalc.label?("  "+e.precalc.label+"  "):''}${a?"›":""}${a}`, '') 
 
-            //this.view_.path.innerText = pathStr // todo: html m frame?
             if (this.args.interaction.onCenterNodeChange) 
                 this.args.interaction.onCenterNodeChange(centerNode, pathStr)            
         }
@@ -274,7 +271,6 @@ export class Hypertree
         this.args.geometry.transformation.state.P.im = 0        
         if (this.args.filter.weightFilter) this.args.filter.weightFilter.magic = 20
         this.args.geometry.transformation.cache.centerNode = undefined
-        //this.args.geometry.transformation.cache.hoverNode = undefined
 
         this.args.objects.selections = []
         this.args.objects.pathes = []
@@ -354,7 +350,6 @@ export class Hypertree
         // without a weight filter every node weighs 1 (used for label sizes, not culling)
         this.sum(this.data, this.args.filter.weightFilter ? this.args.filter.weightFilter.weight : (n=> 1), 'cullingWeight')
         this.sum(this.data, this.args.layout.weight, 'visWeight')
-        //this.sum(this.data, this.args.geometry.weight[0], (n, s)=> n.visprop[0] = s)
 
         // node dinger
         // for arc width and node radius in some cases, not flexible enough
@@ -449,8 +444,6 @@ export class Hypertree
         var context = this.virtualCanvasContext 
             || (this.virtualCanvasContext = canvas.getContext("2d"))
         context.font = this.args.geometry.captionFont
-        //context.textBaseLine = 'middle'
-        //context.textAlign = 'center' 
 
         const updateLabelLen_ = (txtprop, lenprop)=>
         {
@@ -473,7 +466,6 @@ export class Hypertree
 
     public updateLayoutPath_(preservingnode:N) : void {
         const t = this.args.geometry.transformation
-        //console.log("_updateLayoutPath_", t.state.λ)        
         console.assert(!!preservingnode)
         const t0 = performance.now()        
 
@@ -775,7 +767,6 @@ class Animation extends Transition
         
         const frame = ()=> 
         {
-            //console.group("Frame")            
             
             this.currentframe = new Frame(0)
             this.frames.push(this.currentframe)

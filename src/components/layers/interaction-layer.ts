@@ -43,31 +43,12 @@ export class InteractionLayer implements ILayer
     private initMouseStuff() {
         var dragStartPoint = null
         var dragStartElement = null
-        /*var drag = d3.drag()
-            //.filter(()=> console.log(d3.event.type); return true; )
-            .on("start", ()=> this.onDragStart(
-                dragStartElement = this.findNodeByCell(),
-                dragStartPoint = this.currMousePosAsC()
-            ))
-            .on("end",   ()=> this.onDragEnd(
-                dragStartElement,
-                dragStartPoint,
-                this.currMousePosAsC()
-            ))
-            .on("drag",  ()=> this.onDragByNode(
-                dragStartElement,
-                dragStartPoint,
-                this.currMousePosAsC()
-            ))*/
 
         let lasttransform = null
         var zoom = d3.zoom() // zoomevents: start, end, mulitiple, 
             //.scaleExtent([.51, 1.49])      
             .on("zoom", ()=> {
                 console.assert(d3.event)
-                /*
-                const tid = d3.event.sourceEvent.touches[0].identifier || 'mouse'
-                */
 
                 if (d3.event && 
                     d3.event.sourceEvent && 
@@ -80,8 +61,6 @@ export class InteractionLayer implements ILayer
                     
                     const min = .1 * Math.PI
                     const max = .8 * Math.PI*2
-                    //if (newλp.θ >= max) console.log('to big')
-                    //if (newλp.θ <= min) console.log('to small')
 
                     if (newλp < max && newλp > min) 
                         this.onDragλ(newλp)
@@ -96,17 +75,13 @@ export class InteractionLayer implements ILayer
 
                         const newλp = d3.event.transform.k+.5
                         
-                        //console.log('touch zoom', newλp.θ)
                         const min = .1 * Math.PI
                         const max = .8 * Math.PI*2
-                        //if (newλp.θ >= max) console.log('to big')
-                        //if (newλp.θ <= min) console.log('to small')
 
                         if (newλp.θ < max && newλp.θ > min) 
                             this.onDragλ(newλp)                        
                     }
                     else {
-                        //console.log('touch drag')
                         this.onDragByNode(
                             dragStartElement,
                             dragStartPoint,
@@ -124,23 +99,18 @@ export class InteractionLayer implements ILayer
                 }
             })
             .on("start", ()=> {
-                //console.log('start')
                 this.onDragStart(
                     dragStartElement = this.findNodeByCell(),
                     dragStartPoint = this.currMousePosAsC()
             )})
             .on("end",   ()=> { 
-                //console.log('end')
                 this.onDragEnd(
                     dragStartElement,
                     dragStartPoint,
                     this.currMousePosAsC() 
             )})
 
-        //var transform = d3.zoomTransform(selection.node());
-        //var transform = d3.zoomTransform(this); in event sinks
         const htapi = this.view.hypertree.api
-        //const hoverpath = this.view.hypertree.args.objects.pathes.firstornull(e=> type==='HoverPath')[0]
         const hoverpath = this.view.hypertree.args.objects.pathes[0]
 
         this.view.parent.append('circle')
@@ -251,7 +221,6 @@ export class InteractionLayer implements ILayer
             d3.event.preventDefault()
             
         m = m || this.currMousePosAsC()
-        //m = n.cache
 
         if (!this.dblClickTimer) 
             this.dblClickTimer = setTimeout(() => {
@@ -272,7 +241,6 @@ export class InteractionLayer implements ILayer
         var m = this.currMousePosAsC()
 
         this.cancelClickTimer()
-        //this.animateTo(n, ArrtoC(d3.mouse(this.args.parent)))
         this.args.onClick(n, m)
     }    
 }

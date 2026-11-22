@@ -53,7 +53,6 @@ export class ImageLayer implements ILayer
             updateColor:       s=> {},
             updateTransform:   s=> s.attr("transform", (d, i, v)=> {
                 
-                //const delta = this.args.delta(d, i, v)
                 const delta = CmulR({ re:-this.args.width, im:-this.args.height }, d.distScale/2)
 
                 return ` translate(${delta.re} ${delta.im})` 

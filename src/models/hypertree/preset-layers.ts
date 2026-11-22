@@ -9,7 +9,6 @@ import { SymbolLayer }              from '../../components/layers/symbol-layer'
 import { ArcLayer }                 from '../../components/layers/link-layer'
 import { LabelLayer }               from '../../components/layers/label-layer'
 import { LabelForceLayer }          from '../../components/layers/label-force-layer'
-import { InteractionLayer }         from '../../components/layers/interaction-layer'
 import { InteractionLayer2 }        from '../../components/layers/interaction-layer-2'
 import { TraceLayer }               from '../../components/layers/trace-layer'
 import { ImageLayer }               from '../../components/layers/image-layer'
@@ -44,7 +43,6 @@ export const layerSrc = [
     // nodes
     // nodes-leafs
     // nodes-lazy
-    // bounds (lambda, P)    
     // wedges
     // weight circle (radius)
     // weight cell (color)
@@ -324,23 +322,9 @@ export const layerSrc = [
                         ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` 
                         + d.scaleStrText                            
     }),    
-    (v, ud:UnitDisk)=> new InteractionLayer(v, {    
-        invisible:  true,
-        hideOnDrag: true,                        
-        mouseRadius: ud.view.hypertree.args.interaction.mouseRadius,       
-        onClick:     (n:N, m:C)=> {
-                        var s = n.ancestors().find(e=> true)               // obsolete
-                        //ud.args.hypertree.updatePath('SelectionPath', s) // toggle selection 
-                        ud.view.hypertree.api.toggleSelection(s)           // toggle selection, calls onNodeSelect
-        }
-    }),
-    (v, ud:UnitDisk)=> new InteractionLayer2(v, {                            
-        mouseRadius: ud.view.hypertree.args.interaction.mouseRadius,        
-        onClick:     (n:N, m:C)=> {
-                        var s = n.ancestors().find(e=> true)               // obsolete
-                        //ud.args.hypertree.updatePath('SelectionPath', s) // toggle selection 
-                        ud.view.hypertree.api.toggleSelection(s)           // toggle selection, calls onNodeSelect
-        }
+    // mouse, touch and wheel; a click calls interaction.clickAction and onNodeClick
+    (v, ud:UnitDisk)=> new InteractionLayer2(v, {
+        mouseRadius: ud.view.hypertree.args.interaction.mouseRadius,
     }),
     (v, ud:UnitDisk)=> new TraceLayer(v, {  
         invisible:    true,

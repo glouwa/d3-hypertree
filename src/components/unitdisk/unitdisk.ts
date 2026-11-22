@@ -176,7 +176,6 @@ export class UnitDiskNav implements IUnitDisk
             new NegTransformation(
                 new PanTransformation(args.transformation.state))
         
-        //var ncount = 1        
         this.navParameter = new UnitDisk({
             parent:             view.parent,
             className:          'nav-parameter-disc',

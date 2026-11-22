@@ -44,15 +44,12 @@ export class CellLayer implements ILayer
             className:         'cell',
             elementType:       'polygon',
             create:            s=> s.attr('id', d=> 'cell-' + d.data.mergeId)
-                                    .classed("leaf", false)/*s.classed("root",      d=> !d.data.parent)   */
+                                    .classed("leaf", false)
                                     .classed("lazy", true)
                                     .style("stroke",       d=> (d.pathes && d.pathes.labelcolor) || this.args.stroke(d))
                                     .style("stroke-width", d=> (d.pathes && d.pathes.labelcolor) || this.args.strokeWidth(d)),
                                     
                                     
-                                    /*
-                                    .classed("lazy",      d=> d.data.hasOutChildren)                                 
-                                    .classed("leaf",      d=> !d.data.children),*/
             // d is a voronoi polygon; d.data is its node. Only the cell of the node
             // under the mouse is "hovered", and only cells of selected nodes are
             // "selected" (not every cell on the path to them).

@@ -48,12 +48,6 @@ var labelHtml  = (id)=>     `<div class="label"></div> `
 var countHtml  = (id)=>     `<div class="nodes"></div> `
 var timeHtml   = (id)=>     `<div class="time"></div> `
 var switchHtml = (id)=>     `<div class="switch"></div> `
-/*
-var check1Html = (id, c)=>  `<div class="cbx">           
-                                <input type="checkbox" id="${id}" class="filled-in" ${c?'checked':''}/>
-                                <label for="${id}"></label>
-                             </div>`
-*/
 var check1Html = (id, c)=>  `<label class="cbx">           
                                 <input type="checkbox" id="${id}" class="filled-in" ${c?'checked':''}/>
                                 <span></span>
@@ -74,8 +68,6 @@ function ping(v, cond=true) {
         v.style.opacity = 1
         v.style.animation = ""        
         requestAnimationFrame(()=> {             
-            //v.style.animation = "blink-out 750ms cubic-bezier(0.070, 0.065, 0.765, -0.135)"
-            //v.style.animation = "blink-out 2ms cubic-bezier(0.070, 0.455, 0.850, 0.420)"
             v.style.animation = "blink-out 2s cubic-bezier(0.145, 1.130, 0.725, 0.590)"            
             v.style.opacity = 0
         })

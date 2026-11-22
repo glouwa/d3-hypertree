@@ -9,40 +9,6 @@ import { doVoronoiStuff }           from './preset-process'
 import { doLabelStuff }             from './preset-process'
 import { doImageStuff }             from './preset-process'
 
-/*
-class Culler {
-    rangeNodes = { min:120, max:420 }
-    rangeMagic = { min:2,   max:500 }
-    alpha      = 1.05
-
-    public adjustMagic(ud:IUnitDisk, cache:TransformationCache) {
-        const rangeNodes = { min:120, max:420 }
-        const rangeMagic = { min:2,   max:500 }
-        const alpha      = 1.05
-        //stopUp
-        //stopDown
-        if (cache.unculledNodes) {
-            if (cache.unculledNodes.length > rangeNodes.max) {
-                if (ud.view.hypertree.args.magic > rangeMagic.min) { // ???
-                    ud.view.hypertree.args.magic /= alpha                
-                }
-            }
-            if (cache.unculledNodes.length < rangeNodes.min) {
-                if (ud.view.hypertree.args.magic < rangeMagic.max) { // ???
-                    ud.view.hypertree.args.magic *= alpha
-                }
-            }
-        }
-    }
-
-    public abortfilter(n, idx, highway) { // return false to abort
-        n.minWeight = highway[0].precalc.cullingWeight / ud.view.hypertree.args.magic * mf
-        peocessNodeTransformation(ud, cache, n)
-        peocessNode(ud, cache, n, focusR, n.minWeight)        
-        return !n.isOut
-    }
-}
-*/
 function adjustMagic(ud:IUnitDisk, cache:TransformationCache) {
     const filter = ud.view.hypertree.args.filter.weightFilter
     if (filter === null)   // no weight culling
@@ -109,7 +75,6 @@ function collectNodesByWeight(ud:IUnitDisk, cache:TransformationCache, path:N[])
     // centernode will be set at this point
 
     // select visible nodes - alle anderen (von startnode bis abortfilter)
-    // path.pop() 
     dfs2({
         node:        startNode,
         abortFilter: abortfilter,
@@ -199,7 +164,6 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
         (ud.layerStack && ud.layerStack.layers['cells'] && !ud.layerStack.layers['cells'].args.hideOnDrag)) 
         doVoronoiStuff(ud, cache) 
 
-    //if (!ud.view.hypertree.isAnimationRunning())
         doImageStuff(ud, cache)
     
     if (cache.centerNode)         
@@ -249,7 +213,6 @@ function peocessNodeTransformation(ud:IUnitDisk, cache:TransformationCache, n:N)
     n.cache = n.cache || { re:0, im:0 }    
     ud.view.hypertree.args.layout.type(n, ud.args.transformation.state.λ, true)
     CassignC(n.cache, ud.args.transform(n)) 
-    //CassignC(n.cache, n.layout.z) 
     n.cachep = CktoCp(n.cache)   
 }
 

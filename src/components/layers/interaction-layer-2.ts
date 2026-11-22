@@ -16,7 +16,7 @@ const π = Math.PI
 export interface InteractionLayer2Args extends ILayerArgs
 {  
     mouseRadius,
-    onClick
+    onClick?            // unused: a click calls interaction.clickAction and onNodeClick
 }
 
 export class InteractionLayer2 implements ILayer
@@ -236,10 +236,8 @@ export class InteractionLayer2 implements ILayer
         })
 
         if (this.view.hypertree.args.objects.traces.length === 1) {            
-            //this.view.unitdisk.args.transformation.onDragStart(m)
             this.dST = clone(this.view.unitdisk.args.transformation.state)
             this.view.unitdisk.isDraging = true
-            //console.log(still » pan || pinch » pan)
             this.panStart = m
             this.nopinch = true
             this.startHoldTimer(m)
@@ -275,7 +273,6 @@ export class InteractionLayer2 implements ILayer
 
         if (this.view.hypertree.args.objects.traces.length === 1)
         {
-            //this.view.unitdisk.args.transformation.onDragP(this.panStart, m)
             const t = this.view.unitdisk.args.transformation
             t.state.P = compose(this.dST, shift(this.dST, this.panStart, maxR(m, .9))).P
         }
@@ -319,7 +316,6 @@ export class InteractionLayer2 implements ILayer
 
         if (this.view.hypertree.args.objects.traces.length === 0) 
         {
-            //this.view.unitdisk.args.transformation.onDragEnd(m)
             this.dST = undefined
             this.view.unitdisk.isDraging = false
 
@@ -338,7 +334,6 @@ export class InteractionLayer2 implements ILayer
         }
         else if (this.view.hypertree.args.objects.traces.length === 1) 
         {
-            //this.view.unitdisk.args.transformation.onDragStart(m)
             const otherPoints = this.view.hypertree.args.objects.traces[0].points
             this.panStart = otherPoints[otherPoints.length-1] //others.lastpoint
 
@@ -470,86 +465,3 @@ class MouseDownState implements DragState {
     }
 }
 
-/*
-class PanState implements DragState {    
-    private panStart:C    
-    constructor() {
-
-    }
-    public onPointerStart(pid:number, m:C) {
-        //this.view.unitdisk.args.transformation.onDragStart(m)
-        this.dST = clone(this.view.unitdisk.args.transformation.state)
-        this.view.unitdisk.args.transformation.dST = this.dST
-        //console.log(still » pan || pinch » pan)
-        this.panStart = m
-        this.nopinch = true
-    }
-    public onPointerMove(pid:number, m:C) {
-        //this.view.unitdisk.args.transformation.onDragP(this.panStart, m)
-        const t = this.view.unitdisk.args.transformation
-        t.state.P = compose(this.dST, shift(this.dST, this.panStart, maxR(m, .9))).P
-    }
-    public onPointerEnd(pid:number, m:C) {
-        //this.view.unitdisk.args.transformation.onDragEnd(m)
-        this.dST = undefined
-        this.view.unitdisk.args.transformation.dST = undefined
-
-        if (this.dist(this.panStart, m) < .006 && this.nopinch)
-            if (CktoCp(m).r < 1)
-                this.click(m)
-    }
-}
-
-class PinchState implements DragState {    
-    pinchInitDist:       number
-    pinchInitλp:         number
-    pinchcenter:         C
-    pinchPreservingNode: N
-    constructor() {
-
-    }
-    public onPointerStart(pid:number, m:C) {
-        const t0 = this.view.hypertree.args.objects.traces[0]
-        const t0e = t0.points[t0.points.length-1]
-        this.pinchcenter = CmulR(CaddC(t0e, m), .5)
-        this.view.unitdisk.pinchcenter = this.pinchcenter
-        this.pinchPreservingNode = this.findUnculledNodeByCell(this.pinchcenter)            
-        this.pinchInitDist = this.dist(t0e, m)
-        this.pinchInitλp = this.view.unitdisk.args.transformation.state.λ
-        this.nopinch = false
-        //console.log('pan » pinch')
-    }
-    public onPointerMove(pid:number, m:C) {
-        const t0 = this.view.hypertree.args.objects.traces[0]
-        const t0e = t0.points[t0.points.length-1]
-        const t1 = this.view.hypertree.args.objects.traces[1]
-        const t1e = t1.points[t1.points.length-1]
-        const dist = this.dist(t0e, t1e)
-        const f = dist / this.pinchInitDist
-        const newλp = this.view.hypertree.clampλ(this.pinchInitλp * f)
-
-        {
-            const pinchcenter2 = maxR(CmulR(CaddC(t0e, t1e), .5), this.args.mouseRadius)
-            
-            const t = this.view.unitdisk.args.transformation
-            t.onDragλ(newλp)
-            this.view.hypertree.updateLayoutPath_(this.pinchPreservingNode) // only path to center
-            t.state.P = compose(t.state, shift(t.state, { re:0, im:0 }, this.pinchPreservingNode.cache )).P
-            t.state.P = compose(t.state, shift(t.state, this.pinchcenter, pinchcenter2)).P
-
-            this.pinchcenter = CmulR(CaddC(this.pinchcenter, pinchcenter2), .5)
-            this.view.unitdisk.pinchcenter = this.pinchcenter                
-        }
-    }
-    public onPointerEnd(pid:number, m:C) {
-        //this.view.unitdisk.args.transformation.onDragStart(m)
-        const otherPoints = this.view.hypertree.args.objects.traces[0].points
-        this.panStart = otherPoints[otherPoints.length-1] //others.lastpoint
-
-        this.dST = clone(this.view.unitdisk.args.transformation.state)
-        this.view.unitdisk.args.transformation.dST = this.dST
-        //console.log(still » pan || pinch » pan)            
-        this.nopinch = true
-    }
-}
-*/

@@ -205,7 +205,7 @@ A bug or feature counts as done when its expected-to-fail test becomes a normal 
        unfinished copy of `labels`) is removed.
 8. [x] **Hover and selection**: separate node state, interaction strategy and
        display (see "Design: hover and selection" below)
-9. [ ] **Dead code**: the old `InteractionLayer` (invisible in the default layer
+9. [x] **Dead code**: the old `InteractionLayer` (invisible in the default layer
        stack, but still handles events), commented-out blocks. Public exports stay
        until the API review in phase 4.
 10. [ ] **ESLint** with a few useful rules (no mass reformatting)

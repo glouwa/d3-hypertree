@@ -56,7 +56,6 @@ export class ArcLayer implements ILayer
             //updateColor:       s=> this.args.classed(s, this.args.width),
             updateColor:       s=> this.args.classed(s, this.args.width, this.args.stroke),
             updateTransform:   s=> {
-                //const c = d=> d.height===0 ? '+' : '-'                 
                 const c = d=> this.args.curvature
 
                 if (this.args.curvature == 'l')

@@ -125,7 +125,6 @@ export class HypertreeMetaNav
 
     private updateParent() {   
 
-        //this.view_.parent.innerHTML = '' // actually just remove this.view if present ... do less
         this.view.html = HTML.parse<HTMLElement>(this.htmlCarUd)()
         this.view.parent.appendChild(this.view.html)
 

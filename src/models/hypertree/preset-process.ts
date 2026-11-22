@@ -14,18 +14,11 @@ export function doVoronoiStuff(ud:IUnitDisk, cache:TransformationCache) {
         */
 }
 
-/*
-cache.emojis = hasicon
-cache.labels = haslabel + inpath - hasicon
-cache.wikis  = haslabel + inpath - labels - wikis
-*/
 export function doLabelStuff(ud:IUnitDisk, cache:TransformationCache) {    
     var labels = cache.unculledNodes
         // the label layers draw precalc.label: nodes with only an icon are drawn by the emoji layer
         .filter((e:N)=> e.precalc.label)
 
-    //var pathLabels = labels
-    //    .filter((e:N)=> e.pathes.partof && e.pathes.partof.length)
         
     var stdlabels = labels
     //    .filter(e=> pathLabels.indexOf(e) === -1)        
@@ -34,8 +27,6 @@ export function doLabelStuff(ud:IUnitDisk, cache:TransformationCache) {
                 || !e.parent                
                 || !e.isOutλ
         })
-        //.sort((a, b)=> a.label.length - b.label.length)
-        //.slice(0, 15)
         
     let damping = 1
     while (stdlabels.length > ud.view.hypertree.args.filter.maxlabels) {

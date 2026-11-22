@@ -374,8 +374,6 @@ function UnitdiskMeta_({ parent, ud, className })
         const v = rows.lang
         
         v.info.innerHTML  = `${kb}<sub>kB</sub>`
-        //v.info.innerHTML  = `7<sub>kT</sub>${sep}1<sub>k𝐖</sub>${sep}34<sub>◊</sub>${sep}34<sub>◱</sub>`
-        //v.info.innerHTML  = `7<sub>kT</sub>${sep}1<sub>k𝐖</sub>${sep}34<sub>◍</sub> 34<sub>▧</sub>`
         v.q.innerHTML     = Δs.toFixed(1)
 
         updateBar(v.bar, Δ.map(e=>e/mag_load), ['#ff9800', '#2196f3', 'green'])        
@@ -495,8 +493,6 @@ function ping(v, cond = true) {
         v.style.opacity = 1
         v.style.animation = ""        
         requestAnimationFrame(()=> {             
-            //v.style.animation = "blink-out 750ms cubic-bezier(0.070, 0.065, 0.765, -0.135)"
-            //v.style.animation = "blink-out 2ms cubic-bezier(0.070, 0.455, 0.850, 0.420)"
             v.style.animation = "blink-out 2s cubic-bezier(0.145, 1.130, 0.725, 0.590)"            
             v.style.opacity = 0
         })
