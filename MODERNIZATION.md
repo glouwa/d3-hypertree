@@ -78,11 +78,32 @@ Tests for all existing features, following the test strategy above:
 - [x] Interaction with scene snapshots (filter off and default): drag, wheel, pinch, one-finger pan, hover path, hideOnDrag (`interaction.spec.mjs`)
 - [x] API (`api.spec.mjs`): `gotoNode`, `gotoHome`, `goto`, `gotoλ`, `animateUp`, `drawDetailFrame`, `toggleSelection`, `setPathHead`, `selectQuery`, `ripple`
 - [x] Data (`data.spec.mjs`): generators, `fromData`, `fromFile` (`.d3.json`, CSV, SKOS, TreeML fixtures), `fromLangFile`, `dataInitBFS`/`langInitBFS`
-- [ ] Configuration: layer options (visibility, color callbacks,
-      `linkCurvature`, …), layout options (`rootWedge`, `weight`, `linklen`,
-      alternative layouts), one snapshot set per filter option
-- [ ] Presets load and render as before
-- [ ] Verify that the tests catch deliberately broken features
+- [x] Configuration (`config.spec.mjs`): every layer on its own, traces while
+      touching, color callbacks, link curvature `+`/`-`/`l`, dark theme (coarse
+      image check), `rootWedge` variants, all layout types
+- [x] Filter (`filter.spec.mjs`): one snapshot set per option (`cullingRadius`,
+      `rangeNodes`, `rangeCullingWeight`, `focusExtension`, `maxFocusRadius`,
+      `maxlabels`, uniform weights), each compared after the filter has settled
+- [x] Presets (`config.spec.mjs`): all seven presets load and render as before
+- [x] Documented features (`documented.spec.mjs`): every feature from readme.md
+      and docs/readme.md, expected-to-fail where it no longer works (list below)
+- [x] Verify that the tests catch deliberately broken features: six mutations of
+      the built bundle (layout, wheel direction, hover path, node radius, labels,
+      perimeter culling) are each caught
+
+**Documented features that no longer work** (to restore in v2, each has an
+expected-to-fail test): `nodeColor`/`linkColor` (readme example; the code reads
+`fill`/`stroke`), `interaction.wheelSensitivity` (now `wheelFactor`),
+`layout.linklen`, `filter.weightFilter: null`, layers `link-lines` and
+`path-lines` (partly replaced by `linkCurvature: 'l'`), `geometry.addLayer` /
+`removeLayer`, `geometry.animateUpRadius`, `iconmap`, `langmap`,
+`filter.cullingWeight`, `filter.transformation.P`.
+
+**How the filter behaves** (learned while writing the filter tests): it adapts
+`weightFilter.magic` by `alpha` on every update, so the visible node set keeps
+changing for a few frames after loading and after each interaction;
+`cullingRadius` only removes nodes whose parent lies outside the focus area;
+`rangeNodes` is bounded by `rangeCullingWeight`.
 
 ### Phase 1: Modern build
 
@@ -159,6 +180,7 @@ Rendering (DOM, browser), in order of expected gain:
 | **Animations stop slightly short of the target.** `animateTo` interpolates with `1 − sigmoid(progress)`, and `sigmoid(1) < 1`, so ~0.3% of the way remains (e.g. `gotoHome` ends at \|P\| ≈ 0.0013). | Observed; tests use a 0.005–0.01 tolerance |
 | **`weightFilter.magic` can't be configured.** `resetData()` always sets it to 20 (presets say 160); afterwards the filter adapts it to keep the visible node count within `rangeNodes`. | Documented; decide in v2 whether it's an option or internal |
 | **Documented option names that don't exist.** The readme example uses `nodeColor`/`linkColor`; the code reads `fill`/`stroke`/`strokeWidth`. More documented-only features in phase 0b. | See phase 0b, documented features |
+| **Link curvature `'0'` crashes.** Mentioned in a comment in `preset-layers.ts` (not in the docs): "Cannot read properties of undefined (reading 'nodePosStr')". | Expected-to-fail test |
 | **Crash when nodes have an icon but no label.** `preset-process.ts` calls `precalc.label.startsWith(...)` without checking that a label exists. | Found while writing the benchmark |
 
 ### Analysis of the deep-tree bug (for later)
@@ -211,13 +233,29 @@ Microsoft Edge. It serves the repo root and loads the built
 ```bash
 cd test
 npm install
-npm test                 # browser tests (~20 s)
-npm run test:update      # accept intended visual changes as the new reference
+npm test                 # all browser tests (~5 min)
+npx playwright test tests/api.spec.mjs   # one group
+npm run test:update      # accept intended changes as the new reference (scenes and screenshots)
 npm run bench            # per-layer render benchmark -> bench-layers.json
 npm run bench:interaction  # drag/wheel/pinch pipeline benchmark -> bench-interaction.json
-node bench-layers.mjs --cpu 4 --tree "gen=nTree&depth=10&childs=2"
 ```
 
-The harness ([`test/harness.html`](test/harness.html)) takes the generator
-and options as URL parameters, e.g.
-`harness.html?gen=nTree&depth=5&childs=8&labels=1&icons=1`.
+| Spec | Covers |
+|------|--------|
+| `generated.spec.mjs` | generated trees render, drag, wheel/pinch at the λbounds edge, deep-tree bug, hover cells, layer toggling |
+| `callbacks.spec.mjs` | `onNodeClick`, `onNodeHold`, `onNodeHover`/`onHoverNodeChange`, `onNodeSelect`, `onCenterNodeChange` |
+| `interaction.spec.mjs` | drag, wheel, pinch, one-finger pan, hover path, `hideOnDrag`; filter off and default |
+| `api.spec.mjs` | `goto*`, `animateUp`, `drawDetailFrame`, selection, paths, query, ripple; filter off and default |
+| `data.spec.mjs` | every loader and file format, language file, init callbacks |
+| `config.spec.mjs` | every layer on its own, traces, colors, curvature, theme, root wedge, layout types, presets |
+| `filter.spec.mjs` | one snapshot set per filter option |
+| `documented.spec.mjs` | features promised by the docs |
+
+Scene references live in `test/tests/__scenes__/`, screenshots in
+`test/tests/__screenshots__/`. A failing scene comparison names what differs,
+e.g. "node 8 off by 12.3 px" or "layer link-arcs: 0 elements vs expected 62".
+
+The harness ([`test/harness.html`](test/harness.html)) takes the data source and
+every option as URL parameters (documented at the top of the file), e.g.
+`harness.html?gen=nTree&depth=5&childs=8&labels=1&icons=1` or
+`harness.html?file=fixtures/flare.csv&filterOpt={"maxlabels":3}`.

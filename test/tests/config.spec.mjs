@@ -1,0 +1,157 @@
+import { test, expect } from '@playwright/test'
+import { collectErrors, expectNoErrors, openTree, waitForStable, diskBox, expectScene, expectPlausibleScene } from './helpers.mjs'
+
+// Configuration options and switchable features. Every option is changed on its
+// own against the defaults and checked by state and scene snapshot.
+
+const base = 'gen=nTree&depth=4&childs=3&labels=1&icons=1'
+const ALWAYS = ['interaction', 'interaction-2']
+
+test.describe('each layer on its own', () => {
+    // layer names as configured by the default layer set
+    const layers = ['background', 'cells', 'culling-r', 'mouse-r', 'focus-r', 'labels-r-𝐖', 'λ', '(0,0)',
+        'center-node', 'path-arcs', 'link-arcs', 'stem-arc', 'nodes', 'symbols', 'images', 'emojis',
+        'labels', 'labels2', 'labels-force', 'traces']
+    const safe = name => name.replace(/[^a-z0-9-]/gi, c => ({ '(': '', ')': '', ',': '-', 'λ': 'lambda', '𝐖': 'W' })[c] ?? '_')
+
+    test('the default layer set is unchanged', async ({ page }) => {
+        await openTree(page, base)
+        expect(await page.evaluate(() => harness.layerNames())).toEqual([...layers.slice(0, 19), ...ALWAYS, 'traces'])
+    })
+
+    for (const layer of layers) {
+        test(`only "${layer}"`, async ({ page }, testInfo) => {
+            const errors = collectErrors(page)
+            await openTree(page, base)
+            await page.evaluate(l => harness.showOnly([l, 'interaction', 'interaction-2']), layer)
+            await waitForStable(page)
+            const counts = await page.evaluate(() => harness.scene().layers)
+            for (const [name, n] of Object.entries(counts)) {
+                if (name === layer || ALWAYS.includes(name)) continue
+                // every other data-driven layer is empty
+                if (!['background', 'λ', '(0,0)', 'stem-arc', 'center-node', 'culling-r', 'mouse-r', 'focus-r', 'labels-r-𝐖'].includes(name))
+                    expect(n, `${name} must be empty`).toBe(0)
+            }
+            await expectPlausibleScene(page)
+            await expectScene(page, testInfo, `only-${safe(layer)}`)
+            expectNoErrors(errors)
+        })
+    }
+
+    test('traces: touch points are drawn while touching', async ({ page, browser }) => {
+        const context = await browser.newContext({ viewport: { width: 900, height: 900 }, hasTouch: true, baseURL: test.info().project.use.baseURL })
+        const p = await context.newPage()
+        const errors = collectErrors(p)
+        await openTree(p, `${base}&layers={"traces":{"invisible":false,"hideOnDrag":false}}`)
+        const box = await diskBox(p)
+        const cdp = await context.newCDPSession(p)
+        const x = box.x + box.width * 0.6, y = box.y + box.height * 0.45
+        await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y, id: 0 }] })
+        for (let i = 1; i <= 5; i++) {
+            await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: x - i * 10, y, id: 0 }] })
+            await p.waitForTimeout(16)
+        }
+        await p.waitForTimeout(100)
+        const during = await p.evaluate(() => document.getElementById('traces').querySelectorAll('*').length)
+        await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] })
+        await waitForStable(p)
+        const after = await p.evaluate(() => document.getElementById('traces').querySelectorAll('*').length)
+        expect(during).toBeGreaterThan(0)
+        expect(after).toBe(0)
+        expectNoErrors(errors)
+        await context.close()
+    })
+})
+
+test.describe('layer options', () => {
+    test('color callbacks: node fill and link stroke', async ({ page }, testInfo) => {
+        const errors = collectErrors(page)
+        await openTree(page, 'gen=nTree&depth=6&childs=2&colors=1')
+        const s = await page.evaluate(() => harness.scene())
+        expect(new Set(s.nodes.map(n => n.fill)).size).toBeGreaterThan(1)
+        expect(s.nodes.every(n => n.fill && n.fill.startsWith('rgb'))).toBe(true)
+        expect(Object.keys(s.linkColors).every(c => c.startsWith('rgb'))).toBe(true)
+        await expectScene(page, testInfo, 'colors')
+        expectNoErrors(errors)
+    })
+
+    // documented values: '+', '-', 'l' (a code comment also mentions '0', see below)
+    for (const curvature of ['+', '-', 'l']) {
+        test(`link curvature "${curvature}"`, async ({ page }, testInfo) => {
+            const errors = collectErrors(page)
+            await openTree(page, `gen=nTree&depth=6&childs=2&layers=${encodeURIComponent(JSON.stringify({ 'link-arcs': { curvature } }))}`)
+            const tag = await page.evaluate(() => { const e = document.getElementById('link-arcs').firstElementChild; return e && e.tagName })
+            expect(tag).toBe(curvature === 'l' ? 'line' : 'path')
+            await expectPlausibleScene(page)
+            await expectScene(page, testInfo, `curvature-${{ '+': 'plus', '-': 'minus', 'l': 'line' }[curvature]}`)
+            expectNoErrors(errors)
+        })
+    }
+
+    // Known bug: curvature '0' (mentioned in a comment in preset-layers.ts, not in the
+    // docs) crashes with "Cannot read properties of undefined (reading 'nodePosStr')".
+    test.fail('link curvature "0" renders without errors', async ({ page }) => {
+        const errors = collectErrors(page)
+        const layers = encodeURIComponent(JSON.stringify({ 'link-arcs': { curvature: '0' } }))
+        await page.goto(`harness.html?gen=nTree&depth=6&childs=2&layers=${layers}`)
+        await page.waitForTimeout(1500)
+        expectNoErrors(errors)
+    })
+
+    test('dark theme renders like the light one (coarse image check)', async ({ page }, testInfo) => {
+        const errors = collectErrors(page)
+        await openTree(page, 'gen=nTree&depth=6&childs=2&theme=dark')
+        await expectScene(page, testInfo, 'theme-dark')
+        // level 3: coarse image comparison, catches broken CSS or empty renders
+        await expect(page).toHaveScreenshot('theme-dark.png', { maxDiffPixelRatio: 0.02, threshold: 0.3 })
+        expectNoErrors(errors)
+    })
+})
+
+test.describe('layout', () => {
+    const wedges = [
+        ['wedge-right-half', { rootWedge: { orientation: 0, angle: Math.PI } }],
+        ['wedge-full', { rootWedge: { orientation: 3 * Math.PI / 2, angle: 2 * Math.PI } }],
+        ['wedge-narrow-up', { rootWedge: { orientation: 3 * Math.PI / 2, angle: Math.PI / 2 } }],
+    ]
+    for (const [name, layout] of wedges) {
+        test(`rootWedge ${name}`, async ({ page }, testInfo) => {
+            const errors = collectErrors(page)
+            await openTree(page, `gen=nTree&depth=6&childs=2&filter=off&layout=${encodeURIComponent(JSON.stringify(layout))}`)
+            // all children of the root lie within the wedge
+            const ok = await page.evaluate(w => harness.ht.data.children.every(c => {
+                const a = Math.atan2(c.layout.z.im, c.layout.z.re)
+                const d = Math.atan2(Math.sin(a - w.orientation), Math.cos(a - w.orientation))
+                return Math.abs(d) <= w.angle / 2 + 1e-6
+            }), layout.rootWedge)
+            expect(ok).toBe(true)
+            await expectPlausibleScene(page)
+            await expectScene(page, testInfo, `layout-${name}`)
+            expectNoErrors(errors)
+        })
+    }
+
+    for (const type of ['berge', 'spiral', 'buchheim', 'unitLines', 'unitVectors']) {
+        test(`layout type ${type} (filter off)`, async ({ page }, testInfo) => {
+            const errors = collectErrors(page)
+            await openTree(page, `gen=nTree&depth=5&childs=2&filter=off&layoutType=${type}`)
+            expect((await page.evaluate(() => harness.scene())).layers['link-arcs']).toBeGreaterThan(10)
+            await expectPlausibleScene(page)
+            await expectScene(page, testInfo, `layout-type-${type}`)
+            expectNoErrors(errors)
+        })
+    }
+})
+
+test.describe('presets', () => {
+    for (const preset of ['modelBase', 'otolModel', 'generatorModel', 'generatorSpiralModel', 'stackoverflowModel', 'acmflareModel', 'fsModel']) {
+        test(`preset ${preset}`, async ({ page }, testInfo) => {
+            const errors = collectErrors(page)
+            await openTree(page, `gen=nTree&depth=4&childs=3&preset=${preset}`)
+            expect((await page.evaluate(() => harness.scene())).nodes.length).toBeGreaterThan(5)
+            await expectPlausibleScene(page)
+            await expectScene(page, testInfo, `preset-${preset}`)
+            expectNoErrors(errors)
+        })
+    }
+})

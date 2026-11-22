@@ -87,7 +87,7 @@ for (const [name, query] of configs) {
             expect(Math.abs(s.λ - 0.2)).toBeLessThan(0.005)
             expect(s.P.re).toBeCloseTo(P0.re, 6)
             expect(s.P.im).toBeCloseTo(P0.im, 6)
-            await expectScene(page, testInfo, `${name}-gotoλ`)
+            await expectScene(page, testInfo, `${name}-gotoLambda`)
             expectNoErrors(errors)
         })
 

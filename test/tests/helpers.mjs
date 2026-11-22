@@ -135,10 +135,13 @@ export async function openTree(page, query) {
 export async function waitForStable(page, timeout = 30_000) {
     await page.evaluate(() => { window.__stable = { sig: '', count: 0 } })
     await page.waitForFunction(() => {
+        // node positions plus the transformation state, so it also works when
+        // the node layer is hidden
+        const s = harness.ht.unitdisk.args.transformation.state
         const sig = [...document.querySelectorAll('#nodes circle')].slice(0, 50)
-            .map(c => c.getAttribute('transform')).join('|')
+            .map(c => c.getAttribute('transform')).join('|') + `|${s.P.re},${s.P.im},${s.λ}`
         const w = window.__stable
-        if (!harness.ht.transition && sig && sig === w.sig) w.count++
+        if (!harness.ht.transition && sig === w.sig) w.count++
         else { w.sig = sig; w.count = 0 }
         return w.count >= 5
     }, null, { timeout, polling: 200 })

@@ -38,6 +38,7 @@
         //   layers={"cells":{"invisible":false}}      -> model.geometry.layerOptions
         //   interaction={"wheelFactor":1.5}           -> model.interaction
         //   preset=otolModel              start from hyt.presets[preset]() instead of the defaults
+        //   weight=uniform                every node weighs 1 in the culling filter (default: leaves and height)
         //   theme=dark
         //
         // window.harness exposes the component, recorded callbacks and helpers.
@@ -122,6 +123,9 @@
                 },
             } })
         }
+        if (q.get('weight') === 'uniform') merge(model, { filter: { weightFilter: { weight: n => 1 } } })
+        //   model={"iconmap":{}}                     -> deep-merged into the whole model (any documented option)
+        merge(model, json('model'))
         merge(model, { filter: json('filterOpt') })
         merge(model, { layout: json('layout') })
         merge(model, { interaction: json('interaction') })
