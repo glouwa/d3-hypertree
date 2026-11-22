@@ -96,7 +96,7 @@ are listed first.
 ### Performance
 
 Measured with `test/bench-interaction.mjs` and `test/bench-layers.mjs`, before
-and after on the same machine (see [docs/PERFORMANCE.md](docs/PERFORMANCE.md)):
+and after on the same machine (see [docs/dev/PERFORMANCE.md](docs/dev/PERFORMANCE.md)):
 
 - Dragging no longer recomputes the layout (it only depends on the zoom):
   10–22% less time per update.

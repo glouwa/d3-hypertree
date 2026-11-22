@@ -58,13 +58,13 @@ the modernization is measured against. Intended changes get accepted with
 ### Phase 0: Safety net ✅
 
 - [x] Legacy build runs again (Node 10, `natives` fix, `ducd` declared as dependency)
-- [x] Browser tests in [`test/`](../test) using generated trees: binary tree,
+- [x] Browser tests in [`test/`](../../test) using generated trees: binary tree,
       wide tree with labels and icons, star, path, deep star, drag, wheel zoom,
       showing/hiding layers, screenshots, no console errors
-- [x] Per-layer render benchmark: [`test/bench-layers.mjs`](../test/bench-layers.mjs)
+- [x] Per-layer render benchmark: [`test/bench-layers.mjs`](../../test/bench-layers.mjs)
 - [x] Interaction benchmark (drag, wheel, pinch) with the update pipeline split
       into layout, filter, labels, voronoi, layer DOM updates and browser work:
-      [`test/bench-interaction.mjs`](../test/bench-interaction.mjs)
+      [`test/bench-interaction.mjs`](../../test/bench-interaction.mjs)
 - [x] Commit to the `modernize` branch
 
 ### Phase 0b: Extended safety net
@@ -91,7 +91,7 @@ Tests for all existing features, following the test strategy above:
       the built bundle (layout, wheel direction, hover path, node radius, labels,
       perimeter culling) are each caught
 
-- [x] Playground ([`playground/`](../playground)): every data source and option in a UI, callback log, live stats; the configuration lives in the URL in the test harness format, so "Open as test" reproduces it in `test/harness.html` (shared model building in `test/config.js`). Run `npm run playground` (Node 10 for now) → http://localhost:3100/playground/. Smoke-tested in `playground.spec.mjs`. Later: publish on GitHub Pages as the public demo
+- [x] Playground ([`playground/`](../../playground)): every data source and option in a UI, callback log, live stats; the configuration lives in the URL in the test harness format, so "Open as test" reproduces it in `test/harness.html` (shared model building in `test/config.js`). Run `npm run playground` (Node 10 for now) → http://localhost:3100/playground/. Smoke-tested in `playground.spec.mjs`. Later: publish on GitHub Pages as the public demo
 
 **Documented features that no longer worked** (restored in phase 2 step 5;
 each had an expected-to-fail test, now normal tests): `nodeColor`/`linkColor` (readme example; the code reads
@@ -518,7 +518,7 @@ Scene references live in `test/tests/__scenes__/`, screenshots in
 `test/tests/__screenshots__/`. A failing scene comparison names what differs,
 e.g. "node 8 off by 12.3 px" or "layer link-arcs: 0 elements vs expected 62".
 
-The harness ([`test/harness.html`](../test/harness.html)) takes the data source and
+The harness ([`test/harness.html`](../../test/harness.html)) takes the data source and
 every option as URL parameters (documented at the top of the file), e.g.
 `harness.html?gen=nTree&depth=5&childs=8&labels=1&icons=1` or
 `harness.html?file=fixtures/flare.csv&filterOpt={"maxlabels":3}`.
