@@ -34,7 +34,7 @@ for (const [name, query] of configs) {
                 const n = harness.ht.data.descendants().find(n => n.mergeId === id)
                 return Math.hypot(n.cache.re, n.cache.im)
             }, id)
-            expect(r).toBeLessThan(0.01) // animations stop slightly short of the target
+            expect(r).toBeLessThan(1e-6) // animations end exactly at the target
             await expectPlausibleScene(page)
             await expectScene(page, testInfo, `${name}-gotoNode`)
             expectNoErrors(errors)
@@ -49,18 +49,30 @@ for (const [name, query] of configs) {
             })
             await waitForStable(page)
             const s = await state(page)
-            expect(Math.hypot(s.P.re, s.P.im)).toBeLessThan(0.005)
+            expect(Math.hypot(s.P.re, s.P.im)).toBeLessThan(1e-9)
             await expectScene(page, testInfo, `${name}-gotoHome`)
             expectNoErrors(errors)
         })
 
-        // Known bug: animateTo ignores its λ argument, so goto(p, λ) only translates.
-        // Remove .fail once fixed.
-        test.fail('goto: the zoom argument is applied', async ({ page }) => {
+        // Regression: animateTo ignored its λ argument, so goto(p, λ) only translated.
+        test('goto: translation and zoom', async ({ page }) => {
+            const errors = collectErrors(page)
             await openTree(page, query)
             await page.evaluate(() => harness.ht.api.goto({ re: 0.2, im: -0.3 }, 0.25))
             await waitForStable(page)
-            expect(Math.abs((await state(page)).λ - 0.25)).toBeLessThan(0.005)
+            const s = await state(page)
+            expect(Math.abs(s.λ - 0.25)).toBeLessThan(1e-9)
+            expect(Math.abs(s.P.re - 0.2)).toBeLessThan(1e-9)
+            expect(Math.abs(s.P.im + 0.3)).toBeLessThan(1e-9)
+            await expectPlausibleScene(page)
+            expectNoErrors(errors)
+        })
+
+        test('goto: the zoom is limited to λbounds', async ({ page }) => {
+            await openTree(page, query)
+            await page.evaluate(() => harness.ht.api.goto({ re: 0, im: 0 }, 5))
+            await waitForStable(page)
+            expect((await state(page)).λ).toBe(await page.evaluate(() => harness.ht.args.interaction.λbounds[1]))
         })
 
         test('goto: translation', async ({ page }, testInfo) => {
@@ -69,9 +81,8 @@ for (const [name, query] of configs) {
             await page.evaluate(() => harness.ht.api.goto({ re: 0.2, im: -0.3 }, null))
             await waitForStable(page)
             const s = await state(page)
-            // animations end within ~0.3% of the way (the last frame stops short)
-            expect(Math.abs(s.P.re - 0.2)).toBeLessThan(0.005)
-            expect(Math.abs(s.P.im + 0.3)).toBeLessThan(0.005)
+            expect(Math.abs(s.P.re - 0.2)).toBeLessThan(1e-9)
+            expect(Math.abs(s.P.im + 0.3)).toBeLessThan(1e-9)
             await expectPlausibleScene(page)
             await expectScene(page, testInfo, `${name}-goto`)
             expectNoErrors(errors)
@@ -84,7 +95,7 @@ for (const [name, query] of configs) {
             await page.evaluate(() => harness.ht.api.gotoλ(0.2))
             await waitForStable(page)
             const s = await state(page)
-            expect(Math.abs(s.λ - 0.2)).toBeLessThan(0.005)
+            expect(Math.abs(s.λ - 0.2)).toBeLessThan(1e-9)
             expect(s.P.re).toBeCloseTo(P0.re, 6)
             expect(s.P.im).toBeCloseTo(P0.im, 6)
             await expectScene(page, testInfo, `${name}-gotoLambda`)
@@ -99,7 +110,7 @@ for (const [name, query] of configs) {
             await page.evaluate(() => harness.ht.drawDetailFrame())
             await waitForStable(page)
             const after = await state(page)
-            expect(Math.abs(after.λ - before.λ)).toBeLessThan(0.005) // grows back to the start zoom
+            expect(Math.abs(after.λ - before.λ)).toBeLessThan(1e-9) // grows back to the start zoom
             await expectPlausibleScene(page)
             await expectScene(page, testInfo, `${name}-animateUp`)
             expectNoErrors(errors)

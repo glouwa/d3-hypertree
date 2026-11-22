@@ -10,7 +10,7 @@ import { dfsFlat, πify }       from '../../models/transformation/hyperbolic-mat
 import { C }                   from '../../models/transformation/hyperbolic-math'
 import { CassignC }            from '../../models/transformation/hyperbolic-math'
 import { CaddC, CsubC, CmulR } from '../../models/transformation/hyperbolic-math'
-import { sigmoid }             from '../../models/transformation/hyperbolic-math'
+import { sigmoid, sigmoid01 }  from '../../models/transformation/hyperbolic-math'
 import { IUnitDisk }           from '../unitdisk/unitdisk'
 import { presets }             from '../../models/hypertree/preset-base'
 import { mergeDeep }           from '../../ducd'
@@ -587,7 +587,7 @@ export class Hypertree
             resolve: ok,
             reject: err,
             frame: (progress01)=> {
-                const waydone01 = 1-sigmoid(progress01)
+                const waydone01 = 1-sigmoid01(progress01)
                 console.assert(waydone01 >= 0 && waydone01 <= 1)
                 const waydone = way * waydone01
                 const λ = newλ + waydone
@@ -598,21 +598,33 @@ export class Hypertree
         })
     }
     
+    /** Animates the translation to newP and, if newλ is given, the zoom to newλ. */
     public animateTo(resolve, reject, newP:C, newλ:number) : void {
-        const initTS = clone(this.args.geometry.transformation.state)
+        const state = this.args.geometry.transformation.state
+        const initTS = clone(state)
         const way = CsubC(initTS.P, newP)
-        new Animation({      
-            name: 'animateTo',            
+        const zoom = newλ !== null && newλ !== undefined
+        const targetλ = zoom ? this.clampλ(newλ) : undefined
+        const wayλ = zoom ? initTS.λ - targetλ : 0
+        new Animation({
+            name: 'animateTo',
             resolve: resolve,
             reject: reject,
             hypertree: this,
             duration: 750,
             frame: (progress01)=> {
-                const waydone01 = 1-sigmoid(progress01)
+                const waydone01 = 1-sigmoid01(progress01)
                 console.assert(waydone01 >= 0 && waydone01 <= 1)
+                if (zoom) {
+                    // as animateToλ: the layout depends on λ. updateLayoutPath_ also
+                    // recenters the center node, so the translation is set afterwards.
+                    state.λ = targetλ + wayλ * waydone01
+                    this.updateLayoutPath_(this.args.geometry.transformation.cache.centerNode)
+                }
                 const waydone = CmulR(way, waydone01)
                 const animP = CaddC(newP, waydone)
-                CassignC(this.args.geometry.transformation.state.P, animP)            
+                state.P = { re: state.P.re, im: state.P.im }   // updateLayoutPath_ may have replaced it
+                CassignC(state.P, animP)
                 this.update.transformation()
             }
         })

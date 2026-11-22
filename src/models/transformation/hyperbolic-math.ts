@@ -76,6 +76,13 @@ export function sigmoid(x) {
     return .5 + .5 * Math.tanh(x*6-3)
 }
 
+// sigmoid scaled to start exactly at 0 and end exactly at 1 (sigmoid(1) is only
+// 0.9975, so animations used to stop ~0.3% short of their target)
+const sigmoid0 = sigmoid(0), sigmoid1 = sigmoid(1)
+export function sigmoid01(x) {
+    return (sigmoid(x) - sigmoid0) / (sigmoid1 - sigmoid0)
+}
+
 export function maxR(c:C, v:number) {
     var mp = CktoCp(c);
     mp.r = mp.r>v?v:mp.r;

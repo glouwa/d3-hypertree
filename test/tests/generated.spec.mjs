@@ -116,9 +116,9 @@ test.describe('interaction', () => {
         await openTree(page, 'gen=nTree&depth=6&childs=2')
         const [min, max] = await bounds(page)
         await page.evaluate(() => harness.ht.api.gotoλ(5))
-        expect(await λ(page)).toBeCloseTo(max, 2)   // animations end slightly short (known bug)
+        expect(await λ(page)).toBeCloseTo(max, 9)
         await page.evaluate(() => harness.ht.api.gotoλ(0.0001))
-        expect(await λ(page)).toBeCloseTo(min, 2)
+        expect(await λ(page)).toBeCloseTo(min, 9)
     })
 
     test.describe('touch', () => {
