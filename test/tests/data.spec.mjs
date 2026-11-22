@@ -57,9 +57,9 @@ test('dataInitBFS / langInitBFS: icons and labels from callbacks', async ({ page
     expectNoErrors(errors)
 })
 
-// Known bug: preset-process.ts calls precalc.label.startsWith() without checking
-// that a label exists, so icons without labels crash. Remove .fail once fixed.
-test.fail('icons without labels render without errors', async ({ page }) => {
+// Regression: preset-process.ts called precalc.label.startsWith() without checking
+// that a label exists, so icons without labels crashed.
+test('icons without labels render without errors', async ({ page }) => {
     const errors = collectErrors(page)
     await page.goto('harness.html?gen=nTree&depth=4&childs=3&icons=1')
     await page.waitForTimeout(1500)

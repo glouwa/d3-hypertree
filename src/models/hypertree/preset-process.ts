@@ -23,7 +23,8 @@ cache.wikis  = haslabel + inpath - labels - wikis
 */
 export function doLabelStuff(ud:IUnitDisk, cache:TransformationCache) {    
     var labels = cache.unculledNodes
-        .filter((e:N)=> e.precalc.label || e.precalc.icon)
+        // the label layers draw precalc.label: nodes with only an icon are drawn by the emoji layer
+        .filter((e:N)=> e.precalc.label)
 
     //var pathLabels = labels
     //    .filter((e:N)=> e.pathes.partof && e.pathes.partof.length)
@@ -31,7 +32,7 @@ export function doLabelStuff(ud:IUnitDisk, cache:TransformationCache) {
     var stdlabels = labels
     //    .filter(e=> pathLabels.indexOf(e) === -1)        
         .filter(e=> {                         
-            return (e.cachep.r <= ud.view.hypertree.args.filter.wikiRadius  && e.precalc.label.startsWith('𝐖'))
+            return (e.cachep.r <= ud.view.hypertree.args.filter.wikiRadius  && e.precalc.label && e.precalc.label.startsWith('𝐖'))
                 || !e.parent                
                 || !e.isOutλ
         })

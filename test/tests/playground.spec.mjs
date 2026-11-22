@@ -16,6 +16,8 @@ test('loads with the defaults and renders the tree', async ({ page }) => {
     expect(await page.locator('#controls details').count()).toBeGreaterThan(6)
     expect(await page.locator('table.layers tbody tr').count()).toBeGreaterThan(15)
     expect(await page.evaluate(() => document.querySelectorAll('#tree #nodes circle').length)).toBeGreaterThan(10)
+    // icons are off by default: the emoji layer is the slowest one
+    expect(await page.evaluate(() => document.querySelectorAll('#tree #emojis text').length)).toBe(0)
     expectNoErrors(errors)
 })
 
@@ -119,4 +121,24 @@ test('a click anywhere on a layer row toggles its options, its checkboxes do not
     await expect(opts).toBeHidden()
     await page.locator('tr[data-layer="nodes"] button.expander').click()
     await expect(opts).toBeVisible()
+})
+
+test('the emoji layer is off by default; turned on it shows the icons, also after a reload', async ({ page }) => {
+    const errors = collectErrors(page)
+    await page.goto('../playground/')
+    await ready(page)
+    await page.locator('summary').filter({ hasText: /^Layers/ }).click()
+    const box = () => page.locator('tr[data-layer="emojis"] input[type=checkbox]').first()
+    expect(await box().isChecked()).toBe(false)
+    await box().check()
+    await page.waitForFunction(() => document.querySelectorAll('#tree #emojis text').length > 10)
+    await page.reload()
+    await ready(page)
+    await page.waitForFunction(() => document.querySelectorAll('#tree #emojis text').length > 10)
+    // labels off: icons without labels used to crash
+    await page.locator('summary').filter({ hasText: /^Node content/ }).click()
+    await page.locator('.check', { hasText: 'Labels (langInitBFS)' }).locator('input').uncheck()
+    await page.waitForTimeout(800)
+    expect(await page.evaluate(() => document.querySelectorAll('#tree #emojis text').length)).toBeGreaterThan(10)
+    expectNoErrors(errors)
 })

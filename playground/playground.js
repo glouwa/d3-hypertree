@@ -51,7 +51,9 @@
         wheelFactor: base.interaction.wheelFactor,
         holdDuration: base.interaction.holdDuration || 500,
         mouseRadius: base.interaction.mouseRadius,
-        layers: {},           // overrides: name -> { invisible, hideOnDrag, <layer options> }
+        // overrides: name -> { invisible, hideOnDrag, <layer options> }. The emoji layer is the
+        // slowest one: off by default here (the icons are always generated, it's a one-off).
+        layers: { emojis: { invisible: true } },
         click: 'goto',        // playground only: what a click on a node does
     }
     const PRESETS = Object.keys(hyt.presets).filter(p => p !== 'modelBase')
@@ -92,6 +94,7 @@
         'λ': 'circle at the zoom λ (pinch center while pinching)',
         '(0,0)': 'the origin',
         'symbols': 'root and start node symbols',
+        'emojis': 'the icons (always generated); off by default, the slowest layer to render',
         'images': 'needs n.precalc.imageHref (not set by the playground data)',
         'traces': 'touch traces while touching',
         'interaction': 'old interaction layer (click selects)',
@@ -133,7 +136,7 @@
         if (c.lang && c.source === 'file:fixtures/small.d3.json') p.set('lang', 'fixtures/small.lang.json')
         // generated trees have no names: number them; data with names shows its names
         if (c.labels && !c.lang) p.set('labels', kind === 'gen' && value !== 'data' ? '1' : 'name')
-        if (c.icons) p.set('icons', '1')
+        p.set('icons', '1')   // generating icons is a one-off: always on, the emoji layer decides
         if (c.preset) p.set('preset', c.preset)
         if (c.theme !== 'light') p.set('theme', c.theme)
         if (c.layoutType !== 'berge') p.set('layoutType', c.layoutType)
@@ -169,7 +172,8 @@
         if (c.linkWidth !== null) g.linkWidth = c.linkWidth
         if (Object.keys(g).length) p.set('geometry', JSON.stringify(g))
 
-        if (Object.keys(c.layers).length) p.set('layers', JSON.stringify(c.layers))
+        // also written when empty but different from the playground defaults (emojis on: layers={})
+        if (Object.keys(c.layers).length || JSON.stringify(c.layers) !== JSON.stringify(DEFAULTS.layers)) p.set('layers', JSON.stringify(c.layers))
 
         if (!forHarness && c.click !== DEFAULTS.click) p.set('click', c.click)
         return p
@@ -184,7 +188,6 @@
         c.arms = num('arms', c.arms); if (c.source === 'gen:deepStar') { c.armDepth = c.depth; c.depth = DEFAULTS.depth }
         c.lang = p.has('lang')
         c.labels = p.get('labels') === '1' || p.get('labels') === 'name'
-        c.icons = p.get('icons') === '1'
         c.preset = p.get('preset') || ''
         c.theme = p.get('theme') || 'light'
         c.layoutType = p.get('layoutType') || 'berge'
@@ -216,6 +219,7 @@
         }
         if (p.get('layers')) {
             const l = JSON.parse(p.get('layers'))
+            c.layers = {}   // the link defines all layer overrides
             for (const [name, o] of Object.entries(l)) if (Object.keys(o).length) c.layers[name] = o
         }
         if (p.get('colors') === '1') { // older links: color callbacks by depth
@@ -223,8 +227,8 @@
             c.layers['link-arcs'] = Object.assign({}, c.layers['link-arcs'], { stroke: 'depth' })
         }
         c.click = p.get('click') || DEFAULTS.click
-        // a URL without any parameter shows the defaults with labels and icons
-        if (![...p.keys()].length) { c.labels = DEFAULTS.labels; c.icons = DEFAULTS.icons }
+        // a URL without any parameter shows the defaults with labels
+        if (![...p.keys()].length) c.labels = DEFAULTS.labels
         return c
     }
 
@@ -414,9 +418,9 @@
         select(g, 'Preset', 'preset', [['', 'none (library defaults)'], ...PRESETS.map(p => [p, p])])
         hint(g, 'Deep trees (e.g. deep star with arm depth > 40) show the known deep-tree bug when navigating far down.')
 
-        g = section('Node content', ['labels', 'icons'])
+        g = section('Node content', ['labels'])
         check(g, 'Labels (langInitBFS): node names, or numbers for generated trees', 'labels', () => !cfg.lang)
-        check(g, 'Icons / emojis (dataInitBFS)', 'icons', null, 'Emojis are the most expensive layer to render. Icons without labels crash (known bug).')
+        hint(g, 'Icons (dataInitBFS) are always generated; turn on the emojis layer to show them.')
 
         g = section('Geometry', ['linkCurvature', 'captionFontPx', 'captionHeight', 'nodeRadius', 'linkWidth', 'theme'])
         hint(g, 'Options that apply to several layers (model.geometry). Options of a single layer are in the layer list below (▸).')
