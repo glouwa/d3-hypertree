@@ -373,7 +373,7 @@ new hyt.Hypertree(
             onHoverNodeChange:  (n:N)=> void                 // same as onNodeHover
             onNodeSelect:       (n:N, selected:boolean)=> void // called by api.toggleSelection
             onCenterNodeChange: (n:N)=> void 
-            λbounds:            [ number, number ]
+            λbounds:            [ number, number ]           // [min, max] zoom; start zoom, wheel, pinch and gotoλ stay inside
             wheelSensitivity:   number
             mouseRadius:        number
         }

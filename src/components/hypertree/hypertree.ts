@@ -412,6 +412,14 @@ export class Hypertree
                 break
             }
         }
+        // the start zoom obeys interaction.λbounds like every other zoom
+        const fitλ = this.args.geometry.transformation.state.λ
+        const startλ = this.clampλ(fitλ)
+        if (startλ !== fitλ) {
+            this.args.geometry.transformation.state.λ = startλ
+            this.updateLayoutPath_(this.data)
+            this.unitdisk.args.cacheUpdate(this.unitdisk, this.unitdisk.cache)
+        }
         this.data.each((n:N)=> n.layoutReference = clone(n.layout))                
         
         console.groupEnd()
@@ -587,7 +595,14 @@ export class Hypertree
         this.animateToλ(ok, err, newλ)
     }
 
+    /** λ limited to interaction.λbounds [min, max] (inclusive). */
+    public clampλ(λ:number) : number {
+        const [min, max] = this.args.interaction.λbounds
+        return Math.min(max, Math.max(min, λ))
+    }
+
     public animateToλ(ok, err, newλ) : void {
+        newλ = this.clampλ(newλ)
         const initλ = this.args.geometry.transformation.state.λ
         const way = initλ - newλ
         new Animation({
