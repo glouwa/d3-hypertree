@@ -212,8 +212,11 @@ A bug or feature counts as done when its expected-to-fail test becomes a normal 
         `eslint.config.mjs`. Errors for real problems (debug output, unreachable code,
         constant conditions, ...); unused variables are warnings (116, mostly unused
         imports, left for a later cleanup)
-11. [ ] **GitHub Action**: build and all tests on every push (Windows runner, the
-        tests use Edge)
+11. [x] **GitHub Action** (`.github/workflows/ci.yml`): lint, build (fails on type
+        errors) and all browser tests on every push and pull request; Windows runner,
+        the tests use the installed Edge. Runs once the branch is pushed. Possible
+        surprise on the first run: the few pixel screenshot tests may need references
+        from the runner (font rendering); the scene snapshots use tolerances
 12. [ ] Triage the open GitHub issues
 
 Not in phase 2: performance (phase 3), the deep-tree bug (after the modernization).
