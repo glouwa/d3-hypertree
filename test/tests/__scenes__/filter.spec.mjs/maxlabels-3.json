@@ -1822,15 +1822,15 @@
   "symbols": 2,
   "images": 0,
   "emojis": 0,
-  "labels": 1,
-  "labels2": 0,
+  "labels": 3,
   "labels-force": 0,
-  "interaction": 0,
   "interaction-2": 0,
   "traces": 0
  },
  "labels": [
-  "Node 1365"
+  "Node 1365",
+  "Node 1366",
+  "Node 1367"
  ],
  "linkColors": {
   "css": 340

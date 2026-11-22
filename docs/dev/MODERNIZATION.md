@@ -290,6 +290,11 @@ Rendering (DOM, browser), in order of expected gain:
       and keeps every feature (styling with CSS, DOM events, tests on the DOM);
       a canvas renderer would be chosen per layer or per view
 - [ ] Upgrade d3 v4 → v7
+- [ ] **Rework the force labels** (`labels-force`). Details later.
+      Related: since 2026-11-22 the labels are chosen by subtree weight × display
+      scale² (no focus radius any more, `maxLabels` per layer); known weak spots:
+      small subtrees near the center get no label, a label can end up just
+      outside the disk
 
 ### Future features
 

@@ -30,33 +30,22 @@ export function labelsFor(ud:IUnitDisk, max:number|undefined) : N[] {
     return cache.labelsByMax[max] || (cache.labelsByMax[max] = selectLabels(ud, cache, max))
 }
 
-// Candidates: nodes inside the λ circle, the root, and 𝐖 labels inside wikiRadius.
-// While there are more than max, the weight threshold rises (the nodes with the
-// biggest subtrees stay; the root always stays).
+// The max visible nodes nearest to the center of the disk that have a label; the
+// root (tree root) always has one. Until v1 the candidates were the nodes inside
+// the focus radius, thinned out by weight, so max was often not reached.
 function selectLabels(ud:IUnitDisk, cache:TransformationCache, max:number) : N[] {
-    var labels = cache.unculledNodes
-        // the label layers draw precalc.label: nodes with only an icon are drawn by the emoji layer
-        .filter((e:N)=> e.precalc.label)
-
-        
-    var stdlabels = labels
-    //    .filter(e=> pathLabels.indexOf(e) === -1)        
-        .filter(e=> {                         
-            return (e.cachep.r <= ud.view.hypertree.args.filter.wikiRadius  && e.precalc.label && e.precalc.label.startsWith('𝐖'))
-                || !e.parent                
-                || !e.isOutλ
-        })
-        
-    let damping = 1
-    while (stdlabels.length > max) {
-        stdlabels = stdlabels.filter(n=> 
-               (n.precalc.cullingWeight > (n.minWeight * damping) )
-            || !n.parent
-            /*|| !n.isOutλ*/)
-        damping /= .8
-    }
-
-    return stdlabels
+    // the label layers draw precalc.label: nodes with only an icon are drawn by the emoji layer
+    const candidates = cache.unculledNodes.filter((n:N)=> n.precalc.label)
+    const root = candidates.find(n=> !n.parent)
+    const others = candidates.filter(n=> n !== root)
+    // score: subtree weight times the squared display scale (1 at the center, 0 at
+    // the rim): big subtrees near the center first
+    const score = (n:N)=> (n.precalc.cullingWeight || 1) * n.distScale * n.distScale
+    if (others.length > max)
+        others.sort((a, b)=> score(b) - score(a))
+    const n = Math.max(0, root ? max - 1 : max)
+    const nearest = others.length > n ? others.slice(0, n) : others
+    return root ? [root, ...nearest] : nearest
 }
 
 export function doImageStuff(ud:IUnitDisk, cache:TransformationCache) {

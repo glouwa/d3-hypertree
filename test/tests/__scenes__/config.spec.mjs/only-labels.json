@@ -22,10 +22,8 @@
   "symbols": 0,
   "images": 0,
   "emojis": 0,
-  "labels": 13,
-  "labels2": 0,
+  "labels": 25,
   "labels-force": 0,
-  "interaction": 0,
   "interaction-2": 0,
   "traces": 0
  },
@@ -42,7 +40,19 @@
   "Node 130",
   "Node 131",
   "Node 132",
-  "Node 133"
+  "Node 133",
+  "Node 134",
+  "Node 136",
+  "Node 140",
+  "Node 142",
+  "Node 143",
+  "Node 145",
+  "Node 149",
+  "Node 151",
+  "Node 152",
+  "Node 154",
+  "Node 158",
+  "Node 160"
  ],
  "linkColors": {},
  "selections": []

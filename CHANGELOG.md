@@ -9,6 +9,14 @@ are listed first.
 
 ### Changed behavior
 
+- **Which nodes get a label.** Until v1 only nodes inside the focus radius
+  (λ × `focusExtension`, at most `maxFocusRadius`) were candidates, thinned out
+  by weight, so `maxlabels` was often far from reached (a wide tree showed a
+  single label). Now every visible node with a label is a candidate; the ones
+  with the highest subtree weight × display scale² get a label (big subtrees
+  near the center first), up to `maxlabels` (or the layer's `maxLabels`); the
+  root always has one. `wikiRadius` no longer limits 𝐖 labels (it only draws
+  the `labels-r-𝐖` circle).
 - **More nodes are visible from the start.** The filter used to adapt its
   internal factor `weightFilter.magic` by one step per update, so after loading
   the tree stayed far below the configured `rangeNodes` until you interacted

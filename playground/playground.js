@@ -507,7 +507,7 @@
         range(g, 'focusExtension', 'focusExtension', 0.5, 4, 0.05, on)
         range(g, 'maxFocusRadius', 'maxFocusRadius', 0.1, 0.99, 0.01, on)
         number(g, 'maxlabels', 'maxlabels', 0, 200, 1, on)
-        hint(g, 'maxlabels: at most this many labels in the label layers (the nodes inside the λ circle with the biggest subtrees, and the root). A label layer can set its own limit (Layers › labels › maxLabels).')
+        hint(g, 'maxlabels: at most this many labels in the label layers (highest subtree weight × display scale², big subtrees near the center first; the root always). A label layer can set its own limit (Layers › labels › maxLabels).')
         hint(g, 'The filter adapts its weight threshold a little on every update, so the visible set settles over a few frames after loading or interacting.')
 
         g = section('Geometry', ['linkCurvature', 'captionFontPx', 'captionHeight', 'nodeRadius', 'linkWidth', 'theme'])

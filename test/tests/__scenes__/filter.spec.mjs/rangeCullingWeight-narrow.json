@@ -478,10 +478,8 @@
   "symbols": 2,
   "images": 0,
   "emojis": 0,
-  "labels": 21,
-  "labels2": 0,
+  "labels": 25,
   "labels-force": 0,
-  "interaction": 0,
   "interaction-2": 0,
   "traces": 0
  },
@@ -506,7 +504,11 @@
   "Node 1382",
   "Node 1383",
   "Node 1384",
-  "Node 1385"
+  "Node 1385",
+  "Node 1401",
+  "Node 1402",
+  "Node 1418",
+  "Node 1434"
  ],
  "linkColors": {
   "css": 84
