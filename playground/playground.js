@@ -86,7 +86,10 @@
         'labels2':     [['color', 'color']],
         'labels-force':[['background', 'bool']],
     }
+    // what a layer shows, when its name doesn't say it
+    const LAYER_ALIASES = { 'cells': 'voronoi', 'λ': 'zoom', '(0,0)': 'origin' }
     const LAYER_NOTES = {
+        'cells': 'Voronoi cells of the visible nodes: hovered and selected cells are highlighted. The cells are always computed (hover and click find the node under the pointer with them); this layer only draws them.',
         'culling-r': 'circle at filter.cullingRadius',
         'mouse-r': 'circle at interaction.mouseRadius',
         'focus-r': 'circle at the filter\'s focus radius',
@@ -515,7 +518,7 @@
             const hod = el('input', { type: 'checkbox', onchange: e => setLayer('hideOnDrag', e.target.checked) })
             const opts = LAYER_OPTIONS[name] || []
             const toggle = el('button', { class: 'link expander', title: 'layer options' }, opts.length ? '▸' : '')
-            const nameCell = el('td', {}, toggle, ' ', name)
+            const nameCell = el('td', {}, toggle, ' ', name, LAYER_ALIASES[name] ? el('span', { class: 'alias' }, ' ' + LAYER_ALIASES[name]) : null)
             const tr = el('tr', { 'data-layer': name }, nameCell, el('td', { class: 'c' }, vis), el('td', { class: 'c' }, hod))
             tbody.append(tr)
 

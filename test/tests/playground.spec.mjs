@@ -167,3 +167,13 @@ test('the initialization section lists every step with its current value', async
     expect(decodeURIComponent(await page.evaluate(() => location.search))).not.toContain('labels=')
     expectNoErrors(errors)
 })
+
+test('the voronoi cells are recognizable as a layer and can be turned on', async ({ page }) => {
+    await page.goto('../playground/?gen=nTree&depth=6&childs=2&labels=1')
+    await ready(page)
+    await page.locator('summary').filter({ hasText: /^Layers/ }).click()
+    const row = page.locator('tr[data-layer="cells"]')
+    await expect(row).toContainText('voronoi')
+    await row.locator('input[type=checkbox]').first().check()
+    await page.waitForFunction(() => document.querySelectorAll('#tree #cells > *').length > 10)
+})
