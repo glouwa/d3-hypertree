@@ -433,7 +433,9 @@
         hint(g, 'nodeRadius, nodeScale, linkWidth and nodeFilter are functions of the node by default; here you can replace nodeRadius and linkWidth by a constant.')
         select(g, 'Theme (CSS)', 'theme', [['light', 'light'], ['dark', 'dark']])
 
-        g = section('Layers', () => Object.keys(cfg.layers).length)
+        // changed = different from the playground defaults (which hide the emoji layer)
+        const layerChanged = name => JSON.stringify(cfg.layers[name] || {}) !== JSON.stringify(DEFAULTS.layers[name] || {})
+        g = section('Layers', () => Object.keys(Object.assign({}, DEFAULTS.layers, cfg.layers)).filter(layerChanged).length)
         const table = el('table', { class: 'layers' },
             el('thead', {}, el('tr', {}, el('th', {}, 'layer'), el('th', {}, 'visible'), el('th', {}, 'hide on drag'))))
         const tbody = el('tbody')
@@ -471,7 +473,7 @@
             }
             controls.push({ refresh: () => {
                 vis.checked = !eff().invisible; hod.checked = eff().hideOnDrag
-                tr.classList.toggle('changed', !!cfg.layers[name])
+                tr.classList.toggle('changed', layerChanged(name))
             } })
         }
         hint(g, '▸ shows the options of a layer. "hide on drag" hides a layer while dragging, pinching or animating.')

@@ -16,6 +16,9 @@ test('loads with the defaults and renders the tree', async ({ page }) => {
     expect(await page.locator('#controls details').count()).toBeGreaterThan(6)
     expect(await page.locator('table.layers tbody tr').count()).toBeGreaterThan(15)
     expect(await page.evaluate(() => document.querySelectorAll('#tree #nodes circle').length)).toBeGreaterThan(10)
+    // nothing is marked as changed in the default state
+    expect(await page.locator('summary .badge').evaluateAll(b => b.map(e => e.textContent).filter(Boolean))).toEqual([])
+    expect(await page.locator('table.layers tr.changed').count()).toBe(0)
     // icons are off by default: the emoji layer is the slowest one
     expect(await page.evaluate(() => document.querySelectorAll('#tree #emojis text').length)).toBe(0)
     expectNoErrors(errors)
