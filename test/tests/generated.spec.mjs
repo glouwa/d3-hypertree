@@ -176,6 +176,29 @@ test.describe('deep trees', () => {
 })
 
 test.describe('hover', () => {
+    // Regression: the mouse capture circle reaches far beyond the disk and the voronoi
+    // cells are unbounded, so outside the disk the nearest node stayed hovered (seen
+    // in the application, where the pointer can leave the disk without leaving the
+    // capture circle). The corner of the square component is outside the disk.
+    test('outside the disk nothing is hovered', async ({ page }) => {
+        const errors = collectErrors(page)
+        await openTree(page, 'gen=nTree&depth=8&childs=2')
+        await page.evaluate(() => { harness.ht.unitdisk.layerStack.layers.cells.args.invisible = false; harness.ht.update.data() })
+        const box = await diskBox(page)
+        await page.mouse.move(box.x + box.width * 0.55, box.y + box.height * 0.4, { steps: 3 })
+        await page.waitForTimeout(250)
+        const hovered = () => page.evaluate(() => ({
+            paths: harness.ht.args.objects.pathes.filter(p => p.type === 'HoverPath').length,
+            elements: document.querySelectorAll('#cells .hovered, #nodes .hovered, #link-arcs .hovered').length }))
+        expect((await hovered()).paths).toBe(1)
+        await page.mouse.move(box.x + 4, box.y + 4, { steps: 6 })   // corner: in the component, outside the disk
+        await page.waitForTimeout(250)
+        expect(await hovered()).toEqual({ paths: 0, elements: 0 })
+        const events = await page.evaluate(() => harness.events.filter(e => e.type === 'hover'))
+        expect(events[events.length - 1].id).toBeUndefined()   // onNodeHover reports leaving
+        expectNoErrors(errors)
+    })
+
     // Only the cell under the mouse is highlighted: moving on clears the previous
     // cell, leaving the tree clears all.
     test('hover highlights exactly the voronoi cell under the mouse', async ({ page }) => {

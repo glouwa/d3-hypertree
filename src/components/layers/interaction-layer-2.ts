@@ -85,7 +85,10 @@ export class InteractionLayer2 implements ILayer
         else {
             if (!this.view.hypertree.isInitializing
              && !this.view.hypertree.isAnimationRunning()) {
-                const n = this.findNodeByCell()
+                // The capture circle (r = 5) reaches far beyond the disk, and the voronoi
+                // cells are unbounded: outside the disk no node is hovered.
+                const m = this.currMousePosAsC()
+                const n = (m.re * m.re + m.im * m.im) <= 1 ? this.findNodeByCell() : undefined
                 this.setHoverNode(n)
                 this.htapi.setPathHead(this.hoverpath, n)
             }
