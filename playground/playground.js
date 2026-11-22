@@ -506,15 +506,19 @@
         const tbody = el('tbody')
         table.append(tbody)
         g.append(table)
-        // Playground only: the indicator circles (culling-r, mouse-r, focus-r, labels-r-𝐖
-        // and λ) form one group, shown where its first layer is.
-        const GROUPS = [{ name: 'Indicators', test: n => /-r(-|$)/.test(n) || n === 'λ',
-            note: 'circles that show radii of the filter and the interaction, and the zoom λ' }]
+        // Playground only: related layers form collapsible groups, shown where their first
+        // layer is. A layer belongs to the first group that matches it.
+        const GROUPS = [
+            { name: 'Indicators', test: n => /-r(-|$)/.test(n) || n === 'λ',
+              note: 'circles that show radii of the filter and the interaction, and the zoom λ' },
+            { name: 'Labels', test: n => /^labels/.test(n),
+              note: 'the label layers: labels, a second label set, and force-placed labels' },
+        ]
         const groupOf = name => GROUPS.find(gr => gr.test(name))
         const groupRows = {}   // group name -> { rows: member rows, open }
 
         function addGroupRow(gr) {
-            const members = Object.keys(LAYER_DEFAULTS).filter(gr.test)
+            const members = Object.keys(LAYER_DEFAULTS).filter(n => groupOf(n) === gr)
             const effOf = n => Object.assign({}, LAYER_DEFAULTS[n], cfg.layers[n] || {})
             const setAll = (k, v) => {
                 for (const n of members) {
