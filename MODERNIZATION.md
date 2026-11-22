@@ -261,11 +261,54 @@ Rendering (DOM, browser), in order of expected gain:
       element on every update; ~65% of attribute writes set an unchanged value
       (`class`, `r`, `stroke-linecap`). Write only on enter or on change
 - [ ] **Compositor layers.** Every layer group has `transform: translateZ(0)`,
-      so every layer is its own compositor layer; check whether that pays off
+      so every layer is its own compositor layer. Measured (default tree with
+      labels): 23 groups carry the hint, 9 of them have content; Edge builds 15
+      compositor layers (11 drawing) instead of 5 (2 drawing) without the hint.
+      They don't help the hyperbolic navigation (it changes every layer's content),
+      but they will help future features that move parts of the view as a whole
+      (rotate, pan, scale or fade the view; the rectangular view's euclidean
+      navigation, see "Future features"). Planned: planes by what moves together,
+      a layer option `plane`, one `<g>` with `will-change: transform` per plane
+      created by the layer stack (instead of the hint in every layer group):
+      `disk` (background, disk border, indicators), `content` (cells, links,
+      nodes, symbols, images, emojis, labels), `overlay` (traces, interaction).
+      Compare per layer (today) / three planes / none with the benchmarks
 - [ ] Coalesce interaction updates to one per animation frame (today every
       mousemove schedules its own full update)
 - [ ] Canvas renderer for nodes and links if SVG stays the bottleneck after the above
 - [ ] Upgrade d3 v4 → v7
+
+### Future features
+
+**Rectangular view with the Cayley transform** (prototype, to compare the
+usability with the disk). A boolean in `geometry` (e.g. `geometry.halfPlane`)
+switches to the upper half-plane model, which fits a rectangular view.
+
+- Only the ends of the pipeline change: the display maps every position from
+  the disk to the half-plane, `w = i·(1 + z) / (1 − z)`, at the very end; pointer
+  input maps back first, `z = (w − i) / (w + i)`. Layout, filter, transformation
+  and interaction keep working in the disk. Not the fastest way (every frame
+  maps every drawn position), but enough for a prototype.
+- What has to follow the map:
+  - positions (node, label, emoji transforms) and the voronoi cells (built from
+    the mapped positions, so hit testing stays right);
+  - sizes: the local scale of the map, |dw/dz| = 2 / |1 − z|², multiplies the
+    existing distance scale (radii, link widths, `shrinkAtRim`);
+  - links: geodesics are circle arcs orthogonal to the disk border; the Cayley
+    transform is a Möbius transformation, so they become semicircles centered on
+    the real axis (vertical lines through ∞). The arc code needs a half-plane
+    variant (or, for the prototype, sampled arcs);
+  - the background: the disk becomes the half-plane; the rectangle shows a
+    window of it (the point z = 1 maps to ∞, so the view has to be clipped);
+  - text never maps (it's drawn upright at the mapped position, scaled).
+- Navigation that is euclidean in the half-plane: moving along the real axis
+  (`w → w + t`) and scaling about a point on it (`w → k·w`) are hyperbolic
+  isometries there. During such a gesture the `content` plane can be moved by
+  the GPU (CSS transform) and redrawn exactly when the gesture ends; this is
+  one reason for the planes in "Compositor layers".
+- Planes: the map changes the content, so it isn't a GPU transform itself; the
+  `disk` plane gets a half-plane variant of the background, `overlay` draws
+  pointer traces in screen coordinates (no map needed).
 
 ### Phase 4: v2 release
 
