@@ -14,7 +14,8 @@
 //
 // Node content:
 //   labels=1   deterministic label per node     labels=name  the node's own name
-//   icons=1   emoji per node
+//   icons=1   emoji per node     iconPercent=25  only that share of the nodes gets one
+//             (spread evenly in breadth-first order; default 100)
 //   colors=1   color callbacks for nodes and links (by depth)
 //   docColors=1  the readme example's option names (nodeColor / linkColor)
 //
@@ -128,8 +129,15 @@
         }
         if (q.get('icons') === '1') {
             const emojis = ['🌳', '🐟', '🐦', '🦎', '🐸', '🐭', '🦋', '🌸']
-            let i = 0
-            model.dataInitBFS = (ht, n) => { n.precalc.icon = emojis[(i++) % emojis.length] }
+            // iconPercent: node i gets an icon when the running share crosses an integer,
+            // so p% of the nodes get one, evenly spread and the same on every run
+            const p = Math.max(0, Math.min(100, num('iconPercent', 100))) / 100
+            let i = 0, k = 0
+            model.dataInitBFS = (ht, n) => {
+                const has = Math.floor((i + 1) * p) > Math.floor(i * p)
+                i++
+                n.precalc.icon = has ? emojis[(k++) % emojis.length] : undefined
+            }
         }
         if (q.get('filter') === 'off') {
             // weightFilter.magic can't be configured: resetData() sets it to 20 and the

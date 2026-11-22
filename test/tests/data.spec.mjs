@@ -65,3 +65,21 @@ test('icons without labels render without errors', async ({ page }) => {
     await page.waitForTimeout(1500)
     expectNoErrors(errors)
 })
+
+test('iconPercent: only that share of the nodes gets an icon, evenly spread', async ({ page }) => {
+    const share = async pct => {
+        await page.goto(`harness.html?gen=nTree&depth=4&childs=3&labels=1&icons=1${pct === undefined ? '' : '&iconPercent=' + pct}`)
+        await page.waitForFunction(() => window.harness && harness.ht.data)
+        return page.evaluate(() => {
+            const ns = []; harness.ht.data.each(n => ns.push(n))   // breadth-first, like dataInitBFS
+            return { n: ns.length, icons: ns.filter(n => n.precalc.icon).length,
+                     firstHalf: ns.slice(0, ns.length / 2 | 0).filter(n => n.precalc.icon).length }
+        })
+    }
+    expect(await share()).toMatchObject({ n: 121, icons: 121 })        // default: every node
+    expect(await share(100)).toMatchObject({ icons: 121 })
+    expect(await share(0)).toMatchObject({ icons: 0 })
+    const quarter = await share(25)
+    expect(quarter.icons).toBe(30)                                      // floor(121 * 0.25)
+    expect(Math.abs(quarter.firstHalf - 15)).toBeLessThanOrEqual(1)     // spread, not the first 30
+})

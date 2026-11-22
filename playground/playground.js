@@ -27,7 +27,7 @@
     const base = hyt.presets.modelBase()
     const DEFAULTS = {
         source: 'gen:nTree', depth: 10, childs: 2, n: 250, arms: 4, armDepth: 30,
-        lang: false, labels: true, icons: true, preset: '', theme: 'light',
+        lang: false, labels: true, iconPercent: 10, preset: '', theme: 'light',
         // geometry: options that apply to several layers
         linkCurvature: base.geometry.linkCurvature,
         captionFontPx: parseFloat(base.geometry.captionFont),
@@ -52,7 +52,7 @@
         holdDuration: base.interaction.holdDuration || 500,
         mouseRadius: base.interaction.mouseRadius,
         // overrides: name -> { invisible, hideOnDrag, <layer options> }. The emoji layer is the
-        // slowest one: off by default here (the icons are always generated, it's a one-off).
+        // slowest one: off by default here (generating icons is a one-off, see iconPercent).
         layers: { emojis: { invisible: true } },
         click: 'goto',        // playground only: what a click on a node does
     }
@@ -97,7 +97,7 @@
         'λ': 'circle at the zoom λ (pinch center while pinching)',
         '(0,0)': 'the origin',
         'symbols': 'root and start node symbols',
-        'emojis': 'the icons (always generated); off by default, the slowest layer to render',
+        'emojis': 'the icons (share of nodes set in Initialization › Node data); off by default, the slowest layer to render',
         'images': 'needs n.precalc.imageHref (not set by the playground data)',
         'traces': 'touch traces while touching',
         'interaction': 'old interaction layer (click selects)',
@@ -139,7 +139,7 @@
         if (c.lang && c.source === 'file:fixtures/small.d3.json') p.set('lang', 'fixtures/small.lang.json')
         // generated trees have no names: number them; data with names shows its names
         if (c.labels && !c.lang) p.set('labels', kind === 'gen' && value !== 'data' ? '1' : 'name')
-        p.set('icons', '1')   // generating icons is a one-off: always on, the emoji layer decides
+        if (c.iconPercent > 0) { p.set('icons', '1'); if (c.iconPercent !== 100) p.set('iconPercent', c.iconPercent) }
         if (c.preset) p.set('preset', c.preset)
         if (c.theme !== 'light') p.set('theme', c.theme)
         if (c.layoutType !== 'berge') p.set('layoutType', c.layoutType)
@@ -229,6 +229,8 @@
             c.layers.nodes = Object.assign({}, c.layers.nodes, { fill: 'depth' })
             c.layers['link-arcs'] = Object.assign({}, c.layers['link-arcs'], { stroke: 'depth' })
         }
+        // icons: share of the nodes with an icon; a link without icons has none
+        c.iconPercent = p.get('icons') === '1' ? num('iconPercent', 100) : ([...p.keys()].length ? 0 : DEFAULTS.iconPercent)
         c.click = p.get('click') || DEFAULTS.click
         // a URL without any parameter shows the defaults with labels
         if (![...p.keys()].length) c.labels = DEFAULTS.labels
@@ -422,7 +424,7 @@
 
         // What the library does when a model is set, in this order (hypertree.ts: setModel,
         // initData, findInitλ_), with the option that controls each step and its current value.
-        g = section('Initialization', ['lang', 'labels', 'weightUniform'])
+        g = section('Initialization', ['lang', 'labels', 'weightUniform', 'iconPercent'])
         hint(g, 'What happens when the tree is set up, in this order. Steps with an option can be configured by the application.')
         const steps = el('ol', { class: 'init-steps' })
         g.append(steps)
@@ -453,9 +455,11 @@
             'Weights per node, summed over each subtree: layoutWeight shares the space among children, cullingWeight decides what the filter hides.',
             () => 'layout: leaves 1; filter: ' + (cfg.weightUniform ? 'every node 1' : 'leaves 1, inner nodes height²'))
         check(weightStep, 'Uniform filter weights', 'weightUniform', () => !cfg.filterOff)
-        step('Node data', 'dataInitBFS',
+        const dataStep = step('Node data', 'dataInitBFS',
             'Called for every node: icon (emoji), imageHref, clickable, cell. Default: clickable and cell true, no icon or image.',
-            () => 'icon: one emoji per node (always; the emojis layer is off by default)')
+            () => cfg.iconPercent === 0 ? 'no icons'
+                : `icon: an emoji for ${cfg.iconPercent === 100 ? 'every node' : cfg.iconPercent + ' % of the nodes, evenly spread'} (shown by the emojis layer, off by default)`)
+        range(dataStep, 'Nodes with icon', 'iconPercent', 0, 100, 5, null, v => v + ' %')
         const labelStep = step('Node texts', 'langInitBFS',
             'Called for every node after both loaders: label (and wiki). Called again when the language changes.',
             () => cfg.lang ? 'label from the language map'
