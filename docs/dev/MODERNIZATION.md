@@ -300,6 +300,35 @@ Rendering (DOM, browser), in order of expected gain:
       scale² (no focus radius any more, `maxLabels` per layer); known weak spots:
       small subtrees near the center get no label, a label can end up just
       outside the disk
+- [ ] **Rework the presets** (in progress, agreed 2026-11-22). Decisions:
+  - [x] Step 1, default node radius relative to `linkWidth`: inner nodes half the
+        link width, leaves 1.5× (disk three times as wide); still only leaves by
+        default (`show: 'leaves'`). Playground: radius for leaves and inner nodes
+        on their own, checkbox "inner nodes like the leaves" (playground/harness
+        only, no new library option). `geometry.nodeRadius`, `nodeScale`,
+        `linkWidth` stay in geometry: several layers depend on each
+  - [ ] Open question: leaves are still faint (pale green #a5d6a7, ~4 px); proposal:
+        stronger fill in the light theme (e.g. #5eb561)
+  - [ ] Step 2, `geometry.shrinkAtRim`: `'none'` | `'damped'` (today's label
+        default, scale 1 → 0.5) | `'full'` (like the links, 1 → 0) for labels,
+        labels-force and emojis; replaces the per-layer `shrinkAtRim` bool (not
+        released, no alias needed). The layers only bind their size to the data
+        (layer option, default 1), times the global rim factor. Playground: select
+  - [ ] Step 3, presets: none is unused (all old ones are used by the app's demo
+        pages dev-demo.html / ux.html), so the old ones (`otolModel`, `mainModel`,
+        `fsModel`, `acmflareModel`, `stackoverflowModel`, `generatorModel`,
+        `generatorSpiralModel`) stay **deprecated** (warning) until v3. New:
+        - Tree of Life main page preset (visual config of hypertree-of-life
+          index.html; the app keeps its data callbacks)
+        - Tree of Life branch page preset (like otol.html)
+        - infovis preset(s) with d3-scales: weight → node radius / link width;
+          a value as color of links, label backgrounds, voronoi cells, node disks;
+          values from the structure (weight, depth, height) plus an own accessor
+          (e.g. `n => n.data.value`); generators and fixtures get example values
+          (harness). Several presets if one is not enough
+        - one preset with label backgrounds on, one with emojis and labels
+          without background
+  - [ ] Step 4: the app's index.html and otol.html use the new presets
 
 ### Future features
 
