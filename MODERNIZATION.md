@@ -91,6 +91,8 @@ Tests for all existing features, following the test strategy above:
       the built bundle (layout, wheel direction, hover path, node radius, labels,
       perimeter culling) are each caught
 
+- [x] Playground ([`playground/`](playground)): every data source and option in a UI, callback log, live stats; the configuration lives in the URL in the test harness format, so "Open as test" reproduces it in `test/harness.html` (shared model building in `test/config.js`). Run `npm run playground` (Node 10 for now) → http://localhost:3100/playground/. Smoke-tested in `playground.spec.mjs`. Later: publish on GitHub Pages as the public demo
+
 **Documented features that no longer work** (to restore in v2, each has an
 expected-to-fail test): `nodeColor`/`linkColor` (readme example; the code reads
 `fill`/`stroke`), `interaction.wheelSensitivity` (now `wheelFactor`),

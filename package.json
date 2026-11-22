@@ -17,7 +17,8 @@
   ],
   "scripts": {
     "run": "gulp watch",
-    "globalinstall": "npm i -g gulp"
+    "globalinstall": "npm i -g gulp",
+    "playground": "browser-sync start --server --port 3100 --ui-port 3101 --startPath /playground/ --files \"dist/*.js\" \"dist/*.css\" \"playground/*\" \"test/config.js\" --no-open --no-notify"
   },
   "dependencies": {
     "d3": "^4.13.0",
