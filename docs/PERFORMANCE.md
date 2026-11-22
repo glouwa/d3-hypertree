@@ -11,8 +11,8 @@ The benchmarks use generated trees only, no application data.
 
 | Benchmark | Question it answers | Result file | Command | Runtime |
 |-----------|---------------------|-------------|---------|--------:|
-| [`test/bench-interaction.mjs`](test/bench-interaction.mjs) | How long does one update take while dragging, wheel-zooming and pinching, and which part of the pipeline (layout, filter, labels, voronoi, layer DOM updates, browser) costs what? | [`test/bench-interaction.json`](test/bench-interaction.json) | `npm run bench:interaction` | ~5 min |
-| [`test/bench-layers.mjs`](test/bench-layers.mjs) | What does each layer cost to render while dragging? | [`test/bench-layers.json`](test/bench-layers.json) | `npm run bench` | ~3 min |
+| [`test/bench-interaction.mjs`](../test/bench-interaction.mjs) | How long does one update take while dragging, wheel-zooming and pinching, and which part of the pipeline (layout, filter, labels, voronoi, layer DOM updates, browser) costs what? | [`test/bench-interaction.json`](../test/bench-interaction.json) | `npm run bench:interaction` | ~5 min |
+| [`test/bench-layers.mjs`](../test/bench-layers.mjs) | What does each layer cost to render while dragging? | [`test/bench-layers.json`](../test/bench-layers.json) | `npm run bench` | ~3 min |
 
 Both write their result as JSON (committed, so changes show up in `git diff`)
 and print a summary table.
@@ -48,7 +48,7 @@ server needs to run.
 ### Test trees
 
 The trees come from the library's generators, rendered by
-[`test/harness.html`](test/harness.html) (URL parameters select generator and options):
+[`test/harness.html`](../test/harness.html) (URL parameters select generator and options):
 
 | Name in results | Harness query | Nodes | Visible at λ = 0.3 |
 |-----------------|---------------|------:|-------------------:|
