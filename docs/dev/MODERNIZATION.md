@@ -266,7 +266,9 @@ Rendering (DOM, browser), in order of expected gain:
       (`class`, `r`, `stroke-linecap`). Write only on enter or on change. Done for
       `stroke-linecap` (on enter) and the node radius (on change); `class` toggles are
       cheap class list operations and stay
-- [ ] **Compositor layers.** Every layer group has `transform: translateZ(0)`,
+- [x] **Compositor layers.** Done: planes `disk`, `content`, `overlay` (`planes.ts`,
+      layer option `plane`); 20–36% less per update than one compositor layer per
+      layer group, equal to no hints (PERFORMANCE.md). Before: every layer group had `transform: translateZ(0)`,
       so every layer is its own compositor layer. Measured (default tree with
       labels): 23 groups carry the hint, 9 of them have content; Edge builds 15
       compositor layers (11 drawing) instead of 5 (2 drawing) without the hint.

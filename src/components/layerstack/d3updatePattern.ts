@@ -1,3 +1,4 @@
+import { compositing } from './planes'
 import { N } from '../../models/n/n'
 import { ILayer } from './layer'
 import { CaddC, CsubC } from '../../models/transformation/hyperbolic-math'
@@ -41,7 +42,9 @@ export class D3UpdatePattern
         this.mainSvgGroup = this.args.parent.append('g')
             .attr('id', this.args.name)
             .attr('clip-path', (this.args.clip ? `url(${this.args.clip})` : undefined))
-            .style('transform', 'translateZ(0)')
+            // a compositor layer per layer group only in the old mode; normally the
+            // layer stack's planes are the compositor layers (planes.ts)
+            .style('transform', compositing.mode === 'layers' ? 'translateZ(0)' : null)
 
         this.elements =
             this.mainSvgGroup

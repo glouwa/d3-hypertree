@@ -14,6 +14,7 @@ export interface ILayerArgs
 {
     invisible?: boolean,
     hideOnDrag?: boolean,
+    plane?:     'disk' | 'content' | 'overlay',   // compositor plane (default by layer name, see planes.ts)
 }
 
 export interface ILayer

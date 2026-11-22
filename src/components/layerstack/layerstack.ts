@@ -3,6 +3,7 @@ import { N }         from '../../models/n/n'
 import { IUnitDisk } from '../unitdisk/unitdisk'
 import { ILayer }    from './layer'
 import { mergeDeep } from '../../ducd'
+import { planes, planeOf, compositedPlanes, compositing } from './planes'
 
 export interface LayerStackArgs
 {
@@ -14,6 +15,7 @@ export class LayerStack
 {
     args:         LayerStackArgs
     mainSvgGroup: any
+    planes:       { [key:string]: any }       // compositor planes (see planes.ts)
     layers:       { [key:string]: ILayer }
     d3meta
     
@@ -49,9 +51,20 @@ export class LayerStack
             this.layers[layer.name] = layer
         }
 
+        // one group per compositor plane, the layer groups in their plane (in order)
         this.mainSvgGroup.selectAll('*').remove()
-        for (var l in this.layers) 
-            this.layers[l].update.parent()
+        this.planes = {}
+        for (const plane of planes) {
+            const g = this.mainSvgGroup.append('g').attr('class', `plane plane-${plane}`)
+            if (compositing.mode === 'planes' && compositedPlanes.includes(plane))
+                g.style('will-change', 'transform')
+            this.planes[plane] = g
+        }
+        for (var l in this.layers) {
+            const layer = this.layers[l]
+            layer.view.parent = this.planes[planeOf(layer)]
+            layer.update.parent()
+        }
     }
 
     private updateData() {

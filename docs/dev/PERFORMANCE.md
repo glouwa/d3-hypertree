@@ -238,6 +238,30 @@ SVG text emojis were laid out and rasterized again on every update; as `<image>`
 with a data URL the browser only moves finished bitmaps. The other layers moved
 within the noise.
 
+## Phase 3: compositor planes (2026-11-22)
+
+`bench-interaction.mjs`, ms per update (browser native ms in parentheses), the same
+build in three compositing modes (`compositing.mode` in `planes.ts`), back to back
+from snapshots:
+
+| Tree, gesture, CPU | per layer (before) | 3 planes | none |
+|--------------------|-------------------:|---------:|-----:|
+| wide 8⁵ drag 4×    | 110.0 (39.7) | 73.0 (25.6) | 70.4 (24.6) |
+| wide 8⁵ wheel 4×   | 168.4 (48.1) | 118.0 (32.2) | 122.7 (33.7) |
+| wide 8⁵ pinch 4×   | 98.8 (19.9)  | 63.7 (12.4) | 62.2 (11.9) |
+| large 6⁶ drag 4×   | 55.6 (18.6)  | 36.4 (12.0) | 35.4 (12.3) |
+| large 6⁶ pinch 4×  | 41.4 (10.1)  | 29.1 (6.8)  | 27.4 (6.2) |
+| wide 8⁵ drag 1×    | 17.4 (6.2)   | 14.9 (5.2)  | 14.5 (5.2) |
+| wide 8⁵ pinch 1×   | 18.1 (3.5)   | 13.3 (2.5)  | 13.4 (2.5) |
+
+One compositor layer per layer group cost 20–36% per update: every layer's
+content changes on every hyperbolic step, so the layers were rasterized anyway
+and only added compositing work. Three planes (disk, content, overlay without
+hint) and no hint at all are equal within the noise; the planes stay, they
+prepare euclidean transforms of whole planes on the GPU. Compositor layers in the
+default tree with labels: 15 (11 drawing) per layer, 8 (4 drawing) with planes,
+5 (2 drawing) without hints.
+
 ## Comparing after a change
 
 1. Rebuild `dist/`, run the benchmark, commit nothing yet.
