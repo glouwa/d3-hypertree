@@ -84,15 +84,18 @@ export function diffScenes(actual, expected, tolerance = {}) {
 export async function expectScene(page, testInfo, name, tolerance) {
     const actual = await page.evaluate(() => harness.scene())
     const file = join(testInfo.project.testDir, '__scenes__', basename(testInfo.file), `${name}.json`)
-    const update = testInfo.config.updateSnapshots === 'all' || !existsSync(file)
-    if (update) {
+    const mode = testInfo.config.updateSnapshots
+    const write = () => {
         mkdirSync(dirname(file), { recursive: true })
         writeFileSync(file, JSON.stringify(actual, null, 1) + '\n')
         testInfo.annotations.push({ type: 'scene', description: `wrote ${name}.json` })
         return actual
     }
+    // --update-snapshots: 'changed' (the default of the flag) rewrites differing scenes, 'all' every scene
+    if (mode === 'all' || !existsSync(file)) return write()
     const expected = JSON.parse(readFileSync(file, 'utf8'))
     const problems = diffScenes(actual, expected, tolerance)
+    if (problems.length && mode === 'changed') return write()
     expect(problems, `scene "${name}" differs from the reference:\n  ${problems.join('\n  ')}`).toEqual([])
     return actual
 }
