@@ -217,7 +217,8 @@ A bug or feature counts as done when its expected-to-fail test becomes a normal 
         the tests use the installed Edge. Runs once the branch is pushed. Possible
         surprise on the first run: the few pixel screenshot tests may need references
         from the runner (font rendering); the scene snapshots use tolerances
-12. [ ] Triage the open GitHub issues
+12. [x] Triage the open GitHub issues (see "GitHub issues" below; closing or
+        commenting on GitHub is up to the author)
 
 Not in phase 2: performance (phase 3), the deep-tree bug (after the modernization).
 
@@ -265,6 +266,39 @@ Rendering (DOM, browser), in order of expected gain:
 
 - [ ] API review, migration guide, updated docs and examples
 - [ ] Prereleases on npm `next`, then `latest`
+
+## GitHub issues
+
+Triaged on 2026-11-22: 14 open issues, 18 open pull requests (17 by Dependabot,
+#50 the modernization draft).
+
+**Issues from users**
+
+| Issue | Status | Proposal |
+|-------|--------|----------|
+| #28 Can't resolve 'ducd' when importing the module (React, 2020; reproduced by others) | **Fixed in phase 1:** ducd is an internal copy, `main` is the self-contained UMD bundle, `module` the ESM bundle | Close after the next release, with a note on the version |
+| #41 Rendering labels is not obvious (2022) | Still true: labels need `langInitBFS` (or now `langmap`); the playground's Initialization section shows it | Phase 4 docs: an example "node names as labels", `langmap`; answer the issue then |
+| #32 Search examples? (2020) | `api.selectQuery` exists, undocumented in the examples | Phase 4 docs: a search example |
+
+**Author's notes from 2018**
+
+| Issue | Status / proposal |
+|-------|-------------------|
+| #1 final api | Phase 4 API review |
+| #4 paths, selection, on focus change api | Largely done: selection API and strategies (phase 2 step 8), `onCenterNodeChange`; close after the release |
+| #3 global font size ± | Possible feature (`captionFont` exists; the application has disabled A+/A− buttons) |
+| #6 visualization settings packages | Exist as `hyt.presets`; close or keep for the API review |
+| #9, #10, #11 label layer variants ("place", outside the disk with a line, embedded HTML) | Feature ideas; keep as backlog |
+| #12 better way to create background shapes | Feature idea |
+| #13 refactor transformation | Relevant for the deep-tree bug (after the modernization) |
+| #15 wedge (high degree) layer | Feature idea |
+| #18 flicker bug | No description; ask the author whether it still occurs, else close |
+
+**Dependabot pull requests (17):** all bump dependencies of the old toolchain
+(gulp, webpack, node-sass, browser-sync's socket.io, ...) or d3 4 → newer (#42).
+Phase 1 removed that toolchain, so they are obsolete once `modernize` is merged;
+close them then (Dependabot re-evaluates the new lockfile). Upgrading d3 is a
+separate decision (kept at v4 for now).
 
 ## Known bugs
 
