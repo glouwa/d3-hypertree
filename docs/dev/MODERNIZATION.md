@@ -392,6 +392,10 @@ Done 2026-11-23 as a prototype, `geometry.halfPlane` (`src/models/transformation
 - pointer input is mapped back (`viewToDisk`) in the interaction layer; node
   lookups (voronoi, nearest node) use view positions, the transformation disk
   positions.
+- sizes (disks, link widths, labels) follow the map's scale relative to the
+  center, capped at 1: exact sizes grow with the height, which made the ancestors
+  above the center (a Tree of Life branch page starts deep in the tree) huge.
+- used by hypertree-of-life: a view button on the branch pages.
 - links: semicircles centered on the bottom edge (`link-layer.ts` `halfPlaneArc`);
   indicator circles mapped exactly (a circle |z| = r stays a circle); background
   and clip: the half-plane above the border; the SVG viewBox follows the aspect
