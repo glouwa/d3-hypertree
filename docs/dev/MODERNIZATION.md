@@ -396,6 +396,9 @@ Done 2026-11-23 as a prototype, `geometry.halfPlane` (`src/models/transformation
   center, capped at 1: exact sizes grow with the height, which made the ancestors
   above the center (a Tree of Life branch page starts deep in the tree) huge.
 - used by hypertree-of-life: a view button on the branch pages.
+- compared with the half-plane browser of Lamping and Rao (Inxight patent
+  US 6,901,555: layout on horocycles, compression, navigation along the axes):
+  [lamping-halfplane.md](lamping-halfplane.md). Next step not decided.
 - links: semicircles centered on the bottom edge (`link-layer.ts` `halfPlaneArc`);
   indicator circles mapped exactly (a circle |z| = r stays a circle); background
   and clip: the half-plane above the border; the SVG viewBox follows the aspect
