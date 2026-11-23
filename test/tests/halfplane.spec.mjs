@@ -113,7 +113,21 @@ test('drag: the grabbed node follows the pointer', async ({ page }) => {
     expectNoErrors(errors)
 })
 
-test('wheel: zooming keeps the node under the pointer in place', async ({ page }) => {
+// Zoom works as in the disk: it changes λ of the hyperbolic layout (the link length),
+// not a euclidean scale of the view. layoutSpread: the hyperbolic distance from the
+// root to a child in the layout, which only λ changes; exact: the view still shows
+// the Cayley image of the disk positions.
+const zoomState = page => page.evaluate(() => {
+    const ht = harness.ht, g = hyt.infinityOf(ht.args.layout.rootWedge)
+    const child = ht.data.children[0], r = Math.hypot(child.layout.z.re, child.layout.z.im)
+    const exact = ht.unitdisk.cache.unculledNodes.every(n => {
+        const v = hyt.toView(n.cacheDisk, g)
+        return Math.hypot(v.re - n.cache.re, v.im - n.cache.im) < 1e-12
+    })
+    return { λ: ht.unitdisk.args.transformation.state.λ, layoutSpread: Math.log((1 + r) / (1 - r)), exact }
+})
+
+test('wheel: zooms by the layout (λ), keeps the node under the pointer in place', async ({ page }) => {
     await open(page)
     await waitForStable(page)
     const n0 = await page.evaluate(() => {
@@ -122,16 +136,54 @@ test('wheel: zooming keeps the node under the pointer in place', async ({ page }
     })
     const s = await toScreen(page, n0)
     await page.mouse.move(s.x, s.y)
-    const λ0 = await page.evaluate(() => harness.ht.unitdisk.args.transformation.state.λ)
+    const z0 = await zoomState(page)
     await page.mouse.wheel(0, 200)          // out (the start zoom is at the upper λbound)
     await waitForStable(page)
+    const z1 = await zoomState(page)
+    expect(z1.λ).toBeLessThan(z0.λ)
+    expect(z1.layoutSpread).toBeLessThan(z0.layoutSpread * .99)   // the layout got tighter
+    expect(z1.exact).toBe(true)
     const r = await page.evaluate(id => {
         const n = harness.ht.data.descendants().find(n => n.mergeId === id)
-        return { λ: harness.ht.unitdisk.args.transformation.state.λ, re: n.cache.re, im: n.cache.im }
+        return { re: n.cache.re, im: n.cache.im }
     }, n0.id)
-    expect(r.λ).toBeLessThan(λ0)
     const s2 = await toScreen(page, r)
     expect(Math.hypot(s2.x - s.x, s2.y - s.y)).toBeLessThan(3)
+})
+
+test.describe('touch', () => {
+    test.use({ hasTouch: true })
+    test('pinch: zooms by the layout (λ), fingers together out, apart in', async ({ page }) => {
+        const errors = collectErrors(page)
+        await open(page)
+        await page.evaluate(() => harness.ht.api.gotoλ(0.3))
+        await waitForStable(page)
+        const c = await toScreen(page, { re: 0, im: .3 })
+        const cdp = await page.context().newCDPSession(page)
+        const t = (type, pts) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? [] : pts.map((p, id) => ({ x: p.x, y: p.y, id })) })
+        const pinch = async (from, to) => {
+            await t('touchStart', [{ x: c.x - from, y: c.y }, { x: c.x + from, y: c.y }])
+            for (let i = 1; i <= 10; i++) {
+                const d = from + (to - from) * i / 10
+                await t('touchMove', [{ x: c.x - d, y: c.y }, { x: c.x + d, y: c.y }])
+                await page.waitForTimeout(16)
+            }
+            await t('touchEnd', [])
+            await waitForStable(page)
+        }
+        const z0 = await zoomState(page)
+        await pinch(150, 100)
+        const z1 = await zoomState(page)
+        expect(z1.λ).toBeLessThan(z0.λ)
+        expect(z1.layoutSpread).toBeLessThan(z0.layoutSpread * .99)
+        expect(z1.exact).toBe(true)
+        await pinch(100, 150)
+        const z2 = await zoomState(page)
+        expect(z2.λ).toBeGreaterThan(z1.λ)
+        expect(z2.layoutSpread).toBeGreaterThan(z1.layoutSpread * 1.01)
+        expect(z2.exact).toBe(true)
+        expectNoErrors(errors)
+    })
 })
 
 test('click with clickAction select selects the node under the pointer', async ({ page }) => {
