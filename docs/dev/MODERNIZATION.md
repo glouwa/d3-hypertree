@@ -383,6 +383,24 @@ Rendering (DOM, browser), in order of expected gain:
 usability with the disk). A boolean in `geometry` (e.g. `geometry.halfPlane`)
 switches to the upper half-plane model, which fits a rectangular view.
 
+Done 2026-11-23 as a prototype, `geometry.halfPlane` (`src/models/transformation/cayley.ts`):
+- `cacheUpdate` maps the visible nodes after culling (`mapToView`: position, the
+  distance scale times |dw/dz|, disk position kept in `n.cacheDisk`); nodes far
+  above the view (Im w > 3) are not drawn. The disk is rotated first so that the
+  gap of the root wedge goes to infinity (`infinityOf`): no nodes there, and the
+  stem of the root points up into it.
+- pointer input is mapped back (`viewToDisk`) in the interaction layer; node
+  lookups (voronoi, nearest node) use view positions, the transformation disk
+  positions.
+- links: semicircles centered on the bottom edge (`link-layer.ts` `halfPlaneArc`);
+  indicator circles mapped exactly (a circle |z| = r stays a circle); background
+  and clip: the half-plane above the border; the SVG viewBox follows the aspect
+  ratio of the element (also on resize).
+- tests: `halfplane.spec.mjs` (mapping, geodesics, hover, drag, wheel, click,
+  indicators, the 10k file system) and the Cayley properties in `math.spec.mjs`.
+- not yet: the euclidean GPU shortcuts during gestures (moving along the real
+  axis, scaling about a point on it); traces are drawn in disk coordinates.
+
 - Only the ends of the pipeline change: the display maps every position from
   the disk to the half-plane, `w = i·(1 + z) / (1 − z)`, at the very end; pointer
   input maps back first, `z = (w − i) / (w + i)`. Layout, filter, transformation

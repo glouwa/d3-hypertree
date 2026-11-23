@@ -8,7 +8,7 @@ import { CassignC }                 from '../transformation/hyperbolic-math'
 import { doVoronoiStuff }           from './preset-process'
 import { doLabelStuff }             from './preset-process'
 import { doImageStuff }             from './preset-process'
-import { mapToView }                from '../transformation/cayley'
+import { mapToView, infinityOf }    from '../transformation/cayley'
 
 function adjustMagic(ud:IUnitDisk, cache:TransformationCache) {
     const filter = ud.view.hypertree.args.filter.weightFilter
@@ -145,7 +145,7 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
     // rectangular view (geometry.halfPlane): from here on the drawn positions are in
     // the half-plane (cayley.ts); the filter above worked in the disk
     if (ud.view.hypertree.args.geometry.halfPlane) {
-        cache.unculledNodes = mapToView(cache.unculledNodes)
+        cache.unculledNodes = mapToView(cache.unculledNodes, infinityOf(ud.view.hypertree.args.layout.rootWedge))
         const inView = (n:N)=> !!n.cacheDisk          // mapped = inside the view
         cache.emojis = cache.emojis.filter(inView)
         cache.spezialNodes = cache.spezialNodes.filter(inView)

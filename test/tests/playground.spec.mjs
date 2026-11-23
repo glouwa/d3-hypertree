@@ -397,3 +397,20 @@ test('geometry: node radius for leaves and inner nodes, inner like the leaves', 
     await expect(radiusRow('radius: inner')).toBeHidden()
     await page.waitForFunction(() => [...document.querySelectorAll('#tree #nodes circle')].filter(c => c.__data__.parent).every(c => c.getAttribute('r') === '0.015'))
 })
+
+test('geometry: the rectangular view (half-plane) in a wide tree element', async ({ page }) => {
+    const errors = collectErrors(page)
+    await page.goto('../playground/?gen=nTree&depth=5&childs=3')
+    await ready(page)
+    await page.locator('summary').filter({ hasText: /^Geometry/ }).click()
+    await page.locator('label.check', { hasText: /^Rectangular view/ }).locator('input').check()
+    await page.waitForFunction(() => decodeURIComponent(location.search).includes('"halfPlane":true'))
+    await page.waitForFunction(() => window.ht && window.ht.args.geometry.halfPlane && window.ht.unitdisk.cache && window.ht.unitdisk.cache.unculledNodes.length > 10)
+    const r = await page.evaluate(() => {
+        const box = document.querySelector('#tree').getBoundingClientRect()
+        const [, , w, h] = document.querySelector('#tree .unitdisk-nav > svg').getAttribute('viewBox').split(' ').map(Number)
+        return { wide: box.width > box.height * 1.2, viewWide: w > h * 1.2, mapped: window.ht.unitdisk.cache.unculledNodes.every(n => n.cacheDisk) }
+    })
+    expect(r).toEqual({ wide: true, viewWide: true, mapped: true })
+    expectNoErrors(errors)
+})

@@ -53,6 +53,10 @@ are listed first.
 
 ### Added
 
+- **Rectangular view** (`geometry.halfPlane`, prototype): the upper half-plane
+  model via the Cayley transform. The disk border becomes the bottom edge, links
+  are arcs centered on it, the view fills the element's rectangle. Layout,
+  filter and interaction work as in the disk.
 - **Presets** `treeOfLifeMain` and `treeOfLife` (the hypertree-of-life main and
   branch pages), `infovis` and `infovisEmoji`: a value per node (structure:
   `weight`, `depth`, `height`, or own data `n.data.value` / a function) mapped with

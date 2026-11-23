@@ -110,7 +110,10 @@ export class StemLayer implements ILayer
         var $this = this        
         return function(d) : string {
             var arcP1 = $this.args.nodePos(d)
-            var arcP2 = d.parent 
+            // half-plane view: the stem goes into the wedge gap, which is at infinity above
+            if (!d.parent && $this.view.hypertree.args.geometry.halfPlane)
+                return `M ${$this.args.nodePosStr(d)} L ${arcP1.re} -3`
+            var arcP2 = d.parent
                       ? $this.args.nodePos(d.parent)
                       : { re:arcP1.re, im:1 }
             console.assert(!!arcP1)

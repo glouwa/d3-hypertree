@@ -26,6 +26,24 @@ export class BackgroundLayer implements ILayer
     }
 
     private attach() {
+        // half-plane view: the half-plane above the border (view y = 1), wide enough for
+        // any aspect ratio of the view
+        if (this.view.hypertree.args.geometry.halfPlane) {
+            this.d3updatePattern = new D3UpdatePattern({
+                parent:            this.view.parent,
+                layer:             this,
+                data:              [1],
+                name:              this.name,
+                className:         'background-halfplane',
+                elementType:       'rect',
+                create:            s=> s.attr('x', -20).attr('y', -2).attr('width', 40).attr('height', 3)
+                                        .attr('fill', 'rgba(128,128,128,.07)')
+                                        .attr('stroke', 'rgba(128,128,128,.5)').attr('stroke-width', .003),
+                updateColor:       s=> {},
+                updateTransform:   s=> {},
+            })
+            return
+        }
         this.d3updatePattern = new D3UpdatePattern({
             parent:            this.view.parent,
             layer:             this,

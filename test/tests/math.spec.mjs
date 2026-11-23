@@ -112,6 +112,25 @@ test('Cayley map: view and disk are inverse, the border becomes the bottom edge,
     expect(Math.abs(r.center.re) + Math.abs(r.center.im)).toBeLessThan(1e-12)  // the disk center in the middle of the view
 })
 
+test('Cayley map with a direction to infinity: still inverse, that direction goes up', async ({ page }) => {
+    const r = await page.evaluate(() => {
+        let inverse = 0, up = true
+        for (let i = 0; i < 300; i++) {
+            const a = 2 * Math.PI * rnd(), g = { re: Math.cos(a), im: Math.sin(a) }, z = inDisk(.95)
+            inverse = Math.max(inverse, dist(hyt.viewToDisk(hyt.toView(z, g), g), z))
+            // a point near the boundary in direction g is far above, the opposite one near the border
+            up = up && hyt.toHalfPlane({ re: .99 * g.re, im: .99 * g.im }, g).im > 100
+                    && hyt.toHalfPlane({ re: -.99 * g.re, im: -.99 * g.im }, g).im < .01
+        }
+        // infinityOf: the middle of the gap of the root wedge (orientation + π)
+        const inf = hyt.infinityOf({ orientation: 3 * Math.PI / 2, angle: 3 * Math.PI / 2 })
+        return { inverse, up, inf: [Math.round(inf.re * 1e9) / 1e9, Math.round(inf.im * 1e9) / 1e9] }
+    })
+    expect(r.inverse).toBeLessThan(1e-9)
+    expect(r.up).toBe(true)
+    expect(r.inf).toEqual([0, 1])
+})
+
 test('Cayley map: viewScale is the local scale |dw/dz| of the map', async ({ page }) => {
     const err = await page.evaluate(() => {
         let e = 0

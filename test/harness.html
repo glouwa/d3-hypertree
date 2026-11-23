@@ -21,6 +21,12 @@
         // window.harness exposes the component, recorded callbacks and helpers.
         const q = new URLSearchParams(location.search)
         if (q.get('theme') === 'dark') document.getElementById('theme').href = '../dist/d3-hypertree-dark.css'
+        // size=WxH: the size of the tree's element (default 900x900), e.g. a rectangle
+        // for the half-plane view
+        if (/^\d+x\d+$/.test(q.get('size') || '')) {
+            const [w, h] = q.get('size').split('x')
+            Object.assign(document.getElementById('tree').style, { width: w + 'px', height: h + 'px' })
+        }
 
         // every interaction callback is recorded in harness.events
         const events = []

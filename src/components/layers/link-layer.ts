@@ -83,8 +83,10 @@ export class ArcLayer implements ILayer
     }
 
     private svgArc(a:string, b:string) : (d:N)=> string {
-        var $this = this        
+        var $this = this
         return function(d) : string {
+            if ($this.view.hypertree.args.geometry.halfPlane)
+                return $this.halfPlaneArc(d)
             var arcP1 = $this.args.nodePos(d)
             var arcP2 = d.parent 
                       ? $this.args.nodePos(d.parent)
@@ -101,6 +103,21 @@ export class ArcLayer implements ILayer
                   : `${arcP1.re} 1` 
             return `M ${s} A ${r} ${r}, 0, 0, ${f}, ${e}`
         }
+    }
+
+    // half-plane view (cayley.ts): geodesics are semicircles centered on the real axis
+    // (the bottom edge, view y = 1), or vertical lines. View (X, Y) = w (X, 1 − Y).
+    private halfPlaneArc(d:N) : string {
+        const p1 = this.args.nodePos(d)
+        if (!d.parent) return `M ${p1.re} ${p1.im} L ${p1.re} -3`       // the root's stem: into the wedge gap, at infinity above
+        const p2 = this.args.nodePos(d.parent)
+        const x1 = p1.re, y1 = 1 - p1.im, x2 = p2.re, y2 = 1 - p2.im
+        if (Math.abs(x1 - x2) < 1e-9 * (1 + Math.abs(x1)))
+            return `M ${x1} ${p1.im} L ${x2} ${p2.im}`
+        const c = (x1 * x1 + y1 * y1 - x2 * x2 - y2 * y2) / (2 * (x1 - x2))
+        const r = Math.hypot(x1 - c, y1)
+        // over the top: from left to right is clockwise on screen (sweep 1)
+        return `M ${x1} ${p1.im} A ${r} ${r}, 0, 0, ${x1 < x2 ? 1 : 0}, ${x2} ${p2.im}`
     }
 
     private svgArcLine(d:N) {

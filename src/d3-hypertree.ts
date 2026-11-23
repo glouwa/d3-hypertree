@@ -4,7 +4,7 @@ export type { HypertreeArgs } from "./models/hypertree/model"
 
 export * from './models/transformation/hyperbolic-math'
 export * from './models/transformation/hyperbolic-transformation'
-export { toHalfPlane, toView, viewToDisk, viewScale } from './models/transformation/cayley'
+export { toHalfPlane, toView, viewToDisk, viewScale, infinityOf } from './models/transformation/cayley'
 export { colorBy, sizeBy, nodeValues } from './models/hypertree/preset-infovis'
 export { voronoiLayout } from './models/voronoi'
  

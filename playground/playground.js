@@ -33,6 +33,7 @@
         // geometry: options that apply to several layers
         linkCurvature: base.geometry.linkCurvature,
         shrinkAtRim: base.geometry.shrinkAtRim,
+        halfPlane: false,     // rectangular view (upper half-plane, Cayley transform)
         captionFontPx: parseFloat(base.geometry.captionFont),
         captionHeight: base.geometry.captionHeight,
         leafRadius: null,     // null: library default (1.5 x the link width)
@@ -192,6 +193,7 @@
         const g = {}
         if (c.linkCurvature !== DEFAULTS.linkCurvature) g.linkCurvature = c.linkCurvature
         if (c.shrinkAtRim !== DEFAULTS.shrinkAtRim) g.shrinkAtRim = c.shrinkAtRim
+        if (c.halfPlane) g.halfPlane = true
         if (c.captionFontPx !== DEFAULTS.captionFontPx) g.captionFont = `${c.captionFontPx}px Roboto`
         if (c.captionHeight !== DEFAULTS.captionHeight) g.captionHeight = c.captionHeight
         // harness format: nodeRadius { leaves, inner } (test/config.js makes the function)
@@ -247,6 +249,7 @@
             const g = JSON.parse(p.get('geometry'))
             if (g.linkCurvature) c.linkCurvature = g.linkCurvature
             if (g.shrinkAtRim) c.shrinkAtRim = g.shrinkAtRim
+            c.halfPlane = !!g.halfPlane
             if (g.captionFont) c.captionFontPx = parseFloat(g.captionFont)
             if (g.captionHeight !== undefined) c.captionHeight = g.captionHeight
             if (typeof g.nodeRadius === 'number') { c.leafRadius = g.nodeRadius; c.innerLikeLeaves = true }   // older links
@@ -309,6 +312,7 @@
         history.replaceState(null, '', '?' + params.toString())
         $('#theme').href = `../dist/d3-hypertree-${cfg.theme}.css`
         document.body.classList.toggle('dark', cfg.theme === 'dark')
+        document.body.classList.toggle('halfplane', !!cfg.halfPlane)   // a wide tree element (before the tree measures it)
 
         const tree = $('#tree')
         tree.innerHTML = ''
@@ -545,8 +549,9 @@
         hint(g, 'maxlabels: at most this many labels in the label layers (highest subtree weight × display scale², big subtrees near the center first; the root always). A label layer can set its own limit (Layers › labels › maxLabels).')
         hint(g, 'The filter adapts its weight threshold a little on every update, so the visible set settles over a few frames after loading or interacting.')
 
-        g = section('Geometry', ['linkCurvature', 'shrinkAtRim', 'captionFontPx', 'captionHeight', 'leafRadius', 'innerRadius', 'innerLikeLeaves', 'linkWidth', 'theme'])
+        g = section('Geometry', ['halfPlane', 'linkCurvature', 'shrinkAtRim', 'captionFontPx', 'captionHeight', 'leafRadius', 'innerRadius', 'innerLikeLeaves', 'linkWidth', 'theme'])
         hint(g, 'Options that apply to several layers (model.geometry). Options of a single layer are in the layer list below (▸).')
+        check(g, 'Rectangular view (half-plane)', 'halfPlane', null, 'geometry.halfPlane (prototype): the upper half-plane model via the Cayley transform, fits a rectangle. The disk border becomes the bottom edge, the gap of the root wedge goes to infinity above; links are arcs centered on the bottom edge. Layout, filter and interaction stay the same.')
         select(g, 'linkCurvature', 'linkCurvature', [['-', '− (default, hyperbolic geodesic)'], ['+', '+ (arc to the other side)'], ['0', '0 (straight)']])
         hint(g, 'Default curvature of link-arcs and path-arcs; a layer can override it. The library also accepts l (straight, as SVG lines): looks like 0 and needs a little more JavaScript per frame.')
         select(g, 'shrinkAtRim', 'shrinkAtRim', [['damped', 'damped (default): 1 to 0.5 at the rim'], ['none', 'none: constant size'], ['full', 'full: like the links, to 0 at the rim']])

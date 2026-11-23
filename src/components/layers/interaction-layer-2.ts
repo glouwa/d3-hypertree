@@ -9,6 +9,7 @@ import { CptoCk, CktoCp, ArrtoC } from '../../models/transformation/hyperbolic-m
 import { CaddC, CsubC, CmulR }    from '../../models/transformation/hyperbolic-math'
 import { clone }                  from '../../models/transformation/hyperbolic-math'
 import { compose, shift }         from '../../models/transformation/hyperbolic-math'
+import { viewToDisk, toView, diskPos, infinityOf } from '../../models/transformation/cayley'
 
 const π = Math.PI
 
@@ -91,9 +92,9 @@ export class InteractionLayer2 implements ILayer
                 // The capture circle (r = 5) reaches far beyond the disk, and the voronoi
                 // cells are unbounded: outside the disk no node is hovered.
                 // hover strategy: 'pointer' (default) = the node under the mouse, 'none' = no hover
-                const m = this.mousePosAsC(e)
+                const p = this.mousePosAsC(e), m = this.toDisk(p)
                 const pointer = this.view.hypertree.args.interaction.hover !== 'none'
-                const n = pointer && (m.re * m.re + m.im * m.im) <= 1 ? this.findNodeAt(m) : undefined
+                const n = pointer && (m.re * m.re + m.im * m.im) <= 1 ? this.findNodeAt(p) : undefined
                 this.setHoverNode(n)
                 this.htapi.setPathHead(this.hoverpath, n)
             }
@@ -122,10 +123,11 @@ export class InteractionLayer2 implements ILayer
             this.holdTimer = null
             const traces = this.view.hypertree.args.objects.traces
             if (traces.length !== 1 || !this.nopinch) return
+            const v = this.toViewPos(m)
             const q = this.view.unitdisk.cache.voronoiDiagram
-                && this.view.unitdisk.cache.voronoiDiagram.find(m.re, m.im)
+                && this.view.unitdisk.cache.voronoiDiagram.find(v.re, v.im)
             this.held = true
-            i.onNodeHold(q ? q.data : undefined, m, this)
+            i.onNodeHold(q ? q.data : undefined, v, this)
         }, i.holdDuration || 500)
     }
     private cancelHoldTimer() {
@@ -143,7 +145,7 @@ export class InteractionLayer2 implements ILayer
     private fireMouseEvent(e:MouseEvent, eventName:string) {
         e.stopPropagation()
         e.preventDefault()
-        this.enqueuePointerEvent(eventName, 'mouse', this.mousePosAsC(e))
+        this.enqueuePointerEvent(eventName, 'mouse', this.toDisk(this.mousePosAsC(e)))
     }
 
     // Pointer events are processed once per animation frame, in order; consecutive
@@ -184,7 +186,7 @@ export class InteractionLayer2 implements ILayer
 
         if (newλp !== oldλp)
         {
-            const m = this.mousePosAsC(e)
+            const m = this.toDisk(this.mousePosAsC(e))
 
             // A wheel burst is an interaction like dragging: low detail (no voronoi,
             // no labels, hideOnDrag layers hidden) until no wheel event came for
@@ -202,7 +204,7 @@ export class InteractionLayer2 implements ILayer
                 const preservingNode = this.findUnculledNodeByCell(m)
                 t.onDragλ(newλp)
                 this.view.hypertree.updateLayoutPath_(preservingNode) // only path to center
-                t.state.P = compose(t.state, shift(t.state, { re:0, im:0 }, preservingNode.cache)).P
+                t.state.P = compose(t.state, shift(t.state, { re:0, im:0 }, diskPos(preservingNode))).P
                 
                 this.view.hypertree.update.transformation()
             })
@@ -216,7 +218,7 @@ export class InteractionLayer2 implements ILayer
 
         const changedTouches = e.changedTouches
         for (let i=0; i < changedTouches.length; ++i)
-            this.enqueuePointerEvent(eventName, changedTouches[i].identifier, this.mousePosAsC(changedTouches[i]))
+            this.enqueuePointerEvent(eventName, changedTouches[i].identifier, this.toDisk(this.mousePosAsC(changedTouches[i])))
     }
   
     //-----------------------------------------------------------------------------------------
@@ -315,7 +317,7 @@ export class InteractionLayer2 implements ILayer
                 const t = this.view.unitdisk.args.transformation
                 t.onDragλ(newλp)
                 this.view.hypertree.updateLayoutPath_(this.pinchPreservingNode) // only path to center
-                t.state.P = compose(t.state, shift(t.state, { re:0, im:0 }, this.pinchPreservingNode.cache )).P
+                t.state.P = compose(t.state, shift(t.state, { re:0, im:0 }, diskPos(this.pinchPreservingNode))).P
                 t.state.P = compose(t.state, shift(t.state, this.pinchcenter, pinchcenter2)).P
 
                 this.pinchcenter = CmulR(CaddC(this.pinchcenter, pinchcenter2), .5)
@@ -409,14 +411,15 @@ export class InteractionLayer2 implements ILayer
     }
 
     private click(m:C) {
-        const q = this.view.unitdisk.cache.voronoiDiagram.find(m.re, m.im)
+        const v = this.toViewPos(m)              // the voronoi cells are in view coordinates
+        const q = this.view.unitdisk.cache.voronoiDiagram.find(v.re, v.im)
         const n = q ? q.data : undefined
 
         if (!this.view.hypertree.isAnimationRunning()) {
             const i = this.view.hypertree.args.interaction
             if (n && i.clickAction === 'select') this.view.hypertree.api.toggleSelection(n)
             if (n && i.clickAction === 'goto')   this.view.hypertree.api.gotoNode(n)
-            i.onNodeClick(n, m, this)
+            i.onNodeClick(n, v, this)        // v: where it is drawn (e.g. for ripple)
         }
     }
 
@@ -424,7 +427,14 @@ export class InteractionLayer2 implements ILayer
         return this.view.hypertree.args.objects.traces.find(e=> e.id === pid)        
     }
 
-    // position of a mouse event or a touch in the coordinates of the disk
+    // half-plane view (geometry.halfPlane): pointer positions are view coordinates; the
+    // transformation works in the disk (cayley.ts)
+    private get halfPlane() { return !!this.view.hypertree.args.geometry.halfPlane }
+    private get infinity() { return infinityOf(this.view.hypertree.args.layout.rootWedge) }
+    private toDisk = (p:C) : C => this.halfPlane ? viewToDisk(p, this.infinity) : p
+    private toViewPos = (z:C) : C => this.halfPlane ? toView(z, this.infinity) : z
+
+    // position of a mouse event or a touch in the view (the disk unless halfPlane)
     private mousePosAsC = (e:MouseEvent | Touch)=> ArrtoC(d3.pointer(e, this.view.parent.node()))
     private findNodeAt = (m:C)=> {
         var find = this.view.unitdisk.cache.voronoiDiagram.find(m.re, m.im)
@@ -437,7 +447,8 @@ export class InteractionLayer2 implements ILayer
     private findUnculledNodeByCell = (m:C)=> {
         let best:N = undefined, bestD = Infinity
         for (const n of this.view.unitdisk.cache.unculledNodes) {
-            const dx = n.cache.re - m.re, dy = n.cache.im - m.im
+            const z = diskPos(n)                     // m is a disk position
+            const dx = z.re - m.re, dy = z.im - m.im
             const d = dx*dx + dy*dy
             if (d < bestD) { bestD = d; best = n }
         }

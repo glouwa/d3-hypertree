@@ -97,6 +97,7 @@ main { display: grid; grid-template-rows: 1fr auto; height: 100vh; min-width: 0;
    clip the stage, otherwise it covers the panel and swallows its clicks. */
 #stage { display: flex; align-items: center; justify-content: center; padding: 12px; min-height: 0; overflow: hidden; }
 #tree { position: relative; width: min(100%, calc(100vh - 190px)); aspect-ratio: 1; }
+body.halfplane #tree { width: 100%; aspect-ratio: auto; height: calc(100vh - 230px); }
 #panel { position: relative; z-index: 2; }
 
 #info {

@@ -229,6 +229,32 @@ export class Hypertree
         this.updateUnitdiskView()
     }
 
+    // The view: a square for the disk; for the half-plane (geometry.halfPlane) a
+    // rectangle with the aspect ratio of the parent element, kept on resize. The view
+    // coordinates stay: y from about −1 to 1, x as wide as the rectangle.
+    private viewPosition() : string {
+        const svg = this.view_.html.querySelector('.unitdisk-nav > svg')
+        if (!this.args.geometry.halfPlane) {
+            svg.setAttribute('viewBox', '0 0 1000 1000')
+            return 'translate(500,500) scale(480)'
+        }
+        const r = this.view_.parent.getBoundingClientRect()
+        const aspect = r.width > 0 && r.height > 0 ? r.width / r.height : 1.6
+        const w = Math.round(1000 * aspect)
+        svg.setAttribute('viewBox', `0 0 ${w} 1000`)
+        if (!this.onResize) {
+            this.onResize = ()=> {
+                if (!this.args.geometry.halfPlane || !this.view_.html) return
+                const p = this.viewPosition()
+                const g = this.view_.html.querySelector('.unitdisk-nav > svg > .unitDisc')
+                if (g) g.setAttribute('transform', p)
+            }
+            window.addEventListener('resize', this.onResize)
+        }
+        return `translate(${w / 2},500) scale(480)`
+    }
+    private onResize : ()=> void = null
+
     protected updateUnitdiskView()
     {
         var udparent = this.view_.html.querySelector('.unitdisk-nav > svg')
@@ -236,7 +262,7 @@ export class Hypertree
         this.unitdisk = new this.args.geometry.decorator({
             parent:             udparent,
             className:          'unitDisc',
-            position:           'translate(500,500) scale(480)',
+            position:           this.viewPosition(),
             hypertree:          this,
         },  
         {
