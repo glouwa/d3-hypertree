@@ -16,6 +16,7 @@ const sources = [
     ['csv',         'file=fixtures/flare.csv',                252],
     ['skos',        'file=fixtures/animals.skos.xml',         7],
     ['treeml',      'file=fixtures/primates.treeml.xml',      192],
+    ['d3json 10k',  'file=fixtures/filesystem.d3.json',       10000],
 ]
 
 for (const [name, query, count] of sources) {
@@ -116,4 +117,29 @@ test('labels with \n render on several lines', async ({ page }) => {
     expect(r.singleText).toBe('one line')
     expect(r.width).toBeCloseTo(r.widthOfLongest, 9)
     expectNoErrors(errors)
+})
+
+// a missing file: the loader reports it (console.error) instead of failing silently;
+// the page keeps working
+test('fromFile: a missing file is reported, the page does not crash', async ({ page }) => {
+    const messages = [], pageErrors = []
+    page.on('console', m => m.type() === 'error' && messages.push(m.text()))
+    page.on('pageerror', e => pageErrors.push(e.message))
+    await page.goto('harness.html?file=fixtures/does-not-exist.d3.json')
+    await page.waitForFunction(() => window.harness)
+    // initPromise fails with a clear message
+    expect(await page.evaluate(() => harness.ready.then(() => 'resolved', e => e.message))).toBe('d3-hypertree: the dataloader delivered no data')
+    expect(messages.some(m => /could not load fixtures\/does-not-exist\.d3\.json/.test(m))).toBe(true)
+    expect(pageErrors.filter(e => !/delivered no data/.test(e))).toEqual([])      // no TypeError
+})
+
+test('fromLangFile: a missing language file is reported, the tree renders without those labels', async ({ page }) => {
+    const messages = []
+    page.on('console', m => m.type() === 'error' && messages.push(m.text()))
+    const pageErrors = []
+    page.on('pageerror', e => pageErrors.push(e.message))
+    await openTree(page, 'file=fixtures/small.d3.json&lang=fixtures/does-not-exist.lang.json')
+    expect(await total(page)).toBe(11)
+    expect(messages.some(m => /could not load fixtures\/does-not-exist\.lang\.json/.test(m))).toBe(true)
+    expect(pageErrors).toEqual([])
 })

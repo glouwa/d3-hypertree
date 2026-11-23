@@ -53,6 +53,29 @@ Every feature and interaction is checked on up to three levels:
    tolerance, catching broken CSS or empty renders. Never the only check: a
    loose pixel comparison alone missed hidden labels in phase 0.
 
+Two more kinds of tests (added 2026-11-23):
+
+- **Properties** (`math.spec.mjs`): the math checked on hundreds of seeded random
+  points instead of single examples: disk isometries keep hyperbolic distances,
+  `compose(t1, t2)` = t1 then t2, dragging moves the grabbed point to the pointer,
+  link arcs meet the border at right angles, the Cayley map is invertible and
+  keeps distances, the voronoi adapter finds the nearest point (also for points on
+  a line), the infovis scales are monotonic.
+- **Invariants** (`invariants.spec.mjs`): for seven tree shapes (binary, wide,
+  star, path, deep star, flare.csv, the 10k file system), before and after
+  dragging and zooming: positions in the disk, the visible set connected and
+  within `rangeNodes`, one link per visible node, one cell per position, the
+  center node the nearest, labels within `maxlabels`.
+
+Found by them: points on a line (a path tree) got no voronoi cells with
+d3-delaunay (now exact cells for that case); a missing data file crashed the
+initialization with a TypeError (now `initPromise` fails with a clear message).
+Known limit: points crowded on a circle arc near the rim (a path tree after
+dragging) are degenerate for d3-delaunay, a few of them get no cell.
+
+The tests run in parallel (independent pages): one minute locally with eight
+workers instead of 6.5 minutes with one; two workers on the CI runner.
+
 The reference snapshots are taken from the legacy build and are the baseline
 the modernization is measured against. Intended changes get accepted with
 `npm run test:update`, which shows up as a readable JSON diff.
@@ -593,7 +616,7 @@ Microsoft Edge. It serves the repo root and loads the built
 ```bash
 cd test
 npm install
-npm test                 # all browser tests (~5 min)
+npm test                 # all browser tests (~1 min with 8 workers)
 npx playwright test tests/api.spec.mjs   # one group
 npm run test:update      # accept intended changes as the new reference (scenes and screenshots)
 npm run bench            # per-layer render benchmark -> bench-layers.json

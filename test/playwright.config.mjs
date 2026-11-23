@@ -1,11 +1,15 @@
 import { defineConfig } from '@playwright/test'
+import { cpus } from 'node:os'
 
 const port = 4180
 
 export default defineConfig({
     testDir: './tests',
     timeout: 60_000,
-    workers: 1,
+    // the tests are independent: in parallel (CI runners have 4 cores; locally up to 8,
+    // at most half the cores). 6.5 min with one worker, 1 min with eight
+    fullyParallel: true,
+    workers: process.env.CI ? 2 : Math.max(1, Math.min(8, Math.floor(cpus().length / 2))),
     reporter: [['list']],
     expect: {
         // Generated trees render deterministically; keep a tiny margin.

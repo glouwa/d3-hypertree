@@ -126,6 +126,13 @@ export class Hypertree
             this.resetData()
             
             this.args.dataloader((d3h, t1, dl)=> {
+                // no data (e.g. the file could not be loaded; the loader reported why):
+                // initPromise fails instead of a TypeError deep in the initialization
+                if (!d3h) {
+                    this.isInitializing = false
+                    err(new Error('d3-hypertree: the dataloader delivered no data'))
+                    return
+                }
                 this.initData(d3h, t0, t1, dl)
 
                 // If the language map arrived first (the default langloader is
