@@ -19,7 +19,7 @@ import { layerSrc, labeloffsets }   from './preset-layers'
 import { cacheUpdate }              from './magic-filter'
 import { mergeDeep }                from '../../ducd'
 import { C, CmulR }                 from '../transformation/hyperbolic-math'
-import { infovisModel, infovisEmojiModel, InfovisOptions } from './preset-infovis'
+import { infovisModel, infovisEmojiModel, infovisFilesModel, InfovisOptions } from './preset-infovis'
 
 const π =              Math.PI
 const hasLazy =        n=> (n.hasOutChildren && n.isOutλ)
@@ -357,6 +357,8 @@ export const presets : { [key: string]:(options?:any)=> any } =
     // interpolator; see preset-infovis.ts)
     infovis:        (o?:InfovisOptions)=> infovisModel(o),
     infovisEmoji:   (o?:InfovisOptions)=> infovisEmojiModel(o),
+    // a file system tree: size as cell color, number of files as link color
+    infovisFiles:   (o?:InfovisOptions)=> infovisFilesModel(o),
 
     // until v1, deprecated (the hypertree-of-life demo pages still use them)
     otolModel:            deprecatedPreset('otolModel', 'presets.treeOfLife', otolModel),

@@ -179,6 +179,38 @@ test.describe('presets', () => {
         expect(warnings.some(w => /presets\.otolModel is deprecated, use presets\.treeOfLife/.test(w))).toBe(true)
     })
 
+    // infovisFiles on the generated file system (fixtures/gen-filesystem.mjs): the size
+    // as cell color, the number of files as link color, folder labels with their size
+    test('infovisFiles: size as cell color, number of files as link color', async ({ page }) => {
+        const errors = collectErrors(page)
+        await openTree(page, 'file=fixtures/filesystem.d3.json&preset=infovisFiles')
+        await waitForStable(page)
+        const r = await page.evaluate(() => {
+            const same = (els, key, style) => {   // equal data value -> equal color; how many colors
+                const byValue = new Map()
+                for (const e of els) {
+                    const v = key(e.__data__); if (v === undefined) continue
+                    if (!byValue.has(v)) byValue.set(v, new Set())
+                    byValue.get(v).add(style(e))
+                }
+                return { consistent: [...byValue.values()].every(s => s.size === 1), colors: new Set([...byValue.values()].map(s => [...s][0])).size }
+            }
+            return {
+                nodes: harness.ht.data.descendants().length,
+                cells: same([...document.querySelectorAll('[id="cells"] polygon')], p => p.data.data.size, e => e.style.fill),
+                links: same([...document.querySelectorAll('[id="link-arcs"] > *')], n => n.data.files, e => e.style.stroke),
+                folderLabel: harness.ht.data.precalc.label,
+            }
+        })
+        expect(r.nodes).toBe(10000)
+        expect(r.cells.consistent).toBe(true)
+        expect(r.cells.colors).toBeGreaterThan(20)
+        expect(r.links.consistent).toBe(true)
+        expect(r.links.colors).toBeGreaterThan(10)
+        expect(r.folderLabel).toMatch(/^\/\n\d+(\.\d)? GB$/)
+        expectNoErrors(errors)
+    })
+
     // infovis: values mapped with d3-scales to sizes and colors
     test('infovis: own values as size and color of nodes, links, cells and label backgrounds', async ({ page }) => {
         const opt = encodeURIComponent(JSON.stringify({ value: 'value', colorValue: 'depth' }))

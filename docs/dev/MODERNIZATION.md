@@ -342,13 +342,14 @@ Rendering (DOM, browser), in order of expected gain:
         | wiki labels, emojis, labels without background, `clickAction: 'goto'`, selection `'none'` | treeOfLife |
         | disks for every node (`show: 'all'`), d3-scale colors of links / disks / cells / label backgrounds, radius and link width from a value, `shrinkAtRim: 'full'`, hover display `'node'`, selection `'multi'` with `maxSelections`, `clickAction: 'select'` | infovis |
         | emoji size from a value (layer `scale`), `shrinkAtRim: 'none'`, straight links (`linkCurvature: '0'`), no hover path (`path-arcs` hover `'none'`), images layer, selection `'single'` | infovisEmoji |
+        | own data (`'data.<key>'`), log scales, a different value and interpolator per color target (cells: size, links: number of files), multi-line labels; 10k node file system (`test/fixtures/gen-filesystem.mjs`) | infovisFiles |
         | `shrinkAtRim: 'damped'`, arcs, stem, center node, symbols, path layer | all (defaults) |
 
         Not in a preset on purpose: the indicator layers (culling-r, mouse-r,
         focus-r, labels-r-𝐖, λ, origin) and traces are debugging aids; the other
         layout types (spiral, Buchheim, unit lines / vectors) and `hover: 'none'`
-        are one option each, shown in the playground; multi-line labels, langmap
-        and iconmap depend on the data.
+        are one option each, shown in the playground; langmap and iconmap
+        depend on the data.
   - [ ] Open: in the playground, the emoji layer is off by default (it is slow)
         and this overrides presets that turn it on (infovisEmoji)
   - [ ] Step 4: the app's index.html and otol.html use the new presets

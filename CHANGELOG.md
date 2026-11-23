@@ -58,7 +58,10 @@ are listed first.
   `weight`, `depth`, `height`, or own data `n.data.value` / a function) mapped with
   d3-scales to node radius, link width, emoji size and to the colors of links,
   node disks, voronoi cells and label backgrounds (options `value`, `colorValue`,
-  `interpolator`). The presets until v1 (`otolModel`, `mainModel`, `fsModel`,
+  `interpolator`; per color target its own value and interpolator, log scales,
+  `'data.<key>'` for own data). `infovisFiles` for file system trees (size as cell
+  color and disk radius, number of files as link color and width, folder labels
+  with their size), with a generated 10k node example (`test/fixtures`). The presets until v1 (`otolModel`, `mainModel`, `fsModel`,
   `acmflareModel`, `stackoverflowModel`, `generatorModel`,
   `generatorSpiralModel`) still work and warn that they are deprecated.
 - **Label backgrounds in color:** the layer option `background` may be a function

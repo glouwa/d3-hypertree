@@ -67,6 +67,7 @@
     const PRESETS = Object.keys(hyt.presets).filter(p => p !== 'modelBase')
     const DEPRECATED_PRESETS = ['otolModel', 'mainModel', 'generatorModel', 'generatorSpiralModel', 'stackoverflowModel', 'acmflareModel', 'fsModel']
     const isInfovis = c => /^infovis/.test(c.preset)
+    const PRESETS_WITH_LABELS = ['treeOfLife', 'treeOfLifeMain', 'infovisFiles']   // their langInitBFS makes the labels
     const SOURCES = [
         ['gen:nTree', 'Generator: n-ary tree'],
         ['gen:star', 'Generator: star'],
@@ -77,6 +78,7 @@
         ['file:fixtures/flare.csv', 'File: flare.csv (CSV, dot paths)'],
         ['file:fixtures/animals.skos.xml', 'File: animals.skos.xml (SKOS)'],
         ['file:fixtures/primates.treeml.xml', 'File: primates.treeml.xml (TreeML)'],
+        ['file:fixtures/filesystem.d3.json', 'File: filesystem.d3.json (10k nodes, sizes; preset infovisFiles)'],
     ]
 
     // Options each layer reads (from the default layer set in preset-layers.ts).
@@ -146,7 +148,7 @@
         }
         if (c.lang && c.source === 'file:fixtures/small.d3.json') p.set('lang', 'fixtures/small.lang.json')
         // generated trees have no names: number them; data with names shows its names
-        if (c.labels && !c.lang) p.set('labels', kind === 'gen' && value !== 'data' ? '1' : 'name')
+        if (c.labels && !c.lang && !PRESETS_WITH_LABELS.includes(c.preset)) p.set('labels', kind === 'gen' && value !== 'data' ? '1' : 'name')
         if (c.multiline && (c.labels || c.lang)) p.set('multiline', '1')
         if (c.iconPercent > 0) { p.set('icons', '1'); if (c.iconPercent !== 100) p.set('iconPercent', c.iconPercent) }
         if (c.preset) p.set('preset', c.preset)
