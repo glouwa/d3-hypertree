@@ -15,6 +15,7 @@ import { IUnitDisk }           from '../unitdisk/unitdisk'
 import { presets }             from '../../models/hypertree/preset-base'
 import { settleMagic }         from '../../models/hypertree/magic-filter'
 import { applyDocumentedOptions } from '../../models/hypertree/model-compat'
+import { balanceChildren }     from '../../models/n/children-order'
 import { mergeDeep }           from '../../ducd'
 
 let globelhtid = 0
@@ -351,6 +352,9 @@ export class Hypertree
         // - emoji*
         // - img*
         this.data.each(n=> this.args.dataInitBFS(this, n))
+        // layout.childOrder 'balanced': after dataInitBFS (which may reorder children)
+        if (this.args.layout.childOrder === 'balanced')
+            balanceChildren(this.data)
         // iconmap: an emoji per node name (or id), applied once
         const iconmap = this.args.iconmap
         if (iconmap) this.data.each(n=> {

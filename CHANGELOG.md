@@ -66,6 +66,11 @@ are listed first.
   labels never overlap, a label without a free place is left out. Labels grow and
   shrink when they come and go, a label that changes its place glides there
   (option `transition`).
+- **`layout.childOrder`**: `'data'` (default, the order of the data) or
+  `'balanced'`: the heaviest child of every node in the middle, the others each on
+  the side that weighs less so far, heavier ones next to the middle. The heaviest
+  path runs straight where the sides can be balanced, the tree looks like a spruce;
+  where two big branches split it forks. Applied after `dataInitBFS`.
 - **Layer option `leaderLines`** on `labels-force` and `labels-placed`: a line to
   the node for labels pushed away from it (`'auto'`, default), `'always'`, `'never'`.
 - **Rectangular view** (`geometry.halfPlane`, prototype): the upper half-plane

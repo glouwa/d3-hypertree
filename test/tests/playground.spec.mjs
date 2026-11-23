@@ -434,6 +434,15 @@ test('labels and emojis: option asImage', async ({ page }) => {
     await page.waitForFunction(() => document.querySelectorAll('#tree [id="labels"] image').length > 3)
 })
 
+test('layout: child order balanced', async ({ page }) => {
+    await page.goto('../playground/?file=fixtures/primates.treeml.xml&labels=name')
+    await ready(page)
+    await page.locator('summary').filter({ hasText: /^Layout/ }).click()
+    await page.locator('.row', { has: page.locator('label', { hasText: /^Child order$/ }) }).locator('select').selectOption('balanced')
+    await page.waitForFunction(() => decodeURIComponent(location.search).includes('"childOrder":"balanced"'))
+    await page.waitForFunction(() => window.ht && window.ht.args.layout.childOrder === 'balanced' && window.ht.data)
+})
+
 test('geometry: start position', async ({ page }) => {
     await page.goto('../playground/?gen=nTree&depth=5&childs=3')
     await ready(page)

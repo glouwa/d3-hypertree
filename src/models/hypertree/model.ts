@@ -32,6 +32,10 @@ export interface HypertreeArgs
     layout: {
         type:               LayoutFunction
         weight:             (n:N)=> number
+        // order of the children in their wedge: 'data' (default, as given) or
+        // 'balanced' (the heaviest child in the middle, the others on the lighter
+        // side: the heaviest path runs straight, like a spruce; children-order.ts)
+        childOrder?:        'data' | 'balanced'
         initSize:           number
         rootWedge: {
             orientation:    number
