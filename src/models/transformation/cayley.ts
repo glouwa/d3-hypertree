@@ -53,22 +53,25 @@ export function viewScale(z:C, g:C = ONE) : number {
     return 2 / ((1 - z.re) * (1 - z.re) + z.im * z.im)
 }
 
-// nodes above this height (Im w) are outside the view and not drawn: near z = 1 the
-// map grows without bound
+// nodes above this height (Im w) are outside the view: no labels, emojis, symbols for
+// them (n.outOfView). They are still mapped: links of visible children go up to them.
 const maxHeight = 3
+// near the direction to infinity the map grows without bound: limit the height
+const maxDrawnHeight = 1e6
 
 /**
- * Maps the drawn nodes of a frame into the view (call after culling): keeps the disk
+ * Maps the visible nodes of a frame into the view (call after culling): keeps the disk
  * position in n.cacheDisk (interaction), sets n.cache and the derived strings to the
  * view position and multiplies the distance scale with the scale of the map (capped).
- * Returns the nodes that are inside the view (the root always stays first).
+ * Every node is mapped (a link needs both ends in the view coordinates); nodes far
+ * above the view get n.outOfView.
  */
 export function mapToView(nodes:N[], g:C = ONE) : N[] {
-    const visible = []
     for (const n of nodes) {
         const z = { re: n.cache.re, im: n.cache.im }
         const w = toHalfPlane(z, g)
-        if (w.im > maxHeight && n.parent) continue
+        if (!(w.im < maxDrawnHeight)) { w.im = maxDrawnHeight; if (!isFinite(w.re)) w.re = 0 }
+        n.outOfView = w.im > maxHeight
         n.cacheDisk = z
         n.cache = { re: w.re, im: 1 - w.im }
         n.cachep = CktoCp(n.cache)
@@ -81,9 +84,8 @@ export function mapToView(nodes:N[], g:C = ONE) : N[] {
         n.strCache = `${n.cache.re} ${n.cache.im}`
         n.transformStrCache = ` translate(${n.strCache})`
         n.scaleStrText = ` scale(${n.dampedDistScale})`
-        visible.push(n)
     }
-    return visible
+    return nodes
 }
 
 /** The disk position of a node (n.cache holds the view position in the half-plane view). */

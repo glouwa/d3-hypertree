@@ -35,7 +35,8 @@ export function labelsFor(ud:IUnitDisk, max:number|undefined) : N[] {
 // the focus radius, thinned out by weight, so max was often not reached.
 function selectLabels(ud:IUnitDisk, cache:TransformationCache, max:number) : N[] {
     // the label layers draw precalc.label: nodes with only an icon are drawn by the emoji layer
-    const candidates = cache.unculledNodes.filter((n:N)=> n.precalc.label)
+    // (half-plane view: not the nodes far above the view)
+    const candidates = cache.unculledNodes.filter((n:N)=> n.precalc.label && !n.outOfView)
     const root = candidates.find(n=> !n.parent)
     const others = candidates.filter(n=> n !== root)
     // score: subtree weight times the squared display scale (1 at the center, 0 at

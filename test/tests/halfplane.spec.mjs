@@ -231,3 +231,51 @@ test('the infovis presets and the file system work in the rectangular view', asy
     expect(r.nan).toBe(false)
     expectNoErrors(errors)
 })
+
+// Regression: nodes far above the view were left out of the map, so links of their
+// visible children went to an unmapped (disk) position: arcs ending in the middle of
+// the view after zooming in. Every link must start at its node and end at its parent.
+test('every link connects its node and its parent, also after zooming in and dragging', async ({ page }) => {
+    const errors = collectErrors(page)
+    await openTree(page, `gen=nTree&depth=7&childs=3&labels=1&size=1200x600&geometry=${geometry}&interaction=${encodeURIComponent(JSON.stringify({ λbounds: [.02, .9] }))}`)
+    await waitForStable(page)
+    // like a Tree of Life branch page: centered on a deep node, the ancestors above.
+    // Centering moves the ancestors to the opposite side: a node opposite to the
+    // direction that goes to infinity puts them up there, far above the view
+    await page.evaluate(() => {
+        const g = hyt.infinityOf(harness.ht.args.layout.rootWedge)
+        const away = n => -(n.layout.z.re * g.re + n.layout.z.im * g.im) / Math.hypot(n.layout.z.re, n.layout.z.im)
+        const deep = harness.ht.data.descendants().filter(n => n.depth === 5 && n.layout)
+        return harness.ht.api.gotoNode(deep.reduce((a, b) => away(b) > away(a) ? b : a))
+    })
+    await waitForStable(page)
+    const check = () => page.evaluate(() => {
+        let links = 0, bad = 0
+        for (const el of document.querySelectorAll('[id="link-arcs"] > path')) {
+            const d = el.__data__
+            if (!d || !d.parent) continue
+            const nums = el.getAttribute('d').match(/-?[\d.]+(e-?\d+)?/g).map(Number)
+            const [x1, y1] = nums, [x2, y2] = nums.slice(-2)
+            links++
+            if (!(Math.hypot(x1 - d.cache.re, y1 - d.cache.im) + Math.hypot(x2 - d.parent.cache.re, y2 - d.parent.cache.im) < 1e-6)) bad++
+        }
+        const u = harness.ht.unitdisk.cache.unculledNodes
+        return { links, bad, unmapped: u.filter(n => !n.cacheDisk).length, labelsAbove: (harness.ht.unitdisk.cache.labels || []).filter(n => n.outOfView).length }
+    })
+    const c = await toScreen(page, { re: 0, im: .5 })
+    await page.mouse.move(c.x, c.y)
+    for (let i = 0; i < 10; i++) { await page.mouse.wheel(0, -200); await page.waitForTimeout(60) }
+    await waitForStable(page)
+    const zoomed = await check()
+    expect(zoomed.links).toBeGreaterThan(5)
+    expect(zoomed).toEqual({ links: zoomed.links, bad: 0, unmapped: 0, labelsAbove: 0 })
+    const d = await toScreen(page, { re: .4, im: .3 })
+    await page.mouse.move(c.x, c.y)
+    await page.mouse.down()
+    await page.mouse.move(d.x, d.y, { steps: 10 })
+    await page.mouse.up()
+    await waitForStable(page)
+    const dragged = await check()
+    expect(dragged).toEqual({ links: dragged.links, bad: 0, unmapped: 0, labelsAbove: 0 })
+    expectNoErrors(errors)
+})

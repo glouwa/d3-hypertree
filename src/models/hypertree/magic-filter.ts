@@ -146,7 +146,7 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
     // the half-plane (cayley.ts); the filter above worked in the disk
     if (ud.view.hypertree.args.geometry.halfPlane) {
         cache.unculledNodes = mapToView(cache.unculledNodes, infinityOf(ud.view.hypertree.args.layout.rootWedge))
-        const inView = (n:N)=> !!n.cacheDisk          // mapped = inside the view
+        const inView = (n:N)=> !!n.cacheDisk && !n.outOfView
         cache.emojis = cache.emojis.filter(inView)
         cache.spezialNodes = cache.spezialNodes.filter(inView)
     }
@@ -242,6 +242,7 @@ export function layoutNode(ht, n:N, λ:number) {
 function peocessNodeTransformation(ud:IUnitDisk, cache:TransformationCache, n:N) {
     n.cache = n.cache || { re:0, im:0 }
     n.cacheDisk = undefined
+    n.outOfView = undefined
     layoutNode(ud.view.hypertree, n, ud.args.transformation.state.λ)
     CassignC(n.cache, ud.args.transform(n)) 
     n.cachep = CktoCp(n.cache)   
