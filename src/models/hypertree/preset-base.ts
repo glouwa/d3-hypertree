@@ -147,7 +147,7 @@ const treeOfLife = ()=> ({
         rootWedge:  { orientation: 3*π/2, angle: 1.8*π/2 }
     },
     filter: {
-        weightFilter: { rangeNodes: { min:320, max:500 } }
+        weightFilter: { rangeNodes: { min:1000, max:1500 } }
     },
     geometry: {
         nodeRadius:  nodeInitR(.0075),
