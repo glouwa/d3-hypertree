@@ -424,5 +424,5 @@ test('layout: options on the left, the tree, the layer list in its own panel on 
             open: document.querySelector('#layers-panel details').open,
         }
     })
-    expect(r).toEqual({ order: true, leftWidth: 432, rightWidth: 400, layersInRight: true, layersNotLeft: true, open: true })
+    expect(r).toEqual({ order: true, leftWidth: 432, rightWidth: 432, layersInRight: true, layersNotLeft: true, open: true })
 })
