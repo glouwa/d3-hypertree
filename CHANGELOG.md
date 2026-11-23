@@ -14,7 +14,9 @@ are listed first.
   as rectangles of their real size (giving way outward), and kept between frames.
   They used to restart from their node on every update (175 simulation steps with
   fixed circles): labels jumped, long ones overlapped. The line to the node is
-  only drawn for labels pushed away (option `leaderLines`).
+  only drawn for labels pushed away (option `leaderLines`). Labels that appear
+  grow from size 0, labels that disappear shrink to 0, and the labels giving way
+  move smoothly (option `transition`, 250 ms; `0` switches it off).
 - **`geometry.shrinkAtRim`** for labels, force labels and emojis toward the rim:
   `'none'` (constant), `'damped'` (default: 1 in the center to 0.5 at the rim, as
   labels and emojis before), `'full'` (like the links, to 0). Force labels used
@@ -92,6 +94,8 @@ are listed first.
     `'node'`, `'none'`), on `path-arcs` (`'none'` leaves out the hover path or the
     selection paths) and on `cells` (`true` / `false`): how a layer shows the
     state, independent of the events;
+  - `transition` on `labels-force`: duration in ms of growing, shrinking and
+    giving way (default 250, `0`: none);
   - `maxLabels` on `labels` and `labels-force`: a label limit per layer (default
     `filter.maxlabels`);
   - `hoverLabel` / `hoverPathLabels` on `labels` and `labels-force`: always a
