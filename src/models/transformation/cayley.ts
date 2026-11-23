@@ -60,7 +60,7 @@ const maxHeight = 3
 /**
  * Maps the drawn nodes of a frame into the view (call after culling): keeps the disk
  * position in n.cacheDisk (interaction), sets n.cache and the derived strings to the
- * view position and multiplies the distance scale with the scale of the map.
+ * view position and multiplies the distance scale with the scale of the map (capped).
  * Returns the nodes that are inside the view (the root always stays first).
  */
 export function mapToView(nodes:N[], g:C = ONE) : N[] {
@@ -72,7 +72,11 @@ export function mapToView(nodes:N[], g:C = ONE) : N[] {
         n.cacheDisk = z
         n.cache = { re: w.re, im: 1 - w.im }
         n.cachep = CktoCp(n.cache)
-        n.distScale = n.distScale * viewScale(z, g)
+        // sizes (disks, link widths, labels): the scale of the map, relative to the
+        // center (|dw/dz| = 2 there), but never bigger than in the center: in the
+        // half-plane sizes grow with the height, which made links and labels above
+        // the center (the ancestors) huge
+        n.distScale = Math.min(n.distScale * viewScale(z, g) / 2, 1)
         n.dampedDistScale = n.distScale * (.5 / n.distScale + .5)
         n.strCache = `${n.cache.re} ${n.cache.im}`
         n.transformStrCache = ` translate(${n.strCache})`
