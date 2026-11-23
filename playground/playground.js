@@ -34,6 +34,7 @@
         linkCurvature: base.geometry.linkCurvature,
         shrinkAtRim: base.geometry.shrinkAtRim,
         halfPlane: false,     // rectangular view (upper half-plane, Cayley transform)
+        startX: 0, startY: 0, // geometry.startPosition (initial translation)
         captionFontPx: parseFloat(base.geometry.captionFont),
         captionHeight: base.geometry.captionHeight,
         leafRadius: null,     // null: library default (1.5 x the link width)
@@ -92,10 +93,10 @@
         'stem-arc':    [['curvature', 'curvature'], ['width', 'number', 0.001, 0.05, 0.0005]],
         'nodes':       [['show', 'choice', ['leaves', 'all']], ['hover', 'choice', ['path', 'node', 'none']], ['selection', 'choice', ['path', 'node', 'none']], ['fill', 'color'], ['stroke', 'color'], ['strokeWidth', 'number', 0, 0.02, 0.0005], ['r', 'number', 0.002, 0.06, 0.001]],
         'images':      [['width', 'number', 0.01, 0.3, 0.005], ['height', 'number', 0.01, 0.3, 0.005]],
-        'emojis':      [['scale', 'number', 0.2, 3, 0.05], ['color', 'color'], ['background', 'bool']],
-        'labels':      [['maxLabels', 'number', 0, 200, 1], ['hoverLabel', 'bool'], ['hoverPathLabels', 'bool'], ['scale', 'number', 0.2, 3, 0.05], ['color', 'color'], ['background', 'bool']],
-        'labels-placed':[['maxLabels', 'number', 0, 200, 1], ['hoverLabel', 'bool'], ['hoverPathLabels', 'bool'], ['leaderLines', 'choice', ['auto', 'always', 'never']], ['scale', 'number', 0.2, 3, 0.05], ['background', 'bool']],
-        'labels-force':[['maxLabels', 'number', 0, 200, 1], ['hoverLabel', 'bool'], ['hoverPathLabels', 'bool'], ['leaderLines', 'choice', ['auto', 'always', 'never']], ['scale', 'number', 0.2, 3, 0.05], ['background', 'bool']],
+        'emojis':      [['scale', 'number', 0.2, 3, 0.05], ['asImage', 'bool'], ['color', 'color'], ['background', 'bool']],
+        'labels':      [['maxLabels', 'number', 0, 200, 1], ['hoverLabel', 'bool'], ['hoverPathLabels', 'bool'], ['scale', 'number', 0.2, 3, 0.05], ['asImage', 'bool'], ['color', 'color'], ['background', 'bool']],
+        'labels-placed':[['maxLabels', 'number', 0, 200, 1], ['hoverLabel', 'bool'], ['hoverPathLabels', 'bool'], ['leaderLines', 'choice', ['auto', 'always', 'never']], ['transition', 'number', 0, 1000, 10], ['scale', 'number', 0.2, 3, 0.05], ['background', 'bool']],
+        'labels-force':[['maxLabels', 'number', 0, 200, 1], ['hoverLabel', 'bool'], ['hoverPathLabels', 'bool'], ['leaderLines', 'choice', ['auto', 'always', 'never']], ['transition', 'number', 0, 1000, 10], ['scale', 'number', 0.2, 3, 0.05], ['background', 'bool']],
     }
     // what a layer shows, when its name doesn't say it
     const LAYER_ALIASES = { 'cells': 'voronoi', 'λ': 'zoom', '(0,0)': 'origin' }
@@ -111,8 +112,9 @@
         'emojis': 'the icons (share of nodes set in Initialization › Node data); off by default, the slowest layer to render',
         'images': 'needs n.precalc.imageHref (not set by the playground data)',
         'traces': 'touch traces while touching',
-        'labels-force': 'labels moved by a relaxation: pulled to their rest place (above the node in the center, outward toward the rim), pushed apart where they overlap (few overlaps may stay); positions kept between frames',
-        'labels-placed': 'labels placed on candidate positions like on a map (above the node in the center, outward toward the rim): never overlapping, a label without a free place is left out',
+        'labels-force': 'labels moved by a relaxation: pulled to their rest place (above the node in the center, outward toward the rim), pushed apart where they overlap (few overlaps may stay); positions kept between frames. transition (ms, default 250, 0 = off): labels grow when they appear, shrink when they disappear, the others give way smoothly',
+        'labels-placed': 'labels placed on candidate positions like on a map (above the node in the center, outward toward the rim): never overlapping, a label without a free place is left out. transition (ms, default 250, 0 = off): labels grow and shrink, a label that changes its place glides there',
+        'labels': 'labels at their node. asImage: every text as a cached bitmap (faster with many labels, a little blurry when zoomed by the browser)',
         'interaction-2': 'active interaction layer: mouse, touch, wheel',
     }
 
@@ -193,6 +195,7 @@
         if (c.linkCurvature !== DEFAULTS.linkCurvature) g.linkCurvature = c.linkCurvature
         if (c.shrinkAtRim !== DEFAULTS.shrinkAtRim) g.shrinkAtRim = c.shrinkAtRim
         if (c.halfPlane) g.halfPlane = true
+        if (c.startX || c.startY) g.startPosition = { re: c.startX, im: c.startY }
         if (c.captionFontPx !== DEFAULTS.captionFontPx) g.captionFont = `${c.captionFontPx}px Roboto`
         if (c.captionHeight !== DEFAULTS.captionHeight) g.captionHeight = c.captionHeight
         // harness format: nodeRadius { leaves, inner } (test/config.js makes the function)
@@ -248,6 +251,7 @@
             if (g.linkCurvature) c.linkCurvature = g.linkCurvature
             if (g.shrinkAtRim) c.shrinkAtRim = g.shrinkAtRim
             c.halfPlane = !!g.halfPlane
+            if (g.startPosition) { c.startX = g.startPosition.re || 0; c.startY = g.startPosition.im || 0 }
             if (g.captionFont) c.captionFontPx = parseFloat(g.captionFont)
             if (g.captionHeight !== undefined) c.captionHeight = g.captionHeight
             if (typeof g.nodeRadius === 'number') { c.leafRadius = g.nodeRadius; c.innerLikeLeaves = true }   // older links
@@ -545,9 +549,12 @@
         hint(g, 'maxlabels: at most this many labels in the label layers (highest subtree weight × display scale², big subtrees near the center first; the root always). A label layer can set its own limit (Layers › labels › maxLabels).')
         hint(g, 'The filter adapts its weight threshold a little on every update, so the visible set settles over a few frames after loading or interacting.')
 
-        g = section('Geometry', ['halfPlane', 'linkCurvature', 'shrinkAtRim', 'captionFontPx', 'captionHeight', 'leafRadius', 'innerRadius', 'innerLikeLeaves', 'linkWidth', 'theme'])
+        g = section('Geometry', ['halfPlane', 'startX', 'startY', 'linkCurvature', 'shrinkAtRim', 'captionFontPx', 'captionHeight', 'leafRadius', 'innerRadius', 'innerLikeLeaves', 'linkWidth', 'theme'])
         hint(g, 'Options that apply to several layers (model.geometry). Options of a single layer are in the layer list below (▸).')
         check(g, 'Rectangular view (half-plane)', 'halfPlane', null, 'geometry.halfPlane (prototype): the upper half-plane model via the Cayley transform, fits a rectangle. The disk border becomes the bottom edge, the gap of the root wedge goes to infinity above; links are arcs centered on the bottom edge. Layout, filter and interaction stay the same.')
+        range(g, 'start position x', 'startX', -0.9, 0.9, 0.01)
+        range(g, 'start position y', 'startY', -0.9, 0.9, 0.01)
+        hint(g, 'geometry.startPosition: the translation at the start (where the root sits in the disk), e.g. { re: 0, im: 0.5 }. Default 0: the root in the center.')
         select(g, 'linkCurvature', 'linkCurvature', [['-', '− (default, hyperbolic geodesic)'], ['+', '+ (arc to the other side)'], ['0', '0 (straight)']])
         hint(g, 'Default curvature of link-arcs and path-arcs; a layer can override it. The library also accepts l (straight, as SVG lines): looks like 0 and needs a little more JavaScript per frame.')
         select(g, 'shrinkAtRim', 'shrinkAtRim', [['damped', 'damped (default): 1 to 0.5 at the rim'], ['none', 'none: constant size'], ['full', 'full: like the links, to 0 at the rim']])

@@ -6,6 +6,7 @@ import { ILayerArgs }      from '../layerstack/layer'
 import { D3UpdatePattern } from '../layerstack/d3updatePattern'
 import { setLabelText }    from '../layers/label-layer'
 import { Box, outward, labelSize, restCenter, besideNode, overlapping, distanceToBox } from './label-geometry'
+import { LabelTransitions, DEFAULT_TRANSITION } from './label-transition'
 
 export interface LabelPlacementLayerArgs extends ILayerArgs
 {
@@ -25,6 +26,9 @@ export interface LabelPlacementLayerArgs extends ILayerArgs
     // a line from a label to its node: 'auto' (default) for labels placed away from
     // their node, 'always', 'never'
     leaderLines?: 'auto' | 'always' | 'never',
+    // ms: a label that appears grows from size 0, one that disappears shrinks to 0, a
+    // label that changes its place glides there (default 250; 0: no animation)
+    transition?:  number,
 }
 
 var paddingLeftRight = .08
@@ -39,6 +43,11 @@ const MARGIN = .004
 // first candidate that overlaps no label placed before. A label without a free
 // candidate is not drawn: the drawn labels never overlap. The candidate of the last
 // frame comes first while it is free, so labels don't jump between candidates.
+//
+// Option transition (label-transition.ts): a placed label grows from size 0, a label
+// that is no longer placed shrinks to 0, a label that changes its candidate glides
+// there. The placement uses the full size (full-grown labels never overlap); a
+// shrinking label no longer takes a place, so it may cross a growing one.
 export class LabelPlacementLayer implements ILayer
 {
     view:            ILayerView
@@ -47,7 +56,13 @@ export class LabelPlacementLayer implements ILayer
     d3updatePattern2: D3UpdatePattern
     name:            string
     placed:          N[] = []
+    private drawn:   N[] = []                // the placed labels and the shrinking ones
+    private boxes = new Map<N, Box>()        // drawn box of each drawn label (center, full size)
     private last = new Map<N, string>()      // candidate id of the last frame
+    private transitions = new LabelTransitions(
+        ()=> { const t = this.args.transition; return t === undefined || t === null ? DEFAULT_TRANSITION : t },
+        ()=> this.update.data(),
+        ()=> !!this.d3updatePattern && !this.args.invisible)
 
     update = {
         parent:         ()=> this.attach(),
@@ -65,6 +80,11 @@ export class LabelPlacementLayer implements ILayer
     private get halfPlane() { return !!this.view.hypertree.args.geometry.halfPlane }
     private size(n:N) { return this.args.sizeOf ? this.args.sizeOf(n) : 1 }
     private gap(n:N) { return .012 * this.size(n) }
+    // the drawn box: centered on the drawn position, scaled by the growth
+    private drawnBox(n:N) : Box | undefined {
+        const b = this.boxes.get(n), g = this.transitions.growth(n)
+        return b && { x: b.x, y: b.y, w: b.w * g, h: b.h * g }
+    }
 
     private priority(n:N) : number {
         if (n.hovered) return 3e15
@@ -121,7 +141,25 @@ export class LabelPlacementLayer implements ILayer
         }
         this.last = last
         this.placed = placed
-        return before.length !== placed.length || before.some((n, i)=> n !== placed[i])
+
+        // drawn: the placed labels (growing, gliding to their place) and the shrinking ones
+        const visible = new Set<N>(this.view.unitdisk.cache.unculledNodes || [])
+        const drawn = this.transitions.advance(placed, n=> visible.has(n) && !n.outOfView)
+        const isPlaced = new Set(placed)
+        const drawnBoxes = new Map<N, Box>()
+        for (const n of drawn) {
+            const b = isPlaced.has(n) ? n.placedLabel : this.boxes.get(n)
+            if (!b) continue
+            const o = isPlaced.has(n)
+                ? this.transitions.follow(n, b.x - n.cache.re, b.y - n.cache.im)
+                : this.transitions.follow(n)
+            drawnBoxes.set(n, { x: n.cache.re + o.dx, y: n.cache.im + o.dy, w: b.w, h: b.h })
+        }
+        const prev = this.drawn
+        this.drawn = drawn.filter(n=> drawnBoxes.has(n))
+        this.boxes = drawnBoxes
+        this.transitions.finish()
+        return prev.length !== this.drawn.length || prev.some((n, i)=> n !== this.drawn[i])
     }
 
     private redraw(dataChanged:boolean) {
@@ -139,14 +177,15 @@ export class LabelPlacementLayer implements ILayer
 
     private showsLine(d:N) : boolean {
         const mode = this.args.leaderLines || 'auto'
-        if (mode === 'never' || !d.placedLabel) return false
+        const b = this.drawnBox(d)
+        if (mode === 'never' || !b) return false
         if (mode === 'always') return true
-        return distanceToBox({ re: d.cache.re, im: d.cache.im }, d.placedLabel) > this.gap(d) * 1.8
+        return distanceToBox({ re: d.cache.re, im: d.cache.im }, b) > this.gap(d) * 1.8
     }
 
     private attach() {
         const transform = (d:N)=> {
-            const b = d.placedLabel, k = this.size(d)
+            const b = this.boxes.get(d), k = this.size(d) * this.transitions.growth(d)
             const w = (d.precalc[this.args.name + 'len'] || 0) * k
             return b ? ` translate(${b.x - w / 2} ${b.y}) scale(${k})` : ` translate(${d.cache.re} ${d.cache.im})`
         }
@@ -154,7 +193,7 @@ export class LabelPlacementLayer implements ILayer
             parent:            this.view.parent,
             layer:             this,
             clip:              this.args.clip,
-            data:              ()=> this.placed,
+            data:              ()=> this.drawn,
             name:              this.name,
             className:         this.args.className,
             elementType:       'text',
@@ -166,7 +205,7 @@ export class LabelPlacementLayer implements ILayer
                                     .call(s=> setLabelText(s, this.args.text))
         })
         const lineEnd = (d:N)=> {
-            const b = d.placedLabel
+            const b = this.drawnBox(d)
             return { x: Math.max(b.x - b.w / 2, Math.min(b.x + b.w / 2, d.cache.re)),
                      y: Math.max(b.y - b.h / 2, Math.min(b.y + b.h / 2, d.cache.im)) }
         }
@@ -174,13 +213,14 @@ export class LabelPlacementLayer implements ILayer
             parent:            this.view.parent,
             layer:             this,
             clip:              this.args.clip,
-            data:              ()=> this.placed,
+            data:              ()=> this.drawn,
             name:              this.name + '-link',
             className:         'label-link',
             elementType:       'line',
             create:            s=> {},
             updateColor:       s=> {},
             updateTransform:   s=> s.style('display', d=> this.showsLine(d) ? null : 'none')
+                                    .style('opacity', d=> { const g = this.transitions.growth(d); return g < 1 ? g : null })
                                     .attr('x1', d=> lineEnd(d).x).attr('y1', d=> lineEnd(d).y)
                                     .attr('x2', d=> d.cache.re).attr('y2', d=> d.cache.im)
         })

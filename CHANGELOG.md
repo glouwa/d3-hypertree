@@ -63,7 +63,9 @@ are listed first.
 
 - **Layer `labels-placed`** (off by default): labels on candidate positions like
   on a map, above their node in the center and outward toward the rim; drawn
-  labels never overlap, a label without a free place is left out.
+  labels never overlap, a label without a free place is left out. Labels grow and
+  shrink when they come and go, a label that changes its place glides there
+  (option `transition`).
 - **Layer option `leaderLines`** on `labels-force` and `labels-placed`: a line to
   the node for labels pushed away from it (`'auto'`, default), `'always'`, `'never'`.
 - **Rectangular view** (`geometry.halfPlane`, prototype): the upper half-plane
@@ -94,8 +96,9 @@ are listed first.
     `'node'`, `'none'`), on `path-arcs` (`'none'` leaves out the hover path or the
     selection paths) and on `cells` (`true` / `false`): how a layer shows the
     state, independent of the events;
-  - `transition` on `labels-force`: duration in ms of growing, shrinking and
-    giving way (default 250, `0`: none);
+  - `transition` on `labels-force` and `labels-placed`: duration in ms of growing
+    and shrinking labels; the others give way (`labels-force`) or glide to their
+    new place (`labels-placed`) smoothly (default 250, `0`: none);
   - `maxLabels` on `labels` and `labels-force`: a label limit per layer (default
     `filter.maxlabels`);
   - `hoverLabel` / `hoverPathLabels` on `labels` and `labels-force`: always a

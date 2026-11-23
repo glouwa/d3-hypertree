@@ -409,6 +409,43 @@ test('geometry: the rectangular view (half-plane) in a wide tree element', async
     expectNoErrors(errors)
 })
 
+test('labels-force and labels-placed: option transition (0 = off)', async ({ page }) => {
+    await page.goto('../playground/?gen=nTree&depth=5&childs=3&labels=1')
+    await ready(page)
+    await openGroup(page, 'Labels')
+    for (const layer of ['labels-force', 'labels-placed']) {
+        await page.click(`tr[data-layer="${layer}"] button.expander`)
+        const row = page.locator(`tr[data-layer-options="${layer}"] .row`).filter({ has: page.locator('label', { hasText: /^transition$/ }) })
+        await row.locator('input[type=checkbox]').check()
+        await page.waitForFunction(l => window.ht.unitdisk.layerStack.layers[l].args.transition === 250, layer)
+        await row.locator('input[type=range]').fill('0')
+        await page.waitForFunction(l => window.ht.unitdisk.layerStack.layers[l].args.transition === 0, layer)
+        expect(decodeURIComponent(await page.evaluate(() => location.search))).toMatch(new RegExp(`"${layer}":\\{[^}]*"transition":0`))
+    }
+})
+
+test('labels and emojis: option asImage', async ({ page }) => {
+    await page.goto('../playground/?gen=nTree&depth=5&childs=3&labels=1')
+    await ready(page)
+    await openGroup(page, 'Labels')
+    await page.click('tr[data-layer="labels"] button.expander')
+    await page.locator('tr[data-layer-options="labels"] .row').filter({ has: page.locator('label', { hasText: /^asImage$/ }) }).locator('select').selectOption('on')
+    await page.waitForFunction(() => window.ht.unitdisk.layerStack.layers.labels.args.asImage === true)
+    await page.waitForFunction(() => document.querySelectorAll('#tree [id="labels"] image').length > 3)
+})
+
+test('geometry: start position', async ({ page }) => {
+    await page.goto('../playground/?gen=nTree&depth=5&childs=3')
+    await ready(page)
+    await page.locator('summary').filter({ hasText: /^Geometry/ }).click()
+    const range = page.locator('.row', { has: page.locator('label', { hasText: /^start position y$/ }) }).locator('input[type=range]')
+    await range.fill('0.5')
+    await page.waitForFunction(() => decodeURIComponent(location.search).includes('"startPosition":{"re":0,"im":0.5}'))
+    await page.waitForFunction(() => window.ht && window.ht.args.geometry.startPosition && window.ht.args.geometry.startPosition.im === 0.5)
+    // the root sits below the center
+    await page.waitForFunction(() => { const r = window.ht.data; return r.cache && r.cache.im > .3 })
+})
+
 test('layout: options on the left, the tree, the layer list in its own panel on the right', async ({ page }) => {
     await page.setViewportSize({ width: 1600, height: 900 })
     await page.goto('../playground/?gen=nTree&depth=4')

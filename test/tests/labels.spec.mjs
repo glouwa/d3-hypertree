@@ -133,97 +133,117 @@ test('precalc.labelOnHover: only shown for the hovered node and its path', async
     }).toBe(true)
 })
 
-// labels-force, option transition: a label that appears grows from 0, one that
-// disappears shrinks to 0 and is then removed; its neighbours move smoothly
-test('labels-force: labels grow when they appear and shrink when they disappear', async ({ page }) => {
-    const errors = collectErrors(page)
-    await open(page, 'labels-force', { hoverLabel: true, maxLabels: 10 })
-    await waitForStable(page)
-    // a node without a label so far, not too near the rim
-    const t = await page.evaluate(() => {
-        const shown = new Set([...document.querySelectorAll('[id="labels-force"] text')].map(e => e.__data__))
-        const n = harness.ht.unitdisk.cache.unculledNodes.filter(n => n.precalc.label && !shown.has(n) && n.cachep.r > .2 && n.cachep.r < .8)
-            .sort((a, b) => a.cachep.r - b.cachep.r)[0]
-        const m = document.querySelector('.unitDisc').getScreenCTM()
-        return { id: n.mergeId, x: m.a * n.cache.re + m.c * n.cache.im + m.e, y: m.b * n.cache.re + m.d * n.cache.im + m.f }
-    })
-    // per animation frame: the scale of the label of node id (null: not drawn) and the
-    // largest move of another label relative to its node
-    const record = (id, ms) => page.evaluate(([id, ms]) => new Promise(done => {
-        const frames = [], prev = new Map(), t0 = performance.now()
-        const scaleOf = e => { const m = /scale\(([^)]+)\)/.exec(e.getAttribute('transform')); return m ? +m[1] : 1 }
-        const tick = () => {
-            let scale = null, move = 0
-            for (const e of document.querySelectorAll('[id="labels-force"] text')) {
-                const n = e.__data__
-                if (n.mergeId === id) { scale = scaleOf(e); continue }
-                const o = { x: n.forcepoints.x - n.cache.re, y: n.forcepoints.y - n.cache.im }, p = prev.get(n)
-                if (p) move = Math.max(move, Math.hypot(o.x - p.x, o.y - p.y))
-                prev.set(n, o)
-            }
-            frames.push({ scale, move })
-            if (performance.now() - t0 < ms) requestAnimationFrame(tick); else done(frames)
-        }
-        requestAnimationFrame(tick)
-    }), [id, ms])
+// option transition (labels-force, labels-placed): a label that appears grows from 0,
+// one that disappears shrinks to 0 and is then removed; the other labels move smoothly
+// (labels-force: giving way, labels-placed: gliding to another place)
 
-    await page.mouse.move(t.x + 6, t.y + 6)
-    const [appear] = await Promise.all([record(t.id, 600), page.mouse.move(t.x, t.y, { steps: 2 })])
-    const full = await page.evaluate(id => harness.ht.unitdisk.cache.unculledNodes.find(n => n.mergeId === id).hovered, t.id)
-    expect(full).toBe(true)
-    const scales = appear.map(f => f.scale).filter(s => s !== null)
-    expect(scales.length).toBeGreaterThan(5)
-    expect(scales[0]).toBeLessThan(scales[scales.length - 1] * .5)          // starts small
-    for (let i = 1; i < scales.length; i++) expect(scales[i]).toBeGreaterThanOrEqual(scales[i - 1] - 1e-9)   // grows
-    expect(Math.max(...appear.map(f => f.move))).toBeLessThan(.02)         // neighbours: no jumps
+// offset of the drawn label center from its node, from the transform
+// translate(x y) scale(k): the text starts at x, its center is at x + len·k/2
+const centerOffsets = layer => `(() => {
+    const out = new Map()
+    for (const e of document.querySelectorAll('[id="${layer}"] text')) {
+        const n = e.__data__, tr = e.getAttribute('transform')
+        const t = /translate\\(([^ ]+) ([^)]+)\\)/.exec(tr), s = /scale\\(([^)]+)\\)/.exec(tr)
+        if (!t) continue
+        const k = s ? +s[1] : 1, len = n.precalc['${layer}len'] || 0
+        out.set(n, { x: +t[1] + len * k / 2 - n.cache.re, y: +t[2] - n.cache.im, k })
+    }
+    return out
+})()`
 
-    const [vanish] = await Promise.all([record(t.id, 600), page.mouse.move(5, 5)])
-    const shrinking = vanish.map(f => f.scale).filter(s => s !== null)
-    expect(shrinking.length).toBeGreaterThan(3)                             // still drawn a while
-    for (let i = 1; i < shrinking.length; i++) expect(shrinking[i]).toBeLessThanOrEqual(shrinking[i - 1] + 1e-9)
-    expect(vanish[vanish.length - 1].scale).toBeNull()                      // then removed
-    expect(Math.max(...vanish.map(f => f.move))).toBeLessThan(.02)
-    expectNoErrors(errors)
-})
-
-// hovering one node after the other: the labels that give way to the hover label move
-// in small steps per frame (without animation up to ~.03 at once)
-test('labels-force: neighbours of an appearing label move smoothly', async ({ page }) => {
-    {
-        await open(page, 'labels-force', { hoverLabel: true, maxLabels: 30 })
+for (const layer of ['labels-force', 'labels-placed']) {
+    test(`${layer}: labels grow when they appear and shrink when they disappear`, async ({ page }) => {
+        const errors = collectErrors(page)
+        await open(page, layer, { hoverLabel: true, maxLabels: 10 })
         await waitForStable(page)
-        const targets = await page.evaluate(() => {
-            const shown = new Set([...document.querySelectorAll('[id="labels-force"] text')].map(e => e.__data__))
+        // a node without a label so far, not too near the rim
+        const t = await page.evaluate(layer => {
+            const shown = new Set([...document.querySelectorAll(`[id="${layer}"] text`)].map(e => e.__data__))
+            const n = harness.ht.unitdisk.cache.unculledNodes.filter(n => n.precalc.label && !shown.has(n) && n.cachep.r > .2 && n.cachep.r < .8)
+                .sort((a, b) => a.cachep.r - b.cachep.r)[0]
+            const m = document.querySelector('.unitDisc').getScreenCTM()
+            return { id: n.mergeId, x: m.a * n.cache.re + m.c * n.cache.im + m.e, y: m.b * n.cache.re + m.d * n.cache.im + m.f }
+        }, layer)
+        // per animation frame: the scale of the label of node id (null: not drawn) and the
+        // largest move of another label relative to its node
+        const record = (id, ms) => page.evaluate(([id, ms, offsets]) => new Promise(done => {
+            const frames = [], t0 = performance.now()
+            let prev = new Map(), last = t0
+            const tick = () => {
+                let scale = null, move = 0
+                const now = eval(offsets), time = performance.now(), per16 = 16 / Math.max(8, time - last)
+                last = time
+                for (const [n, o] of now) {
+                    if (n.mergeId === id) { scale = o.k; continue }
+                    const p = prev.get(n)
+                    if (p) move = Math.max(move, Math.hypot(o.x - p.x, o.y - p.y) * per16)   // per 16 ms frame
+                }
+                prev = now
+                frames.push({ scale, move })
+                if (performance.now() - t0 < ms) requestAnimationFrame(tick); else done(frames)
+            }
+            requestAnimationFrame(tick)
+        }), [id, ms, centerOffsets(layer)])
+
+        await page.mouse.move(t.x + 6, t.y + 6)
+        const [appear] = await Promise.all([record(t.id, 600), page.mouse.move(t.x, t.y, { steps: 2 })])
+        const hovered = await page.evaluate(id => harness.ht.unitdisk.cache.unculledNodes.find(n => n.mergeId === id).hovered, t.id)
+        expect(hovered).toBe(true)
+        const scales = appear.map(f => f.scale).filter(s => s !== null)
+        expect(scales.length).toBeGreaterThan(5)
+        expect(scales[0]).toBeLessThan(scales[scales.length - 1] * .5)          // starts small
+        for (let i = 1; i < scales.length; i++) expect(scales[i]).toBeGreaterThanOrEqual(scales[i - 1] - 1e-9)   // grows
+        expect(Math.max(...appear.map(f => f.move))).toBeLessThan(.05)         // the others: no jumps
+
+        const [vanish] = await Promise.all([record(t.id, 600), page.mouse.move(5, 5)])
+        const shrinking = vanish.map(f => f.scale).filter(s => s !== null)
+        expect(shrinking.length).toBeGreaterThan(3)                             // still drawn a while
+        for (let i = 1; i < shrinking.length; i++) expect(shrinking[i]).toBeLessThanOrEqual(shrinking[i - 1] + 1e-9)
+        expect(vanish[vanish.length - 1].scale).toBeNull()                      // then removed
+        expect(Math.max(...vanish.map(f => f.move))).toBeLessThan(.05)
+        expectNoErrors(errors)
+    })
+
+    // hovering one node after the other: the labels that give way or change their place
+    // move in small steps (per 16 ms frame; without animation: labels-force ~.07, labels-placed ~.6)
+    test(`${layer}: the other labels move smoothly while hover labels come and go`, async ({ page }) => {
+        await open(page, layer, { hoverLabel: true, maxLabels: 30 })
+        await waitForStable(page)
+        const targets = await page.evaluate(layer => {
+            const shown = new Set([...document.querySelectorAll(`[id="${layer}"] text`)].map(e => e.__data__))
             const m = document.querySelector('.unitDisc').getScreenCTM()
             return harness.ht.unitdisk.cache.unculledNodes.filter(n => n.precalc.label && !shown.has(n) && n.cachep.r > .2 && n.cachep.r < .8).slice(0, 12)
                 .map(n => ({ x: m.a * n.cache.re + m.c * n.cache.im + m.e, y: m.b * n.cache.re + m.d * n.cache.im + m.f }))
-        })
-        await page.evaluate(() => {
-            window.__max = 0; const prev = new Map()
+        }, layer)
+        await page.evaluate(offsets => {
+            window.__max = 0
+            let prev = new Map(), last = performance.now()
             const tick = () => {
-                for (const e of document.querySelectorAll('[id="labels-force"] text')) {
-                    const n = e.__data__; if (n.hovered) continue
-                    const o = { x: n.forcepoints.x - n.cache.re, y: n.forcepoints.y - n.cache.im }, p = prev.get(n)
-                    if (p) window.__max = Math.max(window.__max, Math.hypot(o.x - p.x, o.y - p.y))
-                    prev.set(n, o)
+                const now = eval(offsets), time = performance.now(), per16 = 16 / Math.max(8, time - last)
+                last = time
+                for (const [n, o] of now) {
+                    const p = prev.get(n)
+                    // per 16 ms frame
+                    if (p && !n.hovered) window.__max = Math.max(window.__max, Math.hypot(o.x - p.x, o.y - p.y) * per16)
                 }
+                prev = now
                 requestAnimationFrame(tick)
             }
             requestAnimationFrame(tick)
-        })
+        }, centerOffsets(layer))
         for (const t of targets) { await page.mouse.move(t.x, t.y, { steps: 2 }); await page.waitForTimeout(400) }
         expect(targets.length).toBeGreaterThan(5)
-        expect(await page.evaluate(() => window.__max)).toBeLessThan(.02)
-    }
-})
+        expect(await page.evaluate(() => window.__max)).toBeLessThan(.05)
+    })
 
-test('labels-force: transition 0 shows and removes labels at once', async ({ page }) => {
-    await open(page, 'labels-force', { hoverLabel: true, maxLabels: 25, transition: 0 })
-    await waitForStable(page)
-    const scales = await page.evaluate(() => [...document.querySelectorAll('[id="labels-force"] text')].map(e => +/scale\(([^)]+)\)/.exec(e.getAttribute('transform'))[1]))
-    expect(scales.length).toBeGreaterThan(10)
-    expect(scales.every(s => s > .3)).toBe(true)
-})
+    test(`${layer}: transition 0 shows and removes labels at once`, async ({ page }) => {
+        await open(page, layer, { hoverLabel: true, maxLabels: 25, transition: 0 })
+        await waitForStable(page)
+        const scales = await page.evaluate(layer => [...document.querySelectorAll(`[id="${layer}"] text`)].map(e => +/scale\(([^)]+)\)/.exec(e.getAttribute('transform'))[1]), layer)
+        expect(scales.length).toBeGreaterThan(10)
+        expect(scales.every(s => s > .3)).toBe(true)
+    })
+}
 
 test('labels-placed in the rectangular view: no overlaps', async ({ page }) => {
     const geometry = encodeURIComponent(JSON.stringify({ halfPlane: true }))
