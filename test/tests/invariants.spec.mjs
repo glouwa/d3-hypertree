@@ -49,9 +49,10 @@ const check = (page, afterLoading) => page.evaluate(afterLoading => {
     if (cache.cells.length && (cache.cells.length > positions || cache.cells.length < positions * .9))
         problems.push(`${cache.cells.length} cells for ${positions} positions of clickable nodes`)
 
-    // the center node is the visible node nearest to the center
+    // the center node is the visible node nearest to the center, within the hysteresis
+    // of 0.02 (the last center stays while no node is clearly nearer; magic-filter.ts)
     const nearest = unculled.reduce((a, b) => Math.hypot(b.cache.re, b.cache.im) < Math.hypot(a.cache.re, a.cache.im) ? b : a)
-    if (cache.centerNode && Math.hypot(cache.centerNode.cache.re, cache.centerNode.cache.im) > Math.hypot(nearest.cache.re, nearest.cache.im) + 1e-9)
+    if (cache.centerNode && Math.hypot(cache.centerNode.cache.re, cache.centerNode.cache.im) > Math.hypot(nearest.cache.re, nearest.cache.im) + .02 + 1e-9)
         problems.push('the center node is not the nearest visible node')
 
     // labels: at most maxlabels, the root has one

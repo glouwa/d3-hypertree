@@ -178,6 +178,7 @@ export class InteractionLayer2 implements ILayer
         e.stopPropagation()
         e.preventDefault()
         
+        this.view.hypertree.stopAnimation()
         const mΔ = e.deltaY
         const oldλp = this.view.unitdisk.args.transformation.state.λ
         const Δsens = this.view.hypertree.args.interaction.wheelFactor
@@ -261,6 +262,7 @@ export class InteractionLayer2 implements ILayer
         })
 
         if (this.view.hypertree.args.objects.traces.length === 1) {            
+            this.view.hypertree.stopAnimation()   // the pointer takes over (see stopAnimation)
             this.dST = clone(this.view.unitdisk.args.transformation.state)
             this.view.unitdisk.isDraging = true
             this.panStart = m

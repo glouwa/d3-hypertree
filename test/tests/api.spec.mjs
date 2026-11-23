@@ -202,3 +202,39 @@ test('ripple: shows a ripple at the node and removes it when done', async ({ pag
     expect(await page.evaluate(() => document.querySelectorAll('.ripple-circle').length)).toBe(0)
     expectNoErrors(errors)
 })
+
+// Regression: an animation (goto after a click on the Tree of Life branch pages) kept
+// running when the user dragged right away; both set the translation and the tree
+// jumped between both states on every frame (flickering branches). A drag stops the
+// animation where it is; the goto promise still resolves.
+test('a drag stops a running goto animation (no fight over the translation)', async ({ page }) => {
+    const errors = collectErrors(page)
+    await openTree(page, 'gen=nTree&depth=6&childs=3&filter=off')
+    await waitForStable(page)
+    // record P on every frame, start a goto, drag at once
+    await page.evaluate(() => {
+        window.__P = []
+        const tick = () => { const P = harness.ht.unitdisk.args.transformation.state.P; __P.push([P.re, P.im]); requestAnimationFrame(tick) }
+        requestAnimationFrame(tick)
+        const far = harness.ht.data.leaves()[40]
+        window.__goto = harness.ht.api.gotoNode(far).then(() => 'resolved')
+    })
+    const box = await diskBox(page)
+    const cx = box.x + box.width / 2, cy = box.y + box.height / 2
+    await page.mouse.move(cx, cy)
+    await page.mouse.down()
+    await page.mouse.move(cx - box.width * .2, cy + box.height * .1, { steps: 25 })
+    await page.mouse.up()
+    const r = await page.evaluate(async () => ({ goto: await __goto, P: __P, running: !!harness.ht.transition }))
+    // no back and forth: a big jump followed by a jump back
+    let jumps = 0
+    for (let i = 2; i < r.P.length; i++) {
+        const d1 = Math.hypot(r.P[i][0] - r.P[i-1][0], r.P[i][1] - r.P[i-1][1])
+        const d2 = Math.hypot(r.P[i][0] - r.P[i-2][0], r.P[i][1] - r.P[i-2][1])
+        if (d1 > .05 && d2 < d1 / 3) jumps++
+    }
+    expect(jumps).toBe(0)
+    expect(r.goto).toBe('resolved')
+    expect(r.running).toBe(false)
+    expectNoErrors(errors)
+})

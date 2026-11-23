@@ -24,11 +24,12 @@ const MAGIC_MAX = 1e12
 // the visible set flipped on every update (the Metatheria branch of the Tree of Life
 // flickered). So a step that overshoots is remembered as a limit (steps must not reach
 // that magic again); the filter then stays at the state below the range: fewer nodes
-// rather than too many. The limits hold while the view stays comparable: the same
-// center node, and the number of visible nodes in the state where the filter stopped
-// changes by less than 10 % (zooming, e.g. the animation after loading, changes λ on
-// every frame but not that number; a real change of the view does).
-type MagicLimits = { center:number, up:number, down:number, last:number, stoppedAt:number }
+// rather than too many. The limits hold while the view stays comparable: while the
+// number of visible nodes in the state where the filter stopped changes by less than
+// 10 %. Not tied to the center node or λ: dragging changes the center node often and
+// zooming (also the animation after loading) changes λ on every frame, which reset the
+// limits and brought the flicker back (dragging the Wombat on the Metatheria branch).
+type MagicLimits = { up:number, down:number, last:number, stoppedAt:number }
 const magicLimits = new WeakMap<object, MagicLimits>()
 
 function adjustMagic(ud:IUnitDisk, cache:TransformationCache) {
@@ -39,11 +40,9 @@ function adjustMagic(ud:IUnitDisk, cache:TransformationCache) {
     const n = cache.unculledNodes.length
     const range = filter.rangeNodes
     const alpha = filter.alpha
-    const center = cache.centerNode ? cache.centerNode.mergeId : -1
-    const fresh = ()=> ({ center, up: MAGIC_MAX, down: MAGIC_MIN, last: 0, stoppedAt: 0 })
+    const fresh = ()=> ({ up: MAGIC_MAX, down: MAGIC_MIN, last: 0, stoppedAt: 0 })
     let b = magicLimits.get(filter)
-    if (b && b.center === -1) b.center = center   // found before the first frame (settleMagic): keep
-    if (!b || b.center !== center || (b.stoppedAt && Math.abs(n - b.stoppedAt) > .1 * b.stoppedAt))
+    if (!b || (b.stoppedAt && Math.abs(n - b.stoppedAt) > .1 * b.stoppedAt))
         magicLimits.set(filter, b = fresh())
     const eps = 1e-9   // magic / alpha * alpha is not exactly magic
 
@@ -88,6 +87,7 @@ function collectNodesByWeight(ud:IUnitDisk, cache:TransformationCache, path:N[])
     }    
 
     // dont do it before pathToLastVisible. it uses centerNode
+    const lastCenter = cache.centerNode
     cache.centerNode = undefined// ud.args.data
     
     const t1 = performance.now()    
@@ -107,6 +107,18 @@ function collectNodesByWeight(ud:IUnitDisk, cache:TransformationCache, path:N[])
         preAction:   n=> cache.unculledNodes.push(n),
         highway:     path
     })
+
+    // Hysteresis for the center node: it decides the path the next frame starts from
+    // (and so the weight each branch is compared with). When two nodes are about
+    // equally near the center, e.g. while dragging, the center switched between them
+    // on every frame and branches showed and hid with it (flicker). The last center
+    // stays while it is visible and no node is clearly nearer.
+    const centerMargin = .02
+    if (lastCenter && cache.centerNode && lastCenter !== cache.centerNode
+     && !lastCenter.isOut && lastCenter.cachep
+     && lastCenter.cachep.r < cache.centerNode.cachep.r + centerMargin
+     && cache.unculledNodes.includes(lastCenter))
+        cache.centerNode = lastCenter
     return t1
 }
 

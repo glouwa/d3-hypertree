@@ -717,6 +717,19 @@ export class Hypertree
         })
     }
 
+    /**
+     * Stops a running animation (goto, gotoλ, ...) where it is. Called when a drag,
+     * pinch or wheel starts: an animation that kept running fought with the drag, both
+     * set the translation, and the tree jumped between both states on every frame
+     * (flickering branches; e.g. dragging right after a click that started a goto).
+     */
+    public stopAnimation() : void {
+        if (this.transition) {
+            this.transition.cancel()
+            this.transition = undefined
+        }
+    }
+
     public isAnimationRunning() : boolean {
         const view = this.unitdisk && this.unitdisk.isDraging
         const nav = this.unitdisk && this.unitdisk.isDraging
@@ -761,8 +774,13 @@ export class Transition
     protected end()
     {
         this.currentframe = undefined
-        this.hypertree.transition = undefined        
+        if (this.hypertree.transition === this)   // not a newer one started after a cancel
+            this.hypertree.transition = undefined
     }
+
+    // stops the animation at its current state (its next frame ends it, resolved)
+    public cancelled = false
+    public cancel() { this.cancelled = true }
 }
 
 export class Frame
@@ -801,7 +819,11 @@ class Animation extends Transition
         
         const frame = ()=> 
         {
-            
+            if (this.cancelled) {   // stopAnimation: a pointer took over
+                this.end()
+                args.resolve()
+                return
+            }
             this.currentframe = new Frame(0)
             this.frames.push(this.currentframe)
 

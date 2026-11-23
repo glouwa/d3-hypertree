@@ -102,6 +102,14 @@ are listed first.
 
 ### Fixed
 
+- **Flickering nodes while dragging or loading**:
+  - a drag or wheel now stops a running animation (e.g. a `goto` after a click);
+    both used to set the translation and the tree jumped between two states on
+    every frame;
+  - the filter no longer oscillates when one step shows or hides many nodes of
+    the same weight at once (below `rangeNodes.min`, then above `max`, and back);
+  - the center node has a hysteresis: two nodes about equally near the center no
+    longer take turns, which changed the visible branches on every frame.
 - Mouse wheel and pinch did nothing when the start zoom was outside `λbounds`.
 - Hovered and selected voronoi cells weren't highlighted.
 - Data loaded asynchronously (every `fromFile` format) wasn't drawn until the
