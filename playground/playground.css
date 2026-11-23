@@ -22,7 +22,7 @@ html, body { height: 100%; }
 body {
     margin: 0;
     display: grid;
-    grid-template-columns: 540px 1fr;
+    grid-template-columns: 432px 1fr 400px;   /* options | tree | layers */
     background: var(--bg);
     color: var(--text);
     font: 13px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -100,6 +100,12 @@ main { display: grid; grid-template-rows: 1fr auto; height: 100vh; min-width: 0;
 body.halfplane #tree { width: 100%; aspect-ratio: auto; height: calc(100vh - 230px); }
 #panel { position: relative; z-index: 2; }
 
+/* ---- layers panel (right) ---------------------------------------------- */
+#layers-panel {
+    position: relative; z-index: 2; height: 100vh; overflow-y: auto;
+    background: var(--panel); border-left: 1px solid var(--line); padding: 8px 8px 16px;
+}
+
 #info {
     display: grid; grid-template-columns: minmax(260px, 1fr) 2fr; gap: 16px;
     padding: 10px 16px; border-top: 1px solid var(--line); background: var(--panel);
@@ -125,9 +131,10 @@ body.halfplane #tree { width: 100%; aspect-ratio: auto; height: calc(100vh - 230
 }
 .toast.show { opacity: .92; }
 
-@media (max-width: 800px) {
+@media (max-width: 1200px) {
     body { grid-template-columns: 1fr; }
     #panel { height: auto; max-height: 50vh; }
+    #layers-panel { height: auto; max-height: 50vh; border-left: none; border-top: 1px solid var(--line); }
     main { height: auto; }
     #info { grid-template-columns: 1fr; height: auto; }
 }

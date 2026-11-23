@@ -346,12 +346,12 @@
     const get = k => cfg[k]
     const set = (k, v) => { cfg[k] = v; scheduleRebuild() }
 
-    function section(title, keys, open = false) {
+    function section(title, keys, open = false, container = '#controls') {
         const badge = el('span', { class: 'badge' })
         const d = el('details', open ? { open: true } : {}, el('summary', {}, title, badge))
         const g = el('div', { class: 'group' })
         d.append(g)
-        $('#controls').append(d)
+        $(container).append(d)
         controls.push({ refresh: () => {
             const n = typeof keys === 'function' ? keys() : keys.filter(k => JSON.stringify(cfg[k]) !== JSON.stringify(DEFAULTS[k])).length
             badge.textContent = n ? `${n} changed` : ''
@@ -567,7 +567,8 @@
 
         // changed = different from the playground defaults (which hide the emoji layer)
         const layerChanged = name => JSON.stringify(cfg.layers[name] || {}) !== JSON.stringify(DEFAULTS.layers[name] || {})
-        g = section('Layers', () => Object.keys(Object.assign({}, DEFAULTS.layers, cfg.layers)).filter(layerChanged).length)
+        // the layer list has its own panel on the right, open from the start
+        g = section('Layers', () => Object.keys(Object.assign({}, DEFAULTS.layers, cfg.layers)).filter(layerChanged).length, true, '#layer-controls')
         const table = el('table', { class: 'layers' },
             el('thead', {}, el('tr', {}, el('th', {}, 'layer'), el('th', {}, 'visible'), el('th', {}, 'hide on drag'))))
         const tbody = el('tbody')

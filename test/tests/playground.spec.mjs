@@ -1,11 +1,13 @@
 import { test, expect } from '@playwright/test'
 import { collectErrors, expectNoErrors } from './helpers.mjs'
 
+
 // The playground (../playground) must keep working: it loads, its controls change
 // the configuration (URL and tree), and "Open as test" opens the same configuration
 // in the test harness.
 
-test.use({ viewport: { width: 1400, height: 900 } })
+// the playground is made for wide screens (options | tree | layers)
+test.use({ viewport: { width: 1600, height: 900 } })
 
 // opens a collapsed group of the layer list (Indicators, Labels, Links, Nodes)
 const openGroup = (page, name) => page.locator(`tr[data-group="${name}"]`).click({ position: { x: 20, y: 8 } })
@@ -18,9 +20,11 @@ test('loads with the defaults and renders the tree', async ({ page }) => {
     expect(await page.locator('#controls details').count()).toBeGreaterThan(6)
     expect(await page.locator('table.layers tbody tr').count()).toBeGreaterThan(15)
     expect(await page.evaluate(() => document.querySelectorAll('#tree #nodes circle').length)).toBeGreaterThan(10)
-    // sections in the order of the pipeline: data, setup, layout, filter, then rendering
+    // sections in the order of the pipeline: data, setup, layout, filter, then rendering;
+    // the layers in their own panel on the right
     expect(await page.locator('#controls summary').evaluateAll(s => s.map(e => e.firstChild.textContent.trim())))
-        .toEqual(['Data', 'Initialization', 'Layout', 'Filter', 'Geometry', 'Layers', 'Interaction', 'API'])
+        .toEqual(['Data', 'Initialization', 'Layout', 'Filter', 'Geometry', 'Interaction', 'API'])
+    expect(await page.locator('#layer-controls summary').evaluateAll(s => s.map(e => e.firstChild.textContent.trim()))).toEqual(['Layers'])
     // nothing is marked as changed in the default state
     expect(await page.locator('summary .badge').evaluateAll(b => b.map(e => e.textContent).filter(Boolean))).toEqual([])
     expect(await page.locator('table.layers tr.changed').count()).toBe(0)
@@ -44,7 +48,6 @@ test('controls change URL and tree; the panel stays clickable', async ({ page })
     const labels = await page.evaluate(() => [...document.querySelectorAll('#tree #labels text, #tree #labels-force text')].map(t => t.textContent))
     expect(labels.some(l => /^Node \d+$/.test(l))).toBe(false)
 
-    await page.click('summary:has-text("Layers")')
     await page.locator('tr[data-layer="cells"] input[type=checkbox]').first().check()
     await page.waitForFunction(() => document.querySelectorAll('#tree #cells > *').length > 0)
     expect(decodeURIComponent(await page.evaluate(() => location.search))).toContain('"cells":{"invisible":false}')
@@ -91,7 +94,6 @@ test('each layer has its own options; geometry applies to several layers', async
     await ready(page)
     const opt = (layer, key) => page.locator(`tr[data-layer-options="${layer}"] .row`)
         .filter({ has: page.locator('label', { hasText: new RegExp(`^${key}$`) }) })
-    await page.locator('summary').filter({ hasText: /^Layers/ }).click()
     await openGroup(page, 'Nodes')
     await openGroup(page, 'Links')
 
@@ -120,7 +122,6 @@ test('each layer has its own options; geometry applies to several layers', async
 
 test('a click anywhere on a layer row toggles its options, its checkboxes do not', async ({ page }) => {
     await page.goto('../playground/?gen=nTree&depth=4')
-    await page.locator('summary').filter({ hasText: /^Layers/ }).click()
     await openGroup(page, 'Nodes')
     const opts = page.locator('tr[data-layer-options="nodes"]')
     await expect(opts).toBeHidden()
@@ -138,7 +139,6 @@ test('the emoji layer is off by default; turned on it shows the icons, also afte
     const errors = collectErrors(page)
     await page.goto('../playground/')
     await ready(page)
-    await page.locator('summary').filter({ hasText: /^Layers/ }).click()
     await openGroup(page, 'Nodes')
     const box = () => page.locator('tr[data-layer="emojis"] input[type=checkbox]').first()
     expect(await box().isChecked()).toBe(false)
@@ -177,7 +177,6 @@ test('the initialization section lists every step with its current value', async
 test('the voronoi cells are recognizable as a layer and can be turned on', async ({ page }) => {
     await page.goto('../playground/?gen=nTree&depth=6&childs=2&labels=1')
     await ready(page)
-    await page.locator('summary').filter({ hasText: /^Layers/ }).click()
     const row = page.locator('tr[data-layer="cells"]')
     await expect(row).toContainText('voronoi')
     await row.locator('input[type=checkbox]').first().check()
@@ -188,7 +187,6 @@ test('the indicator layers form the group Indicators', async ({ page }) => {
     const errors = collectErrors(page)
     await page.goto('../playground/?gen=nTree&depth=6&childs=2&labels=1')
     await ready(page)
-    await page.locator('summary').filter({ hasText: /^Layers/ }).click()
     const group = page.locator('tr[data-group="Indicators"]')
     const members = ['culling-r', 'mouse-r', 'focus-r', 'labels-r-𝐖', 'λ']
     await expect(group).toContainText('5 layers')
@@ -212,7 +210,6 @@ test('the indicator layers form the group Indicators', async ({ page }) => {
 test('the label layers form the group Labels', async ({ page }) => {
     await page.goto('../playground/?gen=nTree&depth=6&childs=2&labels=1')
     await ready(page)
-    await page.locator('summary').filter({ hasText: /^Layers/ }).click()
     const group = page.locator('tr[data-group="Labels"]')
     await expect(group).toContainText('2 layers')
     for (const m of ['labels', 'labels-force']) await expect(page.locator(`tr[data-layer="${m}"]`)).toBeHidden()
@@ -260,7 +257,6 @@ test('by default 10 % of the nodes get an icon', async ({ page }) => {
 test('cells: hover and selection highlighting are layer options', async ({ page }) => {
     await page.goto('../playground/?gen=nTree&depth=6&childs=2&labels=1')
     await ready(page)
-    await page.locator('summary').filter({ hasText: /^Layers/ }).click()
     await page.click('tr[data-layer="cells"] button.expander')
     const opt = key => page.locator('tr[data-layer-options="cells"] .row')
         .filter({ has: page.locator('label', { hasText: new RegExp(`^${key}$`) }) }).locator('select')
@@ -274,7 +270,6 @@ test('cells: hover and selection highlighting are layer options', async ({ page 
 test('nodes: option show offers leaves and all', async ({ page }) => {
     await page.goto('../playground/?gen=nTree&depth=6&childs=2&labels=1&filter=off')
     await ready(page)
-    await page.locator('summary').filter({ hasText: /^Layers/ }).click()
     await openGroup(page, 'Nodes')
     await page.click('tr[data-layer="nodes"] button.expander')
     const sel = page.locator('tr[data-layer-options="nodes"] .row').filter({ has: page.locator('label', { hasText: /^show$/ }) }).locator('select')
@@ -303,7 +298,6 @@ test('interaction strategies: selection "single" replaces, hover "none" hovers n
 test('the groups Links, Nodes and Root', async ({ page }) => {
     await page.goto('../playground/?gen=nTree&depth=4')
     await ready(page)
-    await page.locator('summary').filter({ hasText: /^Layers/ }).click()
     const groups = { Links: ['path-arcs', 'link-arcs', 'stem-arc'], Nodes: ['nodes', 'symbols', 'images', 'emojis'], Root: ['(0,0)', 'center-node'] }
     for (const [name, members] of Object.entries(groups)) {
         await expect(page.locator(`tr[data-group="${name}"]`)).toContainText(`${members.length} layers`)
@@ -409,8 +403,26 @@ test('geometry: the rectangular view (half-plane) in a wide tree element', async
     const r = await page.evaluate(() => {
         const box = document.querySelector('#tree').getBoundingClientRect()
         const [, , w, h] = document.querySelector('#tree .unitdisk-nav > svg').getAttribute('viewBox').split(' ').map(Number)
-        return { wide: box.width > box.height * 1.2, viewWide: w > h * 1.2, mapped: window.ht.unitdisk.cache.unculledNodes.every(n => n.cacheDisk) }
+        return { wide: box.width > box.height * 1.05, viewWide: w > h * 1.05, mapped: window.ht.unitdisk.cache.unculledNodes.every(n => n.cacheDisk) }
     })
     expect(r).toEqual({ wide: true, viewWide: true, mapped: true })
     expectNoErrors(errors)
+})
+
+test('layout: options on the left, the tree, the layer list in its own panel on the right', async ({ page }) => {
+    await page.setViewportSize({ width: 1600, height: 900 })
+    await page.goto('../playground/?gen=nTree&depth=4')
+    await ready(page)
+    const r = await page.evaluate(() => {
+        const box = sel => document.querySelector(sel).getBoundingClientRect()
+        const left = box('#panel'), tree = box('#stage'), right = box('#layers-panel')
+        return {
+            order: left.right <= tree.left + 1 && tree.right <= right.left + 1,
+            leftWidth: Math.round(left.width), rightWidth: Math.round(right.width),
+            layersInRight: !!document.querySelector('#layers-panel table.layers'),
+            layersNotLeft: !document.querySelector('#panel table.layers'),
+            open: document.querySelector('#layers-panel details').open,
+        }
+    })
+    expect(r).toEqual({ order: true, leftWidth: 432, rightWidth: 400, layersInRight: true, layersNotLeft: true, open: true })
 })
