@@ -17,28 +17,47 @@ import { mapToView, infinityOf }    from '../transformation/cayley'
 const MAGIC_MIN = 1e-12
 const MAGIC_MAX = 1e12
 
+// One step of magic per update (× or ÷ alpha) toward rangeNodes.
+//
+// Many nodes can share one weight: then a single step shows or hides all of them, and
+// may jump over the whole range (below min -> above max). The next step went back, and
+// the visible set flipped on every update (the Metatheria branch of the Tree of Life
+// flickered). So a step that overshoots is remembered as a limit (steps must not reach
+// that magic again); the filter then stays at the state below the range: fewer nodes
+// rather than too many. The limits hold while the view stays comparable: the same
+// center node, and the number of visible nodes in the state where the filter stopped
+// changes by less than 10 % (zooming, e.g. the animation after loading, changes λ on
+// every frame but not that number; a real change of the view does).
+type MagicLimits = { center:number, up:number, down:number, last:number, stoppedAt:number }
+const magicLimits = new WeakMap<object, MagicLimits>()
+
 function adjustMagic(ud:IUnitDisk, cache:TransformationCache) {
     const filter = ud.view.hypertree.args.filter.weightFilter
-    if (filter === null)   // no weight culling
+    if (filter === null || !cache.unculledNodes)   // no weight culling / nothing drawn yet
         return
 
-    const rangeNodes = filter.rangeNodes  //{ min:300, max:700 }
-    const alpha      = filter.alpha 
-    //stopUp
-    //stopDown
-    if (cache.unculledNodes) {
+    const n = cache.unculledNodes.length
+    const range = filter.rangeNodes
+    const alpha = filter.alpha
+    const center = cache.centerNode ? cache.centerNode.mergeId : -1
+    const fresh = ()=> ({ center, up: MAGIC_MAX, down: MAGIC_MIN, last: 0, stoppedAt: 0 })
+    let b = magicLimits.get(filter)
+    if (b && b.center === -1) b.center = center   // found before the first frame (settleMagic): keep
+    if (!b || b.center !== center || (b.stoppedAt && Math.abs(n - b.stoppedAt) > .1 * b.stoppedAt))
+        magicLimits.set(filter, b = fresh())
+    const eps = 1e-9   // magic / alpha * alpha is not exactly magic
 
-        if (cache.unculledNodes.length > rangeNodes.max) {
-            if (filter.magic > MAGIC_MIN) {
-                filter.magic /= alpha
-            }
-        }
-        if (cache.unculledNodes.length < rangeNodes.min) {
-            if (filter.magic < MAGIC_MAX) {
-                filter.magic *= alpha
-            }
-        }
+    if (n > range.max) {
+        if (b.last > 0) b.up = Math.min(b.up, filter.magic)        // the step up overshot
+        const m = filter.magic / alpha
+        if (m > b.down * (1 + eps)) { filter.magic = m; b.last = -1; b.stoppedAt = 0 } else { b.last = 0; b.stoppedAt = n }
     }
+    else if (n < range.min) {
+        if (b.last < 0) b.down = Math.max(b.down, filter.magic)    // the step down overshot
+        const m = filter.magic * alpha
+        if (m < b.up * (1 - eps)) { filter.magic = m; b.last = 1; b.stoppedAt = 0 } else { b.last = 0; b.stoppedAt = n }
+    }
+    else { b.last = 0; b.stoppedAt = 0 }
 }
 
 function collectNodesByWeight(ud:IUnitDisk, cache:TransformationCache, path:N[])

@@ -106,3 +106,22 @@ test('weight: uniform node weights', async ({ page }, testInfo) => {
     await expectScene(page, testInfo, 'weight-uniform')
     expectNoErrors(errors)
 })
+
+// Regression: when many nodes share one weight, a single step of magic shows or hides
+// all of them at once. If that jumps over the whole rangeNodes (below min -> above max),
+// the next step went back: the visible set flipped on every update (the Metatheria
+// branch of the Tree of Life flickered). The filter must settle instead.
+test('magic does not oscillate when one step jumps over the whole rangeNodes', async ({ page }) => {
+    const errors = collectErrors(page)
+    const filterOpt = encodeURIComponent(JSON.stringify({ weightFilter: { rangeNodes: { min: 300, max: 500 } } }))
+    await openTree(page, `gen=nTree&depth=4&childs=6&filterOpt=${filterOpt}`)   // flipped 1555 / 259
+    const counts = await page.evaluate(() => {
+        const ht = harness.ht, out = []
+        for (let i = 0; i < 12; i++) { ht.update.transformation(); out.push(ht.unitdisk.cache.unculledNodes.length) }
+        return out
+    })
+    // after the first updates it stays put (no A, B, A, B ...)
+    const tail = counts.slice(-6)
+    expect(new Set(tail).size, counts.join(' ')).toBe(1)
+    expectNoErrors(errors)
+})
