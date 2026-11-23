@@ -32,6 +32,7 @@ export interface NodeLayout {
 
 export interface NodeTransformation {
     cache?:               C,
+    cacheDisk?:           C,         // half-plane view: the disk position (cache holds the view position)
     cachep?:              Cp,
     strCache?:            string,    
     transformStrCache?:   string,

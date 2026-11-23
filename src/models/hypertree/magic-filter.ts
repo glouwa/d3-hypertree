@@ -8,6 +8,7 @@ import { CassignC }                 from '../transformation/hyperbolic-math'
 import { doVoronoiStuff }           from './preset-process'
 import { doLabelStuff }             from './preset-process'
 import { doImageStuff }             from './preset-process'
+import { mapToView }                from '../transformation/cayley'
 
 function adjustMagic(ud:IUnitDisk, cache:TransformationCache) {
     const filter = ud.view.hypertree.args.filter.weightFilter
@@ -140,6 +141,15 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
 
     // add pathes to unculled nodes    
     ud.view.hypertree.args.objects.pathes.forEach(p=> addPathToUnculled(ud, cache, p))   
+
+    // rectangular view (geometry.halfPlane): from here on the drawn positions are in
+    // the half-plane (cayley.ts); the filter above worked in the disk
+    if (ud.view.hypertree.args.geometry.halfPlane) {
+        cache.unculledNodes = mapToView(cache.unculledNodes)
+        const inView = (n:N)=> !!n.cacheDisk          // mapped = inside the view
+        cache.emojis = cache.emojis.filter(inView)
+        cache.spezialNodes = cache.spezialNodes.filter(inView)
+    }
     
     // groups of nodes
     cache.links =      cache.unculledNodes.slice(1)
@@ -231,6 +241,7 @@ export function layoutNode(ht, n:N, λ:number) {
 
 function peocessNodeTransformation(ud:IUnitDisk, cache:TransformationCache, n:N) {
     n.cache = n.cache || { re:0, im:0 }
+    n.cacheDisk = undefined
     layoutNode(ud.view.hypertree, n, ud.args.transformation.state.λ)
     CassignC(n.cache, ud.args.transform(n)) 
     n.cachep = CktoCp(n.cache)   
