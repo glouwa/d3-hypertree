@@ -1,12 +1,10 @@
-import * as d3             from 'd3'
 import { N }               from '../../models/n/n'
 import { ILayer }          from '../layerstack/layer'
 import { ILayerView }      from '../layerstack/layer'
 import { ILayerArgs }      from '../layerstack/layer'
 import { D3UpdatePattern } from '../layerstack/d3updatePattern'
-import { CptoCk, CktoCp }  from '../../models/transformation/hyperbolic-math'
-import { CmulR, CaddC }    from '../../models/transformation/hyperbolic-math'
-import { bboxCenter, setLabelText } from '../layers/label-layer';
+import { setLabelText }    from '../layers/label-layer'
+import { Box, outward, labelSize, restCenter, overlap, distanceToBox } from './label-geometry'
 
 export interface LabelForceLayerArgs extends ILayerArgs
 {
@@ -24,33 +22,48 @@ export interface LabelForceLayerArgs extends ILayerArgs
     maxLabels?:   number,      // at most this many labels (default filter.maxlabels; preset-layers.ts)
     hoverLabel?:      boolean, // always a label for the node under the mouse (on top of maxLabels)
     hoverPathLabels?: boolean, // always labels on the path from the node under the mouse to the root
+    // a line from a label to its node: 'auto' (default) when the label was pushed away
+    // from its node, 'always', 'never'
+    leaderLines?: 'auto' | 'always' | 'never',
 }
-
 
 var paddingLeftRight = .08
 var paddingTopBottom = .02
 
+// Labels placed by a relaxation (force) layout:
+//   - each label is pulled toward its rest position (label-geometry.ts: above its node
+//     in the center, outward beyond its node toward the rim)
+//   - overlapping labels push each other apart along the axis of the smaller overlap,
+//     as rectangles of their real size; a push toward the center counts little, so
+//     labels give way outward
+//   - positions are kept between frames as an offset from the node (warm start): a few
+//     iterations per update during interaction, more when the view settles
+// Until v1 every update restarted from the node and ran 175 steps of a d3 force
+// simulation with circles of a fixed radius (jumping labels, overlaps of long ones).
+const ITERATIONS_MOVING = 8
+const ITERATIONS_SETTLED = 40
+const PULL = .25           // share of the way to the rest position per iteration
+const INWARD = .25         // weight of a push toward the center (outward pushes: 1)
+const MARGIN = .004        // free space between labels
+
 export class LabelForceLayer implements ILayer
-{    
+{
     view:            ILayerView
     args:            LabelForceLayerArgs
     d3updatePattern: D3UpdatePattern
     d3updatePattern2: D3UpdatePattern
-    name:            string   
-    simulation 
+    name:            string
+    // offset of each label's center from its node, kept between frames
+    private offsets = new Map<N, { dx:number, dy:number }>()
+
     update = {
-        parent:         ()=> this.attach(),    
-        force:          ()=> { 
+        parent:         ()=> this.attach(),
+        force:          ()=> {
             if (this.args.invisible)
                 return
-            
             if (this.view.hypertree.isAnimationRunning() && this.args.hideOnDrag)
                 return
-
-            this.labelSetUpdate()
-            for (let i=0; i<175; ++i)
-                this.simulation.tick()
-            
+            this.relax(this.view.hypertree.isAnimationRunning() ? ITERATIONS_MOVING : ITERATIONS_SETTLED)
         },
         data:           ()=> {
             this.update.force()
@@ -58,18 +71,18 @@ export class LabelForceLayer implements ILayer
             this.d3updatePattern2.update.data()
 
             if (this.args.background)
-                this.d3updatePattern.addTextBackgroundRects(                
-                    paddingLeftRight, 
+                this.d3updatePattern.addTextBackgroundRects(
+                    paddingLeftRight,
                     paddingTopBottom,
                     .05,
                     this.args.name)
         },
-        transformation: ()=> { 
-            this.update.force()           
+        transformation: ()=> {
+            this.update.force()
             this.d3updatePattern.update.transformation()
             this.d3updatePattern2.update.transformation()
         },
-        style:          ()=> { 
+        style:          ()=> {
             this.d3updatePattern.update.style()
             this.d3updatePattern2.update.style()
         }
@@ -77,67 +90,66 @@ export class LabelForceLayer implements ILayer
 
     constructor(view:ILayerView, args:LabelForceLayerArgs) {
         this.view = view
-        this.args = args  
+        this.args = args
         this.name = args.name
-
-        this.simulation = d3.forceSimulation()
-            .alphaTarget(.001)
-            .force("link",    d3.forceLink()
-                //.distance(2)
-                .strength(-.05))
-            .force("charge",  d3.forceManyBody()
-                .strength(-.05))
-            .force("collide", d3.forceCollide()
-                .strength(.0025)
-                .radius(.18)) // .18
-          //  .force('gravity', d3f(0,0)                
-         //       .strength(-.001))
-            /*.on("tick", ()=> {
-                //console.log('sim tick')
-                this.update.transformation() 
-            })*/
-            .stop()
     }
 
-    labelSetUpdate() {         
-        
-        const labelpoints = []
-        const labellinks = []
-        this.args.data().forEach(n=>
-        {
-            n.forcepoints   = n.forcepoints || {}            
-            n.forcepoints.index = n.mergeId
-            const initxyp = CaddC(n.cache, CptoCk({ θ:n.cachep.θ, r:.001}))
-            n.forcepoints.x = initxyp.re
-            n.forcepoints.y = initxyp.im
-            console.assert(typeof n.forcepoints.x === 'number')
-            console.assert(typeof n.forcepoints.y === 'number')
-
-            n.forcepoints2    = n.forcepoints2 || {}            
-            n.forcepoints2.index = n.mergeId+2000
-            n.forcepoints2.fx = n.cache.re
-            n.forcepoints2.fy = n.cache.im
-            console.assert(typeof n.forcepoints2.fx === 'number')
-            console.assert(typeof n.forcepoints2.fy === 'number')
-
-            labelpoints.push(n.forcepoints)
-            labelpoints.push(n.forcepoints2)
-            labellinks.push(({                 
-                source: n.forcepoints, 
-                target: n.forcepoints2,
-            }))
-        })
-        
-        this.simulation
-            .nodes(labelpoints) // labels aka this.args.data
-           
-        this.simulation.force("link")
-            .links(labellinks)
-
-        //console.log('labelSetUpdate')
+    private get halfPlane() { return !!this.view.hypertree.args.geometry.halfPlane }
+    private size(n:N) { return this.args.sizeOf ? this.args.sizeOf(n) : 1 }
+    private box(n:N) : Box {
+        const k = this.size(n)
+        const { w, h } = labelSize(n, this.args.name + 'len', this.view.hypertree.args.geometry.captionHeight, k)
+        const fp = n.forcepoints
+        return { x: fp.x, y: fp.y, w: w + paddingLeftRight * k / 2, h }
     }
+    private gap(n:N) { return .012 * this.size(n) }
 
-    simulationTick() {
+    // the relaxation: labels in n.forcepoints = { x, y } (box center, view coordinates)
+    private relax(iterations:number) {
+        const labels:N[] = this.args.data() || []
+        const half = this.halfPlane
+        const rest = new Map<N, { x:number, y:number }>()
+        const keep = new Map<N, { dx:number, dy:number }>()
+        for (const n of labels) {
+            const k = this.size(n)
+            const { w, h } = labelSize(n, this.args.name + 'len', this.view.hypertree.args.geometry.captionHeight, k)
+            const r = restCenter(n, w, h, this.gap(n), half)
+            rest.set(n, { x: r.re, y: r.im })
+            const o = this.offsets.get(n)
+            n.forcepoints = o ? { x: n.cache.re + o.dx, y: n.cache.im + o.dy } : { x: r.re, y: r.im }
+        }
+        for (let it = 0; it < iterations; it++) {
+            // pull toward the rest position
+            for (const n of labels) {
+                const r = rest.get(n), fp = n.forcepoints
+                fp.x += (r.x - fp.x) * PULL
+                fp.y += (r.y - fp.y) * PULL
+            }
+            // separate overlapping labels (n is small: all pairs)
+            const boxes = labels.map(n=> this.box(n))
+            for (let i = 0; i < labels.length; i++)
+                for (let j = i + 1; j < labels.length; j++) {
+                    const a = boxes[i], b = boxes[j]
+                    const o = overlap(a, b, MARGIN)
+                    if (o.x <= 0 || o.y <= 0) continue
+                    // along the axis of the smaller overlap, away from each other
+                    const alongX = o.x < o.y
+                    const s = alongX ? o.x : o.y
+                    const sign = alongX ? Math.sign(a.x - b.x || 1) : Math.sign(a.y - b.y || 1)
+                    const da = alongX ? { re: sign, im: 0 } : { re: 0, im: sign }
+                    // a push toward the center weighs little: labels give way outward
+                    const ua = outward(labels[i], half), ub = outward(labels[j], half)
+                    const wa = (da.re * ua.re + da.im * ua.im) < 0 ? INWARD : 1
+                    const wb = (-da.re * ub.re - da.im * ub.im) < 0 ? INWARD : 1
+                    const sa = s * wa / (wa + wb), sb = s * wb / (wa + wb)
+                    const fa = labels[i].forcepoints, fb = labels[j].forcepoints
+                    fa.x += da.re * sa; fa.y += da.im * sa
+                    fb.x -= da.re * sb; fb.y -= da.im * sb
+                    a.x = fa.x; a.y = fa.y; b.x = fb.x; b.y = fb.y
+                }
+        }
+        for (const n of labels) keep.set(n, { dx: n.forcepoints.x - n.cache.re, dy: n.forcepoints.y - n.cache.im })
+        this.offsets = keep   // labels no longer shown are forgotten
     }
 
     private labellen(d)
@@ -145,12 +157,19 @@ export class LabelForceLayer implements ILayer
         return d.precalc[this.args.name+'len']||0
     }
 
+    // leaderLines 'auto': when the label is farther from its node than at its rest place
+    private showsLine(d:N) : boolean {
+        const mode = this.args.leaderLines || 'auto'
+        if (mode === 'never' || !d.forcepoints) return false
+        if (mode === 'always') return true
+        return distanceToBox({ re: d.cache.re, im: d.cache.im }, this.box(d)) > this.gap(d) * 1.8
+    }
+
     private attach() {
         const T = this
         function calctransform(d, i, v) {
             if (!d.forcepoints)
-                return ` translate(${d.cache.re} ${d.cache.im})` 
-            console.assert(d.forcepoints.x || d.depth === 0)
+                return ` translate(${d.cache.re} ${d.cache.im})`
             // size of the label (sizeOf, from the preset: layer option scale times
             // geometry.shrinkAtRim), centered on its force point
             const k = T.args.sizeOf ? T.args.sizeOf(d) : 1
@@ -164,10 +183,9 @@ export class LabelForceLayer implements ILayer
             data:              this.args.data,
             name:              this.name,
             className:         this.args.className,
-            elementType:       'text', 
+            elementType:       'text',
             create:            s=> s.classed("P",            d=> d.name == 'P')
                                     .classed("caption-icon", d=> d.precalc.icon && navigator.platform.includes('inux'))
-                                    //.style("fill",           d=> d.pathes.finalcolor)
                                     .style("fill",         d=> d.pathes && d.pathes.labelcolor)
                                     .call(s=> setLabelText(s, this.args.text))
                                     .attr("transform",       calctransform),
@@ -176,8 +194,11 @@ export class LabelForceLayer implements ILayer
                                     .call(s=> setLabelText(s, this.args.text))
         })
 
-        function calcXY(d, xy, fp) {
-            
+        // leader lines from the label (nearest point of its box) to its node
+        const lineEnd = (d:N)=> {
+            const b = this.box(d)
+            return { x: Math.max(b.x - b.w / 2, Math.min(b.x + b.w / 2, d.cache.re)),
+                     y: Math.max(b.y - b.h / 2, Math.min(b.y + b.h / 2, d.cache.im)) }
         }
         this.d3updatePattern2 = new D3UpdatePattern({
             parent:            this.view.parent,
@@ -189,11 +210,11 @@ export class LabelForceLayer implements ILayer
             elementType:       'line',
             create:            s=> {},
             updateColor:       s=> {},
-            updateTransform:   s=> s.attr('x1',             d=> (d.forcepoints && d.forcepoints.x)||0)
-                                    .attr('y1',             d=> (d.forcepoints && d.forcepoints.y)||0)
-                                    .attr('x2',             d=> (d.forcepoints2 && d.forcepoints2.x)||0)
-                                    .attr('y2',             d=> (d.forcepoints2 && d.forcepoints2.y)||0)                                    
-                //.text(                   this.args.text)
-        })        
+            updateTransform:   s=> s.style('display',      d=> this.showsLine(d) ? null : 'none')
+                                    .attr('x1',             d=> d.forcepoints ? lineEnd(d).x : d.cache.re)
+                                    .attr('y1',             d=> d.forcepoints ? lineEnd(d).y : d.cache.im)
+                                    .attr('x2',             d=> d.cache.re)
+                                    .attr('y2',             d=> d.cache.im)
+        })
     }
 }

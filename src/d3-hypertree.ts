@@ -22,6 +22,7 @@ import * as img  from './components/layers/image-layer'
 import * as sym  from './components/layers/symbol-layer'
 import * as text from './components/layers/label-layer'
 import * as textf from './components/layers/label-force-layer'
+import * as textp from './components/layers/label-placement-layer'
 import * as bg   from './components/layers/background-layer'
 import * as foc  from './components/layers/focus-layer'
 import * as int  from './components/layers/interaction-layer'
@@ -43,6 +44,8 @@ export namespace layers
     export type LabelLayerArgs       = text.LabelLayerArgs 
     export const LabelForceLayer = textf.LabelForceLayer
     export type LabelForceLayerArgs  = textf.LabelForceLayerArgs 
+    export const LabelPlacementLayer = textp.LabelPlacementLayer
+    export type LabelPlacementLayerArgs = textp.LabelPlacementLayerArgs
     export const BackgroundLayer = bg.BackgroundLayer
     export type BackgroundLayerArgs  = bg.BackgroundLayerArgs 
     export const FocusLayer = foc.FocusLayer

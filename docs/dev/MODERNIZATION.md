@@ -322,7 +322,14 @@ Rendering (DOM, browser), in order of expected gain:
       `fetch`; all tests unchanged. Other dependencies updated to the latest
       stable versions, except TypeScript: stays 6.0 because typescript-eslint
       supports at most 6.0 (TypeScript 7 is out)
-- [ ] **Rework the force labels** (`labels-force`). Details later.
+- [x] **Rework the force labels** (`labels-force`). Done 2026-11-23, two layers:
+      `labels-force` as a relaxation (rest place above the node in the center,
+      outward toward the rim; rectangle collisions that give way outward; positions
+      kept between frames, 8 iterations while moving, 40 when settled; was 175 steps
+      from scratch per update with fixed circles) and the new `labels-placed`
+      (candidate placement like on a map, never overlapping, hysteresis). Shared
+      geometry in `label-geometry.ts`; option `leaderLines` ('auto' | 'always' |
+      'never') for both; tests in `labels.spec.mjs`.
       Related: since 2026-11-22 the labels are chosen by subtree weight × display
       scale² (no focus radius any more, `maxLabels` per layer); known weak spots:
       small subtrees near the center get no label, a label can end up just

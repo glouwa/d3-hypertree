@@ -9,6 +9,12 @@ are listed first.
 
 ### Changed behavior
 
+- **Force labels (`labels-force`)** are placed by a relaxation: pulled to a rest
+  place above their node in the center and outward toward the rim, pushed apart
+  as rectangles of their real size (giving way outward), and kept between frames.
+  They used to restart from their node on every update (175 simulation steps with
+  fixed circles): labels jumped, long ones overlapped. The line to the node is
+  only drawn for labels pushed away (option `leaderLines`).
 - **`geometry.shrinkAtRim`** for labels, force labels and emojis toward the rim:
   `'none'` (constant), `'damped'` (default: 1 in the center to 0.5 at the rim, as
   labels and emojis before), `'full'` (like the links, to 0). Force labels used
@@ -53,6 +59,11 @@ are listed first.
 
 ### Added
 
+- **Layer `labels-placed`** (off by default): labels on candidate positions like
+  on a map, above their node in the center and outward toward the rim; drawn
+  labels never overlap, a label without a free place is left out.
+- **Layer option `leaderLines`** on `labels-force` and `labels-placed`: a line to
+  the node for labels pushed away from it (`'auto'`, default), `'always'`, `'never'`.
 - **Rectangular view** (`geometry.halfPlane`, prototype): the upper half-plane
   model via the Cayley transform. The disk border becomes the bottom edge, links
   are arcs centered on it, the view fills the element's rectangle. Layout,
@@ -85,7 +96,8 @@ are listed first.
     `filter.maxlabels`);
   - `hoverLabel` / `hoverPathLabels` on `labels` and `labels-force`: always a
     label for the node under the mouse / for every node on the path from it to
-    the root, on top of the limit (both on in the Tree of Life presets);
+    the root, on top of the limit (both on in the Tree of Life presets); a node
+    with `precalc.labelOnHover` shows its label only this way;
   - `show` on `nodes`: `'leaves'` (default), `'all'` (a disk for every visible
     node) or a function `n => boolean`;
   - `scale` on `labels`, `labels-force`, `emojis`: size bound to the data (a

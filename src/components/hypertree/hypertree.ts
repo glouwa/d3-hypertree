@@ -494,6 +494,7 @@ export class Hypertree
         }
         updateLabelLen_('label', 'labels-forcelen')
         updateLabelLen_('label', 'labelslen')
+        updateLabelLen_('label', 'labels-placedlen')
         updateLabelLen_('icon', 'emojislen')
     }
 

@@ -211,10 +211,10 @@ test('the label layers form the group Labels', async ({ page }) => {
     await page.goto('../playground/?gen=nTree&depth=6&childs=2&labels=1')
     await ready(page)
     const group = page.locator('tr[data-group="Labels"]')
-    await expect(group).toContainText('2 layers')
-    for (const m of ['labels', 'labels-force']) await expect(page.locator(`tr[data-layer="${m}"]`)).toBeHidden()
+    await expect(group).toContainText('3 layers')
+    for (const m of ['labels', 'labels-force', 'labels-placed']) await expect(page.locator(`tr[data-layer="${m}"]`)).toBeHidden()
     await group.click({ position: { x: 20, y: 8 } })
-    for (const m of ['labels', 'labels-force']) await expect(page.locator(`tr[data-layer="${m}"]`)).toBeVisible()
+    for (const m of ['labels', 'labels-force', 'labels-placed']) await expect(page.locator(`tr[data-layer="${m}"]`)).toBeVisible()
     // labels-r-𝐖 stays in Indicators
     await expect(page.locator('tr[data-layer="labels-r-𝐖"]')).toBeHidden()
     // mixed at the start (labels on, labels-force off): the group's checkbox

@@ -94,7 +94,8 @@
         'images':      [['width', 'number', 0.01, 0.3, 0.005], ['height', 'number', 0.01, 0.3, 0.005]],
         'emojis':      [['scale', 'number', 0.2, 3, 0.05], ['color', 'color'], ['background', 'bool']],
         'labels':      [['maxLabels', 'number', 0, 200, 1], ['hoverLabel', 'bool'], ['hoverPathLabels', 'bool'], ['scale', 'number', 0.2, 3, 0.05], ['color', 'color'], ['background', 'bool']],
-        'labels-force':[['maxLabels', 'number', 0, 200, 1], ['hoverLabel', 'bool'], ['hoverPathLabels', 'bool'], ['scale', 'number', 0.2, 3, 0.05], ['background', 'bool']],
+        'labels-placed':[['maxLabels', 'number', 0, 200, 1], ['hoverLabel', 'bool'], ['hoverPathLabels', 'bool'], ['leaderLines', 'choice', ['auto', 'always', 'never']], ['scale', 'number', 0.2, 3, 0.05], ['background', 'bool']],
+        'labels-force':[['maxLabels', 'number', 0, 200, 1], ['hoverLabel', 'bool'], ['hoverPathLabels', 'bool'], ['leaderLines', 'choice', ['auto', 'always', 'never']], ['scale', 'number', 0.2, 3, 0.05], ['background', 'bool']],
     }
     // what a layer shows, when its name doesn't say it
     const LAYER_ALIASES = { 'cells': 'voronoi', 'λ': 'zoom', '(0,0)': 'origin' }
@@ -110,6 +111,8 @@
         'emojis': 'the icons (share of nodes set in Initialization › Node data); off by default, the slowest layer to render',
         'images': 'needs n.precalc.imageHref (not set by the playground data)',
         'traces': 'touch traces while touching',
+        'labels-force': 'labels moved by a relaxation: pulled to their rest place (above the node in the center, outward toward the rim), pushed apart where they overlap (few overlaps may stay); positions kept between frames',
+        'labels-placed': 'labels placed on candidate positions like on a map (above the node in the center, outward toward the rim): never overlapping, a label without a free place is left out',
         'interaction-2': 'active interaction layer: mouse, touch, wheel',
     }
 

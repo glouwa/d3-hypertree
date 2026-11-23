@@ -9,6 +9,7 @@ import { SymbolLayer }              from '../../components/layers/symbol-layer'
 import { ArcLayer }                 from '../../components/layers/link-layer'
 import { LabelLayer }               from '../../components/layers/label-layer'
 import { LabelForceLayer }          from '../../components/layers/label-force-layer'
+import { LabelPlacementLayer }      from '../../components/layers/label-placement-layer'
 import { InteractionLayer2 }        from '../../components/layers/interaction-layer-2'
 import { TraceLayer }               from '../../components/layers/trace-layer'
 import { ImageLayer }               from '../../components/layers/image-layer'
@@ -328,6 +329,17 @@ export const layerSrc = [
                         ` translate(${d.cache.re + delta.re} ${d.cache.im + delta.im})` 
                         + d.scaleStrText                            
     }),    
+    // labels placed on candidate positions (like on a map): never overlapping, a
+    // label without a free place is left out (label-placement-layer.ts)
+    (v, ud:UnitDisk)=> new LabelPlacementLayer(v, {
+        invisible:  true,
+        hideOnDrag: false,
+        name:       'labels-placed',
+        className:  'caption caption-label',
+        data:       ()=> labelsWithHover(ud, layerArgs(ud, 'labels-placed')),
+        text:       (d)=> d.precalc.label,
+        sizeOf:     d=> sizeAt(ud, 'labels-placed', d),
+    }),
     // mouse, touch and wheel; a click calls interaction.clickAction and onNodeClick
     (v, ud:UnitDisk)=> new InteractionLayer2(v, {
         mouseRadius: ud.view.hypertree.args.interaction.mouseRadius,

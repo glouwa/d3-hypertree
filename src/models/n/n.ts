@@ -10,6 +10,7 @@ export interface NodePrecalulations {
     weight:             number
     weightScale:        number    
     label:              string
+    labelOnHover?:      boolean     // the label only shows for the hovered node / its path (hoverLabel, hoverPathLabels)
     labellen:           number
     
     icon:               string  
@@ -50,6 +51,9 @@ export interface NodeTransformation {
     hasOutPeriChildren,
     hasOutWeightChildren,
     hasOutChildren:       boolean,            
+
+    forcepoints?:         { x:number, y:number }                     // labels-force: center of the label
+    placedLabel?:         { x:number, y:number, w:number, h:number } // labels-placed: box of the label
 }
 
 export interface NodePath {

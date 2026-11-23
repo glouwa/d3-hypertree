@@ -34,7 +34,8 @@ export function labelsFor(ud:IUnitDisk, max:number|undefined) : N[] {
  * The labels of a label layer: labelsFor(maxLabels), plus as its options ask
  *   hoverLabel:      the node under the mouse (n.hovered)
  *   hoverPathLabels: every node on the path from it to the root
- * if they are visible and have a label. These come on top of the limit.
+ * if they are visible and have a label. These come on top of the limit. Nodes with
+ * precalc.labelOnHover show their label only this way.
  */
 export function labelsWithHover(ud:IUnitDisk, args:{ maxLabels?:number, hoverLabel?:boolean, hoverPathLabels?:boolean }) : N[] {
     const base = labelsFor(ud, args.maxLabels)
@@ -51,8 +52,9 @@ export function labelsWithHover(ud:IUnitDisk, args:{ maxLabels?:number, hoverLab
 // the focus radius, thinned out by weight, so max was often not reached.
 function selectLabels(ud:IUnitDisk, cache:TransformationCache, max:number) : N[] {
     // the label layers draw precalc.label: nodes with only an icon are drawn by the emoji layer
-    // (half-plane view: not the nodes far above the view)
-    const candidates = cache.unculledNodes.filter((n:N)=> n.precalc.label && !n.outOfView)
+    // (half-plane view: not the nodes far above the view; precalc.labelOnHover: only
+    // shown for the hovered node and its path)
+    const candidates = cache.unculledNodes.filter((n:N)=> n.precalc.label && !n.outOfView && !n.precalc.labelOnHover)
     const root = candidates.find(n=> !n.parent)
     const others = candidates.filter(n=> n !== root)
     // score: subtree weight times the squared display scale (1 at the center, 0 at

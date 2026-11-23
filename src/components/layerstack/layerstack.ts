@@ -113,9 +113,11 @@ export class LayerStack
         if (this.layers['labels']) 
             this.layers['labels'].update.data()
         // force labels: only when they show the hovered node or its path
-        const lf = this.layers['labels-force']
-        if (lf && lf.args && (lf.args.hoverLabel || lf.args.hoverPathLabels))
-            lf.update.data()
+        for (const name of ['labels-force', 'labels-placed']) {
+            const l = this.layers[name]
+            if (l && l.args && (l.args.hoverLabel || l.args.hoverPathLabels))
+                l.update.data()
+        }
         
         var t3 = performance.now()
         this.d3meta = { 
