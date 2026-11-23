@@ -316,7 +316,6 @@ new hyt.Hypertree(
             cullingRadius:      number
             weightFilter:       null | {                   // null: no culling by weight
                 weight:         (n)=> number
-                rangeCullingWeight: { min:number, max:number }   // bounds of the internal factor
                 rangeNodes:     { min:number, max:number }       // number of visible nodes (target)
                 alpha:          number                           // adaptation step per update
             }

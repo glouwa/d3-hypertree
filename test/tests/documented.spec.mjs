@@ -111,8 +111,8 @@ test('docs: langmap translates node labels', async ({ page }) => {
 })
 
 // "Filter Options": cullingWeight { min, max } = range of visible nodes
-// The range is a target: nodes inside the focus area are never culled by weight, and
-// magic is bounded by rangeCullingWeight, so a tree may not reach every range.
+// The range is a target: nodes inside the focus area are never culled by weight, so a
+// tree may not reach every range.
 test('docs: filter.cullingWeight limits the number of visible nodes', async ({ page }) => {
     const visible = async range => {
         await openTree(page, `gen=nTree&depth=5&childs=4&${m({ filter: { cullingWeight: range } })}`)

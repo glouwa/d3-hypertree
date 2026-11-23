@@ -9,11 +9,10 @@ test('the visible node set is final from the first frame', async ({ page }) => {
     const first = await visible()
     for (let i = 0; i < 20; i++) await page.evaluate(() => harness.ht.update.transformation())
     expect(await visible()).toBe(first)
-    // within rangeNodes, unless magic reached its upper bound (this tree has too few
-    // heavy nodes near the focus to show 150)
+    // within rangeNodes (magic has only a wide internal safety bound)
     const f = await page.evaluate(() => harness.ht.args.filter.weightFilter)
     expect(first <= f.rangeNodes.max).toBe(true)
-    expect(first >= f.rangeNodes.min || f.magic >= f.rangeCullingWeight.max).toBe(true)
+    expect(first >= f.rangeNodes.min).toBe(true)
 })
 
 test('a configured weightFilter.magic is ignored with a warning', async ({ page }) => {
@@ -82,7 +81,6 @@ const cases = [
     // at this zoom the default already shows every node the focus and cullingRadius
     // rules allow, so more can't appear
     ['rangeNodes-large', { weightFilter: { rangeNodes: { min: 600, max: 900 } } }, (s, d) => expect(s.unculled).toBeGreaterThanOrEqual(d.unculled)],
-    ['rangeCullingWeight-narrow', { weightFilter: { rangeCullingWeight: { min: 4, max: 10 } } }, () => {}],
     ['focusExtension-1', { focusExtension: 1 }, () => {}],
     ['focusExtension-2.5', { focusExtension: 2.5 }, () => {}],
     ['maxFocusRadius-0.5', { maxFocusRadius: 0.5 }, () => {}],

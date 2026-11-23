@@ -128,6 +128,11 @@ are listed first.
 
 ### Removed
 
+- `filter.weightFilter.rangeCullingWeight` (bounds of the internal factor
+  `magic`, default 4..500): it stopped the filter before `rangeNodes` was
+  reached, e.g. a small tree stayed far below `rangeNodes.min`. `rangeNodes`
+  alone decides the number of visible nodes now; the internal bounds are only a
+  safety net. A given `rangeCullingWeight` is ignored.
 - Layer `labels2` (an unfinished copy of `labels`); use multi-line labels.
 - Layers `link-lines` and `path-lines` (copies of `link-arcs` / `path-arcs` with
   straight lines, and slower). Use `geometry.linkCurvature: 'l'` or `'0'`;

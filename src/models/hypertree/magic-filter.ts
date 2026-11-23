@@ -10,25 +10,31 @@ import { doLabelStuff }             from './preset-process'
 import { doImageStuff }             from './preset-process'
 import { mapToView, infinityOf }    from '../transformation/cayley'
 
+// Bounds of the internal factor magic, only a safety net: magic must not grow without
+// end for a tree that never reaches rangeNodes.min (or shrink to 0). Wide enough that
+// rangeNodes alone decides the number of visible nodes (until v1 the option
+// weightFilter.rangeCullingWeight, default 4..500, stopped it early).
+const MAGIC_MIN = 1e-12
+const MAGIC_MAX = 1e12
+
 function adjustMagic(ud:IUnitDisk, cache:TransformationCache) {
     const filter = ud.view.hypertree.args.filter.weightFilter
     if (filter === null)   // no weight culling
         return
 
     const rangeNodes = filter.rangeNodes  //{ min:300, max:700 }
-    const rangeMagic = filter.rangeCullingWeight  //{ min:4,   max:500 }
     const alpha      = filter.alpha 
     //stopUp
     //stopDown
     if (cache.unculledNodes) {
 
         if (cache.unculledNodes.length > rangeNodes.max) {
-            if (filter.magic > rangeMagic.min) { // ???
+            if (filter.magic > MAGIC_MIN) {
                 filter.magic /= alpha
             }
         }
         if (cache.unculledNodes.length < rangeNodes.min) {
-            if (filter.magic < rangeMagic.max) { // ???
+            if (filter.magic < MAGIC_MAX) {
                 filter.magic *= alpha
             }
         }
@@ -115,7 +121,7 @@ function addPathToUnculled(ud:IUnitDisk, cache:TransformationCache, p)
  *
  * This runs the same steps right away, without drawing, until magic doesn't
  * change any more: the number of visible nodes is within rangeNodes, or magic
- * reached a bound of rangeCullingWeight, or every node is visible already. The
+ * reached its internal bound, or every node is visible already. The
  * result equals the state the frame-by-frame adaptation used to settle in.
  * Returns the number of steps.
  */

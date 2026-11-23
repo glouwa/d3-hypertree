@@ -47,8 +47,6 @@
         cullingRadius: base.filter.cullingRadius,
         rangeNodesMin: base.filter.weightFilter.rangeNodes.min,
         rangeNodesMax: 750,   // playground default; the library's is base.filter.weightFilter.rangeNodes.max
-        rcwMin: base.filter.weightFilter.rangeCullingWeight.min,
-        rcwMax: base.filter.weightFilter.rangeCullingWeight.max,
         focusExtension: base.filter.focusExtension,
         maxFocusRadius: base.filter.maxFocusRadius,
         maxlabels: base.filter.maxlabels,
@@ -177,8 +175,6 @@
         const rn = { min: c.rangeNodesMin, max: c.rangeNodesMax }
         if (!sameRange(rn, LIB_RANGE_NODES) || !sameRange(rn, { min: DEFAULTS.rangeNodesMin, max: DEFAULTS.rangeNodesMax }))
             wf.rangeNodes = { min: c.rangeNodesMin, max: c.rangeNodesMax }
-        if (c.rcwMin !== DEFAULTS.rcwMin || c.rcwMax !== DEFAULTS.rcwMax)
-            wf.rangeCullingWeight = { min: c.rcwMin, max: c.rcwMax }
         if (Object.keys(wf).length) f.weightFilter = wf
         if (Object.keys(f).length && !c.filterOff) p.set('filterOpt', JSON.stringify(f))
 
@@ -238,7 +234,6 @@
             const f = JSON.parse(p.get('filterOpt')), wf = f.weightFilter || {}
             for (const k of ['cullingRadius', 'focusExtension', 'maxFocusRadius', 'maxlabels']) if (f[k] !== undefined) c[k] = f[k]
             if (wf.rangeNodes) { c.rangeNodesMin = wf.rangeNodes.min; c.rangeNodesMax = wf.rangeNodes.max }
-            if (wf.rangeCullingWeight) { c.rcwMin = wf.rangeCullingWeight.min; c.rcwMax = wf.rangeCullingWeight.max }
         }
         if (p.get('interaction')) {
             const i = JSON.parse(p.get('interaction'))
@@ -534,14 +529,12 @@
         range(g, 'Root wedge dir.', 'wedgeOrientation', 0, 360, 1, null, v => `${v}°`)
         range(g, 'Root wedge angle', 'wedgeAngle', 10, 360, 1, null, v => `${v}°`)
 
-        g = section('Filter', ['filterOff', 'cullingRadius', 'rangeNodesMin', 'rangeNodesMax', 'rcwMin', 'rcwMax', 'focusExtension', 'maxFocusRadius', 'maxlabels'])
+        g = section('Filter', ['filterOff', 'cullingRadius', 'rangeNodesMin', 'rangeNodesMax', 'focusExtension', 'maxFocusRadius', 'maxlabels'])
         check(g, 'Filter off (every node visible)', 'filterOff', null, 'Fine for small trees; large trees get slow.')
         const on = () => !cfg.filterOff
         range(g, 'cullingRadius', 'cullingRadius', 0.5, 1, 0.01, on)
         number(g, 'rangeNodes min', 'rangeNodesMin', 0, 5000, 10, on)
         number(g, 'rangeNodes max', 'rangeNodesMax', 0, 5000, 10, on)
-        number(g, 'cullingWeight min', 'rcwMin', 0, 10000, 1, on)
-        number(g, 'cullingWeight max', 'rcwMax', 0, 10000, 10, on)
         range(g, 'focusExtension', 'focusExtension', 0.5, 4, 0.05, on)
         range(g, 'maxFocusRadius', 'maxFocusRadius', 0.1, 0.99, 0.01, on)
         hint(g, 'Focus radius = min(λ × focusExtension, maxFocusRadius), so it grows when you zoom in; Layers › Indicators › focus-r draws it. Inside it the filter hides nothing: a node is hidden only if it is beyond cullingRadius or below the weight threshold and it and its parent are both outside the focus circle. Outside it, a node with hidden children gets a disk (nodeFilter). Labels no longer depend on it.')

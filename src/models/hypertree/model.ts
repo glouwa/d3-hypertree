@@ -44,7 +44,6 @@ export interface HypertreeArgs
         weightFilter: {
             magic?:             number                           // internal: set at initialization so the visible node count is within rangeNodes, then adapted per update
             weight:             (n)=> number
-            rangeCullingWeight: { min:number, max:number }
             rangeNodes:         { min:number, max:number }
             alpha:              number
         }
@@ -57,7 +56,6 @@ export interface HypertreeArgs
             cullingRadius:      number
             magic:              number                           // auto by init up
             weight:             (n)=> number
-            rangeCullingWeight: { min:number, max:number }
             rangeNodes:         { min:number, max:number }
             alpha:              number                
         }*/

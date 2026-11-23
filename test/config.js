@@ -179,7 +179,6 @@
                 cullingRadius: 1,
                 weightFilter: {
                     alpha: 2,
-                    rangeCullingWeight: { min: 0, max: 1e300 },
                     rangeNodes: { min: 1e9, max: 1e10 },
                 },
             } })
