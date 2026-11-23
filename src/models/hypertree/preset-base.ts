@@ -155,7 +155,8 @@ const treeOfLife = ()=> ({
         captionHeight: .05,
         layerOptions: {
             'emojis': { invisible: false },
-            'labels': { background: false },
+            // always a label for the node under the mouse and the path to the root
+            'labels': { background: false, hoverLabel: true, hoverPathLabels: true },
         }
     },
     interaction: {
@@ -178,7 +179,7 @@ const treeOfLifeMain = ()=> mergeDeep(treeOfLife(), {
         layerOptions: {
             'cells':        { invisible: false, hideOnDrag: false, strokeWidth: n=> 0 },
             'labels':       { invisible: true,  hideOnDrag: true },
-            'labels-force': { invisible: false, hideOnDrag: false, maxLabels: 30 },
+            'labels-force': { invisible: false, hideOnDrag: false, maxLabels: 30, hoverLabel: true, hoverPathLabels: true },
         }
     },
     interaction: {

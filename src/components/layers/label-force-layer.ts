@@ -22,6 +22,8 @@ export interface LabelForceLayerArgs extends ILayerArgs
     scale?:       number | ((n)=> number),   // size bound to the data (default 1), times geometry.shrinkAtRim
     sizeOf?:      (n)=> number,  // the resulting size (set by the preset); default 1
     maxLabels?:   number,      // at most this many labels (default filter.maxlabels; preset-layers.ts)
+    hoverLabel?:      boolean, // always a label for the node under the mouse (on top of maxLabels)
+    hoverPathLabels?: boolean, // always labels on the path from the node under the mouse to the root
 }
 
 

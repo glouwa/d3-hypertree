@@ -16,7 +16,7 @@ import { FocusLayer }               from '../../components/layers/focus-layer'
 import { StemLayer }                from '../../components/layers/stem-layer'
 import { bboxCenter, bboxOval }     from '../../d3-hypertree'
 import { showsState }               from '../../components/layers/state-display'
-import { labelsFor }                from './preset-process'
+import { labelsWithHover }          from './preset-process'
 
 // the args of a layer in the stack (its options), {} while the stack is built
 const layerArgs = (ud:UnitDisk, name:string) : any =>
@@ -300,8 +300,10 @@ export const layerSrc = [
         hideOnDrag: false,
         name:       'labels',
         className:  'caption',
-        // option maxLabels: at most this many labels (default filter.maxlabels)
-        data:       ()=> labelsFor(ud, layerArgs(ud, 'labels').maxLabels),
+        // options maxLabels (at most this many labels, default filter.maxlabels),
+        // hoverLabel and hoverPathLabels (always the node under the mouse / the path
+        // from it to the root, on top of the limit; preset-process.ts)
+        data:       ()=> labelsWithHover(ud, layerArgs(ud, 'labels')),
         text:       (d)=> d.precalc.label,
         delta:      labeloffsets.labeloffset(ud),
         color:      ()=> undefined,
@@ -317,7 +319,7 @@ export const layerSrc = [
         hideOnDrag: true,                            
         name:       'labels-force',
         className:  'caption caption-label',
-        data:       ()=> labelsFor(ud, layerArgs(ud, 'labels-force').maxLabels),
+        data:       ()=> labelsWithHover(ud, layerArgs(ud, 'labels-force')),
         text:       (d)=> d.precalc.label,        
         background: n=> !n.parent,
         // size: see emojis (layer option scale times geometry.shrinkAtRim)

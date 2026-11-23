@@ -333,3 +333,38 @@ test('nodes: default disks, inner nodes as wide as their link, leaves three time
     // inner: at most half the link width (lazy nodes are drawn at 80 %)
     for (const { ratio } of inner) { expect(ratio).toBeLessThanOrEqual(0.5001); expect(ratio).toBeGreaterThan(0.39) }
 })
+
+// layer options hoverLabel / hoverPathLabels: the node under the mouse and the path
+// from it to the root always get a label, on top of maxLabels
+test.describe('label layers: labels for the hovered node and its path', () => {
+    for (const layer of ['labels', 'labels-force']) {
+        for (const [option, expectPath] of [['hoverLabel', false], ['hoverPathLabels', true]]) {
+            test(`${layer}: ${option}`, async ({ page }) => {
+                const errors = collectErrors(page)
+                const opts = { [layer]: { invisible: false, hideOnDrag: false, maxLabels: 1, [option]: true } }
+                if (layer === 'labels-force') opts.labels = { invisible: true }
+                await openTree(page, `gen=nTree&depth=5&childs=3&labels=1&filter=off&layers=${encodeURIComponent(JSON.stringify(opts))}`)
+                await waitForStable(page)
+                const shown = () => page.evaluate(layer => [...document.querySelectorAll(`[id="${layer}"] text`)].map(t => t.__data__.mergeId), layer)
+                expect((await shown()).length).toBe(1)          // the limit: the root only
+                // hover a node of depth 3
+                const target = await page.evaluate(() => {
+                    const n = harness.ht.unitdisk.cache.unculledNodes.find(n => n.depth === 3)
+                    const m = document.querySelector('.unitDisc').getScreenCTM()
+                    return { id: n.mergeId, path: n.ancestors().map(a => a.mergeId), x: m.a * n.cache.re + m.c * n.cache.im + m.e, y: m.b * n.cache.re + m.d * n.cache.im + m.f }
+                })
+                await page.mouse.move(target.x + 8, target.y + 8)
+                await page.mouse.move(target.x, target.y, { steps: 3 })
+                await page.waitForFunction(id => harness.ht.data.descendants().find(n => n.mergeId === id).hovered, target.id)
+                await expect.poll(async () => (await shown()).includes(target.id)).toBe(true)
+                const ids = await shown()
+                const pathShown = target.path.every(id => ids.includes(id))
+                expect(pathShown).toBe(expectPath)
+                // the mouse leaves: back to the limit
+                await page.mouse.move(2, 2)
+                await expect.poll(async () => (await shown()).length).toBe(1)
+                expectNoErrors(errors)
+            })
+        }
+    }
+})

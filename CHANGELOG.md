@@ -83,6 +83,9 @@ are listed first.
     state, independent of the events;
   - `maxLabels` on `labels` and `labels-force`: a label limit per layer (default
     `filter.maxlabels`);
+  - `hoverLabel` / `hoverPathLabels` on `labels` and `labels-force`: always a
+    label for the node under the mouse / for every node on the path from it to
+    the root, on top of the limit (both on in the Tree of Life presets);
   - `show` on `nodes`: `'leaves'` (default), `'all'` (a disk for every visible
     node) or a function `n => boolean`;
   - `scale` on `labels`, `labels-force`, `emojis`: size bound to the data (a

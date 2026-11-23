@@ -93,8 +93,8 @@
         'nodes':       [['show', 'choice', ['leaves', 'all']], ['hover', 'choice', ['path', 'node', 'none']], ['selection', 'choice', ['path', 'node', 'none']], ['fill', 'color'], ['stroke', 'color'], ['strokeWidth', 'number', 0, 0.02, 0.0005], ['r', 'number', 0.002, 0.06, 0.001]],
         'images':      [['width', 'number', 0.01, 0.3, 0.005], ['height', 'number', 0.01, 0.3, 0.005]],
         'emojis':      [['scale', 'number', 0.2, 3, 0.05], ['color', 'color'], ['background', 'bool']],
-        'labels':      [['maxLabels', 'number', 0, 200, 1], ['scale', 'number', 0.2, 3, 0.05], ['color', 'color'], ['background', 'bool']],
-        'labels-force':[['maxLabels', 'number', 0, 200, 1], ['scale', 'number', 0.2, 3, 0.05], ['background', 'bool']],
+        'labels':      [['maxLabels', 'number', 0, 200, 1], ['hoverLabel', 'bool'], ['hoverPathLabels', 'bool'], ['scale', 'number', 0.2, 3, 0.05], ['color', 'color'], ['background', 'bool']],
+        'labels-force':[['maxLabels', 'number', 0, 200, 1], ['hoverLabel', 'bool'], ['hoverPathLabels', 'bool'], ['scale', 'number', 0.2, 3, 0.05], ['background', 'bool']],
     }
     // what a layer shows, when its name doesn't say it
     const LAYER_ALIASES = { 'cells': 'voronoi', 'λ': 'zoom', '(0,0)': 'origin' }

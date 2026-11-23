@@ -30,6 +30,22 @@ export function labelsFor(ud:IUnitDisk, max:number|undefined) : N[] {
     return cache.labelsByMax[max] || (cache.labelsByMax[max] = selectLabels(ud, cache, max))
 }
 
+/**
+ * The labels of a label layer: labelsFor(maxLabels), plus as its options ask
+ *   hoverLabel:      the node under the mouse (n.hovered)
+ *   hoverPathLabels: every node on the path from it to the root
+ * if they are visible and have a label. These come on top of the limit.
+ */
+export function labelsWithHover(ud:IUnitDisk, args:{ maxLabels?:number, hoverLabel?:boolean, hoverPathLabels?:boolean }) : N[] {
+    const base = labelsFor(ud, args.maxLabels)
+    if (!args.hoverLabel && !args.hoverPathLabels) return base
+    const extra = ud.cache.unculledNodes.filter((n:N)=> n.precalc.label && !n.outOfView
+        && ((args.hoverLabel && n.hovered) || (args.hoverPathLabels && n.pathes && n.pathes.isPartOfAnyHoverPath)))
+    if (!extra.length) return base
+    const inBase = new Set(base)
+    return base.concat(extra.filter(n=> !inBase.has(n)))
+}
+
 // The max visible nodes nearest to the center of the disk that have a label; the
 // root (tree root) always has one. Until v1 the candidates were the nodes inside
 // the focus radius, thinned out by weight, so max was often not reached.
