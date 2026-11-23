@@ -22,7 +22,7 @@ html, body { height: 100%; }
 body {
     margin: 0;
     display: grid;
-    grid-template-columns: 432px 1fr 432px;   /* options | tree | layers (same width) */
+    grid-template-columns: 389px 1fr 389px;   /* options | tree | layers (same width) */
     background: var(--bg);
     color: var(--text);
     font: 13px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
