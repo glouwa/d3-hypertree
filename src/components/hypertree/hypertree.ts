@@ -551,7 +551,7 @@ export class Hypertree
      * (125 %, 150 %) and with the CSS weight 300 vs 400, so label backgrounds were too
      * small for their text.
      */
-    private captionMetrics(context:CanvasRenderingContext2D) : { font:string, factor:number } | null {
+    private captionMetrics(context:CanvasRenderingContext2D) : { font:string, factor:number, probe:string } | null {
         const html = this.view_ && this.view_.html
         const svg = html && (html.querySelector('.unitdisk-nav svg') || html.querySelector('svg'))
         if (!svg) return null
@@ -568,7 +568,7 @@ export class Hypertree
         const font = `${cs.fontStyle} ${cs.fontWeight} 100px ${cs.fontFamily}`
         context.font = font
         const canvasWidth = context.measureText(sample).width
-        return canvasWidth ? { font, factor: width / canvasWidth } : null
+        return canvasWidth ? { font, factor: width / canvasWidth, probe: `${cs.fontStyle} ${cs.fontWeight} 16px ${cs.fontFamily}` } : null
     }
 
     protected updateLabelLen_() : void {
@@ -581,15 +581,26 @@ export class Hypertree
         const font = metrics ? metrics.font : this.args.geometry.captionFont
         const factor = metrics ? metrics.factor : 1/200
         context.font = font
-        // the web font (e.g. Roboto) not loaded yet: measured with a fallback; again when it is
-        if (document.fonts && document.fonts.status !== 'loaded' && !this.waitingForFonts) {
-            this.waitingForFonts = true
-            document.fonts.ready.then(()=> {
-                this.waitingForFonts = false
-                if (!this.data) return
-                this.updateLabelLen_()
-                this.update.data()
-            })
+        // the web font (e.g. Roboto) not loaded yet: measured with a fallback; loaded now
+        // (the canvas does not request it, the SVG text may not have yet) and measured
+        // again when it is there. Before, a page measured with Roboto or the fallback,
+        // depending on the cache, and the labels sat a few pixels apart.
+        const fonts = document.fonts
+        if (metrics && fonts && !this.waitingForFonts) {
+            let missing = false
+            try { missing = !fonts.check(metrics.probe) } catch (e) { missing = false }
+            if (missing) {
+                this.waitingForFonts = true
+                fonts.load(metrics.probe).catch(()=> {}).then(()=> {
+                    this.waitingForFonts = false
+                    if (!this.data) return
+                    let still = false
+                    try { still = !fonts.check(metrics.probe) } catch (e) {}
+                    if (still) return                  // not available: the fallback stays
+                    this.updateLabelLen_()
+                    this.update.data()
+                })
+            }
         }
 
         const updateLabelLen_ = (txtprop, lenprop)=>
