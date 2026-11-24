@@ -394,6 +394,7 @@ export class Hypertree
         this.updateLang_()
         
         // hmm, wird niergens mitgemessen :(
+        this.applyMinFill_()
         this.findInitλ_()
         
         this.view_.html.querySelector('.preloader').innerHTML = ''        
@@ -435,6 +436,60 @@ export class Hypertree
             map:this.langMap, 
             filesize:dl 
         }        
+    }
+
+    /**
+     * interaction.minFill: the lower λ bound at which the visible tree, with the root in
+     * the middle, still reaches minFill of the disk radius (its farthest visible node:
+     * the filter decides what is visible at that zoom, as in findInitλ_; the radius
+     * grows with λ, so a bisection). Zooming out further would leave the tree a small
+     * spot in the middle. A tree that never reaches it gets λbounds[1].
+     */
+    protected applyMinFill_() : void {
+        if (!this.data) return
+        // interaction.maxLinkLength: the upper bound. A link whose parent is in the
+        // middle is λ × (deflen + L) long (layoutBergé: deflen .5 for the root's
+        // children, else 1; L: the extra length of leaves among many siblings), so the
+        // longest such link reaches maxLinkLength at λ = maxLinkLength / max(deflen + L)
+        const maxLink = this.args.interaction.maxLinkLength
+        if (maxLink) {
+            this.args.layout.type(this.data, this.args.geometry.transformation.state.λ)
+            let f = 0
+            this.data.each(n=> {
+                if (!n.parent) return
+                const L = (n.layout && n.layout.wedge && n.layout.wedge.L) || 0
+                f = Math.max(f, (n.parent.parent ? 1 : .5) + L)
+            })
+            if (f) this.args.interaction.λbounds = [this.args.interaction.λbounds[0], maxLink / f]
+        }
+        const fill = this.args.interaction.minFill
+        if (!fill) {
+            const [lo, hi] = this.args.interaction.λbounds
+            if (lo > hi) this.args.interaction.λbounds = [hi, hi]
+            return
+        }
+        const max = this.args.interaction.λbounds[1]
+        const λstart = this.args.geometry.transformation.state.λ
+        const reach = (λ:number)=> {
+            this.args.geometry.transformation.state.λ = λ
+            this.updateLayoutPath_(this.data)
+            this.unitdisk.args.cacheUpdate(this.unitdisk, this.unitdisk.cache)
+            const visible = this.args.geometry.transformation.cache.unculledNodes || []
+            return visible.reduce((m, n)=> Math.max(m, n.layout && n.layout.zp ? n.layout.zp.r : 0), 0)
+        }
+        let λ = max
+        if (reach(max) > fill) {
+            let lo = 1e-5, hi = max
+            for (let i = 0; i < 40; i++) {
+                const mid = Math.sqrt(lo * hi)
+                if (reach(mid) >= fill) hi = mid; else lo = mid
+            }
+            λ = hi
+        }
+        // a new array: λbounds may be shared with a preset
+        this.args.interaction.λbounds = [λ, max]
+        this.args.geometry.transformation.state.λ = λstart
+        this.updateLayoutPath_(this.data)
     }
 
     protected findInitλ_() : void {
@@ -493,12 +548,57 @@ export class Hypertree
 
     private virtualCanvas = undefined
     private virtualCanvasContext = undefined
+    private waitingForFonts = false
+
+    /**
+     * The canvas font and the factor from canvas pixels to the units of the SVG labels,
+     * from a caption measured in this tree's SVG: the font the labels are drawn with
+     * (family, weight and size from the CSS, e.g. the larger :lang(zh) size), so the
+     * widths fit for every language and screen scaling. Until v1 the widths came from
+     * geometry.captionFont divided by devicePixelRatio: too narrow on scaled screens
+     * (125 %, 150 %) and with the CSS weight 300 vs 400, so label backgrounds were too
+     * small for their text.
+     */
+    private captionMetrics(context:CanvasRenderingContext2D) : { font:string, factor:number } | null {
+        const html = this.view_ && this.view_.html
+        const svg = html && (html.querySelector('.unitdisk-nav svg') || html.querySelector('svg'))
+        if (!svg) return null
+        const sample = 'Hyperbolic Tree of Life 0123456789'
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text')
+        text.setAttribute('class', 'caption')
+        text.textContent = sample
+        const parent = svg.querySelector('.unitDisc') || svg
+        parent.appendChild(text)
+        let width = 0, cs:CSSStyleDeclaration
+        try { width = text.getBBox().width; cs = getComputedStyle(text) } catch (e) { width = 0 }
+        parent.removeChild(text)
+        if (!width || !cs) return null
+        const font = `${cs.fontStyle} ${cs.fontWeight} 100px ${cs.fontFamily}`
+        context.font = font
+        const canvasWidth = context.measureText(sample).width
+        return canvasWidth ? { font, factor: width / canvasWidth } : null
+    }
+
     protected updateLabelLen_() : void {
-        var canvas = this.virtualCanvas 
+        var canvas = this.virtualCanvas
             || (this.virtualCanvas = document.createElement("canvas"))
-        var context = this.virtualCanvasContext 
+        var context = this.virtualCanvasContext
             || (this.virtualCanvasContext = canvas.getContext("2d"))
-        context.font = this.args.geometry.captionFont
+        const metrics = this.captionMetrics(context)
+        // no SVG yet: the geometry font, calibrated by hand for a screen without scaling
+        const font = metrics ? metrics.font : this.args.geometry.captionFont
+        const factor = metrics ? metrics.factor : 1/200
+        context.font = font
+        // the web font (e.g. Roboto) not loaded yet: measured with a fallback; again when it is
+        if (document.fonts && document.fonts.status !== 'loaded' && !this.waitingForFonts) {
+            this.waitingForFonts = true
+            document.fonts.ready.then(()=> {
+                this.waitingForFonts = false
+                if (!this.data) return
+                this.updateLabelLen_()
+                this.update.data()
+            })
+        }
 
         const updateLabelLen_ = (txtprop, lenprop)=>
         {
@@ -507,7 +607,7 @@ export class Hypertree
                     // multi-line labels ('\n'): the width of the longest line
                     const lines = String(n.precalc[txtprop]).split('\n')
                     const width = Math.max(...lines.map(l=> context.measureText(l).width))
-                    n.precalc[lenprop] = width/200/window.devicePixelRatio
+                    n.precalc[lenprop] = width * factor
                     console.assert(typeof n.precalc[lenprop] === 'number')
                 }
                 else

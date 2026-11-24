@@ -66,6 +66,16 @@ are listed first.
   labels never overlap, a label without a free place is left out. Labels grow and
   shrink when they come and go, a label that changes its place glides there
   (option `transition`).
+- **`interaction.minFill`** and **`interaction.maxLinkLength`**: the λ bounds
+  computed per tree after loading. `minFill` (e.g. `.9`): the lower bound at which
+  the visible tree, root in the middle, still reaches that share of the disk radius.
+  `maxLinkLength` (e.g. `.5`): the upper bound at which a link whose parent is in the
+  middle is at most that long (λ × (1 + L) in `layoutBergé`). They replace
+  `λbounds[0]` / `λbounds[1]`.
+- **Nodes with hidden children** (class `lazy`, red in the themes) are drawn 1.5
+  times as large (`nodes` layer option `lazyScale`); the class follows the view (it
+  was only set when a disk was created, so a node that got or lost hidden children
+  kept its color).
 - **`filter.labelScore`**: the weight of a node when the label layers choose which
   nodes get a label (times the squared display scale), e.g. a felt importance from
   the data; default the subtree weight, as before. `undefined` or `null` for a node
@@ -144,6 +154,13 @@ are listed first.
 
 ### Fixed
 
+- **Label widths** (label backgrounds, force label spacing, placement): measured with
+  the font the labels are drawn with (family, weight and size from the CSS, also the
+  larger `:lang(zh)` size), calibrated against an SVG text; they were divided by
+  `devicePixelRatio` and measured with weight 400 instead of 300, so on scaled screens
+  (125 %, 150 %) backgrounds were too small and text stuck out. Measured again when the
+  web font has loaded. The box of the hovered label takes the shape of the label's
+  background and covers it; its border is always 1 screen pixel.
 - **An empty tree after moving away from the center** (flat trees zoomed out):
   nodes inside the focus circle are never hidden, so with more of them than
   `rangeNodes.max` the internal factor of the filter sank on every update toward 0;

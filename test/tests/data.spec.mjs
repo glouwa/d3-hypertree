@@ -106,8 +106,8 @@ test('labels with \n render on several lines', async ({ page }) => {
             singleTspans: single.map(t => t.querySelectorAll('tspan').length),
             singleText: single.length ? single[0].textContent : null,
             width: n1.precalc.labelslen,
-            widthOfLongest: (() => { const c = document.createElement('canvas').getContext('2d'); c.font = ht.args.geometry.captionFont
-                                     return c.measureText('second, longer line').width / 200 / window.devicePixelRatio })(),
+            // the drawn width of each line (in the label's own units)
+            lineWidths: multi.length ? [...multi[0].querySelectorAll('tspan')].map(s => s.getComputedTextLength()) : [],
         }
     })
     expect(r.multiTspans.length).toBeGreaterThan(0)
@@ -115,7 +115,10 @@ test('labels with \n render on several lines', async ({ page }) => {
     expect(r.lines).toEqual(['first line', 'second, longer line', 'third'])
     expect(r.singleTspans.every(n => n === 0)).toBe(true)
     expect(r.singleText).toBe('one line')
-    expect(r.width).toBeCloseTo(r.widthOfLongest, 9)
+    // the measured width is the one of the longest line, as drawn (within 5 %)
+    const longest = Math.max(...r.lineWidths)
+    expect(longest).toBe(r.lineWidths[1])
+    expect(Math.abs(r.width / longest - 1)).toBeLessThan(.05)
     expectNoErrors(errors)
 })
 

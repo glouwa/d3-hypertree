@@ -89,6 +89,14 @@ export interface HypertreeArgs
         onHoverNodeChange?: (n:N)=> void
         onCenterNodeChange: (n:N, s:string)=> void
         λbounds:            [ number, number ]
+        // the tree never fills less than this share of the disk radius (e.g. .9): the
+        // lower λ bound is computed per tree after loading (the smallest λ at which,
+        // with the root in the middle, the farthest node reaches it), replacing λbounds[0]
+        minFill?:           number
+        // a link with its parent in the middle of the disk is at most this long (share
+        // of the disk radius, e.g. .5): the upper λ bound computed per tree, replacing
+        // λbounds[1] (a link from the middle is λ × (1 + L) long in the layoutBergé)
+        maxLinkLength?:     number
         wheelFactor:        number
     }
 }

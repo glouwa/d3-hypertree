@@ -206,14 +206,25 @@ export function markHoveredLabel(s) {
         rect.setAttribute('class', 'caption-hover')
     }
     if (rect.nextSibling !== hovered) group.insertBefore(rect, hovered)
-    const b = hovered.getBBox()            // in the text's own coordinates
-    if (!b.width) { rect.setAttribute('width', '0'); return }
-    const pad = b.height * .25
-    rect.setAttribute('x', String(b.x - pad))
-    rect.setAttribute('y', String(b.y - pad * .5))
-    rect.setAttribute('width', String(b.width + 2 * pad))
-    rect.setAttribute('height', String(b.height + pad))
-    rect.setAttribute('rx', String(pad))
+    // a label with a background (rect.caption-background just before it): the box
+    // takes its shape and covers it exactly (it lies between background and text)
+    let background = rect.previousElementSibling
+    if (background && !background.classList.contains('caption-background')) background = null
+    if (background) {
+        for (const a of ['x', 'y', 'width', 'height', 'rx', 'ry'])
+            rect.setAttribute(a, background.getAttribute(a) || '0')
+    }
+    else {
+        const b = hovered.getBBox()            // in the text's own coordinates
+        if (!b.width) { rect.setAttribute('width', '0'); return }
+        const pad = b.height * .25
+        rect.setAttribute('x', String(b.x - pad))
+        rect.setAttribute('y', String(b.y - pad * .5))
+        rect.setAttribute('width', String(b.width + 2 * pad))
+        rect.setAttribute('height', String(b.height + pad))
+        rect.setAttribute('rx', String(pad))
+        rect.removeAttribute('ry')
+    }
     const t = hovered.getAttribute('transform')
     if (t) rect.setAttribute('transform', t); else rect.removeAttribute('transform')
 }

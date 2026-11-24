@@ -255,10 +255,16 @@ for (const layer of ['labels', 'labels-force', 'labels-placed']) {
         await waitForStable(page)
         const t = await page.evaluate(layer => {
             const m = document.querySelector('.unitDisc').getScreenCTM(), inv = m.inverse()
+            const screen = n => ({ x: m.a * n.cache.re + m.c * n.cache.im + m.e, y: m.b * n.cache.re + m.d * n.cache.im + m.f })
+            const nodes = harness.ht.unitdisk.cache.unculledNodes.map(screen)
+            const texts = [...document.querySelectorAll('[id="labels"] text, [id="labels-force"] text, [id="labels-placed"] text')]
             for (const e of document.querySelectorAll(`[id="${layer}"] text`)) {
                 const r = e.getBoundingClientRect()
                 if (r.width < 15) continue
                 const x = r.left + r.width / 2, y = r.top + r.height / 2
+                // free: no node drawn within 10 px (a node there wins), no other label over it
+                if (nodes.some(p => Math.hypot(p.x - x, p.y - y) < 10)) continue
+                if (texts.some(o => o !== e && (() => { const q = o.getBoundingClientRect(); return x >= q.left - 2 && x <= q.right + 2 && y >= q.top - 2 && y <= q.bottom + 2 })())) continue
                 const v = { re: inv.a * x + inv.c * y + inv.e, im: inv.b * x + inv.d * y + inv.f }
                 const cell = harness.ht.unitdisk.cache.voronoiDiagram.find(v.re, v.im)
                 if (cell && cell.data !== e.__data__) return { x, y, id: e.__data__.mergeId, cell: cell.data.mergeId }

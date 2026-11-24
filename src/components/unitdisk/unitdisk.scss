@@ -65,9 +65,11 @@
         }
 
         // the label of the hovered node (markHoveredLabel): an opaque box with a border
+        // of always one screen pixel (whatever the zoom and the label's scale)
         .caption-hover {
             pointer-events: none;
-            stroke-width: .004;
+            stroke-width: 1px;
+            vector-effect: non-scaling-stroke;
         }
 
         .label-link {

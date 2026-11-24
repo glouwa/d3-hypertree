@@ -105,8 +105,13 @@ export class D3UpdatePattern
                     var h = geometry.captionHeight * lines
                     
                     const b = typeof background === 'function' ? background(d) : background
+                    // before the text, and before the box of the hovered label
+                    // (rect.caption-hover, markHoveredLabel), which covers the background
+                    const text = <Element><unknown>this
+                    const prev = text.previousElementSibling
+                    const before = prev && prev.classList.contains('caption-hover') ? prev : text
                     if (w && b)   // nodes without a measured label get no background
-                        svgRootHere.insert('rect', d=> this)
+                        svgRootHere.insert('rect', d=> before)
                             .attr("x",         x=> -paddingLeftRight/2)
                             .attr("y",         x=> -paddingTopBottom-geometry.captionHeight/2)   // top of the first line
                             .attr("rx",        x=> .01) //.009
