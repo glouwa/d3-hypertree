@@ -167,6 +167,8 @@ are listed first.
   `rangeNodes.max` the internal factor of the filter sank on every update toward 0;
   moved away, every node was too light and nothing was drawn. A step that hides
   nothing now stops it, and the first node of the filter's path is always drawn.
+  That stop holds only for the view (λ, position) it was found in: zoomed fully in
+  and out again, it kept the number of nodes above `rangeNodes.max`.
 - **Flickering nodes while dragging or loading**:
   - a drag or wheel now stops a running animation (e.g. a `goto` after a click);
     both used to set the translation and the tree jumped between two states on

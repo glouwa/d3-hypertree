@@ -35,8 +35,19 @@ const MAGIC_MAX = 1e12
 // nodes in the focus) the count stays above max whatever magic is. magic used to sink
 // on every update toward 0; moved away from the center, every node (the root too) was
 // then lighter than the limit and nothing was drawn.
-type MagicLimits = { up:number, down:number, last:number, stoppedAt:number, lastN?:number }
+// That limit (focusDown) holds only for the view it was found in (λ and P): which nodes
+// are in the focus depends on them. Zoomed fully in, every node was in the focus and
+// the limit was set; zoomed out again it kept the filter above max (Mammalia: 527 of
+// 320..500, one step down gave 497). Retrying it costs nothing: a step that hides
+// nothing changes nothing drawn, a step that hides too much is an overshoot (down).
+type MagicLimits = { up:number, down:number, last:number, stoppedAt:number, lastN?:number,
+                     focusDown:number, focusView?:string }
 const magicLimits = new WeakMap<object, MagicLimits>()
+
+function viewKey(ud:IUnitDisk) {
+    const s = ud.view.hypertree.args.geometry.transformation.state
+    return `${s.λ.toFixed(4)},${s.P.re.toFixed(4)},${s.P.im.toFixed(4)}`
+}
 
 function adjustMagic(ud:IUnitDisk, cache:TransformationCache) {
     const filter = ud.view.hypertree.args.filter.weightFilter
@@ -46,18 +57,20 @@ function adjustMagic(ud:IUnitDisk, cache:TransformationCache) {
     const n = cache.unculledNodes.length
     const range = filter.rangeNodes
     const alpha = filter.alpha
-    const fresh = ()=> ({ up: MAGIC_MAX, down: MAGIC_MIN, last: 0, stoppedAt: 0 })
+    const fresh = ()=> ({ up: MAGIC_MAX, down: MAGIC_MIN, last: 0, stoppedAt: 0, focusDown: MAGIC_MIN })
     let b = magicLimits.get(filter)
     if (!b || (b.stoppedAt && Math.abs(n - b.stoppedAt) > .1 * b.stoppedAt))
         magicLimits.set(filter, b = fresh())
+    const view = viewKey(ud)
+    if (b.focusView !== view) { b.focusDown = MAGIC_MIN; b.focusView = view }
     const eps = 1e-9   // magic / alpha * alpha is not exactly magic
 
     if (n > range.max) {
         if (b.last > 0) b.up = Math.min(b.up, filter.magic)        // the step up overshot
-        // the step down hid nothing: no further down (it would not help)
-        if (b.last < 0 && b.lastN !== undefined && n >= b.lastN) b.down = Math.max(b.down, filter.magic)
+        // the step down hid nothing: no further down in this view (it would not help)
+        if (b.last < 0 && b.lastN !== undefined && n >= b.lastN) b.focusDown = Math.max(b.focusDown, filter.magic)
         const m = filter.magic / alpha
-        if (m > b.down * (1 + eps)) { filter.magic = m; b.last = -1; b.stoppedAt = 0 } else { b.last = 0; b.stoppedAt = n }
+        if (m > Math.max(b.down, b.focusDown) * (1 + eps)) { filter.magic = m; b.last = -1; b.stoppedAt = 0 } else { b.last = 0; b.stoppedAt = n }
     }
     else if (n < range.min) {
         if (b.last < 0) b.down = Math.max(b.down, filter.magic)    // the step down overshot
