@@ -245,6 +245,45 @@ for (const layer of ['labels-force', 'labels-placed']) {
     })
 }
 
+// Pointing at a label acts on its node, like pointing at the node's voronoi cell: hover
+// (and the label is highlighted: rect.caption-hover, class caption-hovered) and click.
+// Tested with a label whose center lies in the voronoi cell of another node.
+for (const layer of ['labels', 'labels-force', 'labels-placed']) {
+    test(`${layer}: hovering and clicking a label act on its node`, async ({ page }) => {
+        const errors = collectErrors(page)
+        await open(page, layer)
+        await waitForStable(page)
+        const t = await page.evaluate(layer => {
+            const m = document.querySelector('.unitDisc').getScreenCTM(), inv = m.inverse()
+            for (const e of document.querySelectorAll(`[id="${layer}"] text`)) {
+                const r = e.getBoundingClientRect()
+                if (r.width < 15) continue
+                const x = r.left + r.width / 2, y = r.top + r.height / 2
+                const v = { re: inv.a * x + inv.c * y + inv.e, im: inv.b * x + inv.d * y + inv.f }
+                const cell = harness.ht.unitdisk.cache.voronoiDiagram.find(v.re, v.im)
+                if (cell && cell.data !== e.__data__) return { x, y, id: e.__data__.mergeId, cell: cell.data.mergeId }
+            }
+        }, layer)
+        expect(t, 'a label over another node\'s cell').toBeTruthy()
+        await page.mouse.move(t.x + 40, t.y + 40)
+        await page.mouse.move(t.x, t.y, { steps: 3 })
+        await expect.poll(() => page.evaluate(() => { const h = harness.ht.data.descendants().find(n => n.hovered); return h && h.mergeId })).toBe(t.id)
+        // highlighted: the box behind the label and the class on its text
+        await expect.poll(() => page.evaluate(layer => {
+            const g = document.querySelector(`[id="${layer}"]`)
+            const text = g.querySelector('text.caption-hovered')
+            return { box: !!g.querySelector('rect.caption-hover'), text: text ? text.__data__.mergeId : null }
+        }, layer)).toEqual({ box: true, text: t.id })
+        await page.evaluate(() => harness.clearEvents())
+        await page.mouse.click(t.x, t.y)
+        await expect.poll(() => page.evaluate(() => harness.events.filter(e => e.type === 'click').map(e => e.id))).toEqual([t.id])
+        // away from the label: no box
+        await page.mouse.move(5, 5)
+        await expect.poll(() => page.evaluate(layer => !!document.querySelector(`[id="${layer}"] rect.caption-hover`), layer)).toBe(false)
+        expectNoErrors(errors)
+    })
+}
+
 test('labels-placed in the rectangular view: no overlaps', async ({ page }) => {
     const geometry = encodeURIComponent(JSON.stringify({ halfPlane: true }))
     await page.setViewportSize({ width: 1300, height: 700 })

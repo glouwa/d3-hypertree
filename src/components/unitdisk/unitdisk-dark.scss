@@ -51,10 +51,19 @@ $nodeStroke:    #90caf9;
             //stroke-linejoin: miter;
         }
 
-        .caption-background {            
+        .caption-background {
             fill: rgba(#111111, .4);
             //stroke: rgba(#fff, 1);
             //stroke-width: .0002;
+        }
+
+        // hovered label: no transparency, a border
+        .caption-hover {
+            fill: #111111;
+            stroke: #b5b5b5;
+        }
+        .caption.caption-hovered {
+            fill: #fff;
         }
 
         .label-link {

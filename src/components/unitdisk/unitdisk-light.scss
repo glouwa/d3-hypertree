@@ -54,9 +54,18 @@ $nodeStroke:    #90caf9;
         .caption-background {
             /*
             fill: #fff;
-            opacity: .76;         
+            opacity: .76;
             */
             fill: rgba(#fff, .76);
+        }
+
+        // hovered label: no transparency, a border
+        .caption-hover {
+            fill: #fff;
+            stroke: rgb(25, 94, 4);
+        }
+        .caption.caption-hovered {
+            stroke: #fff;
         }
 
         .label-link {

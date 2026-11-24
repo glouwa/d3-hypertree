@@ -66,6 +66,12 @@ are listed first.
   labels never overlap, a label without a free place is left out. Labels grow and
   shrink when they come and go, a label that changes its place glides there
   (option `transition`).
+- **Labels can be pointed at**: hovering, clicking or holding a label acts on its
+  node, as its voronoi cell does (labels sit beside their node, often over another
+  node's cell). A node drawn right under the pointer (within 8 px) still wins over a
+  label lying over it. The label of the hovered node is highlighted in every label
+  layer: an opaque box with a border behind it (`rect.caption-hover`) and an opaque
+  halo (`.caption-hovered`), styled in the light and dark theme.
 - **`layout.childOrder`**: `'data'` (default, the order of the data) or
   `'balanced'`: the heaviest child of every node in the middle, the others each on
   the side that weighs less so far, heavier ones next to the middle. The heaviest

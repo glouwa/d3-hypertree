@@ -112,11 +112,13 @@ export class LayerStack
         var t2 = performance.now()
         if (this.layers['labels']) 
             this.layers['labels'].update.data()
-        // force labels: only when they show the hovered node or its path
+        // force labels: their data only when they show the hovered node or its path;
+        // otherwise the style (the hovered label is highlighted: markHoveredLabel)
         for (const name of ['labels-force', 'labels-placed']) {
             const l = this.layers[name]
-            if (l && l.args && (l.args.hoverLabel || l.args.hoverPathLabels))
-                l.update.data()
+            if (!l || !l.args) continue
+            if (l.args.hoverLabel || l.args.hoverPathLabels) l.update.data()
+            else l.update.style()
         }
         
         var t3 = performance.now()

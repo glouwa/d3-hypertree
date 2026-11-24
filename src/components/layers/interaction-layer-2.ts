@@ -12,6 +12,9 @@ import { compose, shift }         from '../../models/transformation/hyperbolic-m
 import { viewToDisk, toView, diskPos, infinityOf } from '../../models/transformation/cayley'
 
 const π = Math.PI
+// pointing within this many screen pixels of a node's position hits the node, even
+// if a label of another node lies over it (nodeAt)
+const NODE_HIT_PX = 8
 
 
 export interface InteractionLayer2Args extends ILayerArgs
@@ -92,9 +95,11 @@ export class InteractionLayer2 implements ILayer
                 // The capture circle (r = 5) reaches far beyond the disk, and the voronoi
                 // cells are unbounded: outside the disk no node is hovered.
                 // hover strategy: 'pointer' (default) = the node under the mouse, 'none' = no hover
+                // A label under the mouse hovers its node (also outside the disk, where
+                // labels at the rim may reach)
                 const p = this.mousePosAsC(e), m = this.toDisk(p)
                 const pointer = this.view.hypertree.args.interaction.hover !== 'none'
-                const n = pointer && (m.re * m.re + m.im * m.im) <= 1 ? this.findNodeAt(p) : undefined
+                const n = !pointer ? undefined : this.nodeAt(p, (m.re * m.re + m.im * m.im) <= 1)
                 this.setHoverNode(n)
                 this.htapi.setPathHead(this.hoverpath, n)
             }
@@ -124,10 +129,8 @@ export class InteractionLayer2 implements ILayer
             const traces = this.view.hypertree.args.objects.traces
             if (traces.length !== 1 || !this.nopinch) return
             const v = this.toViewPos(m)
-            const q = this.view.unitdisk.cache.voronoiDiagram
-                && this.view.unitdisk.cache.voronoiDiagram.find(v.re, v.im)
             this.held = true
-            i.onNodeHold(q ? q.data : undefined, v, this)
+            i.onNodeHold(this.nodeAt(v), v, this)
         }, i.holdDuration || 500)
     }
     private cancelHoldTimer() {
@@ -414,8 +417,7 @@ export class InteractionLayer2 implements ILayer
 
     private click(m:C) {
         const v = this.toViewPos(m)              // the voronoi cells are in view coordinates
-        const q = this.view.unitdisk.cache.voronoiDiagram.find(v.re, v.im)
-        const n = q ? q.data : undefined
+        const n = this.nodeAt(v)
 
         if (!this.view.hypertree.isAnimationRunning()) {
             const i = this.view.hypertree.args.interaction
@@ -441,6 +443,50 @@ export class InteractionLayer2 implements ILayer
     private findNodeAt = (m:C)=> {
         var find = this.view.unitdisk.cache.voronoiDiagram.find(m.re, m.im)
         return find ? find.data : undefined
+    }
+
+    // The node at a view position (hover, click, hold):
+    //   1. a node drawn right there (within NODE_HIT_PX of its position on the screen)
+    //   2. else the node of a label there (a label sits beside its node, often in
+    //      another node's cell: pointing at it acts on its own node; labels may lie
+    //      over other nodes, which is why 1. comes first)
+    //   3. else the node of the voronoi cell (only inside the disk for hover)
+    private nodeAt = (v:C, cellToo = true) : N | undefined=> {
+        const q = this.view.unitdisk.cache.voronoiDiagram && this.view.unitdisk.cache.voronoiDiagram.find(v.re, v.im)
+        const cell:N = q ? q.data : undefined
+        if (cell && cell.cache && this.screenDistance(v, cell.cache) <= NODE_HIT_PX) return cell
+        return this.labelNodeAt(v) || (cellToo ? cell : undefined)
+    }
+    // distance of two view positions in screen pixels
+    private screenDistance(a:C, b:C) : number {
+        const plane = this.view.parent && this.view.parent.node && this.view.parent.node()
+        const ctm = plane && plane.getScreenCTM && plane.getScreenCTM()
+        const scale = ctm ? Math.hypot(ctm.a, ctm.b) : 1
+        return Math.hypot(a.re - b.re, a.im - b.im) * scale
+    }
+
+    // The node of the drawn label at a view position (labels, labels-force,
+    // labels-placed; the text box on the screen, a few pixels larger). Labels have
+    // pointer-events: none, this layer gets the events, so the hit is computed. The
+    // label drawn last (on top) wins.
+    private labelNodeAt(v:C) : N | undefined {
+        const plane = this.view.parent && this.view.parent.node && this.view.parent.node()
+        const stack = plane && plane.parentNode
+        const ctm = plane && plane.getScreenCTM && plane.getScreenCTM()
+        if (!stack || !ctm) return undefined
+        const x = ctm.a * v.re + ctm.c * v.im + ctm.e
+        const y = ctm.b * v.re + ctm.d * v.im + ctm.f
+        const PAD = 2
+        let hit:N = undefined
+        const texts = stack.querySelectorAll('[id="labels"] text, [id="labels-force"] text, [id="labels-placed"] text')
+        for (let i = 0; i < texts.length; i++) {
+            const t:any = texts[i]
+            if (!t.__data__) continue
+            const r = t.getBoundingClientRect()
+            if (r.width < 2 || r.height < 2) continue          // not drawn, or still growing from 0
+            if (x >= r.left - PAD && x <= r.right + PAD && y >= r.top - PAD && y <= r.bottom + PAD) hit = t.__data__
+        }
+        return hit
     }
 
     // The visible node nearest to m: what the voronoi cell under m would give (a

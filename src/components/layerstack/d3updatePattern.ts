@@ -87,7 +87,7 @@ export class D3UpdatePattern
     // falsy = no background, a color string = filled with it, true = CSS color
     public addTextBackgroundRects(paddingLeftRight, paddingTopBottom, height, layername, background:any = true)
     { 
-        this.mainSvgGroup.selectAll('rect').remove()
+        this.mainSvgGroup.selectAll('rect.caption-background').remove()
         var svgRootHere = this.mainSvgGroup
         var T = this
         var geometry =  T.args.layer.view.hypertree.args.geometry

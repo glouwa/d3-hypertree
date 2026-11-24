@@ -109,9 +109,10 @@ export class LabelLayer implements ILayer
                                     .style("fill",           d=> this.args.color(d) )
                                     .call(s=> setLabelText(s, this.args.text)),
             updateColor:       s=> s.style("stroke",         d=> d.pathes && d.pathes.labelcolor)
-                                    .style("fill",           d=> this.args.color(d) ),
+                                    .style("fill",           d=> this.args.color(d) )
+                                    .call(markHoveredLabel),
             updateTransform:   s=> s.attr("transform",       offset)
-           //                         .text(                   this.args.text) 
+                                    .call(markHoveredLabel)
         })
     }
 }
@@ -181,6 +182,40 @@ export function setLabelText(s, text:(d)=> string) {
             this.appendChild(span)
         })
     })
+}
+
+/**
+ * The label of the hovered node stands out (all label layers): class caption-hovered
+ * on its text (an opaque halo, CSS) and an opaque box with a border behind it
+ * (rect.caption-hover, in the label's group just before the text, with the text's
+ * transform). Called with the layer's text elements on every style and transform
+ * update; a label can be hovered by pointing at the label itself
+ * (interaction-layer-2.ts: labelNodeAt).
+ */
+export function markHoveredLabel(s) {
+    s.classed('caption-hovered', d=> Boolean(d && d.hovered))
+    const first = s.node()
+    const group = first && first.parentNode
+    if (!group) return
+    let hovered:SVGTextElement = null
+    s.each(function(d) { if (d && d.hovered) hovered = this })
+    let rect = group.querySelector(':scope > rect.caption-hover') as SVGRectElement
+    if (!hovered) { if (rect) rect.remove(); return }
+    if (!rect) {
+        rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect') as SVGRectElement
+        rect.setAttribute('class', 'caption-hover')
+    }
+    if (rect.nextSibling !== hovered) group.insertBefore(rect, hovered)
+    const b = hovered.getBBox()            // in the text's own coordinates
+    if (!b.width) { rect.setAttribute('width', '0'); return }
+    const pad = b.height * .25
+    rect.setAttribute('x', String(b.x - pad))
+    rect.setAttribute('y', String(b.y - pad * .5))
+    rect.setAttribute('width', String(b.width + 2 * pad))
+    rect.setAttribute('height', String(b.height + pad))
+    rect.setAttribute('rx', String(pad))
+    const t = hovered.getAttribute('transform')
+    if (t) rect.setAttribute('transform', t); else rect.removeAttribute('transform')
 }
 
 export var bboxCenter = (d, cacheId='labelslen')=> {

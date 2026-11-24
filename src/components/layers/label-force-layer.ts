@@ -3,7 +3,7 @@ import { ILayer }          from '../layerstack/layer'
 import { ILayerView }      from '../layerstack/layer'
 import { ILayerArgs }      from '../layerstack/layer'
 import { D3UpdatePattern } from '../layerstack/d3updatePattern'
-import { setLabelText }    from '../layers/label-layer'
+import { setLabelText, markHoveredLabel } from '../layers/label-layer'
 import { Box, outward, labelSize, restCenter, overlap, distanceToBox } from './label-geometry'
 import { LabelTransitions, DEFAULT_TRANSITION } from './label-transition'
 
@@ -210,9 +210,11 @@ export class LabelForceLayer implements ILayer
                                     .style("fill",         d=> d.pathes && d.pathes.labelcolor)
                                     .call(s=> setLabelText(s, this.args.text))
                                     .attr("transform",       calctransform),
-            updateColor:       s=> s.style("fill",         d=> d.pathes && d.pathes.labelcolor),
+            updateColor:       s=> s.style("fill",         d=> d.pathes && d.pathes.labelcolor)
+                                    .call(markHoveredLabel),
             updateTransform:   s=> s.attr("transform",       calctransform)
                                     .call(s=> setLabelText(s, this.args.text))
+                                    .call(markHoveredLabel)
         })
 
         // leader lines from the label (nearest point of its box) to its node; they fade

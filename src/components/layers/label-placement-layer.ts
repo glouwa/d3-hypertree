@@ -4,7 +4,7 @@ import { ILayer }          from '../layerstack/layer'
 import { ILayerView }      from '../layerstack/layer'
 import { ILayerArgs }      from '../layerstack/layer'
 import { D3UpdatePattern } from '../layerstack/d3updatePattern'
-import { setLabelText }    from '../layers/label-layer'
+import { setLabelText, markHoveredLabel } from '../layers/label-layer'
 import { Box, outward, labelSize, restCenter, besideNode, overlapping, distanceToBox } from './label-geometry'
 import { LabelTransitions, DEFAULT_TRANSITION } from './label-transition'
 
@@ -200,9 +200,11 @@ export class LabelPlacementLayer implements ILayer
             create:            s=> s.style("fill", d=> d.pathes && d.pathes.labelcolor)
                                     .call(s=> setLabelText(s, this.args.text))
                                     .attr("transform", transform),
-            updateColor:       s=> s.style("fill", d=> d.pathes && d.pathes.labelcolor),
+            updateColor:       s=> s.style("fill", d=> d.pathes && d.pathes.labelcolor)
+                                    .call(markHoveredLabel),
             updateTransform:   s=> s.attr("transform", transform)
                                     .call(s=> setLabelText(s, this.args.text))
+                                    .call(markHoveredLabel)
         })
         const lineEnd = (d:N)=> {
             const b = this.drawnBox(d)
