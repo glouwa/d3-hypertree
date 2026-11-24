@@ -1,9 +1,10 @@
 import { test, expect } from '@playwright/test'
 import { collectErrors, expectNoErrors, openTree } from './helpers.mjs'
 
-// layout.fanWeight (src/models/n/fan-weight.ts): the leaf children of a node are drawn
-// as a staircase, fanRun(k) leaves per run; the fan needs the angle of its runs
-// (columns), not of its leaves. 'columns' is the default, 'leaves' the old weight.
+// layout.multirowHighDegreeNodes (src/models/n/fan-weight.ts): the leaf children of a
+// node with many of them in several rows (a staircase, fanRun(k) leaves per run); the
+// node needs the angle of its runs (columns), not of its leaves. Default true; false:
+// one row, every leaf its own angle.
 // Tree: root with "fan" (100 leaf children: 11 per run, 10 runs) and "binary" (8 leaves).
 
 const state = page => page.evaluate(() => {
@@ -16,8 +17,9 @@ const state = page => page.evaluate(() => {
         binaryL: binary.children.map(c => c.layout.wedge.L),
     }
 })
+const off = `layout=${encodeURIComponent(JSON.stringify({ multirowHighDegreeNodes: false }))}`
 
-test('columns (default): a fan weighs its columns, the leaf weights stay', async ({ page }) => {
+test('multirow (default): a fan weighs its columns, the leaf weights stay', async ({ page }) => {
     const errors = collectErrors(page)
     await openTree(page, 'gen=fan&n=100&depth=3&filter=off')
     const s = await state(page)
@@ -31,20 +33,21 @@ test('columns (default): a fan weighs its columns, the leaf weights stay', async
     expectNoErrors(errors)
 })
 
-test('columns: the staircase steps .3 link lengths per leaf, 11 leaves per run', async ({ page }) => {
+test('multirow: the first row at the link length, every further row .15 link lengths out', async ({ page }) => {
     await openTree(page, 'gen=fan&n=100&depth=3&filter=off')
     const s = await state(page)
-    s.L.forEach((L, i) => expect(L).toBeCloseTo(.3 * (i % 11), 9))
+    s.L.forEach((L, i) => expect(L).toBeCloseTo(.15 * (i % 11), 9))
     // inner children are not part of a staircase
     s.binaryL.forEach(L => expect(L).toBe(0))
 })
 
-test('leaves: the old weight (every leaf its own angle)', async ({ page }) => {
-    await openTree(page, `gen=fan&n=100&depth=3&filter=off&layout=${encodeURIComponent(JSON.stringify({ fanWeight: 'leaves' }))}`)
+test('multirowHighDegreeNodes false: one row, every leaf its own angle', async ({ page }) => {
+    await openTree(page, `gen=fan&n=100&depth=3&filter=off&${off}`)
     const s = await state(page)
     expect(s.fan.angle).toBe(100)
     expect(s.fan.width / s.binary.width).toBeCloseTo(100 / 8, 5)
-    expect(s.fan.run).toBeUndefined()
+    s.L.forEach(L => expect(L).toBe(0))
+    s.binaryL.forEach(L => expect(L).toBe(0))
 })
 
 test('small fans: two leaves as until v1 (each its angle, .1 apart), three leaves two columns', async ({ page }) => {
@@ -56,5 +59,5 @@ test('small fans: two leaves as until v1 (each its angle, .1 apart), three leave
         })
     }
     expect(await weights(2)).toEqual({ fan: 2, binary: 2, L: [0, .1] })
-    expect(await weights(3)).toEqual({ fan: 2, binary: 2, L: [0, .3, 0] })   // runs of 2
+    expect(await weights(3)).toEqual({ fan: 2, binary: 2, L: [0, .15, 0] })   // runs of 2
 })

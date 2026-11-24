@@ -134,9 +134,10 @@ function r2g(r) {
     return r/π * 360
 }
 
-// the step of the staircase of leaf children (in link lengths, layout.fanWeight
-// 'columns'; 'leaves' keeps the old .1)
-const FAN_STEP = .3
+// the distance of the rows of leaf children (in link lengths; layout
+// multirowHighDegreeNodes): the first row at the normal link length, every further
+// row this much further out
+const FAN_STEP = .15
 
 export function layoutBergé(n:N, λ:number, noRecursion=false)
 {
@@ -178,12 +179,13 @@ export function layoutBergé(n:N, λ:number, noRecursion=false)
         let resetCount = 0
         let anglesum = 0
 
-        // the part of the wedge: precalc.angleWeight (layout.fanWeight, fan-weight.ts)
+        // the part of the wedge: precalc.angleWeight (layout.multirowHighDegreeNodes, fan-weight.ts)
         const weight = (c:N)=> c.precalc.angleWeight !== undefined ? c.precalc.angleWeight : c.precalc.layoutWeight
         const parentWeight = (n.children || []).reduce((a, ccn)=> a+weight(ccn), 0)
         const rowcount = cllen / Math.log(cllen) / 2   // the same for every child
-        // 'columns': the staircase runs over the leaf children only (fanRun leaves per
-        // run), the inner children keep their place (their angle is their subtree's)
+        // fanRun (fan-weight.ts): the staircase runs over the leaf children only
+        // (fanRun leaves per run, 1: one row), the inner children keep their place;
+        // undefined (fewer than 3 leaf children): as until v1
         const fanRun = n.precalc.fanRun
         let leafIndex = 0
         cl.forEach((cn,i)=>

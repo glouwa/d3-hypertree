@@ -43,7 +43,7 @@
         linkWidth: null,
         layoutType: 'berge',
         childOrder: 'data',   // layout.childOrder: 'data' (default) or 'balanced'
-        fanWeight: 'columns', // layout.fanWeight: 'columns' (default) or 'leaves'
+        multirow: true,       // layout.multirowHighDegreeNodes (default true)
         wedgeOrientation: deg(base.layout.rootWedge.orientation),
         wedgeAngle: deg(base.layout.rootWedge.angle),
         filterOff: false, weightUniform: false,
@@ -170,7 +170,7 @@
         if (c.wedgeOrientation !== DEFAULTS.wedgeOrientation || c.wedgeAngle !== DEFAULTS.wedgeAngle)
             lo.rootWedge = { orientation: rad(c.wedgeOrientation), angle: rad(c.wedgeAngle) }
         if (c.childOrder !== DEFAULTS.childOrder) lo.childOrder = c.childOrder
-        if (c.fanWeight !== DEFAULTS.fanWeight) lo.fanWeight = c.fanWeight
+        if (c.multirow !== DEFAULTS.multirow) lo.multirowHighDegreeNodes = c.multirow
         if (Object.keys(lo).length) p.set('layout', JSON.stringify(lo))
         if (c.filterOff) p.set('filter', 'off')
         if (c.weightUniform) p.set('weight', 'uniform')
@@ -240,7 +240,7 @@
             if (w.orientation !== undefined) c.wedgeOrientation = deg(w.orientation)
             if (w.angle !== undefined) c.wedgeAngle = deg(w.angle)
             if (lo.childOrder) c.childOrder = lo.childOrder
-            if (lo.fanWeight) c.fanWeight = lo.fanWeight
+            if (lo.multirowHighDegreeNodes !== undefined) c.multirow = lo.multirowHighDegreeNodes
         }
         c.filterOff = p.get('filter') === 'off'
         c.weightUniform = p.get('weight') === 'uniform'
@@ -539,12 +539,11 @@
             () => `initSize ${base.layout.initSize}, λbounds [${+cfg.λmin.toFixed(3)}, ${+cfg.λmax.toFixed(3)}]`)
         hint(g, 'A preset (Data) may replace these callbacks with its own.')
 
-        g = section('Layout', ['layoutType', 'childOrder', 'fanWeight', 'wedgeOrientation', 'wedgeAngle'])
+        g = section('Layout', ['layoutType', 'childOrder', 'multirow', 'wedgeOrientation', 'wedgeAngle'])
         select(g, 'Type', 'layoutType', [['berge', 'Bergé (default, supports culling)'], ['spiral', 'spiral'], ['buchheim', 'Buchheim'], ['unitLines', 'unit lines'], ['unitVectors', 'unit vectors']])
         select(g, 'Child order', 'childOrder', [['data', 'data (default): as given'], ['balanced', 'balanced: heaviest child in the middle']])
         hint(g, 'layout.childOrder balanced: the heaviest child (most leaves) goes in the middle, the others each to the lighter side, heavier ones next to the middle. The heaviest path runs straight where the sides can be balanced (like a spruce); where two big branches split, it forks.')
-        select(g, 'Fan weight', 'fanWeight', [['columns', 'columns (default): a fan the angle of its runs'], ['leaves', 'leaves (until v1): every leaf its own angle']])
-        hint(g, 'layout.fanWeight: the leaf children of a node are drawn as a staircase (runs of leaves, each further out). columns: they need the angle of their runs only, a big unresolved fan no longer squeezes its resolved siblings. Try Generator: star.')
+        check(g, 'Multirow high-degree nodes', 'multirow', null, 'layout.multirowHighDegreeNodes: the leaf children of a node with many of them in several rows (a staircase, each further out), the node needs only the angle of its columns: a big unresolved fan no longer squeezes its resolved siblings. Off: one row, every leaf its own angle. Try Generator: star.')
         range(g, 'Root wedge dir.', 'wedgeOrientation', 0, 360, 1, null, v => `${v}°`)
         range(g, 'Root wedge angle', 'wedgeAngle', 10, 360, 1, null, v => `${v}°`)
 
