@@ -55,6 +55,11 @@ export interface HypertreeArgs
         maxFocusRadius:     number
         wikiRadius:         number
         maxlabels:          number
+        // the weight of a node when the label layers choose which nodes get a label
+        // (times the squared display scale): default its subtree weight
+        // (precalc.cullingWeight); e.g. a felt importance from the data. A function
+        // returning undefined or null for a node falls back to the subtree weight.
+        labelScore?:        (n:N)=> number
         /*labelFilter: {
             type:               string
             cullingRadius:      number

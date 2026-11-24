@@ -284,6 +284,28 @@ for (const layer of ['labels', 'labels-force', 'labels-placed']) {
     })
 }
 
+// filter.labelScore: the weight when choosing the labels (default: subtree weight);
+// undefined for a node falls back to the subtree weight
+test('filter.labelScore decides which nodes get a label', async ({ page }) => {
+    const opts = { labels: { invisible: false, hideOnDrag: false, maxLabels: 8 } }
+    await openTree(page, `file=fixtures/primates.treeml.xml&labels=name&layers=${encodeURIComponent(JSON.stringify(opts))}`)
+    await waitForStable(page)
+    const shown = () => page.evaluate(() => [...document.querySelectorAll('[id="labels"] text')].map(e => e.__data__.mergeId).sort())
+    const before = await shown()
+    // a visible node without a label so far, light: chosen with a large score
+    const target = await page.evaluate(ids => {
+        const n = harness.ht.unitdisk.cache.unculledNodes.filter(n => n.precalc.label && !ids.includes(n.mergeId) && n.cachep.r < .9)
+            .sort((a, b) => a.precalc.cullingWeight - b.precalc.cullingWeight)[0]
+        harness.ht.args.filter.labelScore = x => x === n ? 1e9 : 1
+        harness.ht.update.transformation()
+        return n.mergeId
+    }, before)
+    await expect.poll(shown).toContain(target)
+    // undefined everywhere: as without labelScore
+    await page.evaluate(() => { harness.ht.args.filter.labelScore = () => undefined; harness.ht.update.transformation() })
+    await expect.poll(shown).toEqual(before)
+})
+
 test('labels-placed in the rectangular view: no overlaps', async ({ page }) => {
     const geometry = encodeURIComponent(JSON.stringify({ halfPlane: true }))
     await page.setViewportSize({ width: 1300, height: 700 })

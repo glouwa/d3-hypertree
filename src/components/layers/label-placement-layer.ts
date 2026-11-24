@@ -7,6 +7,7 @@ import { D3UpdatePattern } from '../layerstack/d3updatePattern'
 import { setLabelText, markHoveredLabel } from '../layers/label-layer'
 import { Box, outward, labelSize, restCenter, besideNode, overlapping, distanceToBox } from './label-geometry'
 import { LabelTransitions, DEFAULT_TRANSITION } from './label-transition'
+import { labelWeight }     from '../../models/hypertree/preset-process'
 
 export interface LabelPlacementLayerArgs extends ILayerArgs
 {
@@ -90,7 +91,7 @@ export class LabelPlacementLayer implements ILayer
         if (n.hovered) return 3e15
         if (n.pathes && n.pathes.isPartOfAnyHoverPath) return 2e15 + (1e3 - n.depth)
         if (!n.parent) return 1e15
-        return (n.precalc.cullingWeight || 1) * n.distScale * n.distScale
+        return labelWeight(this.view.unitdisk, n) * n.distScale * n.distScale
     }
 
     // candidate box centers with ids: the rest position, 8 directions next to the

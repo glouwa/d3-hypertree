@@ -66,6 +66,10 @@ are listed first.
   labels never overlap, a label without a free place is left out. Labels grow and
   shrink when they come and go, a label that changes its place glides there
   (option `transition`).
+- **`filter.labelScore`**: the weight of a node when the label layers choose which
+  nodes get a label (times the squared display scale), e.g. a felt importance from
+  the data; default the subtree weight, as before. `undefined` or `null` for a node
+  falls back to the subtree weight. Also used by `labels-placed` for its order.
 - **`api.overview()` / `api.gotoOverview()`**: a view with a good overview of the
   tree structure, `{ P, λ }`: the root moved down along the trunk axis until the
   centroid of the 300 heaviest inner nodes is in the middle, λ so that they fill the

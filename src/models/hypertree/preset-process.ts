@@ -47,6 +47,17 @@ export function labelsWithHover(ud:IUnitDisk, args:{ maxLabels?:number, hoverLab
     return base.concat(extra.filter(n=> !inBase.has(n)))
 }
 
+/**
+ * The weight of a node when choosing labels (label layers, labels-placed priority):
+ * filter.labelScore (e.g. a felt importance), else (or when it gives undefined, null
+ * or NaN) the subtree weight precalc.cullingWeight.
+ */
+export function labelWeight(ud:IUnitDisk, n:N) : number {
+    const labelScore = ud.view.hypertree.args.filter.labelScore
+    const s = labelScore ? labelScore(n) : undefined
+    return s === undefined || s === null || isNaN(s) ? (n.precalc.cullingWeight || 1) : s
+}
+
 // The max visible nodes nearest to the center of the disk that have a label; the
 // root (tree root) always has one. Until v1 the candidates were the nodes inside
 // the focus radius, thinned out by weight, so max was often not reached.
@@ -57,9 +68,9 @@ function selectLabels(ud:IUnitDisk, cache:TransformationCache, max:number) : N[]
     const candidates = cache.unculledNodes.filter((n:N)=> n.precalc.label && !n.outOfView && !n.precalc.labelOnHover)
     const root = candidates.find(n=> !n.parent)
     const others = candidates.filter(n=> n !== root)
-    // score: subtree weight times the squared display scale (1 at the center, 0 at
-    // the rim): big subtrees near the center first
-    const score = (n:N)=> (n.precalc.cullingWeight || 1) * n.distScale * n.distScale
+    // score: the node's weight (labelWeight) times the squared display scale (1 at the
+    // center, 0 at the rim): heavy nodes near the center first
+    const score = (n:N)=> labelWeight(ud, n) * n.distScale * n.distScale
     if (others.length > max)
         others.sort((a, b)=> score(b) - score(a))
     const n = Math.max(0, root ? max - 1 : max)
