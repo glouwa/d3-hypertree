@@ -447,21 +447,13 @@ export class Hypertree
      */
     protected applyMinFill_() : void {
         if (!this.data) return
-        // interaction.maxLinkLength: the upper bound. A link whose parent is in the
-        // middle is λ × (deflen + L) long (layoutBergé: deflen .5 for the root's
-        // children, else 1; L: the extra length of leaves among many siblings), so the
-        // longest such link reaches maxLinkLength at λ = maxLinkLength / max(deflen + L)
+        // interaction.maxLinkLength: the upper bound. In layoutBergé a link whose parent
+        // is in the middle is λ long (a normal link; leaves among many siblings get an
+        // extra length L, staggered outward, and are not the measure: bounding those
+        // made the normal links a third as long), so λ = maxLinkLength
         const maxLink = this.args.interaction.maxLinkLength
-        if (maxLink) {
-            this.args.layout.type(this.data, this.args.geometry.transformation.state.λ)
-            let f = 0
-            this.data.each(n=> {
-                if (!n.parent) return
-                const L = (n.layout && n.layout.wedge && n.layout.wedge.L) || 0
-                f = Math.max(f, (n.parent.parent ? 1 : .5) + L)
-            })
-            if (f) this.args.interaction.λbounds = [this.args.interaction.λbounds[0], maxLink / f]
-        }
+        if (maxLink)
+            this.args.interaction.λbounds = [this.args.interaction.λbounds[0], maxLink]
         const fill = this.args.interaction.minFill
         if (!fill) {
             const [lo, hi] = this.args.interaction.λbounds

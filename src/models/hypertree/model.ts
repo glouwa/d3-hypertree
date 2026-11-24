@@ -93,9 +93,10 @@ export interface HypertreeArgs
         // lower λ bound is computed per tree after loading (the smallest λ at which,
         // with the root in the middle, the farthest node reaches it), replacing λbounds[0]
         minFill?:           number
-        // a link with its parent in the middle of the disk is at most this long (share
-        // of the disk radius, e.g. .5): the upper λ bound computed per tree, replacing
-        // λbounds[1] (a link from the middle is λ × (1 + L) long in the layoutBergé)
+        // a normal link with its parent in the middle of the disk is at most this long
+        // (share of the disk radius, e.g. .5): the upper λ bound, replacing λbounds[1]
+        // (in layoutBergé such a link is λ long; leaves among many siblings are staggered
+        // outward with an extra length and do not count)
         maxLinkLength?:     number
         wheelFactor:        number
     }

@@ -70,7 +70,8 @@ are listed first.
   computed per tree after loading. `minFill` (e.g. `.9`): the lower bound at which
   the visible tree, root in the middle, still reaches that share of the disk radius.
   `maxLinkLength` (e.g. `.5`): the upper bound at which a link whose parent is in the
-  middle is at most that long (λ × (1 + L) in `layoutBergé`). They replace
+  middle is that long (in `layoutBergé` such a link is λ long; leaves staggered
+  outward among many siblings are longer and do not count). They replace
   `λbounds[0]` / `λbounds[1]`.
 - **Nodes with hidden children** (class `lazy`, red in the themes) are drawn 1.5
   times as large (`nodes` layer option `lazyScale`); the class follows the view (it

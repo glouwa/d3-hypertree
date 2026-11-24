@@ -27,10 +27,11 @@ for (const tree of ['file=fixtures/primates.treeml.xml', 'gen=nTree&depth=6&chil
     })
 }
 
-// interaction.maxLinkLength: the upper λ bound so that a link whose parent is in the
-// middle is at most that long (share of the disk radius)
+// interaction.maxLinkLength: the upper λ bound so that a normal link whose parent is in
+// the middle is that long (share of the disk radius; leaves staggered outward among
+// many siblings, layout wedge L > 0, are longer and do not count)
 for (const tree of ['file=fixtures/primates.treeml.xml', 'file=fixtures/filesystem.d3.json']) {
-    test(`maxLinkLength .5: at the upper bound no link from the middle is longer than half the radius (${tree})`, async ({ page }) => {
+    test(`maxLinkLength .5: at the upper bound a normal link from the middle is half the radius (${tree})`, async ({ page }) => {
         await openTree(page, `${tree}&interaction=${encodeURIComponent(JSON.stringify({ maxLinkLength: .5, minFill: .9 }))}`)
         await waitForStable(page)
         const r = await page.evaluate(() => {
@@ -39,7 +40,8 @@ for (const tree of ['file=fixtures/primates.treeml.xml', 'file=fixtures/filesyst
             // each link with its parent moved to the middle: (z - p) / (1 - conj(p) z)
             let longest = 0
             ht.data.each(n => {
-                if (!n.parent) return
+                // normal links: not from the root (half length), no extra leaf length
+                if (!n.parent || !n.parent.parent || n.layout.wedge.L) return
                 const p = n.parent.layout.z, z = n.layout.z
                 const nr = z.re - p.re, ni = z.im - p.im
                 const dr = 1 - (p.re * z.re + p.im * z.im), di = -(p.re * z.im - p.im * z.re)
