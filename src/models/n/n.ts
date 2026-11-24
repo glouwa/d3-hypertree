@@ -4,6 +4,8 @@ import { Path } from '../path/path';
 
 export interface NodePrecalulations {
     layoutWeight:       number
+    angleWeight?:       number      // the part of the parent's wedge (layout.fanWeight, fan-weight.ts)
+    fanRun?:            number      // leaves per run of the staircase of the leaf children ('columns')
     cullingWeight:      number
     visWeight:          number
     

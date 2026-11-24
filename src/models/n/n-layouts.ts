@@ -134,6 +134,10 @@ function r2g(r) {
     return r/π * 360
 }
 
+// the step of the staircase of leaf children (in link lengths, layout.fanWeight
+// 'columns'; 'leaves' keeps the old .1)
+const FAN_STEP = .3
+
 export function layoutBergé(n:N, λ:number, noRecursion=false)
 {
     let count = 0
@@ -174,20 +178,18 @@ export function layoutBergé(n:N, λ:number, noRecursion=false)
         let resetCount = 0
         let anglesum = 0
 
-        const parentWeight = (n.children || []).reduce((a, ccn)=> a+ccn.precalc.layoutWeight, 0)
+        // the part of the wedge: precalc.angleWeight (layout.fanWeight, fan-weight.ts)
+        const weight = (c:N)=> c.precalc.angleWeight !== undefined ? c.precalc.angleWeight : c.precalc.layoutWeight
+        const parentWeight = (n.children || []).reduce((a, ccn)=> a+weight(ccn), 0)
         const rowcount = cllen / Math.log(cllen) / 2   // the same for every child
+        // 'columns': the staircase runs over the leaf children only (fanRun leaves per
+        // run), the inner children keep their place (their angle is their subtree's)
+        const fanRun = n.precalc.fanRun
+        let leafIndex = 0
         cl.forEach((cn,i)=>
         {
-
-            // verhältniss von parent weight zu child weight
-            // sum(c=> c.eight) != parent weight
-            // d.h. dieser wert liegt nicht zwischen 0 und 1
-            // 
-            // angleWeight wird aber zu alglesum addiert, 
-
-            // angleWeights der children müssen in summe 1 ergeben
-            // da angleWidth die ganze wegde ist
-            const angleWeight = cn.precalc.layoutWeight / parentWeight
+            // the angleWeights of the children sum up to 1: angleWidth is the whole wedge
+            const angleWeight = parentWeight ? weight(cn) / parentWeight : 1 / cllen
 
             anglesum += angleWeight
             const angleOffset = angleWidth * angleWeight
@@ -197,6 +199,14 @@ export function layoutBergé(n:N, λ:number, noRecursion=false)
             currentAngle += angleOffset
             const Ω  = πify(currentAngle)
             
+            if (fanRun !== undefined) {
+                const isLeaf = !cn.children || !cn.children.length
+                const w = { α, Ω, L: isLeaf ? FAN_STEP * (leafIndex++ % fanRun) : 0 }
+                cn.layout = cn.layout || { wedge:w }
+                cn.layout.wedge = w
+                return
+            }
+
             const cL = liner
             const w = { α, Ω, L:cL }
             cn.layout = cn.layout || { wedge:w }

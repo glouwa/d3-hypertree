@@ -17,6 +17,16 @@ are listed first.
   only drawn for labels pushed away (option `leaderLines`). Labels that appear
   grow from size 0, labels that disappear shrink to 0, and the labels giving way
   move smoothly (option `transition`, 250 ms; `0` switches it off).
+- **Fans need less angle (`layout.fanWeight`).** The leaf children of a node
+  are drawn as a staircase: runs of leaves, each a step further out. Leaves of
+  different runs lie at the same distance a whole run apart, so a fan now gets
+  the angle of its runs (columns), not of its leaves (`'columns'`, default; 100
+  leaves: 10 runs). A big unresolved fan (a polytomy, e.g. 7577 species directly
+  under one node) used to take most of the angle and squeeze its resolved
+  siblings. The step is 0.3 link lengths (was 0.1, the angle no longer separates
+  the leaves); with one or two leaves nothing changes. The weights for the filter and
+  the labels still count the leaves; `childOrder: 'balanced'` balances the
+  angles. `'leaves'` restores the old layout.
 - **`geometry.shrinkAtRim`** for labels, force labels and emojis toward the rim:
   `'none'` (constant), `'damped'` (default: 1 in the center to 0.5 at the rim, as
   labels and emojis before), `'full'` (like the links, to 0). Force labels used

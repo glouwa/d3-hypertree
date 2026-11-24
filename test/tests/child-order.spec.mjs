@@ -7,13 +7,14 @@ import { collectErrors, expectNoErrors, openTree, waitForStable } from './helper
 const tree = 'file=fixtures/filesystem.d3.json&labels=name'
 const open = (page, childOrder) => openTree(page, `${tree}${childOrder ? `&layout=${encodeURIComponent(JSON.stringify({ childOrder }))}` : ''}`)
 
-// per node with >= 2 children: the weight left and right of the heaviest child
+// per node with >= 2 children: the weight (precalc.angleWeight, the part of the wedge)
+// left and right of the heaviest child
 const sides = page => page.evaluate(() => {
     const out = []
     harness.ht.data.each(n => {
         const c = n.children
         if (!c || c.length < 2) return
-        const w = x => x.precalc.layoutWeight
+        const w = x => x.precalc.angleWeight
         const max = Math.max(...c.map(w))
         // of several equally heavy children: the one with the most even sides
         let best = null
@@ -43,7 +44,7 @@ const turning = page => page.evaluate(() => {
     // the heaviest child; of several equally heavy ones the most centered (in a
     // balanced order the middle one)
     const heaviest = n => {
-        const c = n.children, w = x => x.precalc.layoutWeight, max = Math.max(...c.map(w))
+        const c = n.children, w = x => x.precalc.angleWeight, max = Math.max(...c.map(w))
         const side = i => Math.abs(c.slice(0, i).reduce((a, x) => a + w(x), 0) - c.slice(i + 1).reduce((a, x) => a + w(x), 0))
         let best = -1
         c.forEach((x, i) => { if (w(x) === max && (best < 0 || side(i) < side(best))) best = i })

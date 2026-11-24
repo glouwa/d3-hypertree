@@ -15,7 +15,8 @@ import { N } from './n'
 //   - on equal weights the first goes left on even depths, right on odd depths (the
 //     branches alternate from level to level).
 
-/** Orders the children of every node of the tree (weights: precalc.layoutWeight). */
+/** Orders the children of every node of the tree (weights: precalc.angleWeight, the
+ *  part of the wedge; precalc.layoutWeight without it). */
 export function balanceChildren(root:N) {
     const todo:N[] = [root]
     while (todo.length) {
@@ -28,7 +29,7 @@ export function balanceChildren(root:N) {
 
 /** The balanced order of a list of children (exported for the tests). */
 export function balanced(children:N[], firstLeft:boolean) : N[] {
-    const w = (c:N)=> c.precalc.layoutWeight || 0
+    const w = (c:N)=> (c.precalc.angleWeight !== undefined ? c.precalc.angleWeight : c.precalc.layoutWeight) || 0
     // heaviest first; equal weights keep their order
     const sorted = children.map((c, i)=> ({ c, i })).sort((a, b)=> (w(b.c) - w(a.c)) || (a.i - b.i)).map(x=> x.c)
     const left:N[] = [], right:N[] = []

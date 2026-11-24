@@ -36,6 +36,10 @@ export interface HypertreeArgs
         // 'balanced' (the heaviest child in the middle, the others on the lighter
         // side: the heaviest path runs straight, like a spruce; children-order.ts)
         childOrder?:        'data' | 'balanced'
+        // the angle of a node with many leaf children: 'columns' (default) the
+        // columns of their staircase, 'leaves' (until v1) the number of leaves
+        // (fan-weight.ts)
+        fanWeight?:         'columns' | 'leaves'
         initSize:           number
         rootWedge: {
             orientation:    number

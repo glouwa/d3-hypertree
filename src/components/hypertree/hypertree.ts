@@ -16,6 +16,7 @@ import { presets }             from '../../models/hypertree/preset-base'
 import { settleMagic }         from '../../models/hypertree/magic-filter'
 import { applyDocumentedOptions } from '../../models/hypertree/model-compat'
 import { balanceChildren }     from '../../models/n/children-order'
+import { angleWeights }        from '../../models/n/fan-weight'
 import { overview, OverviewOptions, OverviewView } from '../../models/hypertree/overview'
 import { mergeDeep }           from '../../ducd'
 
@@ -403,6 +404,11 @@ export class Hypertree
     protected updateWeights_() : void {
         // sum dinger
         this.sum(this.data, this.args.layout.weight, 'layoutWeight')
+        // the angle per node (layout.fanWeight, default 'columns')
+        if (this.args.layout.fanWeight === 'leaves')
+            this.data.each(n=> { n.precalc.angleWeight = n.precalc.layoutWeight; n.precalc.fanRun = undefined })
+        else
+            angleWeights(this.data, this.args.layout.weight)
         // without a weight filter every node weighs 1 (used for label sizes, not culling)
         this.sum(this.data, this.args.filter.weightFilter ? this.args.filter.weightFilter.weight : (n=> 1), 'cullingWeight')
         this.sum(this.data, this.args.layout.weight, 'visWeight')

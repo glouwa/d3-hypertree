@@ -8,6 +8,8 @@
 //   gen=path&n=50                 a path of n nodes
 //   gen=deepStar&arms=4&depth=30  root with arms, each a path
 //   gen=data                      small inline tree via loaders.fromData
+//   gen=fan&n=100&depth=3         root with a fan (node "fan" with n leaf children) and
+//                                 a full binary subtree "binary" with 2^depth leaves
 //   file=fixtures/flare.csv       loaders.fromFile (.d3.json, .csv, SKOS/TreeML .xml),
 //                                 relative to the test folder
 //   lang=fixtures/small.lang.json loaders.fromLangFile; labels from the language map
@@ -51,6 +53,14 @@
             { name: 'b', children: [{ name: 'b1' }, { name: 'b2' }, { name: 'b3' }] },
             { name: 'c' },
         ],
+    }
+
+    function fanData(n, depth) {
+        const binary = (name, d)=> d ? { name, children: [binary(name + '0', d - 1), binary(name + '1', d - 1)] } : { name }
+        return { name: 'root', children: [
+            { name: 'fan', children: Array.from({ length: n }, (_, i)=> ({ name: 'f' + i })) },
+            binary('binary', depth),
+        ] }
     }
 
     // Many layer options are functions of the node (fill: n => color). URL values
@@ -109,6 +119,7 @@
             path:     hyt.path_(num('n', 50)),
             deepStar: ok => hyt.deepStar(ok, num('arms', 4), num('depth', 30)),
             data:     hyt.fromData(inlineData),
+            fan:      ok => hyt.fromData(fanData(num('n', 100), num('depth', 3)))(ok),   // lazy: depth is also deepStar's
         }
         const dataloader = q.get('file') ? hyt.fromFile(fileBase + q.get('file')) : loaders[gen]
         if (!dataloader) throw new Error('unknown generator ' + gen)
