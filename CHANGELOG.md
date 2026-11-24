@@ -66,6 +66,11 @@ are listed first.
   labels never overlap, a label without a free place is left out. Labels grow and
   shrink when they come and go, a label that changes its place glides there
   (option `transition`).
+- **`api.overview()` / `api.gotoOverview()`**: a view with a good overview of the
+  tree structure, `{ P, λ }`: the root moved down along the trunk axis until the
+  centroid of the 300 heaviest inner nodes is in the middle, λ so that they fill the
+  disk to radius 0.95 (alternating, settles in 2-3 rounds). `overview()` only
+  computes, `gotoOverview()` animates there.
 - **Labels can be pointed at**: hovering, clicking or holding a label acts on its
   node, as its voronoi cell does (labels sit beside their node, often over another
   node's cell). A node drawn right under the pointer (within 8 px) still wins over a
@@ -135,6 +140,11 @@ are listed first.
 
 ### Fixed
 
+- **An empty tree after moving away from the center** (flat trees zoomed out):
+  nodes inside the focus circle are never hidden, so with more of them than
+  `rangeNodes.max` the internal factor of the filter sank on every update toward 0;
+  moved away, every node was too light and nothing was drawn. A step that hides
+  nothing now stops it, and the first node of the filter's path is always drawn.
 - **Flickering nodes while dragging or loading**:
   - a drag or wheel now stops a running animation (e.g. a `goto` after a click);
     both used to set the translation and the tree jumped between two states on

@@ -29,7 +29,13 @@ const MAGIC_MAX = 1e12
 // 10 %. Not tied to the center node or λ: dragging changes the center node often and
 // zooming (also the animation after loading) changes λ on every frame, which reset the
 // limits and brought the flicker back (dragging the Wombat on the Metatheria branch).
-type MagicLimits = { up:number, down:number, last:number, stoppedAt:number }
+//
+// A step down that hides nothing is a limit too: nodes inside the focus circle are
+// never hidden, so with many of them (a flat tree zoomed out, e.g. Coleoptera: 7669
+// nodes in the focus) the count stays above max whatever magic is. magic used to sink
+// on every update toward 0; moved away from the center, every node (the root too) was
+// then lighter than the limit and nothing was drawn.
+type MagicLimits = { up:number, down:number, last:number, stoppedAt:number, lastN?:number }
 const magicLimits = new WeakMap<object, MagicLimits>()
 
 function adjustMagic(ud:IUnitDisk, cache:TransformationCache) {
@@ -48,6 +54,8 @@ function adjustMagic(ud:IUnitDisk, cache:TransformationCache) {
 
     if (n > range.max) {
         if (b.last > 0) b.up = Math.min(b.up, filter.magic)        // the step up overshot
+        // the step down hid nothing: no further down (it would not help)
+        if (b.last < 0 && b.lastN !== undefined && n >= b.lastN) b.down = Math.max(b.down, filter.magic)
         const m = filter.magic / alpha
         if (m > b.down * (1 + eps)) { filter.magic = m; b.last = -1; b.stoppedAt = 0 } else { b.last = 0; b.stoppedAt = n }
     }
@@ -57,6 +65,7 @@ function adjustMagic(ud:IUnitDisk, cache:TransformationCache) {
         if (m < b.up * (1 - eps)) { filter.magic = m; b.last = 1; b.stoppedAt = 0 } else { b.last = 0; b.stoppedAt = n }
     }
     else { b.last = 0; b.stoppedAt = 0 }
+    b.lastN = n
 }
 
 function collectNodesByWeight(ud:IUnitDisk, cache:TransformationCache, path:N[])
@@ -82,9 +91,11 @@ function collectNodesByWeight(ud:IUnitDisk, cache:TransformationCache, path:N[])
         n.minWeight = wf === null ? 0                     // no weight culling
                     : highway[0].precalc.cullingWeight / wf.magic / mf
         peocessNodeTransformation(ud, cache, n)
-        peocessNode(ud, cache, n, cache.focusR, n.minWeight)        
-        return !n.isOut
-    }    
+        peocessNode(ud, cache, n, cache.focusR, n.minWeight)
+        // the start node (nearest visible node on the path to the center) always: an
+        // empty tree is never right
+        return !n.isOut || n === startNode
+    }
 
     // dont do it before pathToLastVisible. it uses centerNode
     const lastCenter = cache.centerNode

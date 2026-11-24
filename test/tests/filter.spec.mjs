@@ -111,6 +111,31 @@ test('weight: uniform node weights', async ({ page }, testInfo) => {
 // all of them at once. If that jumps over the whole rangeNodes (below min -> above max),
 // the next step went back: the visible set flipped on every update (the Metatheria
 // branch of the Tree of Life flickered). The filter must settle instead.
+// Nodes inside the focus circle are never hidden: with more of them than rangeNodes.max
+// (a flat tree zoomed out) no magic helps. magic used to sink toward 0 on every update;
+// moved away from the center every node was then too light, nothing was drawn
+// (Coleoptera 16.1 in hypertree-of-life: 0 visible nodes).
+test('a flat tree: magic stops sinking when it hides nothing, the tree never gets empty', async ({ page }) => {
+    const filterOpt = encodeURIComponent(JSON.stringify({ weightFilter: { rangeNodes: { min: 100, max: 300 } } }))
+    await page.goto(`harness.html?gen=star&n=3000&filterOpt=${filterOpt}`)
+    await page.waitForFunction(() => window.harness && harness.ht && harness.ht.unitdisk && harness.ht.unitdisk.cache && harness.ht.unitdisk.cache.unculledNodes)
+    // many frames at the center
+    await page.evaluate(async () => { for (let i = 0; i < 60; i++) { harness.ht.update.transformation(); await new Promise(r => requestAnimationFrame(r)) } })
+    const center = await page.evaluate(() => ({ visible: harness.ht.unitdisk.cache.unculledNodes.length, magic: harness.ht.args.filter.weightFilter.magic }))
+    expect(center.visible).toBeGreaterThan(300)          // more than max: inside the focus
+    expect(center.magic).toBeGreaterThan(1e-3)           // did not sink toward 0
+    // moved away: never empty (the start node at least). (In a star all leaves weigh
+    // the same: one step of magic shows or hides all of them, the filter then stays
+    // below rangeNodes on purpose, see the oscillation test below.)
+    await page.evaluate(() => harness.ht.api.goto({ re: 0, im: .6 }, null))
+    const counts = await page.evaluate(async () => {
+        const out = []
+        for (let i = 0; i < 60; i++) { harness.ht.update.transformation(); await new Promise(r => requestAnimationFrame(r)); out.push(harness.ht.unitdisk.cache.unculledNodes.length) }
+        return out
+    })
+    expect(Math.min(...counts)).toBeGreaterThan(0)
+})
+
 test('magic does not oscillate when one step jumps over the whole rangeNodes', async ({ page }) => {
     const errors = collectErrors(page)
     const filterOpt = encodeURIComponent(JSON.stringify({ weightFilter: { rangeNodes: { min: 300, max: 500 } } }))

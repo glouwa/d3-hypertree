@@ -16,6 +16,7 @@ import { presets }             from '../../models/hypertree/preset-base'
 import { settleMagic }         from '../../models/hypertree/magic-filter'
 import { applyDocumentedOptions } from '../../models/hypertree/model-compat'
 import { balanceChildren }     from '../../models/n/children-order'
+import { overview, OverviewOptions, OverviewView } from '../../models/hypertree/overview'
 import { mergeDeep }           from '../../ducd'
 
 let globelhtid = 0
@@ -186,7 +187,24 @@ export class Hypertree
         gotoNode: (n:N)=>  new Promise((ok, err)=> this.animateTo(ok, err, CmulR({ re:n.layout.z.re, im:n.layout.z.im }, -1), null)),
 
         goto:     (p, l)=> new Promise((ok, err)=> this.animateTo(ok, err, p, l)),
-        gotoλ:    (l)=>    new Promise((ok, err)=> this.animateToλ(ok, err, l))
+        gotoλ:    (l)=>    new Promise((ok, err)=> this.animateToλ(ok, err, l)),
+        /**
+         * A view with a good overview of the tree structure: { P, λ } with the root
+         * at the bottom, the main branchings in the middle, the branches filling the
+         * disk (models/hypertree/overview.ts). Only computes; the view stays.
+         */
+        overview: (o?:OverviewOptions) : OverviewView=> {
+            const state = this.args.geometry.transformation.state
+            const v = overview(this.data, (n, λ)=> this.args.layout.type(n, λ), this.args.layout.rootWedge.orientation,
+                state.λ, this.args.interaction.λbounds, o)
+            this.args.layout.type(this.data, state.λ)          // the layout of the current view again
+            return v
+        },
+        /** Animates to api.overview(). */
+        gotoOverview: (o?:OverviewOptions)=> {
+            const v = this.api.overview(o)
+            return new Promise((ok, err)=> this.animateTo(ok, err, v.P, v.λ))
+        }
     }
 
     /*
