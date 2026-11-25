@@ -1,9 +1,10 @@
 import { test, expect } from '@playwright/test'
 import { collectErrors, expectNoErrors, openTree, waitForStable } from './helpers.mjs'
 
-// The rectangular view (geometry.halfPlane): the upper half-plane via the Cayley
-// transform. Layout, filter and transformation stay in the disk; the drawn positions
-// are mapped at the end, pointer input is mapped back (cayley.ts).
+// The rectangular view (geometry.halfPlane): the half-plane via the Cayley transform,
+// drawn with the border at the top (view y = −1) and infinity (the root's stem) below.
+// Layout, filter and transformation stay in the disk; the drawn positions are mapped
+// at the end, pointer input is mapped back (cayley.ts).
 
 test.use({ viewport: { width: 1300, height: 700 } })
 
@@ -17,17 +18,26 @@ const toScreen = (page, c) => page.evaluate(c => {
     return { x: m.a * c.re + m.c * c.im + m.e, y: m.b * c.re + m.d * c.im + m.f }
 }, c)
 
-test('the view is a rectangle with the aspect ratio of the element', async ({ page }) => {
+// the viewBox for the drawn box of the svg (the hypertree's element fills the window
+// in the harness: 1300 x 700, not the 1200 x 600 of #tree)
+const viewBoxFor = page => page.evaluate(() => {
+    const svg = document.querySelector('.unitdisk-nav > svg'), r = svg.getBoundingClientRect()
+    return { viewBox: svg.getAttribute('viewBox'), expected: `0 0 ${Math.round(1000 * r.width / r.height)} 1000` }
+})
+
+test('the view is a rectangle with the aspect ratio of the drawn svg', async ({ page }) => {
     const errors = collectErrors(page)
     await open(page)
-    expect(await page.evaluate(() => document.querySelector('.unitdisk-nav > svg').getAttribute('viewBox'))).toBe('0 0 2000 1000')
+    const v = await viewBoxFor(page)
+    expect(v.viewBox).toBe(v.expected)
+    expect(v.viewBox).toBe('0 0 1857 1000')
     // a resize keeps it
-    await page.evaluate(() => { document.getElementById('tree').style.width = '900px'; window.dispatchEvent(new Event('resize')) })
-    expect(await page.evaluate(() => document.querySelector('.unitdisk-nav > svg').getAttribute('viewBox'))).toBe('0 0 1500 1000')
+    await page.setViewportSize({ width: 900, height: 700 })
+    await expect.poll(async () => { const v = await viewBoxFor(page); return v.viewBox === v.expected && v.viewBox }).toBe('0 0 1286 1000')
     expectNoErrors(errors)
 })
 
-test('drawn positions: the Cayley image of the disk positions, above the border', async ({ page }) => {
+test('drawn positions: the Cayley image of the disk positions, below the border', async ({ page }) => {
     const errors = collectErrors(page)
     await open(page)
     await waitForStable(page)
@@ -37,7 +47,7 @@ test('drawn positions: the Cayley image of the disk positions, above the border'
         for (const n of cache.unculledNodes) {
             const v = hyt.toView(n.cacheDisk, g)
             maxErr = Math.max(maxErr, Math.hypot(v.re - n.cache.re, v.im - n.cache.im))
-            if (n.cache.im >= 1) below++
+            if (n.cache.im <= -1) below++          // beyond the border (counted as "below" the half-plane)
             if (Math.hypot(n.cacheDisk.re, n.cacheDisk.im) >= 1) outsideDisk++
         }
         return { n: cache.unculledNodes.length, maxErr, below, outsideDisk, root: cache.unculledNodes[0] === ht.data,
@@ -62,9 +72,9 @@ test('links are geodesics of the half-plane: arcs centered on the border', async
             const m = /^M (\S+) (\S+) A (\S+) \S+, 0, 0, [01], (\S+) (\S+)$/.exec(el.getAttribute('d'))
             if (!m) continue
             const [x1, y1, r, x2, y2] = m.slice(1).map(Number)
-            // the circle through both ends centered on y = 1 has radius r
-            const c = (x1 * x1 + (1 - y1) ** 2 - x2 * x2 - (1 - y2) ** 2) / (2 * (x1 - x2))
-            worst = Math.max(worst, Math.abs(Math.hypot(x1 - c, 1 - y1) - r) / r, Math.abs(Math.hypot(x2 - c, 1 - y2) - r) / r)
+            // the circle through both ends centered on the border y = −1 has radius r
+            const c = (x1 * x1 + (y1 + 1) ** 2 - x2 * x2 - (y2 + 1) ** 2) / (2 * (x1 - x2))
+            worst = Math.max(worst, Math.abs(Math.hypot(x1 - c, y1 + 1) - r) / r, Math.abs(Math.hypot(x2 - c, y2 + 1) - r) / r)
             arcs++
         }
         return { arcs, worst }
@@ -232,16 +242,16 @@ test('the infovis presets and the file system work in the rectangular view', asy
     expectNoErrors(errors)
 })
 
-// Regression: nodes far above the view were left out of the map, so links of their
+// Regression: nodes far beyond the view (toward infinity) were left out of the map, so links of their
 // visible children went to an unmapped (disk) position: arcs ending in the middle of
 // the view after zooming in. Every link must start at its node and end at its parent.
 test('every link connects its node and its parent, also after zooming in and dragging', async ({ page }) => {
     const errors = collectErrors(page)
     await openTree(page, `gen=nTree&depth=7&childs=3&labels=1&size=1200x600&geometry=${geometry}&interaction=${encodeURIComponent(JSON.stringify({ λbounds: [.02, .9] }))}`)
     await waitForStable(page)
-    // like a Tree of Life branch page: centered on a deep node, the ancestors above.
+    // like a Tree of Life branch page: centered on a deep node, the ancestors below.
     // Centering moves the ancestors to the opposite side: a node opposite to the
-    // direction that goes to infinity puts them up there, far above the view
+    // direction that goes to infinity puts them down there, far below the view
     await page.evaluate(() => {
         const g = hyt.infinityOf(harness.ht.args.layout.rootWedge)
         const away = n => -(n.layout.z.re * g.re + n.layout.z.im * g.im) / Math.hypot(n.layout.z.re, n.layout.z.im)
@@ -278,4 +288,80 @@ test('every link connects its node and its parent, also after zooming in and dra
     const dragged = await check()
     expect(dragged).toEqual({ links: dragged.links, bad: 0, unmapped: 0, labelsAbove: 0 })
     expectNoErrors(errors)
+})
+
+test('like the disk: the root at the bottom with its stem going down, the tree up to the border', async ({ page }) => {
+    const errors = collectErrors(page)
+    await open(page)
+    await waitForStable(page)
+    const r = await page.evaluate(() => {
+        const ht = harness.ht, root = ht.data, u = ht.unitdisk.cache.unculledNodes
+        const deepest = Math.max(...u.map(n => n.depth))
+        const leaves = u.filter(n => n.depth === deepest)      // the outermost visible nodes
+        const stem = [...document.querySelectorAll('.unitDisc path')].find(el => el.__data__ === root)
+        return { rootY: root.cache.im, leavesY: leaves.reduce((a, n) => a + n.cache.im, 0) / leaves.length,
+                 stemEnd: stem && Number(stem.getAttribute('d').match(/-?[\d.]+(e-?\d+)?/g).slice(-1)[0]) }
+    })
+    expect(r.leavesY).toBeLessThan(r.rootY)       // the leaves above the root (toward the border)
+    expect(r.stemEnd).toBeGreaterThan(1)           // the stem goes down out of the view
+    expectNoErrors(errors)
+})
+
+test('a grid in half-plane coordinates: (0,0) on the border, (0,−1) the disk center', async ({ page }) => {
+    await open(page)
+    await waitForStable(page)
+    const r = await page.evaluate(() => {
+        const label = t => [...document.querySelectorAll('.background-halfplane text')].find(e => e.textContent.startsWith(t))
+        const at = e => e && [+e.getAttribute('x'), +e.getAttribute('y')]
+        return { zero: at(label('(0,0)')), center: at(label('(0,−1)')), one: at(label('(1,0)')),
+                 lines: document.querySelectorAll('.background-halfplane line').length }
+    })
+    expect(r.lines).toBeGreaterThan(50)
+    // the labels next to their points: (0,0) and (1,0) at the border y = −1, (0,−1) at the view's (0,0)
+    expect(Math.abs(r.zero[0])).toBeLessThan(.05); expect(Math.abs(r.zero[1] + 1)).toBeLessThan(.05)
+    expect(Math.abs(r.one[0] - 1)).toBeLessThan(.05); expect(Math.abs(r.one[1] + 1)).toBeLessThan(.05)
+    expect(Math.abs(r.center[0])).toBeLessThan(.05); expect(Math.abs(r.center[1])).toBeLessThan(.05)
+})
+
+test('indicator circles off the center (the λ circle at the pinch point) are mapped too', async ({ page }) => {
+    await open(page)
+    await waitForStable(page)
+    const worst = await page.evaluate(() => {
+        const ht = harness.ht, ud = ht.unitdisk, g = hyt.infinityOf(ht.args.layout.rootWedge)
+        ud.pinchcenter = { re: .3, im: -.2 }
+        ud.layerStack.layers['λ'].update.transformation()
+        const r = ud.args.transformation.state.λ
+        const t = /translate\((\S+) (\S+)\) scale\((\S+)\)/.exec(document.querySelector('[id="λ"] circle').getAttribute('transform'))
+        const [cx, cy, rad] = t.slice(1).map(Number)
+        let e = 0
+        for (let a = 0; a < 2 * Math.PI; a += .3) {
+            const v = hyt.toView({ re: .3 + r * Math.cos(a), im: -.2 + r * Math.sin(a) }, g)
+            e = Math.max(e, Math.abs(Math.hypot(v.re - cx, v.im - cy) - rad) / rad)
+        }
+        return e
+    })
+    expect(worst).toBeLessThan(1e-9)
+})
+
+test('the view follows the size of its element, also without a window resize (a splitter)', async ({ page }) => {
+    await open(page)
+    // the drawn box changes, the window not (no resize event)
+    await page.evaluate(() => { document.querySelector('.unitdisk-nav > svg').style.width = '700px' })
+    await expect.poll(() => page.evaluate(() => document.querySelector('.unitdisk-nav > svg').getAttribute('viewBox'))).toBe('0 0 1000 1000')
+})
+
+test('layout.rootLinkLength: short links at the root, whole ones at the leaves, growing between', async ({ page }) => {
+    const layout = encodeURIComponent(JSON.stringify({ rootLinkLength: .1 }))
+    await openTree(page, `gen=nTree&depth=5&childs=2&size=1200x600&geometry=${geometry}&layout=${layout}`)
+    await waitForStable(page)
+    const r = await page.evaluate(() => {
+        const ht = harness.ht, λ = ht.unitdisk.args.transformation.state.λ
+        const byDepth = d => ht.data.descendants().filter(n => n.depth === d).map(n => n.precalc.linkFactor)
+        const child = ht.data.children[0]
+        return { f: [1, 2, 3, 4, 5].map(d => byDepth(d)[0]), childR: Math.hypot(child.layout.z.re, child.layout.z.im) / λ }
+    })
+    expect(r.f[0]).toBeCloseTo(.1, 9)               // the root's children
+    expect(r.f[4]).toBeCloseTo(1, 9)                // the leaves
+    for (let i = 1; i < 5; i++) expect(r.f[i]).toBeGreaterThan(r.f[i - 1])
+    expect(r.childR).toBeCloseTo(.1, 6)             // the layout: a link of .1 λ (the root at 0)
 })

@@ -6,6 +6,7 @@ export interface NodePrecalulations {
     layoutWeight:       number
     angleWeight?:       number      // the part of the parent's wedge (layout.multirowHighDegreeNodes, fan-weight.ts)
     fanRun?:            number      // leaves per run of the staircase of the leaf children (multirowHighDegreeNodes; 1: one row)
+    linkFactor?:        number      // the length of the link to the parent in λ (layout.rootLinkLength)
     cullingWeight:      number
     visWeight:          number
     

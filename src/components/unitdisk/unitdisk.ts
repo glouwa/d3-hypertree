@@ -100,16 +100,17 @@ export class UnitDisk implements IUnitDisk
             .attr('class', this.view.className)
             .attr('transform', this.view.position)
         
-        // half-plane view: the clip is the half-plane above the border (view y = 1), wide
-        // enough for any aspect ratio; the voronoi extent covers it
+        // half-plane view: the clip is the half-plane below the border (view y = −1, the
+        // view ends at about y = 1), wide enough for any aspect ratio; the voronoi extent
+        // covers it
         const halfPlane = this.view.hypertree && this.view.hypertree.args.geometry.halfPlane
         const clip = this.mainsvg.append('clipPath').attr('id', 'circle-clip' + this.args.clipRadius)
         if (halfPlane)
-            clip.append('rect').attr('x', -20).attr('y', -2).attr('width', 40).attr('height', 3)
+            clip.append('rect').attr('x', -20).attr('y', -1).attr('width', 40).attr('height', 3)
         else
             clip.append('circle').attr('r', this.args.clipRadius)
 
-        this.voronoiLayout = voronoiLayout<N>(d=> d.cache.re, d=> d.cache.im, halfPlane ? [[-20,-2], [20,1]] : [[-2,-2], [2,2]])
+        this.voronoiLayout = voronoiLayout<N>(d=> d.cache.re, d=> d.cache.im, halfPlane ? [[-20,-1], [20,2]] : [[-2,-2], [2,2]])
        
         this.layerStack = new LayerStack({ 
             parent: this.mainsvg,

@@ -151,8 +151,10 @@ export function layoutBergé(n:N, λ:number, noRecursion=false)
             const angleWidth = πify(wedge.Ω - wedge.α)
             const bisectionAngle = wedge.α + (angleWidth / 2.0)
             
-            let deflen = 1
-            if (!n.parent.parent) deflen = .5
+            // the link length in λ: precalc.linkFactor (layout.rootLinkLength), else the
+            // root's children half, all others 1
+            let deflen = n.precalc.linkFactor !== undefined ? n.precalc.linkFactor : 1
+            if (n.precalc.linkFactor === undefined && !n.parent.parent) deflen = .5
 
             const nz1 = CptoCk({ θ:bisectionAngle, r:λ*(deflen+L||1) })
             setZ(n, h2e(makeT(n.parent.layout.z, one), nz1))

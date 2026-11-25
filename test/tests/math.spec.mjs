@@ -90,7 +90,7 @@ test('arcCenter: the link arc goes through both points and meets the disk border
     expect(err).toBeLessThan(1e-9)
 })
 
-test('Cayley map: view and disk are inverse, the border becomes the bottom edge, distances stay', async ({ page }) => {
+test('Cayley map: view and disk are inverse, the border becomes the top edge (view y = −1), distances stay', async ({ page }) => {
     const r = await page.evaluate(() => {
         let inverse = 0, border = 0, distance = 0, above = true
         for (let i = 0; i < 500; i++) {
@@ -100,7 +100,7 @@ test('Cayley map: view and disk are inverse, the border becomes the bottom edge,
             above = above && w.im > 0
             distance = Math.max(distance, Math.abs(Math.log(coshHalf(w, v)) - Math.log(coshDisk(z, y))))
             const a = 2 * Math.PI * rnd()                                     // a point of the border (not z = 1)
-            if (Math.abs(a) > .05) border = Math.max(border, Math.abs(hyt.toView({ re: Math.cos(a), im: Math.sin(a) }).im - 1))
+            if (Math.abs(a) > .05) border = Math.max(border, Math.abs(hyt.toView({ re: Math.cos(a), im: Math.sin(a) }).im + 1))
         }
         const center = hyt.toView({ re: 0, im: 0 })
         return { inverse, border, distance, above, center }
@@ -112,7 +112,7 @@ test('Cayley map: view and disk are inverse, the border becomes the bottom edge,
     expect(Math.abs(r.center.re) + Math.abs(r.center.im)).toBeLessThan(1e-12)  // the disk center in the middle of the view
 })
 
-test('Cayley map with a direction to infinity: still inverse, that direction goes up', async ({ page }) => {
+test('Cayley map with a direction to infinity: still inverse, that direction goes to infinity (down in the view)', async ({ page }) => {
     const r = await page.evaluate(() => {
         let inverse = 0, up = true
         for (let i = 0; i < 300; i++) {

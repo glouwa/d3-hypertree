@@ -111,10 +111,20 @@ are listed first.
   where two big branches split it forks. Applied after `dataInitBFS`.
 - **Layer option `leaderLines`** on `labels-force` and `labels-placed`: a line to
   the node for labels pushed away from it (`'auto'`, default), `'always'`, `'never'`.
-- **Rectangular view** (`geometry.halfPlane`, prototype): the upper half-plane
-  model via the Cayley transform. The disk border becomes the bottom edge, links
-  are arcs centered on it, the view fills the element's rectangle. Layout,
-  filter and interaction work as in the disk.
+- **Rectangular view** (`geometry.halfPlane`, prototype): the half-plane model via
+  the Cayley transform. The disk border becomes the top edge and the gap of the
+  root wedge goes to infinity below, so it looks like the disk: the root at the
+  bottom with its stem, the tree growing up to the border. Links are arcs
+  centered on the border, the view fills the drawn rectangle (and follows its
+  size, also when only the element changes, e.g. with a splitter). A grid in
+  half-plane coordinates in the background ((0,0) on the border, (0,−1) the disk
+  center); the indicator circles (λ, focus, …) are mapped for any center; the
+  start view of `api.overview` keeps the root in the picture. Layout, filter and
+  interaction work as in the disk.
+- **`layout.rootLinkLength`** (Bergé layout): shorter links near the root. The
+  root's children get this part of a link (e.g. `.1`), the links to the leaves
+  the whole one, growing linearly in between (by the place between root and
+  leaves). Default off: the root's children half, all other links whole.
 - **Presets** `treeOfLifeMain` and `treeOfLife` (the hypertree-of-life main and
   branch pages), `infovis` and `infovisEmoji`: a value per node (structure:
   `weight`, `depth`, `height`, or own data `n.data.value` / a function) mapped with

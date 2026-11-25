@@ -7,14 +7,14 @@ import { C } from '../../models/transformation/hyperbolic-math'
 //
 // The rest position of a label goes smoothly from "directly above its node" in the
 // center to "outward, beyond its node" toward the rim; a label only leaves it when
-// it would overlap another one. Outward is radial in the disk, down (toward the
-// border) in the half-plane view.
+// it would overlap another one. Outward is radial in the disk, up (toward the
+// border, view y = −1) in the half-plane view.
 
 export interface Box { x:number, y:number, w:number, h:number }   // center, size
 
 /** The direction away from the center (unit vector, view coordinates). */
 export function outward(n:N, halfPlane:boolean) : C {
-    if (halfPlane) return { re: 0, im: 1 }
+    if (halfPlane) return { re: 0, im: -1 }
     const r = Math.hypot(n.cache.re, n.cache.im)
     return r > 1e-9 ? { re: n.cache.re / r, im: n.cache.im / r } : { re: 0, im: -1 }
 }
@@ -26,7 +26,7 @@ const smoothstep = (a:number, b:number, x:number)=> {
 
 /** 0 in the center (label above its node) .. 1 near the rim (label outward). */
 export function rimness(n:N, halfPlane:boolean) : number {
-    const r = halfPlane ? Math.max(0, n.cache.im) : Math.hypot(n.cache.re, n.cache.im)
+    const r = halfPlane ? Math.max(0, -n.cache.im) : Math.hypot(n.cache.re, n.cache.im)
     return smoothstep(.3, .85, r)
 }
 

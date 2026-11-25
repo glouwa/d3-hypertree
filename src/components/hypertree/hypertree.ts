@@ -199,6 +199,13 @@ export class Hypertree
             const v = overview(this.data, (n, λ)=> this.args.layout.type(n, λ), this.args.layout.rootWedge.orientation,
                 state.λ, this.args.interaction.λbounds, o)
             this.args.layout.type(this.data, state.λ)          // the layout of the current view again
+            // half-plane view: the root (at P) in the picture, just above the bottom
+            // edge with its stem below it (view y .85: |z| = .85 / 2.85, cayley.ts); the
+            // disk's P (|z| up to .5) put it far below the view
+            if (this.args.geometry.halfPlane) {
+                const r = Math.hypot(v.P.re, v.P.im), max = .85 / 2.85
+                if (r > max) v.P = { re: v.P.re * max / r, im: v.P.im * max / r }
+            }
             return v
         },
         /** Animates to api.overview(). */
@@ -261,7 +268,9 @@ export class Hypertree
             svg.setAttribute('viewBox', '0 0 1000 1000')
             return 'translate(500,500) scale(480)'
         }
-        const r = this.view_.parent.getBoundingClientRect()
+        // the svg's own box (the parent element can be larger: other content in it)
+        const s = svg.getBoundingClientRect(), p = this.view_.parent.getBoundingClientRect()
+        const r = s.width > 0 && s.height > 0 ? s : p
         const aspect = r.width > 0 && r.height > 0 ? r.width / r.height : 1.6
         const w = Math.round(1000 * aspect)
         svg.setAttribute('viewBox', `0 0 ${w} 1000`)
@@ -273,6 +282,14 @@ export class Hypertree
                 if (g) g.setAttribute('transform', p)
             }
             window.addEventListener('resize', this.onResize)
+            // the element changes size without the window too (a splitter: the tree
+            // next to the Wikipedia panel); the view kept the old aspect ratio and part
+            // of the half-plane was outside it
+            if (typeof ResizeObserver !== 'undefined') {
+                const o = new ResizeObserver(()=> this.onResize())
+                o.observe(this.view_.parent)
+                o.observe(svg)                  // the box that is drawn (it can differ)
+            }
         }
         return `translate(${w / 2},500) scale(480)`
     }
@@ -410,6 +427,14 @@ export class Hypertree
         // the angle per node and the rows of the leaf children
         // (layout.multirowHighDegreeNodes, default true; fan-weight.ts)
         angleWeights(this.data, this.args.layout.weight, this.args.layout.multirowHighDegreeNodes !== false)
+        // the link lengths (layout.rootLinkLength): from that part at the root's children
+        // to 1 at the leaves
+        const f0 = this.args.layout.rootLinkLength
+        this.data.each(n=> {
+            if (f0 === undefined || f0 === null || !n.parent) { n.precalc.linkFactor = undefined; return }
+            const t = n.depth - 1 + n.height > 0 ? (n.depth - 1) / (n.depth - 1 + n.height) : 1
+            n.precalc.linkFactor = f0 + (1 - f0) * t
+        })
         // without a weight filter every node weighs 1 (used for label sizes, not culling)
         this.sum(this.data, this.args.filter.weightFilter ? this.args.filter.weightFilter.weight : (n=> 1), 'cullingWeight')
         this.sum(this.data, this.args.layout.weight, 'visWeight')

@@ -2,6 +2,7 @@ import { ILayer }          from '../layerstack/layer'
 import { ILayerView }      from '../layerstack/layer'
 import { ILayerArgs }      from '../layerstack/layer'
 import { D3UpdatePattern } from '../layerstack/d3updatePattern'
+import { circleToView, infinityOf } from '../../models/transformation/cayley'
 
 export interface FocusLayerArgs extends ILayerArgs
 {
@@ -31,14 +32,17 @@ export class FocusLayer implements ILayer
         this.name = args.name
     }
 
-    // half-plane view: the image of the circle |z| = r around the disk center is a
-    // circle on the vertical middle axis, from height (1−r)/(1+r) to (1+r)/(1−r)
+    // half-plane view: the image of the disk circle (any center, e.g. the λ circle at the
+    // point of the last wheel zoom; that one used to be drawn unmapped) is a circle
+    // (cayley.ts circleToView); through the point at infinity it is not drawn
     private transform() : string {
         const r = this.args.r(), c = this.args.center()
-        if (!this.view.hypertree.args.geometry.halfPlane || c !== '0 0' || !(r < 1))
+        if (!this.view.hypertree.args.geometry.halfPlane)
             return `translate(${c}) scale(${r})`
-        const top = (1 + r) / (1 - r), bottom = (1 - r) / (1 + r)
-        return `translate(0 ${1 - (top + bottom) / 2}) scale(${(top - bottom) / 2})`
+        const [re, im] = c.split(' ').map(Number)
+        const v = r > 0 && Math.hypot(re, im) + r < 1
+                ? circleToView({ re, im }, r, infinityOf(this.view.hypertree.args.layout.rootWedge)) : null
+        return v ? `translate(${v.cx} ${v.cy}) scale(${v.r})` : 'translate(0 0) scale(0)'
     }
 
     private attach() {

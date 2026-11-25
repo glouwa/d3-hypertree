@@ -44,6 +44,8 @@
         layoutType: 'berge',
         childOrder: 'data',   // layout.childOrder: 'data' (default) or 'balanced'
         multirow: true,       // layout.multirowHighDegreeNodes (default true)
+        shortRoot: false,     // layout.rootLinkLength off (default) or rootLink
+        rootLink: .1,
         wedgeOrientation: deg(base.layout.rootWedge.orientation),
         wedgeAngle: deg(base.layout.rootWedge.angle),
         filterOff: false, weightUniform: false,
@@ -171,6 +173,7 @@
             lo.rootWedge = { orientation: rad(c.wedgeOrientation), angle: rad(c.wedgeAngle) }
         if (c.childOrder !== DEFAULTS.childOrder) lo.childOrder = c.childOrder
         if (c.multirow !== DEFAULTS.multirow) lo.multirowHighDegreeNodes = c.multirow
+        if (c.shortRoot) lo.rootLinkLength = c.rootLink
         if (Object.keys(lo).length) p.set('layout', JSON.stringify(lo))
         if (c.filterOff) p.set('filter', 'off')
         if (c.weightUniform) p.set('weight', 'uniform')
@@ -241,6 +244,7 @@
             if (w.angle !== undefined) c.wedgeAngle = deg(w.angle)
             if (lo.childOrder) c.childOrder = lo.childOrder
             if (lo.multirowHighDegreeNodes !== undefined) c.multirow = lo.multirowHighDegreeNodes
+            if (lo.rootLinkLength !== undefined) { c.shortRoot = true; c.rootLink = lo.rootLinkLength }
         }
         c.filterOff = p.get('filter') === 'off'
         c.weightUniform = p.get('weight') === 'uniform'
@@ -539,11 +543,13 @@
             () => `initSize ${base.layout.initSize}, λbounds [${+cfg.λmin.toFixed(3)}, ${+cfg.λmax.toFixed(3)}]`)
         hint(g, 'A preset (Data) may replace these callbacks with its own.')
 
-        g = section('Layout', ['layoutType', 'childOrder', 'multirow', 'wedgeOrientation', 'wedgeAngle'])
+        g = section('Layout', ['layoutType', 'childOrder', 'multirow', 'shortRoot', 'rootLink', 'wedgeOrientation', 'wedgeAngle'])
         select(g, 'Type', 'layoutType', [['berge', 'Bergé (default, supports culling)'], ['spiral', 'spiral'], ['buchheim', 'Buchheim'], ['unitLines', 'unit lines'], ['unitVectors', 'unit vectors']])
         select(g, 'Child order', 'childOrder', [['data', 'data (default): as given'], ['balanced', 'balanced: heaviest child in the middle']])
         hint(g, 'layout.childOrder balanced: the heaviest child (most leaves) goes in the middle, the others each to the lighter side, heavier ones next to the middle. The heaviest path runs straight where the sides can be balanced (like a spruce); where two big branches split, it forks.')
         check(g, 'Multirow high-degree nodes', 'multirow', null, 'layout.multirowHighDegreeNodes: the leaf children of a node with many of them in several rows (a staircase, each further out), the node needs only the angle of its columns: a big unresolved fan no longer squeezes its resolved siblings. Off: one row, every leaf its own angle. Try Generator: star.')
+        check(g, 'Short links near the root', 'shortRoot', null, 'layout.rootLinkLength: the links of the root children get this part of a link, the links to the leaves the whole one, growing in between (until v1: the root children half, all others whole). The rectangular view of the Tree of Life uses .1.')
+        number(g, 'Root link length', 'rootLink', .01, 1, .01, () => cfg.shortRoot)
         range(g, 'Root wedge dir.', 'wedgeOrientation', 0, 360, 1, null, v => `${v}°`)
         range(g, 'Root wedge angle', 'wedgeAngle', 10, 360, 1, null, v => `${v}°`)
 

@@ -40,6 +40,11 @@ export interface HypertreeArgs
         // staircase), the node the angle of its columns (true, default); false:
         // one row, every leaf its own angle (fan-weight.ts)
         multirowHighDegreeNodes?: boolean
+        // shorter links near the root (layoutBergé): the root's children get this part
+        // of a link (e.g. .1), the links to the leaves the whole one, linear in between
+        // (by the place between root and leaves: (depth − 1) / (depth − 1 + height)).
+        // undefined (default): the root's children half, all other links whole
+        rootLinkLength?:    number
         initSize:           number
         rootWedge: {
             orientation:    number
