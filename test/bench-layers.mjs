@@ -89,11 +89,15 @@ async function measure(browser, config) {
         window.__layerMs = {}
         const t = ht.update.transformation
         ht.update.transformation = (...a) => { window.__updates++; return t.apply(ht.update, a) }
-        const d = ls.update.data
-        ls.update.data = (...a) => {
-            const r = d.apply(ls.update, a)
-            ls.d3meta.names.forEach((n, i) => window.__layerMs[n] = (window.__layerMs[n] || 0) + ls.d3meta.Δ[i])
-            return r
+        // v2: every frame goes through layerStack.frame(reason) (a drag calls it
+        // directly); until v2 through layerStack.update.data
+        const accumulate = () => ls.d3meta.names.forEach((n, i) => window.__layerMs[n] = (window.__layerMs[n] || 0) + ls.d3meta.Δ[i])
+        if (typeof ls.frame === 'function') {
+            const f = ls.frame.bind(ls)
+            ls.frame = (...a) => { const r = f(...a); accumulate(); return r }
+        } else {
+            const d = ls.update.data
+            ls.update.data = (...a) => { const r = d.apply(ls.update, a); accumulate(); return r }
         }
     })
     const cdp = await context.newCDPSession(page)

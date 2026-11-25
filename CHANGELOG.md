@@ -114,6 +114,10 @@ are listed first.
   (`['background', 'link-arcs', { type: 'nodes', name: 'big', options: {…} }]`).
 - **`'linear'`** as a scale type of `hyt.colorBy` / `hyt.sizeBy`, next to `sqrt`
   and `log`.
+- **Layer `emoji-backgrounds`** (off by default, below `emojis`): a disk with a
+  border under every emoji, centered on the node and as large as the emoji (option
+  `padding`, colors from the theme or the options `fill` and `stroke`; transparent
+  like the label backgrounds).
 - **Layer `labels-placed`** (off by default): labels on candidate positions like
   on a map, above their node in the center and outward toward the rim; drawn
   labels never overlap, a label without a free place is left out. Labels grow and
@@ -224,6 +228,11 @@ are listed first.
 
 ### Fixed
 
+- **Emojis sit with their middle on their node.** The offset `bboxCenter` was applied
+  before the emoji's double scale and the bitmap included the glyph's side bearings,
+  so emojis sat up to 10 px right of and above their node. The bitmap now holds only
+  the emoji's ink and is centered on the node (as text: `text-anchor: middle`,
+  `dominant-baseline: central`); the emoji layer's default `delta` is zero.
 - **Label widths** (label backgrounds, force label spacing, placement): measured with
   the font the labels are drawn with (family, weight and size from the CSS, also the
   larger `:lang(zh)` size), calibrated against an SVG text; they were divided by

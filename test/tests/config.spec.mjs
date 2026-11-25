@@ -10,7 +10,7 @@ const ALWAYS = ['interaction-2']
 test.describe('each layer on its own', () => {
     // layer names as configured by the default layer set
     const layers = ['background', 'cells', 'culling-r', 'mouse-r', 'focus-r', 'labels-r-𝐖', 'λ', '(0,0)',
-        'center-node', 'path-arcs', 'link-arcs', 'stem-arc', 'nodes', 'symbols', 'images', 'emojis',
+        'center-node', 'path-arcs', 'link-arcs', 'stem-arc', 'nodes', 'symbols', 'images', 'emoji-backgrounds', 'emojis',
         'labels', 'labels-force', 'labels-placed', 'traces']
     const safe = name => name.replace(/[^a-z0-9-]/gi, c => ({ '(': '', ')': '', ',': '-', 'λ': 'lambda', '𝐖': 'W' })[c] ?? '_')
 

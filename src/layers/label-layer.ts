@@ -4,7 +4,7 @@ import { ILayer, ILayerArgs, LayerContext, LayerType, layerData } from '../view/
 import { D3UpdatePattern } from '../view/d3-join'
 import { labelsWithHover } from '../filter/labels'
 import { DEFAULT_MAX_LABELS } from '../filter/labels'
-import { sizeAt, offsetFactor, labelOffset, bboxCenter, paddingLeftRight, paddingTopBottom } from './label-geometry'
+import { sizeAt, offsetFactor, labelOffset, paddingLeftRight, paddingTopBottom } from './label-geometry'
 
 export interface LabelLayerArgs extends ILayerArgs
 {
@@ -56,7 +56,9 @@ export class LabelLayer implements ILayer
             kind:       'emoji',
             data:       'emojis',
             text:       (d:N)=> d.precalc.icon,
-            delta:      (d:N)=> bboxCenter(d, 'emojislen'),
+            // the middle of the emoji on the node (the bitmap and the text are centered;
+            // until v2 the box offset bboxCenter, which missed the emoji's double size)
+            delta:      ()=> ({ re: 0, im: 0 }),
             color:      ()=> undefined,
             background: false,
             scale:      1,
@@ -118,7 +120,7 @@ export class LabelLayer implements ILayer
                 className:         this.args.className,
                 elementType:       'image',
                 create:            s=> s.each(function(d) {
-                                        const image = textImage(this.parentNode, className + (linux && d.precalc.icon ? ' caption-icon' : ''), $this.args.text(d))
+                                        const image = textImage(this.parentNode, className + (linux && d.precalc.icon ? ' caption-icon' : ''), $this.args.text(d), $this.args.kind === 'emoji')
                                         if (!image) return
                                         this.setAttribute('href', image.href)
                                         this.setAttribute('x', String(image.x))
@@ -141,6 +143,9 @@ export class LabelLayer implements ILayer
             elementType:       'text',
             create:            s=> s.classed("P",            d=> d.name == 'P')
                                     .classed("caption-icon", d=> d.precalc.icon && navigator.platform.includes('inux'))
+                                    // emojis as text: centered on the node
+                                    .attr("text-anchor",       this.args.kind === 'emoji' ? 'middle' : null)
+                                    .attr("dominant-baseline", this.args.kind === 'emoji' ? 'central' : null)
                                     .style("stroke",         d=> d.pathes && d.pathes.labelcolor)
                                     .style("fill",           d=> this.args.color(d) )
                                     .call(s=> setLabelText(s, this.args.text)),
@@ -161,8 +166,13 @@ export class LabelLayer implements ILayer
  * font, and then reused as an <image> with a data URL.
  */
 const textImages = new Map<string, { href:string, x:number, y:number, w:number, h:number }>()
-export function textImage(group:Element, className:string, text:string) {
-    const key = className + '\u0000' + text
+/**
+ * centered: the bitmap holds only the ink of the text and is centered on the origin
+ * (the emojis: their middle exactly on the node). Otherwise it covers the text's box
+ * at the text's own position (labels).
+ */
+export function textImage(group:Element, className:string, text:string, centered = false) {
+    const key = className + '\u0000' + text + (centered ? '\u0000c' : '')
     let image = textImages.get(key)
     if (image) return image
 
@@ -181,6 +191,24 @@ export function textImage(group:Element, className:string, text:string) {
     ctx.font = `${px}px ${family}`
     const m = ctx.measureText(text)
     const ascent = m.fontBoundingBoxAscent || px * .9, descent = m.fontBoundingBoxDescent || px * .25
+    if (centered) {
+        // the ink box (actualBoundingBox: left and ascent are positive toward the
+        // left and up), one pixel of margin; its size in SVG units by the ratio of the
+        // SVG text's box to the font box
+        const left = m.actualBoundingBoxLeft || 0, right = m.actualBoundingBoxRight || m.width
+        const up = m.actualBoundingBoxAscent || ascent, down = m.actualBoundingBoxDescent || descent
+        const pad = 1, inkW = left + right, inkH = up + down
+        canvas.width = Math.max(1, Math.ceil(inkW + 2*pad))
+        canvas.height = Math.max(1, Math.ceil(inkH + 2*pad))
+        ctx.font = `${px}px ${family}`
+        ctx.textBaseline = 'alphabetic'
+        ctx.fillText(text, pad + left, pad + up)
+        const unit = bb.height / (ascent + descent)
+        const w = canvas.width * unit, h = canvas.height * unit
+        image = { href: canvas.toDataURL(), x: -w/2, y: -h/2, w, h }
+        textImages.set(key, image)
+        return image
+    }
     canvas.width = Math.max(1, Math.ceil(m.width))
     canvas.height = Math.max(1, Math.ceil(ascent + descent))
     ctx.font = `${px}px ${family}`

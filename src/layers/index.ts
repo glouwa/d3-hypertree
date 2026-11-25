@@ -18,6 +18,7 @@ import { ImageLayer }           from './image-layer'
 import { LabelLayer }           from './label-layer'
 import { LabelForceLayer }      from './label-force-layer'
 import { LabelPlacementLayer }  from './label-placement-layer'
+import { EmojiBackgroundLayer } from './emoji-background-layer'
 import { InteractionLayer2 }    from '../interaction/interaction-layer'
 import { TraceLayer }           from './trace-layer'
 
@@ -33,6 +34,7 @@ export const layerTypes : { [type:string]: LayerType } = {
     'images':         ImageLayer.type,
     'labels':         LabelLayer.text,
     'emojis':         LabelLayer.emoji,
+    'emoji-backgrounds': EmojiBackgroundLayer.type,
     'labels-force':   LabelForceLayer.type,
     'labels-placed':  LabelPlacementLayer.type,
     'interaction':    InteractionLayer2.type,
@@ -61,6 +63,8 @@ export const defaultLayers = () : LayerSpec[] => [
     { type: 'nodes',      name: 'nodes' },
     { type: 'symbols',    name: 'symbols' },
     { type: 'images',     name: 'images' },
+    // a disk under every emoji (off by default)
+    { type: 'emoji-backgrounds', name: 'emoji-backgrounds' },
     { type: 'emojis',     name: 'emojis' },
     { type: 'labels',     name: 'labels' },
     { type: 'labels-force',  name: 'labels-force' },

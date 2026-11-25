@@ -174,6 +174,12 @@
             leaderLines: { kind: 'enum', values: ['auto', 'always', 'never'], doc: 'a line from a label to its node: for labels placed away from it, always, never' },
             transition: { kind: 'number', min: 0, max: 1000, step: 10, unit: 'ms', doc: 'labels grow and shrink, a label that changes its place glides there (0: off)' },
         },
+        'emoji-backgrounds': {
+            emojiLayer: { kind: 'string', doc: 'the emoji layer it lies under: its scale and the size of its emojis' },
+            padding:    { kind: 'number', min: .8, max: 2, step: .05, doc: 'the radius of a disk: half the emoji\'s larger side times this' },
+            fill:       { kind: 'function', returns: 'color', doc: 'the fill of a disk (default: the theme)' },
+            stroke:     { kind: 'function', returns: 'color', doc: 'the border of a disk (default: the theme)' },
+        },
         'interaction': {
             mouseRadius: { kind: 'number', min: .3, max: 1, step: .01, doc: 'the radius within which the mouse picks nodes; default interaction.mouseRadius' },
         },
@@ -197,6 +203,7 @@
         'images':        'images of nodes with precalc.imageHref, centered on the node',
         'labels':        'labels at their node, without placement against each other',
         'emojis':        'the icons (precalc.icon) centered on their node, as bitmaps; the slowest layer to render',
+        'emoji-backgrounds': 'a disk with a border under every emoji, as large as the emoji (off by default)',
         'labels-force':  'labels moved by a relaxation: pulled to their rest place (above the node in the center, outward toward the rim), pushed apart where they overlap; positions kept between frames',
         'labels-placed': 'labels placed on candidate positions like on a map: never overlapping, a label without a free place is left out',
         'interaction':   'mouse, touch and wheel: hover, drag, pinch, zoom, click and hold',

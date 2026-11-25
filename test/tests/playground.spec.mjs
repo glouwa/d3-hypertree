@@ -327,7 +327,7 @@ test('interaction strategies: selection "single" replaces, hover "none" hovers n
 test('the groups Links, Nodes and Root', async ({ page }) => {
     await page.goto('../playground/?gen=nTree&depth=4')
     await ready(page)
-    const groups = { Links: ['path-arcs', 'link-arcs', 'stem-arc'], Nodes: ['nodes', 'symbols', 'images', 'emojis'], Root: ['(0,0)', 'center-node'] }
+    const groups = { Links: ['path-arcs', 'link-arcs', 'stem-arc'], Nodes: ['nodes', 'symbols', 'images', 'emoji-backgrounds', 'emojis'], Root: ['(0,0)', 'center-node'] }
     for (const [name, members] of Object.entries(groups)) {
         await expect(page.locator(`tr[data-group="${name}"]`)).toContainText(`${members.length} layers`)
         for (const m of members) await expect(page.locator(`tr[data-layer="${m}"]`)).toBeHidden()

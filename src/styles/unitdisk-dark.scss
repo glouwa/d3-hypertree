@@ -62,6 +62,12 @@ $nodeStroke:    #90caf9;
             fill: #111111;
             stroke: #b5b5b5;
         }
+        // the disk under an emoji (layer emoji-backgrounds): transparent like the label
+        // backgrounds, with the border of the hovered label's box
+        .emoji-background {
+            fill: rgba(#111111, .4);
+            stroke: #b5b5b5;
+        }
         .caption.caption-hovered {
             fill: #fff;
         }

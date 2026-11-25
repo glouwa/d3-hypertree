@@ -737,7 +737,7 @@
         { name: 'Indicators', test: n => /-r(-|$)/.test(n) || n === 'λ', note: 'circles that show radii of the filter and the interaction, and the zoom λ' },
         { name: 'Labels', test: n => /^labels/.test(n), note: 'the label layers: labels, force-placed and map-placed labels' },
         { name: 'Links', test: n => /-arcs?$/.test(n), note: 'the edges between nodes: all links, the hover and selection paths, and the stem to the root' },
-        { name: 'Nodes', test: n => ['nodes', 'symbols', 'images', 'emojis'].includes(n), note: 'what is drawn at a node: disk, symbol, image and emoji' },
+        { name: 'Nodes', test: n => ['nodes', 'symbols', 'images', 'emoji-backgrounds', 'emojis'].includes(n), note: 'what is drawn at a node: disk, symbol, image, emoji and the disk under it' },
         { name: 'Root', test: n => n === '(0,0)' || n === 'center-node', note: 'the origin (0,0) and the disk behind the node next to it' },
     ]
     const groupOf = name => GROUPS.find(gr => gr.test(name))
