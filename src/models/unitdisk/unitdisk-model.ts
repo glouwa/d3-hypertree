@@ -45,7 +45,8 @@ export interface UnitDiskArgs
 
     linkWidth:         (n:N)=> number
     linkCurvature:     ArcCurvature
-    halfPlane?:        boolean        // rectangular view: upper half-plane via the Cayley transform (prototype, cayley.ts)
+    halfPlane?:        boolean        // rectangular view: the half-plane via the Cayley transform (prototype, cayley.ts)
+    diskSize?:         number         // the diameter of the disk in the square view (default .96; > 1: beyond the view)
     shrinkAtRim?:      'none' | 'damped' | 'full'   // labels and emojis toward the rim: constant, 1 to 0.5 (default), like the links (to 0)
 
     startPosition?:    C                    // initial translation (documented as filter.transformation.P)

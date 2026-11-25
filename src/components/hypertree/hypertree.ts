@@ -265,8 +265,10 @@ export class Hypertree
     private viewPosition() : string {
         const svg = this.view_.html.querySelector('.unitdisk-nav > svg')
         if (!this.args.geometry.halfPlane) {
+            // geometry.diskSize: the diameter of the disk in the square view (default
+            // .96); above 1 it reaches beyond the view (cut at its edges, e.g. on a phone)
             svg.setAttribute('viewBox', '0 0 1000 1000')
-            return 'translate(500,500) scale(480)'
+            return `translate(500,500) scale(${500 * (this.args.geometry.diskSize || .96)})`
         }
         // the svg's own box (the parent element can be larger: other content in it)
         const s = svg.getBoundingClientRect(), p = this.view_.parent.getBoundingClientRect()

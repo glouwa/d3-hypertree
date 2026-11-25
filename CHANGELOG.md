@@ -121,6 +121,9 @@ are listed first.
   center); the indicator circles (λ, focus, …) are mapped for any center; the
   start view of `api.overview` keeps the root in the picture. Layout, filter and
   interaction work as in the disk.
+- **`geometry.diskSize`**: the diameter of the disk in the square view (default
+  `.96`, as before); above 1 the disk reaches beyond the view and is cut at its
+  edges (e.g. `1.05` on a phone, where every pixel counts).
 - **`layout.rootLinkLength`** (Bergé layout): shorter links near the root. The
   root's children get this part of a link (e.g. `.1`), the links to the leaves
   the whole one, growing linearly in between (by the place between root and
