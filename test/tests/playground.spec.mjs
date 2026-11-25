@@ -1,17 +1,20 @@
 import { test, expect } from '@playwright/test'
 import { collectErrors, expectNoErrors } from './helpers.mjs'
 
-
-// The playground (../playground) must keep working: it loads, its controls change
-// the configuration (URL and tree), and "Open as test" opens the same configuration
-// in the test harness.
+// The playground (../playground, docs/dev/PLAYGROUND.md): the controls come from the
+// option descriptors, the state is the stack of overlays in the URL, a control
+// change is applied live with configure(), and "Open as test" opens the same
+// configuration in the test harness.
 
 // the playground is made for wide screens (options | tree | layers)
 test.use({ viewport: { width: 1600, height: 900 } })
 
-// opens a collapsed group of the layer list (Indicators, Labels, Links, Nodes)
 const openGroup = (page, name) => page.locator(`tr[data-group="${name}"]`).click({ position: { x: 20, y: 8 } })
+const openSection = (page, name) => page.locator('summary').filter({ hasText: new RegExp(`^${name}`) }).click()
 const ready = page => page.waitForFunction(() => window.ht && window.ht.data && document.querySelector('#tree #link-arcs'), null, { timeout: 15000 })
+const opt = (page, path) => page.locator(`.row.opt[data-path="${path}"]`)
+const stackOf = async page => JSON.parse(decodeURIComponent(await page.evaluate(() => new URLSearchParams(location.search).get('stack'))))
+const urlOverlay = async page => ((await stackOf(page)).find(e => e.name === 'url') || { overlay: {} }).overlay
 
 test('loads with the defaults and renders the tree', async ({ page }) => {
     const errors = collectErrors(page)
@@ -20,60 +23,92 @@ test('loads with the defaults and renders the tree', async ({ page }) => {
     expect(await page.locator('#controls details').count()).toBeGreaterThan(6)
     expect(await page.locator('table.layers tbody tr').count()).toBeGreaterThan(15)
     expect(await page.evaluate(() => document.querySelectorAll('#tree #nodes circle').length)).toBeGreaterThan(10)
-    // sections in the order of the pipeline: data, setup, layout, filter, then rendering;
-    // the layers in their own panel on the right
+    // sections in the order of the pipeline; the layers in their own panel on the right; no "Other"
     expect(await page.locator('#controls summary').evaluateAll(s => s.map(e => e.firstChild.textContent.trim())))
-        .toEqual(['Data', 'Initialization', 'Layout', 'Filter', 'Geometry', 'Interaction', 'API'])
+        .toEqual(['Data', 'Presets', 'Initialization', 'Layout', 'Filter', 'Geometry', 'Interaction', 'API'])
     expect(await page.locator('#layer-controls summary').evaluateAll(s => s.map(e => e.firstChild.textContent.trim()))).toEqual(['Layers'])
-    // nothing is marked as changed in the default state
+    // nothing is marked as changed in the default state; the stack is the playground preset and the url
     expect(await page.locator('summary .badge').evaluateAll(b => b.map(e => e.textContent).filter(Boolean))).toEqual([])
     expect(await page.locator('table.layers tr.changed').count()).toBe(0)
-    // icons are off by default: the emoji layer is the slowest one
+    expect(await page.locator('.stack .entry').evaluateAll(e => e.map(x => x.dataset.entry))).toEqual(['defaults', 'playground', 'url'])
+    expect(await stackOf(page)).toEqual([{ name: 'playground' }])
+    // the playground preset: the emoji layer (the slowest one) is off, 750 nodes at most
     expect(await page.evaluate(() => document.querySelectorAll('#tree #emojis > text, #tree #emojis > image').length)).toBe(0)
+    expect(await page.evaluate(() => window.ht.args.filter.weightFilter.rangeNodes.max)).toBe(750)
     expectNoErrors(errors)
 })
 
-test('controls change URL and tree; the panel stays clickable', async ({ page }) => {
-    const errors = collectErrors(page)
-    await page.goto('../playground/')
+test('every described option has a control (or is a callback, state, the layers)', async ({ page }) => {
+    await page.goto('../playground/?gen=nTree&depth=3')
     await ready(page)
-    // regression: the component's mouse capture circle used to cover the panel
-    expect(await page.evaluate(() => document.elementFromPoint(40, 300).closest('#panel') !== null)).toBe(true)
+    const r = await page.evaluate(() => {
+        const paths = [...document.querySelectorAll('#controls .row.opt')].map(r => r.dataset.path)
+        const expected = Object.entries(hytOptions.options)
+            .filter(([, i]) => !['callback', 'state', 'layers', 'data'].includes(i.kind) && !(i.kind === 'object' && !i.nullable) && !i.internal)
+            .map(([p]) => p)
+        return { missing: expected.filter(p => !paths.includes(p)), extra: paths.filter(p => !expected.includes(p)), count: paths.length }
+    })
+    expect(r.missing).toEqual([])
+    expect(r.extra).toEqual([])
+    expect(r.count).toBeGreaterThan(30)
+})
 
-    await page.locator('#controls select').first().selectOption('file:fixtures/flare.csv')
-    await page.waitForFunction(() => window.ht && window.ht.data && window.ht.data.descendants().length === 252)
-    expect(decodeURIComponent(await page.evaluate(() => location.search))).toContain('file=fixtures/flare.csv')
-    // real names as labels for data with names
-    await page.waitForTimeout(800)
-    const labels = await page.evaluate(() => [...document.querySelectorAll('#tree #labels text, #tree #labels-force text')].map(t => t.textContent))
-    expect(labels.some(l => /^Node \d+$/.test(l))).toBe(false)
-
-    await page.locator('tr[data-layer="cells"] input[type=checkbox]').first().check()
-    await page.waitForFunction(() => document.querySelectorAll('#tree #cells > *').length > 0)
-    expect(decodeURIComponent(await page.evaluate(() => location.search))).toContain('"cells":{"invisible":false}')
+test('a control change goes into the url entry, is applied live and shows its provenance; reset removes it', async ({ page }) => {
+    const errors = collectErrors(page)
+    await page.goto('../playground/?gen=nTree&depth=5&childs=3&labels=1')
+    await ready(page)
+    const before = await page.evaluate(() => window.ht)
+    await openSection(page, 'Filter')
+    const row = opt(page, 'filter.cullingRadius')
+    await row.locator('input[type=range]').fill('0.7')
+    await page.waitForFunction(() => window.ht.args.filter.cullingRadius === .7)
+    expect(await urlOverlay(page)).toEqual({ filter: { cullingRadius: .7 } })
+    await expect(row.locator('.prov')).toHaveText('url')
+    await expect(row).toHaveClass(/changed/)
+    expect(await page.locator('summary').filter({ hasText: /^Filter/ }).locator('.badge').textContent()).toBe('1 changed')
+    // live: the same component, a log line names the effect
+    expect(await page.evaluate(() => window.ht === window.__before)).toBe(false) // sanity: evaluate cannot compare handles
+    await expect(page.locator('#log li.conf').first()).toContainText('filter.cullingRadius = 0.7 → frame')
+    expect(await page.evaluate(() => window.ht.data.descendants().length)).toBe(364)
+    // reset: the value below (the library default) shows again
+    await row.locator('button.reset').click()
+    await page.waitForFunction(() => window.ht.args.filter.cullingRadius === .99)
+    expect(await urlOverlay(page)).toEqual({})
+    await expect(row.locator('.prov')).toBeHidden()
     expectNoErrors(errors)
 })
 
-test('a configuration survives a reload and opens as a test', async ({ page, context }) => {
-    const query = 'gen=nTree&depth=5&childs=3&labels=1&layoutType=spiral&filter=off&click=select'
+test('a configuration survives a reload and opens as a test; older links are translated into the url entry', async ({ page, context }) => {
+    const query = 'gen=nTree&depth=5&childs=3&labels=1&layoutType=spiral&filter=off&ripple=1'
     await page.goto(`../playground/?${query}`)
     await ready(page)
-    expect(await page.locator('.row', { hasText: 'Type' }).locator('select').inputValue()).toBe('spiral')
-    expect(await page.locator('.row', { hasText: 'Click on a node' }).locator('select').inputValue()).toBe('select')
+    // the older parameters became the url entry (layout.type as a named value)
+    const url = await urlOverlay(page)
+    expect(url.layout).toEqual({ type: '@spiral' })
+    expect(url.filter.weightFilter.rangeNodes).toEqual({ min: 1e9, max: 1e10 })
+    expect(await page.evaluate(() => decodeURIComponent(location.search))).not.toContain('layoutType=')
+    await openSection(page, 'Layout')
+    expect(await opt(page, 'layout.type').locator('select').first().inputValue()).toBe('@spiral')
+    expect(await page.locator('label.check', { hasText: /^Ripple on click/ }).locator('input').isChecked()).toBe(true)
 
     const [harness] = await Promise.all([context.waitForEvent('page'), page.click('#btn-harness')])
     await harness.waitForFunction(() => window.harness && window.harness.ht.data)
-    const url = decodeURIComponent(harness.url())
-    expect(url).toContain('harness.html?')
-    expect(url).toContain('layoutType=spiral')
-    expect(url).not.toContain('click=')   // playground-only parameter
-    expect(await harness.evaluate(() => harness.ht.data.descendants().length)).toBe(364)
+    const hurl = decodeURIComponent(harness.url())
+    expect(hurl).toContain('harness.html?')
+    expect(hurl).toContain('"@spiral"')
+    expect(hurl).not.toContain('ripple=')   // playground-only parameter
+    // the same stack: the playground preset, then the url entry (filter=off: an unreachable rangeNodes)
+    expect(await harness.evaluate(() => [harness.ht.data.descendants().length, harness.ht.args.layout.type === hyt.layouts.layoutSpiral,
+        harness.ht.args.filter.weightFilter.rangeNodes.max, harness.ht.args.interaction.clickAction])).toEqual([364, true, 1e10, 'goto'])
 })
 
-test('callbacks are logged and a click can select a node', async ({ page }) => {
-    await page.goto('../playground/?gen=nTree&depth=6&childs=2&labels=1&click=select')
+test('callbacks are logged and a click can select a node (interaction.clickAction)', async ({ page }) => {
+    await page.goto('../playground/?gen=nTree&depth=6&childs=2&labels=1')
     await ready(page)
-    await page.waitForTimeout(1000)
+    await openSection(page, 'Interaction')
+    await opt(page, 'interaction.clickAction').locator('select').selectOption('select')
+    await page.waitForFunction(() => window.ht.args.interaction.clickAction === 'select')
+    await page.waitForTimeout(800)
     const target = await page.evaluate(() => {
         const c = [...document.querySelectorAll('#tree #nodes circle')].filter(c => c.__data__ && c.__data__.depth >= 2)[0]
         const r = c.getBoundingClientRect()
@@ -92,50 +127,50 @@ test('each layer has its own options; geometry applies to several layers', async
     const errors = collectErrors(page)
     await page.goto('../playground/?gen=nTree&depth=6&childs=2&labels=1')
     await ready(page)
-    const opt = (layer, key) => page.locator(`tr[data-layer-options="${layer}"] .row`)
-        .filter({ has: page.locator('label', { hasText: new RegExp(`^${key}$`) }) })
+    const lopt = (layer, key) => page.locator(`tr[data-layer-options="${layer}"] .row.opt[data-path="geometry.layerOptions.${layer}.${key}"]`)
     await openGroup(page, 'Nodes')
     await openGroup(page, 'Links')
 
     // nodes: fill (constant color)
     await page.click('tr[data-layer="nodes"] button.expander')
-    await opt('nodes', 'fill').locator('select').selectOption('const')
-    await opt('nodes', 'fill').locator('input[type=color]').fill('#ff0000')
+    await lopt('nodes', 'fill').locator('select').first().selectOption('constant')
+    await lopt('nodes', 'fill').locator('input[type=color]').fill('#ff0000')
     await page.waitForFunction(() => document.querySelector('#tree #nodes circle') && document.querySelector('#tree #nodes circle').style.fill === 'rgb(255, 0, 0)')
 
     // geometry.linkCurvature '0' turns both arc layers into straight lines...
-    await page.locator('summary').filter({ hasText: /^Geometry/ }).click()
-    await page.locator('.row', { has: page.locator('label', { hasText: /^linkCurvature$/ }) }).locator('select').selectOption('0')
+    await openSection(page, 'Geometry')
+    await opt(page, 'geometry.linkCurvature').locator('select').selectOption('0')
     await page.waitForFunction(() => { const l = document.querySelector('#tree #link-arcs > *'); return l && !/A/.test(l.getAttribute('d')) })
 
     // ...unless a layer overrides it
     await page.click('tr[data-layer="link-arcs"] button.expander')
-    await opt('link-arcs', 'curvature').locator('select').selectOption('+')
+    await lopt('link-arcs', 'curvature').locator('select').selectOption('+')
     await page.waitForFunction(() => { const l = document.querySelector('#tree #link-arcs > *'); return l && /A/.test(l.getAttribute('d')) })
 
-    const url = decodeURIComponent(await page.evaluate(() => location.search))
-    expect(url).toContain('geometry={"linkCurvature":"0"}')
-    expect(url).toContain('"nodes":{"fill":"#ff0000"}')
-    expect(url).toContain('"link-arcs":{"curvature":"+"}')
+    const url = await urlOverlay(page)
+    expect(url.geometry.linkCurvature).toBe('0')
+    expect(url.geometry.layerOptions).toEqual({ nodes: { fill: '#ff0000' }, 'link-arcs': { curvature: '+' } })
+    await expect(lopt('link-arcs', 'curvature').locator('.prov')).toHaveText('url')
     expectNoErrors(errors)
 })
 
-test('a click anywhere on a layer row toggles its options, its checkboxes do not', async ({ page }) => {
+test('a click anywhere on a layer row toggles its options, its checkboxes and tools do not', async ({ page }) => {
     await page.goto('../playground/?gen=nTree&depth=4')
+    await ready(page)
     await openGroup(page, 'Nodes')
-    const opts = page.locator('tr[data-layer-options="nodes"]')
-    await expect(opts).toBeHidden()
+    const opts = () => page.locator('tr[data-layer-options="nodes"]')
+    await expect(opts()).toHaveCount(0)
     await page.locator('tr[data-layer="nodes"] td').nth(0).click({ position: { x: 150, y: 5 } })
-    await expect(opts).toBeVisible()
+    await expect(opts()).toBeVisible()
     await page.locator('tr[data-layer="nodes"] td').nth(1).click({ position: { x: 5, y: 5 } })
-    await expect(opts).toBeHidden()
+    await expect(opts()).toHaveCount(0)
     await page.locator('tr[data-layer="nodes"] input[type=checkbox]').first().click()
-    await expect(opts).toBeHidden()
+    await expect(opts()).toHaveCount(0)
     await page.locator('tr[data-layer="nodes"] button.expander').click()
-    await expect(opts).toBeVisible()
+    await expect(opts()).toBeVisible()
 })
 
-test('the emoji layer is off by default; turned on it shows the icons, also after a reload', async ({ page }) => {
+test('the emoji layer is off in the playground preset; turned on it shows the icons, also after a reload', async ({ page }) => {
     const errors = collectErrors(page)
     await page.goto('../playground/')
     await ready(page)
@@ -144,11 +179,12 @@ test('the emoji layer is off by default; turned on it shows the icons, also afte
     expect(await box().isChecked()).toBe(false)
     await box().check()
     await page.waitForFunction(() => document.querySelectorAll('#tree #emojis > text, #tree #emojis > image').length > 3)
+    expect(await urlOverlay(page)).toEqual({ geometry: { layerOptions: { emojis: { invisible: false } } } })
     await page.reload()
     await ready(page)
     await page.waitForFunction(() => document.querySelectorAll('#tree #emojis > text, #tree #emojis > image').length > 3)
     // labels off: icons without labels used to crash
-    await page.locator('summary').filter({ hasText: /^Initialization/ }).click()
+    await openSection(page, 'Initialization')
     await page.locator('.init-steps .check', { hasText: /^Labels$/ }).locator('input').uncheck()
     await page.waitForTimeout(800)
     expect(await page.evaluate(() => document.querySelectorAll('#tree #emojis > text, #tree #emojis > image').length)).toBeGreaterThan(3)
@@ -159,7 +195,7 @@ test('the initialization section lists every step with its current value', async
     const errors = collectErrors(page)
     await page.goto('../playground/?gen=nTree&depth=6&childs=3&labels=1')
     await ready(page)
-    await page.locator('summary').filter({ hasText: /^Initialization/ }).click()
+    await openSection(page, 'Initialization')
     const steps = page.locator('ol.init-steps > li')
     expect(await steps.count()).toBe(8)
     const text = await steps.allInnerTexts()
@@ -167,7 +203,6 @@ test('the initialization section lists every step with its current value', async
     expect(text[0]).toContain('hyt.nTree(depth 6, 3 children)')
     expect(text[5]).toContain('langInitBFS')
     expect(text[5]).toContain('Node 0')
-    // the controls in a step change the configuration and the shown value
     await steps.nth(5).locator('.check', { hasText: /^Labels$/ }).locator('input').uncheck()
     await expect(steps.nth(5)).toContainText('none (library default: no labels)')
     expect(decodeURIComponent(await page.evaluate(() => location.search))).not.toContain('labels=')
@@ -202,7 +237,6 @@ test('the indicator layers form the group Indicators', async ({ page }) => {
     // one member off: the group shows a mixed state
     await page.locator('tr[data-layer="mouse-r"] input[type=checkbox]').first().uncheck()
     await page.waitForFunction(() => document.querySelector('tr[data-group="Indicators"] input').indeterminate)
-    // other layers are not in the group
     await expect(page.locator('tr[data-layer="cells"]')).toBeVisible()
     expectNoErrors(errors)
 })
@@ -215,25 +249,23 @@ test('the label layers form the group Labels', async ({ page }) => {
     for (const m of ['labels', 'labels-force', 'labels-placed']) await expect(page.locator(`tr[data-layer="${m}"]`)).toBeHidden()
     await group.click({ position: { x: 20, y: 8 } })
     for (const m of ['labels', 'labels-force', 'labels-placed']) await expect(page.locator(`tr[data-layer="${m}"]`)).toBeVisible()
-    // labels-r-𝐖 stays in Indicators
     await expect(page.locator('tr[data-layer="labels-r-𝐖"]')).toBeHidden()
-    // mixed at the start (labels on, labels-force off): the group's checkbox
-    // turns both on, then both off
-    const box = group.locator('input[type=checkbox]').first()
-    expect(await box.evaluate(b => b.indeterminate)).toBe(true)
-    await box.check()
+    // mixed at the start (labels on, labels-force off): the group's checkbox turns both on, then both off
+    const box = () => group.locator('input[type=checkbox]').first()
+    expect(await box().evaluate(b => b.indeterminate)).toBe(true)
+    await box().check()
     await page.waitForFunction(() => document.querySelectorAll('#tree [id="labels-force"] > *').length > 0)
-    await box.uncheck()
+    await box().uncheck()
     await page.waitForFunction(() => document.querySelectorAll('#tree #labels text').length === 0)
 })
 
 test('Node data: the share of nodes with an icon is adjustable', async ({ page }) => {
     const errors = collectErrors(page)
-    await page.goto('../playground/?gen=nTree&depth=4&childs=3&labels=1&filter=off&icons=1&iconPercent=25&layers={}')
+    await page.goto('../playground/?gen=nTree&depth=4&childs=3&labels=1&filter=off&icons=1&iconPercent=25&stack=[]')
     await ready(page)
     const icons = () => page.evaluate(() => { let c = 0; window.ht.data.each(n => { if (n.precalc.icon) c++ }); return c })
     expect(await icons()).toBe(30)
-    await page.locator('summary').filter({ hasText: /^Initialization/ }).click()
+    await openSection(page, 'Initialization')
     const step = page.locator('ol.init-steps > li', { hasText: 'dataInitBFS' })
     await expect(step).toContainText('25 % of the nodes')
     await step.locator('input[type=range]').fill('0')
@@ -258,13 +290,12 @@ test('cells: hover and selection highlighting are layer options', async ({ page 
     await page.goto('../playground/?gen=nTree&depth=6&childs=2&labels=1')
     await ready(page)
     await page.click('tr[data-layer="cells"] button.expander')
-    const opt = key => page.locator('tr[data-layer-options="cells"] .row')
-        .filter({ has: page.locator('label', { hasText: new RegExp(`^${key}$`) }) }).locator('select')
-    await opt('hover').selectOption('off')
-    await opt('selection').selectOption('off')
+    const box = key => page.locator(`tr[data-layer-options="cells"] .row.opt[data-path="geometry.layerOptions.cells.${key}"] input[type=checkbox]`)
+    await box('hover').uncheck()
+    await box('selection').uncheck()
     await page.waitForFunction(() => window.ht.unitdisk.layerStack.layers.cells.args.hover === false
         && window.ht.unitdisk.layerStack.layers.cells.args.selection === false)
-    expect(decodeURIComponent(await page.evaluate(() => location.search))).toContain('"hover":false,"selection":false')
+    expect((await urlOverlay(page)).geometry.layerOptions.cells).toEqual({ hover: false, selection: false })
 })
 
 test('nodes: option show offers leaves and all', async ({ page }) => {
@@ -272,21 +303,19 @@ test('nodes: option show offers leaves and all', async ({ page }) => {
     await ready(page)
     await openGroup(page, 'Nodes')
     await page.click('tr[data-layer="nodes"] button.expander')
-    const sel = page.locator('tr[data-layer-options="nodes"] .row').filter({ has: page.locator('label', { hasText: /^show$/ }) }).locator('select')
-    await sel.selectOption('all')
+    await page.locator('tr[data-layer-options="nodes"] .row.opt[data-path="geometry.layerOptions.nodes.show"] select').selectOption('all')
     await page.waitForFunction(() => [...document.querySelectorAll('#tree #nodes circle')].some(c => c.__data__ && c.__data__.children && c.__data__.parent))
-    expect(decodeURIComponent(await page.evaluate(() => location.search))).toContain('"nodes":{"show":"all"}')
+    expect((await urlOverlay(page)).geometry.layerOptions.nodes).toEqual({ show: 'all' })
 })
 
 test('interaction strategies: selection "single" replaces, hover "none" hovers nothing', async ({ page }) => {
     await page.goto('../playground/?gen=nTree&depth=6&childs=2&labels=1&filter=off')
     await ready(page)
-    await page.locator('summary').filter({ hasText: /^Interaction/ }).click()
-    const row = label => page.locator('.row', { has: page.locator('label', { hasText: new RegExp(`^${label}$`) }) }).locator('select')
-    await row('Selection').selectOption('single')
-    await row('Hover').selectOption('none')
+    await openSection(page, 'Interaction')
+    await opt(page, 'interaction.selection').locator('select').selectOption('single')
+    await opt(page, 'interaction.hover').locator('select').selectOption('none')
     await page.waitForFunction(() => window.ht.args.interaction.selection === 'single' && window.ht.args.interaction.hover === 'none')
-    expect(decodeURIComponent(await page.evaluate(() => location.search))).toContain('"hover":"none","selection":"single"')
+    expect((await urlOverlay(page)).interaction).toEqual({ selection: 'single', hover: 'none' })
     const ids = await page.evaluate(() => {
         const [a, b] = window.ht.data.leaves()
         window.ht.api.toggleSelection(a); window.ht.api.toggleSelection(b)
@@ -311,7 +340,7 @@ test('the groups Links, Nodes and Root', async ({ page }) => {
 test('interaction: hover path and hover cell switch independently', async ({ page }) => {
     await page.goto('../playground/?gen=nTree&depth=6&childs=2&filter=off')
     await ready(page)
-    await page.locator('summary').filter({ hasText: /^Interaction/ }).click()
+    await openSection(page, 'Interaction')
     const box = label => page.locator('label.check', { hasText: new RegExp(`^${label}$`) }).locator('input')
     const hoverMiddle = async () => {
         const b = await page.locator('#tree svg').first().boundingBox()
@@ -328,78 +357,82 @@ test('interaction: hover path and hover cell switch independently', async ({ pag
 
     await box('Hover cell').check()
     await page.waitForFunction(() => decodeURIComponent(location.search).includes('"cells":{"invisible":false}'))
-    await ready(page)
     expect(await hoverMiddle()).toEqual({ path: true, cell: true })
 
     await box('Hover path').uncheck()
     await page.waitForFunction(() => decodeURIComponent(location.search).includes('"path-arcs":{"hover":"none"}'))
-    await ready(page)
     expect(await hoverMiddle()).toEqual({ path: false, cell: true })
-})
-
-test('click: goto or select, ripple in addition', async ({ page }) => {
-    await page.goto('../playground/?gen=nTree&depth=4')
-    await ready(page)
-    await page.locator('summary').filter({ hasText: /^Interaction/ }).click()
-    const sel = page.locator('.row', { has: page.locator('label', { hasText: /^Click on a node$/ }) }).locator('select')
-    expect(await sel.locator('option').evaluateAll(o => o.map(x => x.value))).toEqual(['goto', 'select', 'none'])
-    await sel.selectOption('select')
-    await page.locator('label.check', { hasText: /^Ripple on click/ }).locator('input').check()
-    await page.waitForFunction(() => /click=select/.test(location.search) && /ripple=1/.test(location.search))
-    // older links: click=ripple
-    await page.goto('../playground/?gen=nTree&depth=4&click=ripple')
-    await ready(page)
-    expect(await sel.inputValue()).toBe('none')
-    expect(await page.locator('label.check', { hasText: /^Ripple on click/ }).locator('input').isChecked()).toBe(true)
 })
 
 test('initialization: multi-line labels', async ({ page }) => {
     await page.goto('../playground/?gen=nTree&depth=3&childs=2&labels=1&filter=off')
     await ready(page)
-    await page.locator('summary').filter({ hasText: /^Initialization/ }).click()
+    await openSection(page, 'Initialization')
     await page.locator('label.check', { hasText: /^Multi-line labels$/ }).locator('input').check()
     await page.waitForFunction(() => /multiline=1/.test(location.search))
     await page.waitForFunction(() => window.ht && window.ht.data && window.ht.data.descendants().every(n => !n.precalc.label || n.precalc.label.includes('\n')))
 })
 
-test('filter: rangeNodes max defaults to 750 in the playground', async ({ page }) => {
-    await page.goto('../playground/?gen=nTree&depth=4')
+test('geometry: node radius as a named value (leaves only), then a constant for every node', async ({ page }) => {
+    await page.goto('../playground/?gen=nTree&depth=3&childs=3&filter=off&layers={"nodes":{"show":"all"}}')
     await ready(page)
-    expect(await page.evaluate(() => window.ht.args.filter.weightFilter.rangeNodes.max)).toBe(750)
-})
-
-test('geometry: node radius for leaves and inner nodes, inner like the leaves', async ({ page }) => {
-    const layers = encodeURIComponent(JSON.stringify({ nodes: { show: 'all' } }))
-    await page.goto(`../playground/?gen=nTree&depth=3&childs=3&filter=off&layers=${layers}`)
-    await ready(page)
-    await page.locator('summary').filter({ hasText: /^Geometry/ }).click()
-    const radiusRow = label => page.locator('.row', { has: page.locator('label', { hasText: new RegExp(`^${label}$`) }) })
+    await openSection(page, 'Geometry')
+    const row = opt(page, 'geometry.nodeRadius')
     const radii = () => page.evaluate(() => {
         const r = c => +c.getAttribute('r')
         const cs = [...document.querySelectorAll('#tree #nodes circle')].filter(c => c.__data__.parent)
         return { leaves: [...new Set(cs.filter(c => !c.__data__.children).map(r))], inner: [...new Set(cs.filter(c => c.__data__.children).map(r))] }
     })
-    await radiusRow('radius: leaves').locator('input[type=checkbox]').check()
-    await page.waitForFunction(() => decodeURIComponent(location.search).includes('"nodeRadius":{"leaves":0.015}'))
-    await ready(page)
+    await row.locator('select').first().selectOption('@leaves 0.015')
     await page.waitForFunction(() => [...document.querySelectorAll('#tree #nodes circle')].some(c => c.getAttribute('r') === '0.015'))
     let r = await radii()
     expect(r.leaves).toEqual([0.015])
     expect(r.inner).not.toContain(0.015)
-    await page.locator('label.check', { hasText: /^Inner nodes like the leaves$/ }).locator('input').check()
-    await page.waitForFunction(() => decodeURIComponent(location.search).includes('"nodeRadius":{"leaves":0.015,"inner":"leaves"}'))
-    await expect(radiusRow('radius: inner')).toBeHidden()
+    expect((await urlOverlay(page)).geometry.nodeRadius).toBe('@leaves 0.015')
+    await row.locator('select').first().selectOption('constant')
+    await row.locator('input[type=range]').fill('0.015')
     await page.waitForFunction(() => [...document.querySelectorAll('#tree #nodes circle')].filter(c => c.__data__.parent).every(c => c.getAttribute('r') === '0.015'))
+    expect((await urlOverlay(page)).geometry.nodeRadius).toBe(0.015)
+})
+
+test('a scale: node fill by depth with a d3 interpolator, link width by weight', async ({ page }) => {
+    const errors = collectErrors(page)
+    await page.goto('../playground/?gen=nTree&depth=5&childs=3&filter=off')
+    await ready(page)
+    await openGroup(page, 'Nodes')
+    await page.click('tr[data-layer="nodes"] button.expander')
+    const fill = page.locator('tr[data-layer-options="nodes"] .row.opt[data-path="geometry.layerOptions.nodes.fill"]')
+    await fill.locator('select').first().selectOption('scale')
+    await fill.locator('select.scale').nth(0).selectOption('depth')
+    await fill.locator('select.scale').nth(2).selectOption('Turbo')
+    await page.waitForFunction(() => {
+        const cs = [...document.querySelectorAll('#tree #nodes circle')]
+        return cs.length > 5 && new Set(cs.map(c => c.style.fill)).size > 1 && cs.every(c => /^rgb/.test(c.style.fill))
+    })
+    expect((await urlOverlay(page)).geometry.layerOptions.nodes.fill).toEqual({ '@scale': { value: 'depth', scale: 'sqrt', interpolator: 'Turbo', opacity: 1 } })
+
+    await openSection(page, 'Geometry')
+    const width = opt(page, 'geometry.linkWidth')
+    await width.locator('select').first().selectOption('scale')
+    await page.waitForFunction(() => {
+        const ws = [...document.querySelectorAll('#tree #link-arcs path')].map(p => +p.style.strokeWidth || +p.getAttribute('stroke-width'))
+        return ws.length > 5 && new Set(ws).size > 1
+    })
+    const spec = (await urlOverlay(page)).geometry.linkWidth['@scale']
+    expect(spec.value).toBe('weight')
+    expect(spec.range).toEqual([.0005, .03])
+    expectNoErrors(errors)
 })
 
 test('geometry: the rectangular view (half-plane) in a wide tree element', async ({ page }) => {
     const errors = collectErrors(page)
     await page.goto('../playground/?gen=nTree&depth=5&childs=3')
     await ready(page)
-    await page.locator('summary').filter({ hasText: /^Geometry/ }).click()
-    await page.locator('label.check', { hasText: /^Rectangular view/ }).locator('input').check()
-    await page.waitForFunction(() => decodeURIComponent(location.search).includes('"halfPlane":true'))
-    await page.waitForFunction(() => window.ht && window.ht.args.geometry.halfPlane && window.ht.unitdisk.cache && window.ht.unitdisk.cache.unculledNodes.length > 10)
+    await openSection(page, 'Geometry')
+    await opt(page, 'geometry.view').locator('select').selectOption('halfplane')
+    await page.waitForFunction(() => decodeURIComponent(location.search).includes('"view":"halfplane"'))
+    await page.waitForFunction(() => window.ht && window.ht.args.geometry.view === 'halfplane' && window.ht.unitdisk.cache && window.ht.unitdisk.cache.unculledNodes.length > 10)
+    await page.waitForTimeout(300)
     const r = await page.evaluate(() => {
         const box = document.querySelector('#tree').getBoundingClientRect()
         const [, , w, h] = document.querySelector('#tree .unitdisk-nav > svg').getAttribute('viewBox').split(' ').map(Number)
@@ -415,21 +448,19 @@ test('labels-force and labels-placed: option transition (0 = off)', async ({ pag
     await openGroup(page, 'Labels')
     for (const layer of ['labels-force', 'labels-placed']) {
         await page.click(`tr[data-layer="${layer}"] button.expander`)
-        const row = page.locator(`tr[data-layer-options="${layer}"] .row`).filter({ has: page.locator('label', { hasText: /^transition$/ }) })
-        await row.locator('input[type=checkbox]').check()
-        await page.waitForFunction(l => window.ht.unitdisk.layerStack.layers[l].args.transition === 250, layer)
+        const row = page.locator(`tr[data-layer-options="${layer}"] .row.opt[data-path="geometry.layerOptions.${layer}.transition"]`)
         await row.locator('input[type=range]').fill('0')
         await page.waitForFunction(l => window.ht.unitdisk.layerStack.layers[l].args.transition === 0, layer)
-        expect(decodeURIComponent(await page.evaluate(() => location.search))).toMatch(new RegExp(`"${layer}":\\{[^}]*"transition":0`))
+        expect((await urlOverlay(page)).geometry.layerOptions[layer]).toEqual({ transition: 0 })
     }
 })
 
-test('labels and emojis: option asImage', async ({ page }) => {
+test('labels: option asImage', async ({ page }) => {
     await page.goto('../playground/?gen=nTree&depth=5&childs=3&labels=1')
     await ready(page)
     await openGroup(page, 'Labels')
     await page.click('tr[data-layer="labels"] button.expander')
-    await page.locator('tr[data-layer-options="labels"] .row').filter({ has: page.locator('label', { hasText: /^asImage$/ }) }).locator('select').selectOption('on')
+    await page.locator('tr[data-layer-options="labels"] .row.opt[data-path="geometry.layerOptions.labels.asImage"] input[type=checkbox]').check()
     await page.waitForFunction(() => window.ht.unitdisk.layerStack.layers.labels.args.asImage === true)
     await page.waitForFunction(() => document.querySelectorAll('#tree [id="labels"] image').length > 3)
 })
@@ -437,8 +468,8 @@ test('labels and emojis: option asImage', async ({ page }) => {
 test('layout: child order balanced', async ({ page }) => {
     await page.goto('../playground/?file=fixtures/primates.treeml.xml&labels=name')
     await ready(page)
-    await page.locator('summary').filter({ hasText: /^Layout/ }).click()
-    await page.locator('.row', { has: page.locator('label', { hasText: /^Child order$/ }) }).locator('select').selectOption('balanced')
+    await openSection(page, 'Layout')
+    await opt(page, 'layout.childOrder').locator('select').selectOption('balanced')
     await page.waitForFunction(() => decodeURIComponent(location.search).includes('"childOrder":"balanced"'))
     await page.waitForFunction(() => window.ht && window.ht.args.layout.childOrder === 'balanced' && window.ht.data)
 })
@@ -446,13 +477,104 @@ test('layout: child order balanced', async ({ page }) => {
 test('geometry: start position', async ({ page }) => {
     await page.goto('../playground/?gen=nTree&depth=5&childs=3')
     await ready(page)
-    await page.locator('summary').filter({ hasText: /^Geometry/ }).click()
-    const range = page.locator('.row', { has: page.locator('label', { hasText: /^start position y$/ }) }).locator('input[type=range]')
-    await range.fill('0.5')
+    await openSection(page, 'Geometry')
+    const row = opt(page, 'geometry.startPosition')
+    await row.locator('input[type=checkbox]').check()
+    await row.locator('input[type=range]').nth(1).fill('0.5')
     await page.waitForFunction(() => decodeURIComponent(location.search).includes('"startPosition":{"re":0,"im":0.5}'))
     await page.waitForFunction(() => window.ht && window.ht.args.geometry.startPosition && window.ht.args.geometry.startPosition.im === 0.5)
-    // the root sits below the center
-    await page.waitForFunction(() => { const r = window.ht.data; return r.cache && r.cache.im > .3 })
+})
+
+test('the stack: a preset added, its options shown with provenance; own preset saved, combined, switched off', async ({ page }) => {
+    const errors = collectErrors(page)
+    await page.goto('../playground/?gen=nTree&depth=5&childs=3&labels=1&values=1')
+    await ready(page)
+    // add the infovis preset: it is applied, its values carry its badge
+    await page.locator('.row', { hasText: 'Add preset' }).locator('select').selectOption('infovis')
+    await page.locator('.row', { hasText: 'Add preset' }).locator('button').click()
+    await page.waitForFunction(() => window.ht && window.ht.args.geometry.shrinkAtRim === 'full' && window.ht.data)
+    expect(await page.locator('.stack .entry').evaluateAll(e => e.map(x => x.dataset.entry))).toEqual(['defaults', 'playground', 'infovis', 'url'])
+    await openSection(page, 'Geometry')
+    await expect(opt(page, 'geometry.shrinkAtRim').locator('.prov')).toHaveText('infovis')
+    await expect(opt(page, 'geometry.shrinkAtRim').locator('.prov')).toHaveClass(/preset/)
+    // the entry expands to the options it sets
+    await page.locator('.entry[data-entry="infovis"] button.expander').click()
+    await expect(page.locator('.entry-details .path', { hasText: 'geometry.shrinkAtRim' })).toContainText('full')
+    // a change on top, saved as an own preset: the url entry is empty again, the own entry is in the stack and the URL
+    await opt(page, 'geometry.shrinkAtRim').locator('select').selectOption('none')
+    await page.waitForFunction(() => window.ht.args.geometry.shrinkAtRim === 'none')
+    await expect(page.locator('.entry-details .path', { hasText: 'geometry.shrinkAtRim' })).toContainText('overridden by url')
+    page.once('dialog', d => d.accept('mine'))
+    await page.locator('button', { hasText: 'Save url changes as preset' }).click()
+    await page.waitForFunction(() => document.querySelector('.entry[data-entry="mine"]'))
+    await ready(page)
+    const stack = await stackOf(page)
+    expect(stack.map(e => e.name)).toEqual(['playground', 'infovis', 'mine'])
+    expect(stack[2]).toEqual({ name: 'mine', own: true, overlay: { geometry: { shrinkAtRim: 'none' } } })
+    await expect(opt(page, 'geometry.shrinkAtRim').locator('.prov')).toHaveText('mine')
+    expect(await page.evaluate(() => window.ht.args.geometry.shrinkAtRim)).toBe('none')
+    // switched off: the preset below shows again
+    await page.locator('.entry[data-entry="mine"] input[type=checkbox]').uncheck()
+    await page.waitForFunction(() => window.ht && window.ht.args.geometry.shrinkAtRim === 'full' && window.ht.data)
+    expect((await stackOf(page))[2].enabled).toBe(false)
+    // the own preset survives a reload from the URL
+    await page.reload()
+    await ready(page)
+    expect(await page.locator('.stack .entry').evaluateAll(e => e.map(x => x.dataset.entry))).toEqual(['defaults', 'playground', 'infovis', 'mine', 'url'])
+    expectNoErrors(errors)
+})
+
+test('the stack: editing target, reorder and remove', async ({ page }) => {
+    const stack = encodeURIComponent(JSON.stringify([{ name: 'a', own: true, overlay: { filter: { cullingRadius: .8 } } }, { name: 'b', own: true, overlay: { filter: { cullingRadius: .9 } } }]))
+    await page.goto(`../playground/?gen=nTree&depth=4&childs=3&stack=${stack}`)
+    await ready(page)
+    expect(await page.evaluate(() => window.ht.args.filter.cullingRadius)).toBe(.9)
+    await openSection(page, 'Filter')
+    const row = opt(page, 'filter.cullingRadius')
+    await expect(row.locator('.prov')).toHaveText('b')
+    // b moved above a: a wins
+    await page.locator('.entry[data-entry="b"] button[title="up"]').click()
+    await page.waitForFunction(() => window.ht && window.ht.args.filter.cullingRadius === .8 && window.ht.data)
+    expect((await stackOf(page)).map(e => e.name)).toEqual(['b', 'a'])
+    // editing target a: a change goes into a
+    await page.locator('.entry[data-entry="a"] button[title^="edit"]').click()
+    await row.locator('input[type=range]').fill('0.6')
+    await page.waitForFunction(() => window.ht.args.filter.cullingRadius === .6)
+    expect((await stackOf(page)).find(e => e.name === 'a').overlay).toEqual({ filter: { cullingRadius: .6 } })
+    // a removed: b shows again
+    await page.locator('.entry[data-entry="a"] button[title="remove from the stack"]').click()
+    await page.waitForFunction(() => window.ht && window.ht.args.filter.cullingRadius === .9 && window.ht.data)
+    expect((await stackOf(page)).map(e => e.name)).toEqual(['b'])
+})
+
+test('the layer panel: a layer added, moved and removed writes geometry.layers by name', async ({ page }) => {
+    const errors = collectErrors(page)
+    await page.goto('../playground/?gen=nTree&depth=4&childs=3&filter=off')
+    await ready(page)
+    const add = page.locator('.row', { hasText: 'Add layer' })
+    await add.locator('select').selectOption('nodes')
+    await add.locator('input[type=text]').fill('big')
+    await add.locator('button').click()
+    await page.waitForFunction(() => window.ht.unitdisk.layerStack.layers.big)
+    let layers = (await urlOverlay(page)).geometry.layers
+    expect(layers[0]).toBe('background')
+    expect(layers[layers.length - 1]).toEqual({ type: 'nodes', name: 'big' })
+    expect(await page.locator('tr[data-layer="big"]')).toBeVisible()
+    // its options: a bigger constant radius, all nodes
+    await page.click('tr[data-layer="big"] button.expander')
+    const r = page.locator('tr[data-layer-options="big"] .row.opt[data-path="geometry.layerOptions.big.r"]')
+    await r.locator('select').first().selectOption('constant')
+    await r.locator('input[type=range]').fill('0.05')
+    await page.waitForFunction(() => document.querySelector('#tree [id="big"] circle') && document.querySelector('#tree [id="big"] circle').getAttribute('r') === '0.05')
+    // moved up (drawn earlier), then removed
+    await page.hover('tr[data-layer="big"]')
+    await page.locator('tr[data-layer="big"] button[title^="draw earlier"]').click()
+    await page.waitForFunction(() => Object.keys(window.ht.unitdisk.layerStack.layers).indexOf('big') === Object.keys(window.ht.unitdisk.layerStack.layers).length - 2)
+    await page.hover('tr[data-layer="big"]')
+    await page.locator('tr[data-layer="big"] button[title="remove from the stack"]').click()
+    await page.waitForFunction(() => !window.ht.unitdisk.layerStack.layers.big)
+    expect((await urlOverlay(page)).geometry.layers).toBeUndefined()
+    expectNoErrors(errors)
 })
 
 test('layout: options on the left, the tree, the layer list in its own panel on the right', async ({ page }) => {

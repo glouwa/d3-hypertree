@@ -25,7 +25,7 @@ export default defineConfig({
         minify: false,
         emptyOutDir: false,       // the CSS and the declarations live in dist/ too
         lib: {
-            entry: 'src/d3-hypertree.ts',
+            entry: 'src/index.ts',
             name: 'hyt',
             formats: ['umd', 'es'],
             fileName: format => format === 'es' ? 'd3-hypertree.mjs' : 'd3-hypertree.js',

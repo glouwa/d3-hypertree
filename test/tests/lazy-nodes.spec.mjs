@@ -13,7 +13,7 @@ const state = page => page.evaluate(() => {
         const n = c.__data__
         const isLazy = c.classList.contains('lazy')
         if (isLazy !== !!n.hasOutChildren) out.wrongClass++
-        const r = ud.args.nodeRadius(ud, n), drawn = +c.getAttribute('r')
+        const r = harness.ht.args.geometry.nodeRadius(ud, n), drawn = +c.getAttribute('r')
         if (isLazy) {
             out.lazy++
             // some child is not visible
@@ -59,7 +59,7 @@ test('nodes option lazyScale: 1 draws them as large as the others', async ({ pag
     await waitForStable(page)
     const r = await page.evaluate(() => {
         const ud = harness.ht.unitdisk
-        return [...document.querySelectorAll('[id="nodes"] circle.lazy')].map(c => +c.getAttribute('r') / ud.args.nodeRadius(ud, c.__data__))
+        return [...document.querySelectorAll('[id="nodes"] circle.lazy')].map(c => +c.getAttribute('r') / harness.ht.args.geometry.nodeRadius(ud, c.__data__))
     })
     expect(r.length).toBeGreaterThan(0)
     for (const x of r) expect(x).toBeCloseTo(1, 9)

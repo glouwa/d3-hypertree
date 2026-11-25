@@ -313,7 +313,7 @@ test('filter.labelScore decides which nodes get a label', async ({ page }) => {
 })
 
 test('labels-placed in the rectangular view: no overlaps', async ({ page }) => {
-    const geometry = encodeURIComponent(JSON.stringify({ halfPlane: true }))
+    const geometry = encodeURIComponent(JSON.stringify({ view: 'halfplane' }))
     await page.setViewportSize({ width: 1300, height: 700 })
     await openTree(page, `file=fixtures/primates.treeml.xml&labels=name&size=1200x600&geometry=${geometry}&layers=${encodeURIComponent(JSON.stringify(layerOpts('labels-placed')))}`)
     await waitForStable(page)

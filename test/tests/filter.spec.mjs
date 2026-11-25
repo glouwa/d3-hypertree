@@ -29,7 +29,10 @@ import { collectErrors, expectNoErrors, openTree, expectScene, expectPlausibleSc
 // A wide tree with labels gives the filter something to cut.
 
 const base = 'gen=nTree&depth=5&childs=4&labels=1'   // 1,365 nodes
-const withFilter = opt => `${base}&filterOpt=${encodeURIComponent(JSON.stringify(opt))}`
+// a filter option, or { layers } for the label layers' own limit (maxLabels)
+const withFilter = opt => opt.layers
+    ? `${base}&layers=${encodeURIComponent(JSON.stringify(opt.layers))}`
+    : `${base}&filterOpt=${encodeURIComponent(JSON.stringify(opt))}`
 
 // The filter adapts weightFilter.magic by the factor alpha on every update, so it
 // needs several frames to converge; right after loading (no updates yet) it is
@@ -84,8 +87,8 @@ const cases = [
     ['focusExtension-1', { focusExtension: 1 }, () => {}],
     ['focusExtension-2.5', { focusExtension: 2.5 }, () => {}],
     ['maxFocusRadius-0.5', { maxFocusRadius: 0.5 }, () => {}],
-    ['maxlabels-3', { maxlabels: 3 }, s => expect(s.labels).toBeLessThanOrEqual(3)],
-    ['maxlabels-60', { maxlabels: 60 }, (s, d) => expect(s.labels).toBeGreaterThanOrEqual(d.labels)],
+    ['maxlabels-3', { layers: { labels: { maxLabels: 3 } } }, s => expect(s.labels).toBeLessThanOrEqual(3)],
+    ['maxlabels-60', { layers: { labels: { maxLabels: 60 } } }, (s, d) => expect(s.labels).toBeGreaterThanOrEqual(d.labels)],
 ]
 
 for (const [name, opt, check] of cases) {

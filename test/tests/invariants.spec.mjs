@@ -55,9 +55,9 @@ const check = (page, afterLoading) => page.evaluate(afterLoading => {
     if (cache.centerNode && Math.hypot(cache.centerNode.cache.re, cache.centerNode.cache.im) > Math.hypot(nearest.cache.re, nearest.cache.im) + .02 + 1e-9)
         problems.push('the center node is not the nearest visible node')
 
-    // labels: at most maxlabels, the root has one
+    // labels: at most the default limit of the label layers, the root has one
     const labels = cache.labels || []
-    if (labels.length > ht.args.filter.maxlabels) problems.push(`${labels.length} labels, maxlabels ${ht.args.filter.maxlabels}`)
+    if (labels.length > hyt.DEFAULT_MAX_LABELS) problems.push(`${labels.length} labels, maxLabels ${hyt.DEFAULT_MAX_LABELS}`)
     if (labels.length && ht.data.precalc.label && !labels.includes(ht.data)) problems.push('the root has no label')
     if (labels.some(n => !set.has(n))) problems.push('a label of a hidden node')
     return { problems, visible: unculled.length }

@@ -1,0 +1,180 @@
+import { Tree } from "./tree"
+import { N } from './n'
+import { stratify, csvParse } from 'd3'
+
+// todo loader MUSS ein generic sein
+export type LoaderFunction = (ok: (root:N, t0:number, dl:number)=>void)=> void
+
+function oneNode(ok) {
+    ok({
+        parent:null,
+        children:[],
+        data:{}
+    })
+}
+
+function path(ok, max) {
+    oneNode(d=> {
+        var cur = d
+        for (var i=0; i < max; i++) {
+            var newN = { parent:d, children:[] }
+            cur.children.push(newN)
+            cur = newN
+        }
+        ok(d)
+    })
+}
+
+function star(ok, max) {
+    oneNode(d=> {
+        for (var i=0; i < max-1; i++)
+            d.children.push({ parent:d, children:[] })
+        ok(d)
+    })
+}
+// Downloads a text file; ok gets the text, the time after the download and its length.
+// On an error the loader reports it and calls ok with undefined (as with d3-request).
+function loadText(file:string, ok:(text:string|undefined, t0:number, dl:number)=> void) {
+    fetch(file)
+        .then(r=> { if (!r.ok) throw new Error(`${r.status} ${r.statusText}`); return r.text() })
+        .then(text=> ok(text, performance.now(), text.length))
+        .catch(e=> { console.error(`d3-hypertree: could not load ${file}:`, e); ok(undefined, performance.now(), 0) })
+}
+
+const parseJson = (text:string|undefined)=> text === undefined ? undefined : JSON.parse(text)
+
+function loadFromLangFile(ok, file) {
+    loadText(file, (text, t0, dl)=> ok(parseJson(text), t0, dl))
+}
+
+function loadFromFile(ok, file) {
+    if (file.endsWith('.xml') ||
+        file.endsWith('.json') ||
+        file.endsWith('.rdf'))
+        if (file.endsWith('.d3.json') || file == "data/upload/user-uploaded.xml")
+            loadText(file, (text, t0, dl)=> ok(parseJson(text), t0, dl))
+        else
+            new Tree(ok, file)
+    else
+        loadText(file, text=> {
+            if (text === undefined) return
+            ok(stratify()
+                .parentId((d:any)=> d.id.substring(0, d.id.lastIndexOf(".")))
+                (csvParse(text)))
+        })
+}
+
+function loadFromData(ok, data) {    
+    const t0 = performance.now()
+    const dl = 0
+    ok(data, t0, dl)
+}
+
+export var path_ =        len=> ok=> path(ok, len)
+export var star_ =        degree=> ok=> star(ok, degree)
+export var fromFile =     f=> ok=> loadFromFile(ok, f)
+export var fromData =     f=> ok=> loadFromData(ok, f)
+export var fromLangFile = f=> ok=> loadFromLangFile(ok, f)
+
+export function nTreeAtFirst(ok, max=75, deg=6) {
+    oneNode(d=> {
+        var cur = d
+        for (var i=0; i < max; i++) {
+            for (var j=0; j<deg; j++) {
+                var newN = { parent:d, children:[] }
+                cur.children.push(newN)
+            }
+            cur = cur.children[deg/2]
+        }
+        ok(d)
+    })
+}
+
+export function nTree(ok, depth=14, childs=2) {
+    oneNode(d=> {
+        function processNode(parent, l)
+        {
+            if (l>=depth) return
+            for (var i=0; i<childs; i++) {
+                var newN = { parent:parent, children:[] }
+                parent.children.push(newN)
+                processNode(newN, l+1)
+            }
+        }
+        processNode(d, 0)
+        ok(d)
+    })
+}
+
+export function deepStar(ok, arms=4, depth=30) {
+    oneNode(d=> {
+        for (var i=0; i < arms; i++) {
+            var l1 = { parent:d, children:[] }
+            d.children.push(l1)
+            var cur = l1
+            for (var j=0; j < depth; j++) {
+                var newN = { parent:d, children:[] }
+                cur.children.push(newN)
+                cur = newN
+            }
+        }
+        ok(d)
+    })
+}
+
+/**
+ * special tactics loader for navDisks
+ * generates a path containing nodes for each member of 'o'
+ *
+ * no new object created, o is extended by tree stuff.
+ */
+export function obj2data(o)
+{
+    var mergeId = 1
+    var cur = null
+    var root = null    
+    for (var name in o) {
+        var newN = o[name]
+        newN.mergeId = mergeId++
+        newN.precalc = {}
+        newN.name = name
+        newN.children = []
+
+        if (cur)
+            cur.children.push(newN)
+        else
+            root = newN
+        cur = newN
+    }
+    return root
+}
+
+/**
+ * creates node object for each namespace, and type
+ */
+function type2data(o, name)
+{
+    var root = { name:name, children:[] }
+    for (var n in o)
+        root.children.push(type2data(o[n], n))
+
+    return root
+}
+
+export function code(ok)
+{
+    ok(type2data({ a:{ b:{}, c:{} }}/*ivis*/, 'ivis'))
+}
+
+export namespace generators
+{
+//    export var star5 = star_(5)
+//    export var star51 = star_(50)
+    export const star120 = deepStar
+    export const star501 = function degree(ok) { return star(ok, 250) }
+//    export var path50 = path_(50)
+    export const path500 = function spiral(ok) { return path(ok, 50) }
+//    export var path5000 = path_(5000)
+    export const nT1 = nTree
+    export const nT2 = nTreeAtFirst
+}

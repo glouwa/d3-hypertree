@@ -158,12 +158,11 @@ test.describe('layout', () => {
 })
 
 test.describe('presets', () => {
-    for (const preset of ['modelBase', 'treeOfLifeMain', 'treeOfLife', 'infovis', 'infovisEmoji',
-                          'otolModel', 'generatorModel', 'generatorSpiralModel', 'stackoverflowModel', 'acmflareModel', 'fsModel']) {
+    // the library's presets (generic; the Tree of Life presets live with the application)
+    for (const preset of ['modelBase', 'infovis', 'infovisEmoji']) {
         test(`preset ${preset}`, async ({ page }, testInfo) => {
             const errors = collectErrors(page)
-            // the new presets with labels and icons (the old ones as their references were made)
-            const content = ['treeOfLifeMain', 'treeOfLife', 'infovis', 'infovisEmoji'].includes(preset) ? '&labels=1&icons=1' : ''
+            const content = preset === 'modelBase' ? '' : '&labels=1&icons=1'
             await openTree(page, `gen=nTree&depth=4&childs=3${content}&preset=${preset}`)
             expect((await page.evaluate(() => harness.scene())).nodes.length).toBeGreaterThan(5)
             await expectPlausibleScene(page)
@@ -172,11 +171,9 @@ test.describe('presets', () => {
         })
     }
 
-    test('the presets until v1 warn that they are deprecated', async ({ page }) => {
-        const warnings = []
-        page.on('console', m => { if (m.type() === 'warning') warnings.push(m.text()) })
-        await openTree(page, 'gen=nTree&depth=3&childs=2&preset=otolModel')
-        expect(warnings.some(w => /presets\.otolModel is deprecated, use presets\.treeOfLife/.test(w))).toBe(true)
+    test('the presets until v1 are gone; the model overlay of an application replaces them', async ({ page }) => {
+        await openTree(page, 'gen=nTree&depth=3&childs=2')
+        expect(await page.evaluate(() => Object.keys(hyt.presets).sort())).toEqual(['infovis', 'infovisEmoji', 'infovisFiles', 'modelBase'])
     })
 
     // infovisFiles on the generated file system (fixtures/gen-filesystem.mjs): the size

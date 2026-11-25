@@ -9,6 +9,24 @@ are listed first.
 
 ### Changed behavior
 
+- **The model is an overlay over the defaults** (config/schema.ts). The object
+  given to the constructor is merged into the complete defaults with fixed rules:
+  plain objects merge, arrays and functions replace, `null` switches an option
+  off (`filter.weightFilter: null`), `undefined` is ignored. `ht.args` is the
+  resolved model (every option has a value, no fallbacks at the place of use);
+  `ht.provenance` says where a value came from (`'defaults'`, `'app'`,
+  `'configure'`, `hyt.whence(ht.provenance, 'interaction.wheelFactor')`). Until v1
+  `mergeDeep` merged arrays by index and class instances key by key, and could
+  not express `null`.
+- **Layers are data.** `geometry.layers` is a list of specs `{ type, name, data,
+  options }` over the layer types in `hyt.layerTypes` (`'nodes'`, `'arcs'`,
+  `'labels-force'`, …); `hyt.defaultLayers()` is the default stack. A layer's
+  defaults live in its class; the spec's options and `geometry.layerOptions[name]`
+  are merged over them. An own layer is a spec with an own type (added to
+  `layerTypes`) or, as before, a factory function in the list.
+- **The label limit is a layer option.** `maxLabels` on `labels`, `labels-force`
+  and `labels-placed` (default 25 each, `hyt.DEFAULT_MAX_LABELS`); the common
+  `filter.maxlabels` is gone (deprecated: it sets the three).
 - **Force labels (`labels-force`)** are placed by a relaxation: pulled to a rest
   place above their node in the center and outward toward the rim, pushed apart
   as rectangles of their real size (giving way outward), and kept between frames.
@@ -73,6 +91,29 @@ are listed first.
 
 ### Added
 
+- **`ht.configure(overlay)`**: changes options at runtime. Each option declares
+  what a change affects (`hyt.affects`, `hyt.effectOf(path)`): the data is loaded
+  again, the layout, the label measures, the layer stack, a frame, or the styles;
+  configure applies the strongest effect of the changed options and returns it.
+- **`geometry.view`** selects the projection of the hyperbolic plane onto the
+  screen: `'disk'` (default), `'halfplane'` (the rectangular view) or an own
+  `Projection` (`hyt.DiskProjection`, `hyt.HalfPlaneProjection`,
+  `hyt.createProjection`). The layers ask the projection for geodesics, circles,
+  the outward direction and the view box; the filter maps the positions, the
+  pointer is mapped back. A third view is a new projection, not a change of the
+  layers.
+- **Configuration helpers** in the API: `hyt.defaults()`, `hyt.coreDefaults()`,
+  `hyt.resolveModel`, `hyt.composeOverlays`, `hyt.mergeInto`, `hyt.migrate` (v1
+  option names), `hyt.whence`, `hyt.pathsOf`.
+- **A stack of named overlays** in the constructor: `new Hypertree(view, [{ name,
+  overlay }, …])` applies the overlays in order and `ht.provenance` names the entry
+  that set each value (e.g. a preset, then the application's own options). A single
+  overlay is still accepted (its name is `app`).
+- **`geometry.layers` entries by name**: a string in the list stands for the default
+  layer of that name, so a reordered or extended stack can be written as data
+  (`['background', 'link-arcs', { type: 'nodes', name: 'big', options: {…} }]`).
+- **`'linear'`** as a scale type of `hyt.colorBy` / `hyt.sizeBy`, next to `sqrt`
+  and `log`.
 - **Layer `labels-placed`** (off by default): labels on candidate positions like
   on a map, above their node in the center and outward toward the rim; drawn
   labels never overlap, a label without a free place is left out. Labels grow and
@@ -242,9 +283,27 @@ are listed first.
 | `filter.cullingWeight` | `filter.weightFilter.rangeNodes` |
 | `filter.transformation.P` | `geometry.startPosition` |
 | `geometry.addLayer: ['link-lines' / 'path-lines']` | `link-arcs` / `path-arcs` with `geometry.linkCurvature: 'l'` |
+| `geometry.halfPlane: true` | `geometry.view: 'halfplane'` |
+| `filter.maxlabels` | the layer option `maxLabels` of `labels`, `labels-force`, `labels-placed` |
+| `geometry.decorator` (the unit disk class) | `geometry.view` (a `Projection`); dropped |
+| `geometry.cacheUpdate` (the frame function) | nothing: the frame is not an option; dropped |
 
 ### Removed
 
+- `HypertreeEx` and the three-disk navigation (`UnitDiskNav`, the navigation
+  background and parameter disks), the pre-v2 interaction layer and the debug
+  grids (`components/meta`): about a fifth of the code, reachable only through
+  the exports, used by nothing.
+- The Tree of Life presets `treeOfLife` and `treeOfLifeMain`, and the presets
+  until v1 (`otolModel`, `mainModel`, `generatorModel`, `generatorSpiralModel`,
+  `stackoverflowModel`, `acmflareModel`, `fsModel`): the library ships generic
+  presets only (`modelBase`, `infovis`, `infovisEmoji`, `infovisFiles`); an
+  application's presets live with the application (hypertree-of-life:
+  `src/presets.ts`).
+- The exports `layerSrc`, `labeloffsets` and `cacheUpdate` (see "Layers are
+  data"; `labelOffset`, `bboxCenter`, `bboxOval`, `sizeAt`, `rimScale` and the
+  label selection `labelsWithHover` / `labelsFor` are exported instead).
+- `filter.type` (there was only `'magic'`).
 - `filter.weightFilter.rangeCullingWeight` (bounds of the internal factor
   `magic`, default 4..500): it stopped the filter before `rangeNodes` was
   reached, e.g. a small tree stayed far below `rangeNodes.min`. `rangeNodes`
@@ -285,6 +344,20 @@ and after on the same machine (see [docs/dev/PERFORMANCE.md](docs/dev/PERFORMANC
   its interface (`polygons()`, `find(x, y)`). Unused dependency
   `d3-force-gravity` removed, `xml2js` 0.6.
 - Browser test suite (`test/`, Playwright), lint (`npm run lint`), CI on every push.
+- **The playground** (`playground/`) is built on the configuration model: its state
+  is the data source and a stack of overlays (library presets, own presets, the
+  link's changes), the controls come from option descriptors
+  (`playground/options.js`; a test keeps them complete), a change is applied live
+  with `configure()` and shows which entry set a value. Function options take a
+  constant, a d3-scale (value, scale type, interpolator) or a named value; the
+  stack is the URL (`stack=`), the older parameters still work. See
+  [docs/dev/PLAYGROUND.md](docs/dev/PLAYGROUND.md).
+- **The sources are arranged by pipeline stage** (`src/config`, `data`, `layout`,
+  `geometry`, `filter`, `projection`, `view`, `layers`, `interaction`, `state`,
+  `styles`; `src/hypertree.ts` the facade, `src/index.ts` the public API) instead
+  of `components/` and `models/`; a frame has one entry (`unitdisk.frame(reason)`)
+  and every layer declares the frames it needs (`needs`). See
+  [docs/dev/REFACTORING.md](docs/dev/REFACTORING.md).
 
 ## 1.1.3 and earlier
 

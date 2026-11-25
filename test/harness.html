@@ -13,6 +13,8 @@
 <body>
     <div id="tree"></div>
     <script src="../dist/d3-hypertree.js"></script>
+    <script src="../node_modules/d3/dist/d3.min.js"></script>
+    <script src="../playground/options.js"></script>
     <script src="config.js"></script>
     <script>
         // Test harness for d3-hypertree. Everything is configured by URL parameters
@@ -33,7 +35,8 @@
         const record = type => (n, ...rest) => events.push({
             type, id: n ? n.mergeId : undefined, arg: typeof rest[0] === 'boolean' ? rest[0] : undefined,
         })
-        const model = hypertreeConfig.buildModel(q, { interaction: {
+        // the stack of named overlays (the provenance names them: data, the presets, url, harness)
+        const stack = hypertreeConfig.buildStack(q, { interaction: {
             onNodeClick:        record('click'),
             onNodeHold:         record('hold'),
             onNodeHover:        record('hover'),
@@ -42,7 +45,7 @@
             onCenterNodeChange: record('center'),
         } })
 
-        const ht = new hyt.Hypertree({ parent: document.querySelector('#tree') }, model)
+        const ht = new hyt.Hypertree({ parent: document.querySelector('#tree') }, stack)
 
         const layerStack = () => ht.unitdisk.layerStack || ht.unitdisk.mainView.layerStack
         const r1 = v => Math.round(v * 10) / 10
