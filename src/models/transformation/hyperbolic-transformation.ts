@@ -107,6 +107,10 @@ export class TransformationCache
     focusR:         number
     centerNode:     N
     unculledNodes:  N[]
+    // the weight filter's last selection (magic-filter.ts adjustMagic): the magic at
+    // which the next visible node is hidden, the next hidden one shows (null: none)
+    nextHideAt?:    number | null
+    nextShowAt?:    number | null
     links:          N[]
     leafOrLazy:     N[]
     spezialNodes:   N[]

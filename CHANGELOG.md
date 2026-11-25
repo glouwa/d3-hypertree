@@ -181,6 +181,20 @@ are listed first.
   nothing now stops it, and the first node of the filter's path is always drawn.
   That stop holds only for the view (λ, position) it was found in: zoomed fully in
   and out again, it kept the number of nodes above `rangeNodes.max`.
+- **Far too many (or too few) nodes after zooming fully in and out again.** The
+  filter takes one step per update and stopped with the last update of an
+  interaction (zooming ends at the λ bound); its limits against flickering,
+  learned zoomed in, held after zooming out. Zoomed in, dragged and zoomed out,
+  Mammalia showed 1699 nodes of 750..1000, a test tree all 8191 of 300..400. Now
+  the filter requests further updates by itself until the count is in
+  `rangeNodes` (then it stops: no updates at rest), and a limit holds only while
+  the count and λ are close to the state it was learned in. Each selection
+  records where the next node would be hidden or shown: a step that would change
+  nothing jumps there (many nodes share one weight: fully zoomed out it took a
+  factor of 27 before the first node went), and "nothing can change" is known
+  exactly instead of guessed from steps that hid nothing. When a step jumps over
+  the whole range, the filter still ends below it (fewer nodes rather than too
+  many). The start zoom is unchanged.
 - **Flickering nodes while dragging or loading**:
   - a drag or wheel now stops a running animation (e.g. a `goto` after a click);
     both used to set the translation and the tree jumped between two states on

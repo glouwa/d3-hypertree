@@ -22,7 +22,7 @@ test('a configured weightFilter.magic is ignored with a warning', async ({ page 
     await page.waitForFunction(() => window.harness && harness.ht.data)
     expect(warnings.some(w => w.includes('magic') && w.includes('rangeNodes'))).toBe(true)
 })
-import { collectErrors, expectNoErrors, openTree, expectScene, expectPlausibleScene } from './helpers.mjs'
+import { collectErrors, expectNoErrors, openTree, expectScene, expectPlausibleScene, diskBox } from './helpers.mjs'
 
 // Filter options. The filter decides which nodes are visible, so each option gets
 // its own scene snapshots, changing one option at a time against the defaults.
@@ -134,6 +134,40 @@ test('a flat tree: magic stops sinking when it hides nothing, the tree never get
         return out
     })
     expect(Math.min(...counts)).toBeGreaterThan(0)
+})
+
+// Zoomed fully in, dragged, zoomed out again: the filter used to stop far above
+// rangeNodes.max. Limits learned zoomed in held after zooming out, and the steps
+// ended with the last update of the interaction (Mammalia: 1699 nodes of 750..1000).
+// Now it goes on by itself until the count is in the range, and then stops updating.
+test('zoomed in, dragged, zoomed out: the count comes back into rangeNodes by itself', async ({ page }) => {
+    const errors = collectErrors(page)
+    const filterOpt = encodeURIComponent(JSON.stringify({ weightFilter: { rangeNodes: { min: 300, max: 400 } } }))
+    await openTree(page, `gen=nTree&depth=12&childs=2&filterOpt=${filterOpt}`)
+    const box = await diskBox(page)
+    const cx = box.x + box.width / 2, cy = box.y + box.height / 2
+    await page.mouse.move(cx, cy)
+    for (let i = 0; i < 40; i++) await page.mouse.wheel(0, -300)
+    await page.waitForTimeout(500)
+    await page.mouse.down()
+    for (let i = 0; i < 30; i++) await page.mouse.move(cx + 200 * Math.sin(i / 5), cy + 150 * Math.cos(i / 4))
+    await page.mouse.up()
+    await page.waitForTimeout(500)
+    await page.mouse.move(cx, cy)
+    for (let i = 0; i < 60; i++) await page.mouse.wheel(0, 300)
+    // settled: no update for half a second (one step per frame; slow under load)
+    const s = await page.evaluate(async () => {
+        const ud = harness.ht.unitdisk, f = ud.update.transformation.bind(ud.update)
+        let last = performance.now()
+        ud.update.transformation = (...a) => { last = performance.now(); return f(...a) }
+        const t0 = performance.now()
+        while (performance.now() - last < 500 && performance.now() - t0 < 20000) await new Promise(r => setTimeout(r, 100))
+        return { visible: ud.cache.unculledNodes.length, settled: performance.now() - last >= 500 }
+    })
+    expect(s.settled).toBe(true)
+    expect(s.visible).toBeLessThanOrEqual(400)
+    expect(s.visible).toBeGreaterThan(0)
+    expectNoErrors(errors)
 })
 
 test('magic does not oscillate when one step jumps over the whole rangeNodes', async ({ page }) => {

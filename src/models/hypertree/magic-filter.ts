@@ -22,32 +22,39 @@ const MAGIC_MAX = 1e12
 // Many nodes can share one weight: then a single step shows or hides all of them, and
 // may jump over the whole range (below min -> above max). The next step went back, and
 // the visible set flipped on every update (the Metatheria branch of the Tree of Life
-// flickered). So a step that overshoots is remembered as a limit (steps must not reach
-// that magic again); the filter then stays at the state below the range: fewer nodes
-// rather than too many. The limits hold while the view stays comparable: while the
+// flickered). So a step that overshoots is remembered as a limit: the threshold it
+// crossed (lastAt: nextShowAt / nextHideAt, see below), no step crosses it again (the
+// magic it reached was the limit until steps could jump: a jump landed beside it and a
+// plain step slipped past, Mammalia stayed at 1303 of 750..1000); the filter then
+// stays at the state below the range: fewer nodes rather than too many. The limits hold while the view stays comparable: while the
 // number of visible nodes in the state where the filter stopped changes by less than
-// 10 %. Not tied to the center node or λ: dragging changes the center node often and
-// zooming (also the animation after loading) changes λ on every frame, which reset the
-// limits and brought the flicker back (dragging the Wombat on the Metatheria branch).
+// 10 % (stoppedAt: the count when it stopped, kept while it stays stopped), and each
+// limit only while the count and λ are within 10 % of the state it was learned in
+// (upN/upλ: before the overshooting step). stoppedAt used to follow the
+// count on every frame and the limits had no state of their own: a limit learned
+// zoomed in held after zooming out, the filter stopped far above max (zoomed fully in
+// and out, Mammalia showed up to 1699 nodes of 750..1000; zoomed in fast 389). Not
+// tied to the center node: dragging changes it often, which reset the limits and
+// brought the flicker back (dragging the Wombat on the Metatheria branch); dragging
+// keeps λ.
 //
-// A step down that hides nothing is a limit too: nodes inside the focus circle are
-// never hidden, so with many of them (a flat tree zoomed out, e.g. Coleoptera: 7669
-// nodes in the focus) the count stays above max whatever magic is. magic used to sink
-// on every update toward 0; moved away from the center, every node (the root too) was
-// then lighter than the limit and nothing was drawn.
-// That limit (focusDown) holds only for the view it was found in (λ and P): which nodes
-// are in the focus depends on them. Zoomed fully in, every node was in the focus and
-// the limit was set; zoomed out again it kept the filter above max (Mammalia: 527 of
-// 320..500, one step down gave 497). Retrying it costs nothing: a step that hides
-// nothing changes nothing drawn, a step that hides too much is an overshoot (down).
-type MagicLimits = { up:number, down:number, last:number, stoppedAt:number, lastN?:number,
-                     focusDown:number, focusView?:string }
+// Where a step can change something is known from the last selection. A node is hidden
+// when its weight <= W / magic (W: the weight of its branch point on the path to the
+// center, highway[0]), outside the focus circle, its parent too; so at magic <= W / w:
+//   - nextHideAt: the largest W / w of the visible nodes a smaller magic would hide
+//     (the first to go). None: every visible node is in the focus circle (a flat
+//     tree zoomed out, e.g. Coleoptera: 7669 nodes in the focus): no step down helps.
+//     magic used to sink toward 0 then; moved away from the center, nothing was drawn.
+//   - nextShowAt: the smallest W / w of the nodes hidden by their weight only. None:
+//     every node that can be visible is (a small tree, the cullingRadius).
+// A step jumps to the magic where that node changes when a plain step would change
+// nothing: many nodes share a weight (all leaves 1), and zoomed fully in magic grew so
+// far that zoomed out it took a factor of 27 before the first node was hidden.
+type MagicLimits = { up:number, last:number, stoppedAt:number, lastN?:number,
+                     upN?:number, upλ?:number, lastAt?:number }
+// the state a limit was learned in: count n is not comparable to it
+const differs = (a:number, learned:number|undefined)=> !!learned && Math.abs(a - learned) > .1 * learned
 const magicLimits = new WeakMap<object, MagicLimits>()
-
-function viewKey(ud:IUnitDisk) {
-    const s = ud.view.hypertree.args.geometry.transformation.state
-    return `${s.λ.toFixed(4)},${s.P.re.toFixed(4)},${s.P.im.toFixed(4)}`
-}
 
 function adjustMagic(ud:IUnitDisk, cache:TransformationCache) {
     const filter = ud.view.hypertree.args.filter.weightFilter
@@ -55,30 +62,63 @@ function adjustMagic(ud:IUnitDisk, cache:TransformationCache) {
         return
 
     const n = cache.unculledNodes.length
+    const λ = ud.args.transformation.state.λ
     const range = filter.rangeNodes
     const alpha = filter.alpha
-    const fresh = ()=> ({ up: MAGIC_MAX, down: MAGIC_MIN, last: 0, stoppedAt: 0, focusDown: MAGIC_MIN })
+    const fresh = ()=> ({ up: MAGIC_MAX, last: 0, stoppedAt: 0 })
     let b = magicLimits.get(filter)
     if (!b || (b.stoppedAt && Math.abs(n - b.stoppedAt) > .1 * b.stoppedAt))
         magicLimits.set(filter, b = fresh())
-    const view = viewKey(ud)
-    if (b.focusView !== view) { b.focusDown = MAGIC_MIN; b.focusView = view }
     const eps = 1e-9   // magic / alpha * alpha is not exactly magic
+    // while the start zoom is searched: plain steps, as until then (jumps changed it)
+    const plainOnly = ud.view.hypertree.findingInitλ
 
     if (n > range.max) {
-        if (b.last > 0) b.up = Math.min(b.up, filter.magic)        // the step up overshot
-        // the step down hid nothing: no further down in this view (it would not help)
-        if (b.last < 0 && b.lastN !== undefined && n >= b.lastN) b.focusDown = Math.max(b.focusDown, filter.magic)
-        const m = filter.magic / alpha
-        if (m > Math.max(b.down, b.focusDown) * (1 + eps)) { filter.magic = m; b.last = -1; b.stoppedAt = 0 } else { b.last = 0; b.stoppedAt = n }
+        if (b.last > 0) { b.up = Math.min(b.up, b.lastAt || filter.magic); b.upN = b.lastN; b.upλ = λ }   // the step up overshot
+        // a step; when it would hide nothing, half a step past nextHideAt (the first
+        // visible node to be hidden); none: nothing can be hidden. Always down, even
+        // when it overshoots below min: fewer rather than too many (a limit for steps
+        // down kept the filter above max: the limit up expired, the one down not)
+        const next = plainOnly ? undefined : cache.nextHideAt, plain = filter.magic / alpha, at = next || 0
+        const m = next === null ? 0 : !at || plain <= at ? plain : at / Math.sqrt(alpha)
+        if (m > MAGIC_MIN) { filter.magic = m; b.last = -1; b.lastAt = at; b.stoppedAt = 0 } else { b.last = 0; b.stoppedAt = b.stoppedAt || n }
     }
     else if (n < range.min) {
-        if (b.last < 0) b.down = Math.max(b.down, filter.magic)    // the step down overshot
-        const m = filter.magic * alpha
-        if (m < b.up * (1 - eps)) { filter.magic = m; b.last = 1; b.stoppedAt = 0 } else { b.last = 0; b.stoppedAt = n }
+        // the overshoot up was learned in another state: try again
+        if (differs(n, b.upN) || differs(λ, b.upλ)) { b.up = MAGIC_MAX; b.upN = b.upλ = undefined }
+        // a step; when it would show nothing, half a step past nextShowAt (the first
+        // hidden node to show); none: nothing more can be shown
+        const next = plainOnly ? undefined : cache.nextShowAt, plain = filter.magic * alpha, at = next || 0
+        const m = next === null ? Infinity : !at || plain > at ? plain : at * Math.sqrt(alpha)
+        if (m < b.up * (1 - eps)) { filter.magic = m; b.last = 1; b.lastAt = at; b.stoppedAt = 0 } else { b.last = 0; b.stoppedAt = b.stoppedAt || n }
     }
     else { b.last = 0; b.stoppedAt = 0 }
     b.lastN = n
+    updates.set(ud, (updates.get(ud) || 0) + 1)
+    stepping.set(ud, b.last !== 0)
+    if (b.last !== 0 && !plainOnly) settle(ud)
+}
+
+// A step shows its effect on the next update only. Updates come from interaction and
+// animation; when they end (zooming stops at the λ bound, the mouse rests) the filter
+// stopped wherever the last update left it (zoomed fully in, dragged, zoomed out:
+// Mammalia 1699 nodes of 750..1000, the next 60 updates brought it to 984). So after a
+// step one more update is requested for the next frame; when another update came in
+// between, it waits a frame more (that update could not request one: one was pending).
+// It ends when the count is in the range or a limit stops the steps.
+const updates = new WeakMap<object, number>()     // adjustMagic calls per unit disk
+const stepping = new WeakMap<object, boolean>()   // the last call took a step
+const settling = new WeakSet<object>()            // a frame is requested
+function settle(ud:IUnitDisk) {
+    if (settling.has(ud) || typeof requestAnimationFrame === 'undefined') return
+    settling.add(ud)
+    const seen = updates.get(ud)
+    requestAnimationFrame(()=> {
+        settling.delete(ud)
+        if (!stepping.get(ud)) return
+        if (updates.get(ud) === seen) ud.view.hypertree.update.transformation()
+        else settle(ud)
+    })
 }
 
 function collectNodesByWeight(ud:IUnitDisk, cache:TransformationCache, path:N[])
@@ -98,6 +138,8 @@ function collectNodesByWeight(ud:IUnitDisk, cache:TransformationCache, path:N[])
     cache.cells =         []
   
     const mf = ud.view.hypertree.isAnimationRunning() ? 1:1 // todo: make configurable
+    // for adjustMagic: where the next node is hidden / shows (W / w, see adjustMagic)
+    let nextHideAt:number|null = null, nextShowAt:number|null = null
 
     function abortfilter(n, idx, highway) { // return false to abort
         const wf = ud.view.hypertree.args.filter.weightFilter
@@ -105,6 +147,15 @@ function collectNodesByWeight(ud:IUnitDisk, cache:TransformationCache, path:N[])
                     : highway[0].precalc.cullingWeight / wf.magic / mf
         peocessNodeTransformation(ud, cache, n)
         peocessNode(ud, cache, n, cache.focusR, n.minWeight)
+        if (n !== startNode && !n.isOut99 && n.precalc.cullingWeight > 0) {
+            const at = highway[0].precalc.cullingWeight / n.precalc.cullingWeight
+            if (n.isOut && n.isOutWeight) {                                         // hidden by its weight
+                if (nextShowAt === null || at < nextShowAt) nextShowAt = at
+            }
+            else if (!n.isOut && n.isOutλ && (!n.parent || n.parent.isOutλ)) {      // visible, hideable
+                if (nextHideAt === null || at > nextHideAt) nextHideAt = at
+            }
+        }
         // the start node (nearest visible node on the path to the center) always: an
         // empty tree is never right
         return !n.isOut || n === startNode
@@ -131,6 +182,9 @@ function collectNodesByWeight(ud:IUnitDisk, cache:TransformationCache, path:N[])
         preAction:   n=> cache.unculledNodes.push(n),
         highway:     path
     })
+
+    cache.nextHideAt = nextHideAt
+    cache.nextShowAt = nextShowAt
 
     // Hysteresis for the center node: it decides the path the next frame starts from
     // (and so the weight each branch is compared with). When two nodes are about

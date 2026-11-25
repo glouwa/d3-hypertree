@@ -212,6 +212,9 @@ export class Hypertree
     * this functions assume the model/view (this class internal state)
     * has changes, and call the according ui updates (animatin frames)
     */    
+    // findInitλ_ runs (the weight filter takes plain steps, magic-filter.ts)
+    public findingInitλ = false
+
     public update = {
         view: {
             parent:     ()=> this.updateParent(),
@@ -500,6 +503,9 @@ export class Hypertree
             return unculledNodes.reduce((max, n)=> Math.max(max, n.layout.zp.r), 0)
         }
         let fitting:number = undefined, tooLarge:number = undefined
+        // the filter takes plain steps meanwhile (magic-filter.ts: no jumps over equal
+        // weights, no further updates): the start zoom as before
+        this.findingInitλ = true
         for (let i=0; i<50; i++) {
             const λ = .02 + sigmoid(i/50) * .75
             if (maxRAt(λ) > initSize) { tooLarge = λ; break }
@@ -515,6 +521,7 @@ export class Hypertree
             }
             maxRAt(lo)
         }
+        this.findingInitλ = false
         // the start zoom obeys interaction.λbounds like every other zoom
         const fitλ = this.args.geometry.transformation.state.λ
         const startλ = this.clampλ(fitλ)
