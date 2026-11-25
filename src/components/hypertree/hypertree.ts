@@ -834,7 +834,7 @@ export class Hypertree
         new Animation({
             name: 'animateToλ',
             hypertree: this,
-            duration: 750,            
+            duration: this.args.interaction.animationDuration || 750,
             resolve: ok,
             reject: err,
             frame: (progress01)=> {
@@ -862,7 +862,7 @@ export class Hypertree
             resolve: resolve,
             reject: reject,
             hypertree: this,
-            duration: 750,
+            duration: this.args.interaction.animationDuration || 750,
             frame: (progress01)=> {
                 const waydone01 = 1-sigmoid01(progress01)
                 console.assert(waydone01 >= 0 && waydone01 <= 1)

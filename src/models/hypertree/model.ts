@@ -107,6 +107,8 @@ export interface HypertreeArgs
         // (in layoutBergé such a link is λ long; leaves among many siblings are staggered
         // outward with an extra length and do not count)
         maxLinkLength?:     number
+        // the duration of goto, gotoNode, gotoHome, gotoλ, gotoOverview in ms (default 750)
+        animationDuration?: number
         wheelFactor:        number
     }
 }

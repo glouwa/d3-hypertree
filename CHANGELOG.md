@@ -121,6 +121,9 @@ are listed first.
   center); the indicator circles (λ, focus, …) are mapped for any center; the
   start view of `api.overview` keeps the root in the picture. Layout, filter and
   interaction work as in the disk.
+- **`interaction.animationDuration`**: the duration of the `goto` animations
+  (`goto`, `gotoNode`, `gotoHome`, `gotoλ`, `gotoOverview`) in ms, default 750 as
+  before.
 - **`geometry.diskSize`**: the diameter of the disk in the square view (default
   `.96`, as before); above 1 the disk reaches beyond the view and is cut at its
   edges (e.g. `1.05` on a phone, where every pixel counts).
