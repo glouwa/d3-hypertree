@@ -59,7 +59,7 @@ test('selection "none": nothing can be selected', async ({ page }) => {
     expect(await selectEvents(page)).toEqual([])
 })
 
-test('hover "pointer" sets n.hovered on the node under the mouse; "none" hovers nothing', async ({ page }) => {
+test('highlightNode "mousehover" sets n.hovered on the node under the mouse; "none" hovers nothing', async ({ page }) => {
     const hoverAt = async interaction => {
         await open(page, interaction)
         const box = await diskBox(page)
@@ -71,7 +71,98 @@ test('hover "pointer" sets n.hovered on the node under the mouse; "none" hovers 
             events: harness.events.filter(e => e.type === 'hover').length > 0 }))
     }
     expect(await hoverAt({})).toEqual({ hovered: 1, paths: 1, events: true })
+    expect(await hoverAt({ highlightNode: 'none' })).toEqual({ hovered: 0, paths: 0, events: false })
+    // v2.0 name, migrated: hover 'none' -> highlightNode 'none'
     expect(await hoverAt({ hover: 'none' })).toEqual({ hovered: 0, paths: 0, events: false })
+})
+
+test('highlightNode "mousehover": onHoverNodeChange once per change, not on every mouse move', async ({ page }) => {
+    await open(page)
+    const box = await diskBox(page)
+    await page.mouse.move(box.x + box.width * 0.55, box.y + box.height * 0.4)
+    await page.waitForTimeout(200)
+    await page.evaluate(() => harness.clearEvents())
+    // small moves inside one cell: no change
+    for (let i = 1; i <= 4; i++) await page.mouse.move(box.x + box.width * 0.55 + i * .3, box.y + box.height * 0.4)
+    await page.waitForTimeout(200)
+    expect(await page.evaluate(() => harness.events.filter(e => e.type === 'hoverchange').length)).toBe(0)
+    // leaving the tree: undefined once
+    await page.mouse.move(box.x - 40, box.y - 40)
+    await page.waitForTimeout(200)
+    const after = await page.evaluate(() => ({
+        events: harness.events.filter(e => e.type === 'hoverchange').map(e => e.id),
+        hovered: harness.ht.data.descendants().filter(n => n.hovered).length }))
+    expect(after).toEqual({ events: [undefined], hovered: 0 })
+})
+
+test.describe('highlightNode "center"', () => {
+    const state = page => page.evaluate(() => {
+        const ht = harness.ht, c = ht.lastCenterNode
+        const hovered = ht.data.descendants().filter(n => n.hovered)
+        return {
+            center: c && c.mergeId,
+            hovered: hovered.map(n => n.mergeId),
+            paths: ht.args.objects.pathes.filter(p => p.type === 'HoverPath').map(p => p.head.mergeId),
+        }
+    })
+
+    test('the center node is highlighted: n.hovered, the hover path, onHoverNodeChange', async ({ page }) => {
+        const errors = collectErrors(page)
+        await open(page, { highlightNode: 'center' })
+        await page.waitForTimeout(300)
+        const s = await state(page)
+        expect(s.center).toBeDefined()
+        expect(s.hovered).toEqual([s.center])
+        expect(s.paths).toEqual([s.center])
+        expect(await page.evaluate(() => harness.events.filter(e => e.type === 'hoverchange').map(e => e.id).pop())).toBe(s.center)
+        expectNoErrors(errors)
+    })
+
+    test('the mouse does not change it (moving over other nodes, leaving the tree)', async ({ page }) => {
+        await open(page, { highlightNode: 'center' })
+        await page.waitForTimeout(300)
+        const before = await state(page)
+        const box = await diskBox(page)
+        await page.mouse.move(box.x + box.width * 0.8, box.y + box.height * 0.3, { steps: 4 })
+        await page.mouse.move(box.x - 40, box.y - 40)
+        await page.waitForTimeout(250)
+        expect(await state(page)).toEqual(before)
+    })
+
+    test('follows the center node during a drag, not only at its end', async ({ page }) => {
+        const errors = collectErrors(page)
+        await open(page, { highlightNode: 'center' })
+        await page.waitForTimeout(300)
+        const start = await state(page)
+        await page.evaluate(() => harness.clearEvents())
+        const box = await diskBox(page)
+        const cx = box.x + box.width / 2, cy = box.y + box.height / 2
+        await page.mouse.move(cx, cy)
+        await page.mouse.down()
+        const during = []
+        for (let i = 1; i <= 12; i++) {
+            await page.mouse.move(cx + i * box.width * .03, cy - i * box.height * .02)
+            await page.waitForTimeout(40)
+            during.push(await state(page))
+        }
+        // still pressed: the highlight is the center node of the frame
+        expect(await page.evaluate(() => harness.ht.unitdisk.isDraging)).toBe(true)
+        const mid = during[during.length - 1]
+        expect(mid.center).not.toBe(start.center)
+        expect(mid.hovered).toEqual([mid.center])
+        expect(mid.paths).toEqual([mid.center])
+        await page.mouse.up()
+        await page.waitForTimeout(300)
+        const end = await state(page)
+        expect(end.hovered).toEqual([end.center])
+        // one onHoverNodeChange per change, each one a center node (onCenterNodeChange)
+        const ev = await page.evaluate(() => harness.events.filter(e => e.type === 'hoverchange' || e.type === 'center').map(e => [e.type, e.id]))
+        const changes = ev.filter(([t]) => t === 'hoverchange').map(([, id]) => id)
+        const centers = ev.filter(([t]) => t === 'center').map(([, id]) => id)
+        expect(changes.length).toBeGreaterThan(0)
+        expect(changes).toEqual(centers)
+        expectNoErrors(errors)
+    })
 })
 
 test.describe('clickAction', () => {

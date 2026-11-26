@@ -67,7 +67,7 @@
         'geometry.startPosition':   { kind: 'point', min: -.9, max: .9, step: .01, nullable: true, doc: 'the translation at the start: where the root sits in the disk, e.g. { re: 0, im: .5 }. Off: the root in the center' },
 
         'interaction.mouseRadius':  { kind: 'number', min: .3, max: 1, step: .01, doc: 'the radius within which the mouse picks nodes' },
-        'interaction.hover':        { kind: 'enum', values: ['pointer', 'none'], doc: 'the hover strategy: the node under the pointer, or none. Strategies set the node state (hovered, selected); the layers only decide how they show it' },
+        'interaction.highlightNode': { kind: 'enum', values: ['mousehover', 'center', 'none'], doc: 'which node is highlighted (hovered: the hover path, cell and label): the node under the mouse, the node nearest to the center (also while dragging; for touch screens), or none. Strategies set the node state (hovered, selected); the layers only decide how they show it' },
         'interaction.selection':    { kind: 'enum', values: ['none', 'single', 'multi'], doc: 'the selection strategy: single replaces the old selection, multi keeps up to maxSelections' },
         'interaction.maxSelections': { kind: 'number', min: 1, max: 100, step: 1, doc: 'multi: the oldest selection is dropped beyond this' },
         'interaction.clickAction':  { kind: 'enum', values: ['select', 'goto', 'none'], doc: 'what a click does besides onNodeClick: toggle the selection, animate the node to the center, nothing' },

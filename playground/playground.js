@@ -566,7 +566,7 @@
         // shortcuts for layer display options, and the playground's ripple
         const HOVER_PATH_LAYERS = ['path-arcs', 'link-arcs', 'nodes', 'symbols']
         const layerOpt = (n, k) => get(editing().overlay, `geometry.layerOptions.${n}.${k}`)
-        const pointer = () => value('interaction.hover') === 'pointer'
+        const pointer = () => value('interaction.highlightNode') !== 'none'
         layerCheck(g, 'Hover path', 'the path from the hovered node to the root (layers path-arcs, link-arcs, nodes, symbols: option hover)',
             () => HOVER_PATH_LAYERS.every(n => layerOpt(n, 'hover') !== 'none'),
             on => HOVER_PATH_LAYERS.forEach(n => change(`geometry.layerOptions.${n}.hover`, on ? undefined : 'none')), pointer)

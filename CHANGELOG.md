@@ -103,6 +103,15 @@ are listed first.
 
 ### Added
 
+- **`interaction.highlightNode: 'mousehover' | 'center' | 'none'`** (replaces the
+  v2 preview's `interaction.hover: 'pointer' | 'none'`, migrated with a warning).
+  Which node is highlighted (`n.hovered`, the hover path, the hover label,
+  `onNodeHover` / `onHoverNodeChange`): the node under the mouse (default), or the
+  node nearest to the center, for touch screens without a mouse. `'center'` follows
+  the center node in every frame, also while dragging, pinching and animating (the
+  hysteresis of the center node keeps it from flickering); the mouse does not change
+  it. Both go through one place (`Hypertree.highlight`). With `'mousehover'`,
+  mouse moves inside one cell no longer redraw the paths (they did on every move).
 - **`labels-force` options `color` and `hoverTransition`.** `color(n)`: the text color
   (undefined: the theme's), as on `labels`. `hoverTransition: false`: the label of the
   node under the mouse appears and goes at once, the other labels keep their growing

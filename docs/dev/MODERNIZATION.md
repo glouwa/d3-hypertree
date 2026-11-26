@@ -541,7 +541,7 @@ separate decision (kept at v4 for now).
 ### Design: hover and selection (for Phase 2)
 
 Agreed on 2026-11-22, implemented in phase 2 step 8 (`selection.spec.mjs`): node
-state `n.hovered` / `n.selected`; `interaction.hover`, `selection`, `maxSelections`,
+state `n.hovered` / `n.selected`; `interaction.highlightNode` (was `hover`), `selection`, `maxSelections`,
 `clickAction`; `api.select` / `deselect` / `clearSelection` / `toggleSelection` through
 one place that fires `onNodeSelect` for every change; layer options `hover` /
 `selection` (`'path'` default, `'node'`, `'none'`) on `nodes`, `symbols`, `link-arcs`,

@@ -374,14 +374,17 @@ new hyt.Hypertree(
         interaction: {            
             // strategies: they set the node state n.hovered / n.selected; layers only show it
             // (layer options hover / selection: 'path' default, 'node' or 'none'; cells: true / false)
-            hover:              'pointer' | 'none'           // default 'pointer': the node under the mouse
+            // the highlighted node (n.hovered, hover path and label, onNodeHover):
+            // default 'mousehover': the node under the mouse; 'center': the node nearest
+            // to the center, also while dragging (touch screens); 'none'
+            highlightNode:      'mousehover' | 'center' | 'none'
             selection:          'none' | 'single' | 'multi'  // default 'multi'; 'single' replaces the old selection
             maxSelections:      number                       // 'multi': the oldest is dropped beyond this (default 10)
             clickAction:        'select' | 'goto' | 'none'   // besides onNodeClick (default 'none')
             onNodeClick:        (n:N, m:C, l:ILayer)=> void
             onNodeHold:         (n:N, m:C, l:ILayer)=> void  // pressed for holdDuration ms without moving; no click follows
             holdDuration:       number                       // default 500
-            onNodeHover:        (n:N)=> void                 // hovered node changed; undefined when leaving
+            onNodeHover:        (n:N)=> void                 // highlighted node changed (mouse or center); undefined when leaving
             onHoverNodeChange:  (n:N)=> void                 // same as onNodeHover
             onNodeSelect:       (n:N, selected:boolean)=> void // every selection change, also replaced or dropped ones
             onCenterNodeChange: (n:N)=> void 

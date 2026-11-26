@@ -111,7 +111,10 @@ export interface HypertreeArgs
     interaction: {
         mouseRadius:        number
         // strategies that set the node state (n.hovered, n.selected); layers only show it
-        hover:              'pointer' | 'none'               // 'pointer': the node under the mouse
+        // the highlighted node (n.hovered, the hover path and label, onNodeHover):
+        // 'mousehover' the node under the mouse, 'center' the node nearest to the
+        // center (also while dragging; touch screens), 'none'
+        highlightNode:      'mousehover' | 'center' | 'none'
         selection:          'none' | 'single' | 'multi'      // 'single': a new selection replaces the old one
         maxSelections:      number                           // 'multi': the oldest selection is dropped beyond this
         clickAction:        'select' | 'goto' | 'none'       // what a click does besides onNodeClick
@@ -230,7 +233,7 @@ export const coreDefaults = () : HypertreeArgs => ({
     },
     interaction: {
         mouseRadius:        .9,
-        hover:              'pointer',
+        highlightNode:      'mousehover',
         selection:          'multi',
         maxSelections:      10,
         clickAction:        'none',

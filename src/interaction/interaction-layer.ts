@@ -37,15 +37,11 @@ export class InteractionLayer2 implements ILayer
 
     mousedown:  boolean
     dST
-    htapi
-    hoverpath
 
     constructor(view:LayerContext, name:string, args:InteractionLayer2Args) {
         this.view = view
         this.args = args
         this.name = name
-        this.htapi = this.view.hypertree.api
-        this.hoverpath = this.view.model.objects.pathes[0]
         this.mousedown = false
     }
 
@@ -68,7 +64,7 @@ export class InteractionLayer2 implements ILayer
             .on('mousedown',    e=> this.fireMouseDown(e))
             .on('mousemove',    e=> this.fireMouseMove(e))
             .on('mouseup',      e=> this.fireMouseUp(e))
-            .on('mouseout',     e=> { this.setHoverNode(undefined); this.htapi.setPathHead(this.hoverpath, undefined) })
+            .on('mouseout',     e=> { if (this.mousehover) this.view.hypertree.highlight(undefined) })
 
             .on('touchstart',   e=> this.fireTouchEvent(e, 'onPointerStart'))
             .on('touchmove',    e=> this.fireTouchEvent(e, 'onPointerMove'))
@@ -99,31 +95,22 @@ export class InteractionLayer2 implements ILayer
         if (this.mousedown)
             this.fireMouseEvent(e, 'onPointerMove')
         else {
-            if (!this.view.hypertree.isInitializing
+            if (this.mousehover
+             && !this.view.hypertree.isInitializing
              && !this.view.hypertree.isAnimationRunning()) {
                 // The capture circle (r = 5) reaches far beyond the disk, and the voronoi
                 // cells are unbounded: outside the disk no node is hovered.
-                // hover strategy: 'pointer' (default) = the node under the mouse, 'none' = no hover
                 // A label under the mouse hovers its node (also outside the disk, where
                 // labels at the rim may reach)
                 const p = this.mousePosAsC(e), m = this.toDisk(p)
-                const pointer = this.interaction.hover !== 'none'
-                const n = !pointer ? undefined : this.nodeAt(p, (m.re * m.re + m.im * m.im) <= 1)
-                this.setHoverNode(n)
-                this.htapi.setPathHead(this.hoverpath, n)
+                this.view.hypertree.highlight(this.nodeAt(p, (m.re * m.re + m.im * m.im) <= 1))
             }
         }
     }
 
-    // onNodeHover / onHoverNodeChange: only when the node under the mouse changes
-    private hoverNode : N | undefined = undefined
-    private setHoverNode(n:N | undefined) {
-        if (n === this.hoverNode) return
-        this.hoverNode = n
-        const i = this.interaction
-        if (i.onNodeHover)       i.onNodeHover(n)
-        if (i.onHoverNodeChange) i.onHoverNodeChange(n)
-    }
+    // highlightNode 'mousehover' (default): the mouse sets the highlighted node
+    // (Hypertree.highlight; 'center': the center node, 'none': nothing)
+    private get mousehover() { return this.interaction.highlightNode === 'mousehover' }
 
     // onNodeHold: pointer pressed for holdDuration ms without moving
     private holdTimer : any = null

@@ -92,6 +92,32 @@ export class Hypertree
 
     lastCenterNode = undefined
 
+    // the highlighted node (interaction.highlightNode): the node under the mouse
+    // (interaction-layer.ts) or the center node (update.centernode)
+    private highlighted : N | undefined = undefined
+    // a style frame is waiting (update.centernode); every frame clears it (view/unitdisk.ts)
+    public highlightFramePending = false
+
+    /**
+     * Highlights n (undefined: none): the callbacks onNodeHover / onHoverNodeChange
+     * when it changes, then the hover path (n.hovered). redraw: a style frame; false
+     * from inside a frame (its layers draw the new state).
+     */
+    public highlight(n:N | undefined, redraw = true) {
+        const i = this.args.interaction
+        const changed = n !== this.highlighted
+        if (changed) {
+            this.highlighted = n
+            if (i.onNodeHover)       i.onNodeHover(n)
+            if (i.onHoverNodeChange) i.onHoverNodeChange(n)
+        }
+        // unchanged: only if the hover path went away (selectQuery clears the paths)
+        else if (!n || this.args.objects.pathes.some(p=> p.type === 'HoverPath' && p.head === n))
+            return
+        selection.setPathHead(this, undefined, n)
+        if (redraw) this.update.pathes()
+    }
+
     /**
      * @param args  the application's overlay over the defaults, or a stack of named
      *              overlays [{ name, overlay }] applied in order (the name goes into
@@ -256,6 +282,23 @@ export class Hypertree
                 return
 
             this.lastCenterNode = centerNode
+
+            // highlightNode 'center': called from inside the frame (filter/culling.ts),
+            // after the filter: this frame's layers draw the new state; when the view
+            // stands still a style frame follows if no other frame comes first (the
+            // filter keeps the new path); while it moves the next frame comes anyway
+            if (this.args.interaction.highlightNode === 'center') {
+                this.highlight(centerNode, false)
+                if (!this.highlightFramePending && !this.isAnimationRunning()) {
+                    this.highlightFramePending = true
+                    requestAnimationFrame(()=> {
+                        if (!this.highlightFramePending) return
+                        this.highlightFramePending = false
+                        this.update.pathes()
+                    })
+                }
+            }
+
             const pathStr = centerNode
                 .ancestors()
                 .reduce((a, e)=> `${e.precalc.label?("  "+e.precalc.label+"  "):''}${a?"›":""}${a}`, '')

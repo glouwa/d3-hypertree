@@ -40,6 +40,14 @@ export function migrate(input:any) : any {
         delete i.wheelSensitivity
     }
 
+    // the v2 preview's hover strategy
+    if (input && input.interaction && input.interaction.hover !== undefined) {
+        deprecated('interaction.hover', 'interaction.highlightNode')
+        const i = branch('interaction')
+        if (i.highlightNode === undefined) i.highlightNode = i.hover === 'none' ? 'none' : 'mousehover'
+        delete i.hover
+    }
+
     const g = input && input.geometry
     if (g) {
         if (g.animateUpRadius !== undefined) {

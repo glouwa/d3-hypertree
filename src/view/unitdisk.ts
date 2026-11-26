@@ -76,6 +76,7 @@ export class UnitDisk implements IUnitDisk
      * layers that show the state draw.
      */
     public frame(reason:FrameReason) {
+        this.view.hypertree.highlightFramePending = false
         cacheUpdate(this, this.cache)
         this.layerStack.frame(reason)
     }

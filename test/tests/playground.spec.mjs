@@ -308,14 +308,14 @@ test('nodes: option show offers leaves and all', async ({ page }) => {
     expect((await urlOverlay(page)).geometry.layerOptions.nodes).toEqual({ show: 'all' })
 })
 
-test('interaction strategies: selection "single" replaces, hover "none" hovers nothing', async ({ page }) => {
+test('interaction strategies: selection "single" replaces, highlightNode "none" hovers nothing', async ({ page }) => {
     await page.goto('../playground/?gen=nTree&depth=6&childs=2&labels=1&filter=off')
     await ready(page)
     await openSection(page, 'Interaction')
     await opt(page, 'interaction.selection').locator('select').selectOption('single')
-    await opt(page, 'interaction.hover').locator('select').selectOption('none')
-    await page.waitForFunction(() => window.ht.args.interaction.selection === 'single' && window.ht.args.interaction.hover === 'none')
-    expect((await urlOverlay(page)).interaction).toEqual({ selection: 'single', hover: 'none' })
+    await opt(page, 'interaction.highlightNode').locator('select').selectOption('none')
+    await page.waitForFunction(() => window.ht.args.interaction.selection === 'single' && window.ht.args.interaction.highlightNode === 'none')
+    expect((await urlOverlay(page)).interaction).toEqual({ selection: 'single', highlightNode: 'none' })
     const ids = await page.evaluate(() => {
         const [a, b] = window.ht.data.leaves()
         window.ht.api.toggleSelection(a); window.ht.api.toggleSelection(b)
