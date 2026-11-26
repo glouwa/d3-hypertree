@@ -1,5 +1,6 @@
 import { ILayer, ILayerArgs, LayerContext, LayerType, layerData } from '../view/layer'
 import { D3UpdatePattern } from '../view/d3-join'
+import { setClass, setStyle } from '../view/dom-write'
 
 export interface CellLayerArgs extends ILayerArgs
 {
@@ -65,13 +66,17 @@ export class CellLayer implements ILayer
             // d is a voronoi polygon; d.data is its node. Only the cell of the node
             // under the mouse is "hovered", and only cells of selected nodes are
             // "selected" (not every cell on the path to them).
+            // (on every frame while dragging: written only when changed, dom-write.ts)
             updateColor:       s=>  {
                                     // the node state set by the interaction (n.hovered, n.selected)
                                     const showHover = this.args.hover !== false
                                     const showSelection = this.args.selection !== false
-                                    return s.classed("hovered",  d=> showHover && !!d.data.hovered)
-                                            .classed("selected", d=> showSelection && !!d.data.selected)
-                                            .style("fill",      d=> (d.pathes && d.pathes.labelcolor) || this.args.fill(d))
+                                    const fill = this.args.fill
+                                    return s.each(function(d) {
+                                        setClass(this, 'hovered',  showHover && !!d.data.hovered)
+                                        setClass(this, 'selected', showSelection && !!d.data.selected)
+                                        setStyle(this, 'fill', (d.pathes && d.pathes.labelcolor) || fill(d))
+                                    })
                                },
             updateTransform:   s=> s.attr("points", d=> d && d.join(" ")),
         })

@@ -2,6 +2,7 @@ import { N }               from '../data/n'
 import { C }               from '../geometry/hyperbolic-math'
 import { ILayer, ILayerArgs, LayerContext, LayerType, layerData } from '../view/layer'
 import { D3UpdatePattern } from '../view/d3-join'
+import { setClass, setStyle } from '../view/dom-write'
 import { labelsWithHover } from '../filter/labels'
 import { DEFAULT_MAX_LABELS } from '../filter/labels'
 import { sizeAt, offsetFactor, labelOffset, paddingLeftRight, paddingTopBottom } from './label-geometry'
@@ -149,8 +150,11 @@ export class LabelLayer implements ILayer
                                     .style("stroke",         d=> d.pathes && d.pathes.labelcolor)
                                     .style("fill",           d=> this.args.color(d) )
                                     .call(s=> setLabelText(s, this.args.text)),
-            updateColor:       s=> s.style("stroke",         d=> d.pathes && d.pathes.labelcolor)
-                                    .style("fill",           d=> this.args.color(d) )
+            // (on every frame while dragging: written only when changed, dom-write.ts)
+            updateColor:       s=> s.each(function(d) {
+                                        setStyle(this, 'stroke', d.pathes && d.pathes.labelcolor)
+                                        setStyle(this, 'fill', $this.args.color(d))
+                                    })
                                     .call(markHoveredLabel),
             updateTransform:   s=> s.attr("transform",       offset)
                                     .call(markHoveredLabel)
@@ -254,7 +258,7 @@ export function setLabelText(s, text:(d)=> string) {
  * (interaction-layer-2.ts: labelNodeAt).
  */
 export function markHoveredLabel(s) {
-    s.classed('caption-hovered', d=> Boolean(d && d.hovered))
+    s.each(function(d) { setClass(this, 'caption-hovered', d && d.hovered) })   // only when changed
     const first = s.node()
     const group = first && first.parentNode
     if (!group) return
@@ -276,16 +280,36 @@ export function markHoveredLabel(s) {
             rect.setAttribute(a, background.getAttribute(a) || '0')
     }
     else {
-        const b = hovered.getBBox()            // in the text's own coordinates
-        if (!b.width) { rect.setAttribute('width', '0'); return }
-        const pad = b.height * .25
-        rect.setAttribute('x', String(b.x - pad))
-        rect.setAttribute('y', String(b.y - pad * .5))
-        rect.setAttribute('width', String(b.width + 2 * pad))
-        rect.setAttribute('height', String(b.height + pad))
-        rect.setAttribute('rx', String(pad))
-        rect.removeAttribute('ry')
+        // the text's box in its own coordinates: measured once per text, class and font
+        // size (hoveredBox), not on every frame (getBBox forces a layout right after the
+        // new transforms: a quarter of the time while dragging on a phone)
+        const b = hoveredBox(hovered)
+        if (!b) { rect.setAttribute('width', '0'); return }
+        if (rect.dataset.box !== b.key) {
+            const pad = b.height * .25
+            rect.setAttribute('x', String(b.x - pad))
+            rect.setAttribute('y', String(b.y - pad * .5))
+            rect.setAttribute('width', String(b.width + 2 * pad))
+            rect.setAttribute('height', String(b.height + pad))
+            rect.setAttribute('rx', String(pad))
+            rect.removeAttribute('ry')
+            rect.dataset.box = b.key
+        }
     }
     const t = hovered.getAttribute('transform')
     if (t) rect.setAttribute('transform', t); else rect.removeAttribute('transform')
+}
+
+// the box of a label's text in its own coordinates, by its text, class and the font
+// size of the svg (the page may size the labels there): getBBox only when one changed
+const boxes = new WeakMap<SVGTextElement, { key:string, x:number, y:number, width:number, height:number }>()
+function hoveredBox(text:SVGTextElement) {
+    const svg = text.ownerSVGElement
+    const key = `${text.textContent}\0${text.getAttribute('class')}\0${svg ? svg.style.fontSize : ''}`
+    const known = boxes.get(text)
+    if (known && known.key === key) return known.width ? known : null
+    const b = text.getBBox()
+    const box = { key, x: b.x, y: b.y, width: b.width, height: b.height }
+    boxes.set(text, box)
+    return box.width ? box : null
 }

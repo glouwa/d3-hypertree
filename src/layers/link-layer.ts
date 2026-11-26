@@ -1,6 +1,7 @@
 import { N }               from '../data/n'
 import { ILayer, ILayerArgs, LayerContext, LayerType, layerData } from '../view/layer'
 import { D3UpdatePattern } from '../view/d3-join'
+import { setClass, setStyle } from '../view/dom-write'
 import { StateDisplay, showsState } from './state-display'
 import { ArcCurvature }    from '../projection/projection'
 
@@ -92,13 +93,19 @@ export class ArcLayer implements ILayer
     }
 
     private attach() {
+        // (on every frame while dragging: written only when changed, dom-write.ts)
+        const args = this.args
         const style = this.args.role === 'paths'
-            ? (s)=> s.classed("hovered-path",  d=> d.pathes && d.pathes.isPartOfAnyHoverPath)
-                     .classed("selected-path", d=> d.pathes && d.pathes.isPartOfAnySelectionPath)
-                     .style("stroke",          d=> d.pathes && d.pathes.finalcolor)
-            : (s)=> s.style("stroke",     d=> (d.pathes && d.pathes.finalcolor) || this.args.stroke(d))
-                     .classed("hovered",   d=> showsState(this.args.hover, d, 'hover'))
-                     .classed("selected",  d=> showsState(this.args.selection, d, 'selection'))
+            ? (s)=> s.each(function(d) {
+                        setClass(this, 'hovered-path',  d.pathes && d.pathes.isPartOfAnyHoverPath)
+                        setClass(this, 'selected-path', d.pathes && d.pathes.isPartOfAnySelectionPath)
+                        setStyle(this, 'stroke', d.pathes && d.pathes.finalcolor)
+                    })
+            : (s)=> s.each(function(d) {
+                        setStyle(this, 'stroke', (d.pathes && d.pathes.finalcolor) || args.stroke(d))
+                        setClass(this, 'hovered',  showsState(args.hover, d, 'hover'))
+                        setClass(this, 'selected', showsState(args.selection, d, 'selection'))
+                    })
         this.d3updatePattern = new D3UpdatePattern({
             parent:            this.view.parent,
             layer:             this,

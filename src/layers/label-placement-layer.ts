@@ -2,6 +2,7 @@ import { N }               from '../data/n'
 import { C }               from '../geometry/hyperbolic-math'
 import { ILayer, ILayerArgs, LayerContext, LayerType, layerData } from '../view/layer'
 import { D3UpdatePattern } from '../view/d3-join'
+import { setClass, setStyle } from '../view/dom-write'
 import { setLabelText, markHoveredLabel } from './label-layer'
 import { Box, outward, labelSize, restCenter, besideNode, overlapping, distanceToBox, sizeAt } from './label-geometry'
 import { paddingLeftRight, paddingTopBottom, paddingsFor } from './label-geometry'
@@ -212,7 +213,8 @@ export class LabelPlacementLayer implements ILayer
             create:            s=> s.style("fill", d=> d.pathes && d.pathes.labelcolor)
                                     .call(s=> setLabelText(s, this.args.text))
                                     .attr("transform", transform),
-            updateColor:       s=> s.style("fill", d=> d.pathes && d.pathes.labelcolor)
+            // (written only when changed, dom-write.ts)
+            updateColor:       s=> s.each(function(d) { setStyle(this, 'fill', d.pathes && d.pathes.labelcolor) })
                                     .call(markHoveredLabel),
             updateTransform:   s=> s.attr("transform", transform)
                                     .call(s=> setLabelText(s, this.args.text))

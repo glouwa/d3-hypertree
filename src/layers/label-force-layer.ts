@@ -1,6 +1,7 @@
 import { N }               from '../data/n'
 import { ILayer, ILayerArgs, LayerContext, LayerType, layerData } from '../view/layer'
 import { D3UpdatePattern } from '../view/d3-join'
+import { setClass, setStyle } from '../view/dom-write'
 import { setLabelText, markHoveredLabel } from './label-layer'
 import { Box, outward, labelSize, restCenter, overlap, distanceToBox, sizeAt } from './label-geometry'
 import { paddingLeftRight, paddingTopBottom, paddingsFor } from './label-geometry'
@@ -228,7 +229,8 @@ export class LabelForceLayer implements ILayer
                                     .style("fill",         d=> (d.pathes && d.pathes.labelcolor) || this.args.color(d))
                                     .call(s=> setLabelText(s, this.args.text))
                                     .attr("transform",       calctransform),
-            updateColor:       s=> s.style("fill",         d=> (d.pathes && d.pathes.labelcolor) || this.args.color(d))
+            // (on every frame while dragging: written only when changed, dom-write.ts)
+            updateColor:       s=> s.each(function(d) { setStyle(this, 'fill', (d.pathes && d.pathes.labelcolor) || T.args.color(d)) })
                                     .call(markHoveredLabel),
             updateTransform:   s=> s.attr("transform",       calctransform)
                                     .call(s=> setLabelText(s, this.args.text))

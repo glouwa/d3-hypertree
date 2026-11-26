@@ -35,6 +35,23 @@ export function overview(root:N, layout:(n:N, λ:number)=> void, orientation:num
     const S = inner.slice(0, count)
     if (!S.length) return { P: { re:0, im:0 }, λ: λstart }
 
+    // only S is needed: the layout goes down S and its ancestors, the children of the
+    // other inner nodes are hidden meanwhile (a node's place depends on its ancestors and
+    // the weights of its siblings, not on what is below it). The bisections lay the tree
+    // out up to ~150 times; for all of it that took 4 s on a phone (Mammalia, 12000
+    // nodes). The caller lays the tree out again for its view.
+    const keep = new Set<N>()
+    for (const n of S) for (let a:N = n; a && !keep.has(a); a = a.parent) keep.add(a)
+    const hidden:[N, N[]][] = inner.filter(n=> !keep.has(n)).map(n=> [n, n.children])
+    for (const [n] of hidden) n.children = undefined
+    try {
+        return search()
+    }
+    finally {
+        for (const [n, c] of hidden) n.children = c
+    }
+
+    function search() : OverviewView {
     // start: the root moved against the direction the tree grows in (down)
     const down = { re: -Math.cos(orientation), im: -Math.sin(orientation) }
     const positions = (λ:number)=> { layout(root, λ); return S.map(n=> ({ re: n.layout.z.re, im: n.layout.z.im })) }
@@ -74,4 +91,5 @@ export function overview(root:N, layout:(n:N, λ:number)=> void, orientation:num
         if (settled) break
     }
     return { P, λ }
+    }
 }

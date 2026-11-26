@@ -1,6 +1,7 @@
 import { N }               from '../data/n'
 import { ILayer, ILayerArgs, LayerContext, LayerType, layerData } from '../view/layer'
 import { D3UpdatePattern } from '../view/d3-join'
+import { setClass, setStyle } from '../view/dom-write'
 import { showsState, StateDisplay } from './state-display'
 
 export interface NodeLayerArgs extends ILayerArgs
@@ -91,9 +92,12 @@ export class NodeLayer implements ILayer
                                     .style("stroke",       d=> (d.pathes && d.pathes.labelcolor) || this.args.stroke(d))
                                     .style("stroke-width", d=> (d.pathes && d.pathes.labelcolor) || this.args.strokeWidth(d)),
 
-            updateColor:       s=> s.classed("hovered",   d=> showsState(this.args.hover, d, 'hover'))
-                                    .classed("selected",  d=> showsState(this.args.selection, d, 'selection'))
-                                    .style("fill",      d=> (d.pathes && d.pathes.labelcolor) || this.args.fill(d)),
+            // (on every frame while dragging: written only when changed, dom-write.ts)
+            updateColor:       s=> s.each(function(d) {
+                                    setClass(this, 'hovered',  showsState($this.args.hover, d, 'hover'))
+                                    setClass(this, 'selected', showsState($this.args.selection, d, 'selection'))
+                                    setStyle(this, 'fill', (d.pathes && d.pathes.labelcolor) || $this.args.fill(d))
+                                }),
 
             updateTransform:   s=> s.attr("transform",    d=> this.args.transform(d))
                                     // r and lazy rarely change: write them only when they do

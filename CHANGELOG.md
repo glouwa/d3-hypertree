@@ -247,6 +247,21 @@ are listed first.
 
 ### Fixed
 
+- **Colors and state classes are written only when they change** (view/dom-write.ts;
+  the cell, node, link and label layers, `markHoveredLabel`). The data join runs
+  `updateColor` on every element on every frame while dragging (the visible nodes
+  change); d3's `classed()`/`style()` write to the DOM even when nothing changes, and
+  those writes and the style recalculation they caused cost about a third of a frame on
+  a phone. The values are still computed every frame (a color function may depend on
+  anything), only unchanged ones are not written. Frames while dragging: -30 % (phone
+  emulation, Coleoptera).
+- **`api.overview()` 7-17 times faster** (layout/overview.ts). Its bisections laid out
+  the whole tree up to ~150 times; now only the 300 heaviest inner nodes and their
+  ancestors (the children of the other inner nodes are hidden meanwhile). Same result;
+  on a phone 4-15 s less for a branch page of the Tree of Life.
+- **The hovered label's box is not measured on every frame** (layers/label-layer.ts
+  `markHoveredLabel`): `getBBox` once per text, class and font size. It forced a layout
+  on every frame, a quarter of the time while dragging on a phone.
 - **Label widths are measured in the labels' font.** The computed style of the probe
   caption was read after removing it (it is live: every value was empty), so the canvas
   font was invalid and every width was measured in the canvas default 10px sans-serif;
