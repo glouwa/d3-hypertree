@@ -18,8 +18,8 @@ export interface LabelLayerArgs extends ILayerArgs
     background?: any,          // falsy, true (every label, CSS color) or a function of the node: falsy, true or a color
     scale?:       number | ((n:N)=> number),   // size bound to the data (default 1), times geometry.shrinkAtRim
     maxLabels?:   number,      // at most this many labels
-    hoverLabel?:      boolean, // always a label for the node under the mouse (on top of maxLabels)
-    hoverPathLabels?: boolean, // always labels on the path from the node under the mouse to the root
+    hoverLabel?:      boolean, // always a label for the node under the mouse (counts in maxLabels)
+    hoverPathLabels?: boolean, // labels on the path from the node under the mouse to the root, first in maxLabels
     asImage?:    boolean,      // draw each distinct text once as a bitmap and reuse it
 }
 

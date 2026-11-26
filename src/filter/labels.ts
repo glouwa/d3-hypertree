@@ -38,20 +38,31 @@ export function labelsFor(ud:IUnitDisk, max:number|undefined) : N[] {
 }
 
 /**
- * The labels of a label layer: labelsFor(maxLabels), plus as its options ask
- *   hoverLabel:      the node under the mouse (n.hovered)
- *   hoverPathLabels: every node on the path from it to the root
- * if they are visible and have a label. These come on top of the limit. Nodes with
- * precalc.labelOnHover show their label only this way.
+ * The labels of a label layer, at most maxLabels, as its options ask:
+ *   hoverLabel:      the node under the mouse (n.hovered): always, it counts
+ *   hoverPathLabels: the nodes on the path from it to the root, nearest first, as far
+ *                    as the limit goes (the ones near the root are left out first)
+ *   the rest of the limit: the labels by weight and nearness (labelsFor)
+ * only visible nodes with a label. Nodes with precalc.labelOnHover show their label only
+ * on the hover path.
  */
 export function labelsWithHover(ud:IUnitDisk, args:{ maxLabels?:number, hoverLabel?:boolean, hoverPathLabels?:boolean }) : N[] {
-    const base = labelsFor(ud, args.maxLabels)
-    if (!args.hoverLabel && !args.hoverPathLabels) return base
-    const extra = ud.cache.unculledNodes.filter((n:N)=> n.precalc.label && !n.outOfView
-        && ((args.hoverLabel && n.hovered) || (args.hoverPathLabels && n.pathes && n.pathes.isPartOfAnyHoverPath)))
-    if (!extra.length) return base
-    const inBase = new Set(base)
-    return base.concat(extra.filter(n=> !inBase.has(n)))
+    if (!args.hoverLabel && !args.hoverPathLabels) return labelsFor(ud, args.maxLabels)
+    const max = args.maxLabels === undefined || args.maxLabels === null ? DEFAULT_MAX_LABELS : args.maxLabels
+    const shown = (n:N)=> n.precalc.label && !n.outOfView
+    const unculled = ud.cache.unculledNodes
+    const hover = args.hoverLabel ? unculled.filter((n:N)=> n.hovered && shown(n)) : []
+    const path = !args.hoverPathLabels ? [] : unculled
+        .filter((n:N)=> !hover.includes(n) && n.pathes && n.pathes.isPartOfAnyHoverPath && shown(n))
+        .sort((a, b)=> b.depth - a.depth)                          // the hovered node (its head), then the nearest
+        .slice(0, Math.max(0, max - hover.length))
+    const taken = new Set([...hover, ...path])
+    const rest = Math.max(0, max - taken.size)
+    // the others: the rest of the limit (a node already on the path does not count twice)
+    let base = rest ? labelsFor(ud, rest) : []
+    const twice = base.filter(n=> taken.has(n)).length
+    if (twice) base = labelsFor(ud, rest + twice)
+    return base.filter(n=> !taken.has(n)).slice(0, rest).concat(hover, path)
 }
 
 /**

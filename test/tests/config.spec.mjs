@@ -331,19 +331,21 @@ test('nodes: default disks, inner nodes as wide as their link, leaves three time
     for (const { ratio } of inner) { expect(ratio).toBeLessThanOrEqual(0.5001); expect(ratio).toBeGreaterThan(0.39) }
 })
 
-// layer options hoverLabel / hoverPathLabels: the node under the mouse and the path
-// from it to the root always get a label, on top of maxLabels
+// layer options hoverLabel / hoverPathLabels: the node under the mouse always gets a
+// label, then the path from it to the root, nearest first; all of them count in
+// maxLabels, the other labels get what is left
 test.describe('label layers: labels for the hovered node and its path', () => {
     for (const layer of ['labels', 'labels-force']) {
-        for (const [option, expectPath] of [['hoverLabel', false], ['hoverPathLabels', true]]) {
+        for (const option of ['hoverLabel', 'hoverPathLabels']) {
             test(`${layer}: ${option}`, async ({ page }) => {
                 const errors = collectErrors(page)
-                const opts = { [layer]: { invisible: false, hideOnDrag: false, maxLabels: 1, [option]: true } }
+                const opts = { [layer]: { invisible: false, hideOnDrag: false, maxLabels: 3, [option]: true } }
                 if (layer === 'labels-force') opts.labels = { invisible: true }
                 await openTree(page, `gen=nTree&depth=5&childs=3&labels=1&filter=off&layers=${encodeURIComponent(JSON.stringify(opts))}`)
                 await waitForStable(page)
                 const shown = () => page.evaluate(layer => [...document.querySelectorAll(`[id="${layer}"] text`)].map(t => t.__data__.mergeId), layer)
-                expect((await shown()).length).toBe(1)          // the limit: the root only
+                const before = await shown()
+                expect(before.length).toBe(3)                   // the limit
                 // hover a node of depth 3
                 const target = await page.evaluate(() => {
                     const n = harness.ht.unitdisk.cache.unculledNodes.find(n => n.depth === 3)
@@ -354,12 +356,21 @@ test.describe('label layers: labels for the hovered node and its path', () => {
                 await page.mouse.move(target.x, target.y, { steps: 3 })
                 await page.waitForFunction(id => harness.ht.data.descendants().find(n => n.mergeId === id).hovered, target.id)
                 await expect.poll(async () => (await shown()).includes(target.id)).toBe(true)
+                // still the limit
+                await expect.poll(async () => (await shown()).length).toBe(3)
                 const ids = await shown()
-                const pathShown = target.path.every(id => ids.includes(id))
-                expect(pathShown).toBe(expectPath)
-                // the mouse leaves: back to the limit
+                if (option === 'hoverPathLabels') {
+                    // the hovered node and its two nearest ancestors (depth 2 and 1), not
+                    // the root: the path takes the limit, nothing is left for the others
+                    expect([...ids].sort()).toEqual(target.path.slice(0, 3).sort())
+                }
+                else {
+                    // the hovered node and two others; the path is not asked for
+                    expect(ids.filter(id => target.path.slice(1, 3).includes(id) && !before.includes(id))).toEqual([])
+                }
+                // the mouse leaves: back to the others
                 await page.mouse.move(2, 2)
-                await expect.poll(async () => (await shown()).length).toBe(1)
+                await expect.poll(async () => [...(await shown())].sort()).toEqual([...before].sort())
                 expectNoErrors(errors)
             })
         }

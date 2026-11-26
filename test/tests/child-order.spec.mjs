@@ -94,6 +94,49 @@ test('balanced: the heaviest child goes on much straighter than with the data or
     expect(balanced.mean).toBeLessThan(data.mean * .5)
 })
 
+test('balanced: a trunk does not lean further and further to one side', async ({ page }) => {
+    // along every trunk (from a node through its heaviest children) the turns (weight
+    // left minus right of the heaviest child, in parts of all) add up to the lean; the
+    // sides are swapped where the lean would grow, so it stays within the largest single
+    // turn on the way (with the depth rule alone it grew on the trees of the Tree of Life)
+    const errors = collectErrors(page)
+    await open(page, 'balanced')
+    await waitForStable(page)
+    const worst = await page.evaluate(() => {
+        const w = x => x.precalc.angleWeight
+        let worst = 0, trunks = 0
+        harness.ht.data.each(start => {
+            if (start.parent && start.parent.children.length > 1) {
+                const p = start.parent.children, max = Math.max(...p.map(w))
+                if (w(start) === max && p.filter(x => w(x) === max).length === 1) return   // on its parent's trunk
+            }
+            trunks++
+            let n = start, lean = 0, largest = 0
+            while (n.children && n.children.length) {
+                const c = n.children
+                if (c.length > 1) {
+                    const max = Math.max(...c.map(w))
+                    // equally heavy children: which one the trunk follows is the library's
+                    // choice (the first in the data order), not known here: the trunk ends
+                    if (c.filter(x => w(x) === max).length > 1) break
+                    const side = i => c.slice(0, i).reduce((a, x) => a + w(x), 0) - c.slice(i + 1).reduce((a, x) => a + w(x), 0)
+                    const h = c.findIndex(x => w(x) === max)
+                    const total = c.reduce((a, x) => a + w(x), 0)
+                    const t = total ? side(h) / total : 0
+                    lean += t; largest = Math.max(largest, Math.abs(t))
+                    worst = Math.max(worst, Math.abs(lean) - largest)
+                    n = c[h]
+                }
+                else n = c[0]
+            }
+        })
+        return { worst, trunks }
+    })
+    expect(worst.trunks).toBeGreaterThan(10)
+    expect(worst.worst).toBeLessThanOrEqual(1e-9)
+    expectNoErrors(errors)
+})
+
 test('default: the children keep the data order', async ({ page }) => {
     await open(page, null)
     await waitForStable(page)

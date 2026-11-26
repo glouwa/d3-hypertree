@@ -9,6 +9,18 @@ are listed first.
 
 ### Changed behavior
 
+- **Hover labels count in `maxLabels`** (filter/labels.ts `labelsWithHover`, all label
+  layers). The label of the node under the mouse (`hoverLabel`) is always shown and
+  counts; then the path to the root (`hoverPathLabels`), nearest first, as far as the
+  limit goes; the other labels get what is left. Before, the hover labels came on top
+  of the limit. A layer that showed only hover labels with `maxLabels: 0` needs a limit
+  now (the path's length).
+- **`layout.childOrder: 'balanced'` keeps trunks straight** (data/children-order.ts).
+  The turns of a trunk (the path of the heaviest children) are summed up; where the
+  next one would lean it further to the same side, the sides of that node are swapped.
+  Before, only the depth decided the side, and a trunk could lean 15-30° to one side
+  (the beetles of the Tree of Life). Side branches start their own trunk. Trees with
+  `'balanced'` look a little different.
 - **The model is an overlay over the defaults** (config/schema.ts). The object
   given to the constructor is merged into the complete defaults with fixed rules:
   plain objects merge, arrays and functions replace, `null` switches an option

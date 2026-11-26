@@ -15,8 +15,8 @@ export interface LabelForceLayerArgs extends ILayerArgs
     background?: any,          // falsy, or a function of the node: draw a background rect
     scale?:       number | ((n:N)=> number),   // size bound to the data (default 1), times geometry.shrinkAtRim
     maxLabels?:   number,      // at most this many labels
-    hoverLabel?:      boolean, // always a label for the node under the mouse (on top of maxLabels)
-    hoverPathLabels?: boolean, // always labels on the path from the node under the mouse to the root
+    hoverLabel?:      boolean, // always a label for the node under the mouse (counts in maxLabels)
+    hoverPathLabels?: boolean, // labels on the path from the node under the mouse to the root, first in maxLabels
     // a line from a label to its node: 'auto' when the label was pushed away from its
     // node, 'always', 'never'
     leaderLines?: 'auto' | 'always' | 'never',
