@@ -23,6 +23,18 @@ const waiting = new WeakSet<object>()
  * (125 %, 150 %) and with the CSS weight 300 vs 400, so label backgrounds were too
  * small for their text.
  */
+// The vertical middle of a caption's text relative to its baseline and the distance of
+// its lines (label units at scale 1), per tree: measured with the widths
+// (captionMetrics); the label backgrounds are centered on it (captionBox).
+const centers = new WeakMap<object, { center:number, line:number }>()
+
+/**
+ * Where a caption's text sits: center (the middle of its first line's box above the
+ * baseline, negative) and line (the distance of its lines), in label units. undefined
+ * until the labels were measured in an SVG.
+ */
+export function captionBox(ht:object) : { center:number, line:number } | undefined { return centers.get(ht) }
+
 function captionMetrics(ht:MeasureHost, context:CanvasRenderingContext2D) : { font:string, factor:number, probe:string } | null {
     const html = ht.view_ && ht.view_.html
     const svg = html && (html.querySelector('.unitdisk-nav svg') || html.querySelector('svg'))
@@ -33,10 +45,20 @@ function captionMetrics(ht:MeasureHost, context:CanvasRenderingContext2D) : { fo
     text.textContent = sample
     const parent = svg.querySelector('.unitDisc') || svg
     parent.appendChild(text)
-    let width = 0, cs:CSSStyleDeclaration
-    try { width = text.getBBox().width; cs = getComputedStyle(text) } catch (e) { width = 0 }
+    // the computed style is live: read while the probe is in the document (read after
+    // removing it, every value was '': the canvas font '  100px ' was invalid, so the
+    // widths were measured in the canvas default 10px sans-serif, not the labels' font,
+    // and the fallback for scripts Roboto lacks (Chinese, ...) was another one)
+    let width = 0, bb:DOMRect, cs:{ fontStyle:string, fontWeight:string, fontFamily:string, fontSize:string }
+    try {
+        bb = text.getBBox(); width = bb.width
+        const s = getComputedStyle(text)
+        cs = { fontStyle: s.fontStyle, fontWeight: s.fontWeight, fontFamily: s.fontFamily, fontSize: s.fontSize }
+    } catch (e) { width = 0 }
     parent.removeChild(text)
-    if (!width || !cs) return null
+    if (!width || !cs || !cs.fontFamily) return null
+    // label-layer setLabelText: the lines of a label 1.2em apart
+    centers.set(ht, { center: bb.y + bb.height / 2, line: 1.2 * parseFloat(cs.fontSize) })
     const font = `${cs.fontStyle} ${cs.fontWeight} 100px ${cs.fontFamily}`
     context.font = font
     const canvasWidth = context.measureText(sample).width

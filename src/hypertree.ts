@@ -18,7 +18,6 @@ import { πify }                from './geometry/hyperbolic-math'
 import { C }                   from './geometry/hyperbolic-math'
 import { CassignC }            from './geometry/hyperbolic-math'
 import { CaddC, CsubC, CmulR } from './geometry/hyperbolic-math'
-import { sigmoid01 }           from './geometry/hyperbolic-math'
 import { IUnitDisk, UnitDisk } from './view/unitdisk'
 import { measureLabels }       from './layers/label-measure'
 import { Animation, Transition } from './interaction/animation'
@@ -478,7 +477,7 @@ export class Hypertree
             resolve: ok,
             reject: err,
             frame: (progress01)=> {
-                const waydone01 = 1-sigmoid01(progress01)
+                const waydone01 = 1-this.args.interaction.animationEasing(progress01)
                 console.assert(waydone01 >= 0 && waydone01 <= 1)
                 const waydone = way * waydone01
                 const λ = newλ + waydone
@@ -504,7 +503,7 @@ export class Hypertree
             hypertree: this,
             duration: this.args.interaction.animationDuration,
             frame: (progress01)=> {
-                const waydone01 = 1-sigmoid01(progress01)
+                const waydone01 = 1-this.args.interaction.animationEasing(progress01)
                 console.assert(waydone01 >= 0 && waydone01 <= 1)
                 if (zoom) {
                     // as animateToλ: the layout depends on λ. updateLayoutPath_ also

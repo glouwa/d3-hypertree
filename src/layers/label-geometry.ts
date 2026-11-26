@@ -14,8 +14,15 @@ import { LayerContext }    from '../view/layer'
 
 export interface Box { x:number, y:number, w:number, h:number }   // center, size
 
+// the room around a label's text in its background box, at the default captionHeight
+// .05; paddingsFor: for any captionHeight (the box keeps its shape when an application
+// sizes its labels, e.g. in screen pixels: until v2 the paddings stayed .08 / .02, so
+// larger labels got relatively thin boxes, smaller ones thick ones)
 export const paddingLeftRight = .08
 export const paddingTopBottom = .02
+export function paddingsFor(captionHeight:number) : { lr:number, tb:number } {
+    return { lr: captionHeight * paddingLeftRight / .05, tb: captionHeight * paddingTopBottom / .05 }
+}
 
 // Size of labels and emojis: the layer option scale (a number or a function of the
 // node, bound to the data; default 1) times the rim factor of geometry.shrinkAtRim:

@@ -91,6 +91,13 @@ are listed first.
 
 ### Added
 
+- **`labels-force` options `color` and `hoverTransition`.** `color(n)`: the text color
+  (undefined: the theme's), as on `labels`. `hoverTransition: false`: the label of the
+  node under the mouse appears and goes at once, the other labels keep their growing
+  and gliding (`transition`).
+- **`interaction.animationEasing(t)`**: the curve of goto, gotoNode, gotoHome, gotoλ
+  and gotoOverview (share of the way at share t of the time). Default: the symmetric
+  tanh sigmoid as before.
 - **`ht.configure(overlay)`**: changes options at runtime. Each option declares
   what a change affects (`hyt.affects`, `hyt.effectOf(path)`): the data is loaded
   again, the layout, the label measures, the layer stack, a frame, or the styles;
@@ -228,6 +235,22 @@ are listed first.
 
 ### Fixed
 
+- **Label widths are measured in the labels' font.** The computed style of the probe
+  caption was read after removing it (it is live: every value was empty), so the canvas
+  font was invalid and every width was measured in the canvas default 10px sans-serif;
+  scripts Roboto lacks (Chinese, ...) were off the most.
+- **Label backgrounds are centered on their text** (measured with the widths) and their
+  paddings grow with `geometry.captionHeight` (`paddingsFor`). They were centered on a
+  point a fixed .01 above the baseline: a larger font sat high in its box.
+- **The weight filter no longer empties the view when dragging.** The nodes in the focus
+  circle and their children (shown whatever their weight) counted against
+  `rangeNodes`; a fan in the focus filled the range alone, magic hid everything else,
+  and dragging the fan out of the focus left almost nothing until magic recovered over
+  many frames. They no longer count, and the other nodes keep at least a quarter of
+  the range.
+- **Half-plane view: the root is projected.** It was drawn at its disk position when it
+  was outside the culling radius: a node, a stem and a piece of path in the middle of
+  the view, connected to nothing.
 - **Emojis sit with their middle on their node.** The offset `bboxCenter` was applied
   before the emoji's double scale and the bitmap included the glyph's side bearings,
   so emojis sat up to 10 px right of and above their node. The bitmap now holds only

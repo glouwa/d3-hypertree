@@ -1,6 +1,8 @@
 import { compositing } from './planes'
 import { N } from '../data/n'
 import { ILayer } from './layer'
+import { paddingsFor } from '../layers/label-geometry'
+import { captionBox } from '../layers/label-measure'
 
 export interface D3UpdatePatternArgs
 {
@@ -86,6 +88,7 @@ export class D3UpdatePattern
         this.mainSvgGroup.selectAll('rect.caption-background').remove()
         var svgRootHere = this.mainSvgGroup
         var geometry = this.args.layer.view.model.geometry
+        var hypertree = this.args.layer.view.hypertree
 
         this.mainSvgGroup.selectAll("text")
         .each(function(d:N, i, v:SVGTextElement[])
@@ -95,7 +98,16 @@ export class D3UpdatePattern
             var view:any = v[i]
             var w = d.precalc[layername+'len'] || 0
             var lines = view.childElementCount || 1          // multi-line labels: one tspan per line
-            var h = geometry.captionHeight * lines
+            var ch = geometry.captionHeight
+            var h = ch * lines
+            // the room around the text grows with captionHeight (paddingsFor); the box is
+            // centered on the text (captionBox: measured), not on a point a fixed .01 above
+            // the baseline: a font larger than the one that was calibrated for sat high
+            // in its box (the main page of the Tree of Life: 2.5 px above, 5 below)
+            var pad = paddingsFor(ch)
+            var box = captionBox(hypertree) || { center: -pad.tb / 2, line: 0 }
+            var H = h + pad.tb
+            var middle = box.center + (lines - 1) * box.line / 2
 
             const b = typeof background === 'function' ? background(d) : background
             // before the text, and before the box of the hovered label
@@ -105,12 +117,12 @@ export class D3UpdatePattern
             const before = prev && prev.classList.contains('caption-hover') ? prev : text
             if (w && b)   // nodes without a measured label get no background
                 svgRootHere.insert('rect', d=> before)
-                    .attr("x",         x=> -paddingLeftRight/2)
-                    .attr("y",         x=> -paddingTopBottom-geometry.captionHeight/2)   // top of the first line
-                    .attr("rx",        x=> .01)
-                    .attr("ry",        x=> .03)
-                    .attr("width",     x=> w + paddingLeftRight)
-                    .attr("height",    x=> h + paddingTopBottom)
+                    .attr("x",         x=> -pad.lr/2)
+                    .attr("y",         x=> middle - H/2)
+                    .attr("rx",        x=> .01 * ch / .05)
+                    .attr("ry",        x=> .03 * ch / .05)
+                    .attr("width",     x=> w + pad.lr)
+                    .attr("height",    x=> H)
                     .attr("transform", x=> view.attributes.transform.value)
                     .classed('caption-background', true)
                     .style('fill', typeof b === 'string' ? b : null)

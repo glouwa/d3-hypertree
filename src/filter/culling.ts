@@ -15,6 +15,9 @@ import { doImageStuff }             from './labels'
 // weightFilter.rangeCullingWeight, default 4..500, stopped it early).
 const MAGIC_MIN = 1e-12
 const MAGIC_MAX = 1e12
+// the share of rangeNodes kept for the nodes magic decides on, however many the focus
+// circle holds (adjustMagic)
+const FOCUS_FLOOR = .25
 
 // One step of magic per update (× or ÷ alpha) toward rangeNodes.
 //
@@ -60,9 +63,19 @@ function adjustMagic(ud:IUnitDisk, cache:TransformationCache) {
     if (filter === null || !cache.unculledNodes)   // no weight culling / nothing drawn yet
         return
 
-    const n = cache.unculledNodes.length
+    // Only the nodes magic decides on count against rangeNodes. The nodes in the focus
+    // circle and their children are drawn whatever their weight (cache.focusCount); a
+    // fan in the focus (zoomed out on a flat tree: Coleoptera, 780 of 808 nodes) filled
+    // the range alone, magic kept everything else hidden (W / magic 58755 of 226332), and
+    // dragging the fan out of the focus left 65 nodes, sometimes almost none, until magic
+    // had climbed back over many frames. Now the nodes magic decides on keep at least
+    // FOCUS_FLOOR of the range, beside the focus.
+    const focus = Math.min(cache.focusCount || 0, cache.unculledNodes.length)
+    const n = cache.unculledNodes.length - focus
     const λ = ud.args.transformation.state.λ
-    const range = filter.rangeNodes
+    const full = filter.rangeNodes
+    const range = { min: Math.max(full.min - focus, full.min * FOCUS_FLOOR),
+                    max: Math.max(full.max - focus, full.max * FOCUS_FLOOR) }
     const alpha = filter.alpha
     const fresh = ()=> ({ up: MAGIC_MAX, last: 0, stoppedAt: 0 })
     let b = magicLimits.get(filter)
@@ -139,6 +152,9 @@ function collectNodesByWeight(ud:IUnitDisk, cache:TransformationCache, path:N[])
     const mf = ud.view.hypertree.isAnimationRunning() ? 1:1 // todo: make configurable
     // for adjustMagic: where the next node is hidden / shows (W / w, see adjustMagic)
     let nextHideAt:number|null = null, nextShowAt:number|null = null
+    // the visible nodes drawn whatever their weight: in the focus circle, or a child of
+    // a node in it (for adjustMagic)
+    let focusCount = 0
 
     function abortfilter(n, idx, highway) { // return false to abort
         const wf = ud.args.model.filter.weightFilter
@@ -146,6 +162,7 @@ function collectNodesByWeight(ud:IUnitDisk, cache:TransformationCache, path:N[])
                     : highway[0].precalc.cullingWeight / wf.magic / mf
         peocessNodeTransformation(ud, cache, n)
         peocessNode(ud, cache, n, cache.focusR, n.minWeight)
+        if (!n.isOut && (!n.isOutλ || (n.parent && !n.parent.isOutλ))) focusCount++
         if (n !== startNode && !n.isOut99 && n.precalc.cullingWeight > 0) {
             const at = highway[0].precalc.cullingWeight / n.precalc.cullingWeight
             if (n.isOut && n.isOutWeight) {                                         // hidden by its weight
@@ -184,6 +201,7 @@ function collectNodesByWeight(ud:IUnitDisk, cache:TransformationCache, path:N[])
 
     cache.nextHideAt = nextHideAt
     cache.nextShowAt = nextShowAt
+    cache.focusCount = focusCount
 
     // Hysteresis for the center node: it decides the path the next frame starts from
     // (and so the weight each branch is compared with). When two nodes are about
@@ -260,6 +278,13 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
     // positions (the half-plane view maps them; the disk keeps them); the filter above
     // worked in the disk. Nodes outside the view get no emoji or symbol.
     cache.unculledNodes = ud.args.projection.project(cache.unculledNodes)
+    // the root is laid out on every frame but is in unculledNodes only while it is within
+    // the culling radius; it is drawn anyway (spezialNodes: its node, its stem, the
+    // selected path to it), so it is projected too. Before, the half-plane view drew it
+    // at its disk position: zoomed in at the leaves the root stood in the middle of the
+    // view with a line down from it and a piece of path, none of them connected to the tree
+    const root = ud.args.data
+    if (root && root.cache && !cache.unculledNodes.includes(root)) ud.args.projection.project([root])
     const inView = (n:N)=> !n.outOfView
     cache.emojis = cache.emojis.filter(inView)
     cache.spezialNodes = cache.spezialNodes.filter(inView)

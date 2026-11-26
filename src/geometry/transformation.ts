@@ -111,6 +111,9 @@ export class TransformationCache
     // which the next visible node is hidden, the next hidden one shows (null: none)
     nextHideAt?:    number | null
     nextShowAt?:    number | null
+    // of the visible nodes those drawn whatever their weight (in the focus circle or a
+    // child of a node in it); adjustMagic counts only the others against rangeNodes
+    focusCount?:    number
     links:          N[]
     leafOrLazy:     N[]
     spezialNodes:   N[]

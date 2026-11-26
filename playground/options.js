@@ -82,6 +82,7 @@
         'interaction.minFill':      { kind: 'number', min: .3, max: 1, step: .01, nullable: true, doc: 'the tree never fills less than this share of the disk radius: the lower λ bound is computed per tree after loading, replacing λbounds[0]' },
         'interaction.maxLinkLength': { kind: 'number', min: .1, max: 1, step: .01, nullable: true, doc: 'a normal link with its parent in the middle of the disk is at most this long (share of the radius): the upper λ bound, replacing λbounds[1]' },
         'interaction.animationDuration': { kind: 'number', min: 0, max: 3000, step: 25, unit: 'ms', doc: 'ms of goto, gotoNode, gotoHome, gotoλ, gotoOverview' },
+        'interaction.animationEasing': { kind: 'function', returns: 'number', doc: 'the curve of those animations: share of the way at share t of the time, 0..1 (default: symmetric tanh sigmoid)' },
         'interaction.wheelFactor':  { kind: 'number', min: 1.01, max: 2, step: .005, doc: 'the zoom per wheel step' },
     }
 
@@ -156,6 +157,7 @@
         },
         'labels-force': {
             text:       { kind: 'function', returns: 'string', doc: 'the text of a node; default precalc.label' },
+            color:      { kind: 'function', returns: 'color', doc: 'the color of the text (default: the theme)' },
             background: { kind: 'function', returns: 'boolean', doc: 'a background rect behind the label: on, off, or per node (default: the root)' },
             scale:      { kind: 'function', returns: 'number', min: .2, max: 3, step: .05, doc: 'the size bound to the data (default 1), times geometry.shrinkAtRim' },
             maxLabels:  { kind: 'number', min: 0, max: 200, step: 1, doc: 'at most this many labels' },
@@ -163,6 +165,7 @@
             hoverPathLabels: { kind: 'boolean', doc: 'always labels on the path from the node under the mouse to the root' },
             leaderLines: { kind: 'enum', values: ['auto', 'always', 'never'], doc: 'a line from a label to its node: when the label was pushed away from it, always, never' },
             transition: { kind: 'number', min: 0, max: 1000, step: 10, unit: 'ms', doc: 'labels grow when they appear, shrink when they disappear, the others give way smoothly (0: off)' },
+            hoverTransition: { kind: 'boolean', doc: 'the label of the node under the mouse animated like the others (off: there and gone at once)' },
         },
         'labels-placed': {
             text:       { kind: 'function', returns: 'string', doc: 'the text of a node; default precalc.label' },

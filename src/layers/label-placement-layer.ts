@@ -4,7 +4,7 @@ import { ILayer, ILayerArgs, LayerContext, LayerType, layerData } from '../view/
 import { D3UpdatePattern } from '../view/d3-join'
 import { setLabelText, markHoveredLabel } from './label-layer'
 import { Box, outward, labelSize, restCenter, besideNode, overlapping, distanceToBox, sizeAt } from './label-geometry'
-import { paddingLeftRight, paddingTopBottom } from './label-geometry'
+import { paddingLeftRight, paddingTopBottom, paddingsFor } from './label-geometry'
 import { LabelTransitions, DEFAULT_TRANSITION } from './label-transition'
 import { labelsWithHover, labelWeight, DEFAULT_MAX_LABELS } from '../filter/labels'
 
@@ -138,7 +138,7 @@ export class LabelPlacementLayer implements ILayer
             const k = this.size(n)
             const { w, h } = labelSize(n, this.name + 'len', captionHeight, k)
             if (!w) continue
-            const W = w + paddingLeftRight * k / 2
+            const W = w + paddingsFor(captionHeight).lr * k / 2
             const cands = this.candidates(n, W, h)
             const prev = this.last.get(n)
             if (prev) { const i = cands.findIndex(c=> c.id === prev); if (i > 0) cands.unshift(cands.splice(i, 1)[0]) }

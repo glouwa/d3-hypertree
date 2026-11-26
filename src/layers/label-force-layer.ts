@@ -3,7 +3,7 @@ import { ILayer, ILayerArgs, LayerContext, LayerType, layerData } from '../view/
 import { D3UpdatePattern } from '../view/d3-join'
 import { setLabelText, markHoveredLabel } from './label-layer'
 import { Box, outward, labelSize, restCenter, overlap, distanceToBox, sizeAt } from './label-geometry'
-import { paddingLeftRight, paddingTopBottom } from './label-geometry'
+import { paddingLeftRight, paddingTopBottom, paddingsFor } from './label-geometry'
 import { LabelTransitions, DEFAULT_TRANSITION } from './label-transition'
 import { labelsWithHover, DEFAULT_MAX_LABELS } from '../filter/labels'
 
@@ -11,6 +11,7 @@ export interface LabelForceLayerArgs extends ILayerArgs
 {
     className?:  string,
     text?:       (d:N)=> string,
+    color?:      (d:N)=> string | undefined,   // the text color (undefined: the theme's), as the labels layer
     background?: any,          // falsy, or a function of the node: draw a background rect
     scale?:       number | ((n:N)=> number),   // size bound to the data (default 1), times geometry.shrinkAtRim
     maxLabels?:   number,      // at most this many labels
@@ -22,6 +23,9 @@ export interface LabelForceLayerArgs extends ILayerArgs
     // ms: a label that appears grows from size 0, one that disappears shrinks to 0, and
     // the labels it pushes move smoothly (0: no animation)
     transition?:  number,
+    // false: the label of the node under the mouse without that animation (it is there
+    // at once and goes at once); the other labels keep it
+    hoverTransition?: boolean,
 }
 
 // Labels placed by a relaxation (force) layout:
@@ -54,6 +58,7 @@ export class LabelForceLayer implements ILayer
             className:   'caption caption-label',
             data:        (layer:LabelForceLayer)=> labelsWithHover(ctx.unitdisk, layer.args),
             text:        (d:N)=> d.precalc.label,
+            color:       (d:N)=> undefined,
             background:  (n:N)=> !n.parent,
             scale:       1,
             maxLabels:   DEFAULT_MAX_LABELS,
@@ -61,6 +66,7 @@ export class LabelForceLayer implements ILayer
             hoverPathLabels: false,
             leaderLines: 'auto',
             transition:  DEFAULT_TRANSITION,
+            hoverTransition: true,
         }),
         create: (ctx, name, args)=> new LabelForceLayer(ctx, name, args),
     }
@@ -75,7 +81,8 @@ export class LabelForceLayer implements ILayer
     private transitions = new LabelTransitions(
         ()=> this.args.transition,
         ()=> this.update.data(),
-        ()=> !!this.d3updatePattern && !this.args.invisible)
+        ()=> !!this.d3updatePattern && !this.args.invisible,
+        (n:N)=> this.args.hoverTransition === false && !!n.hovered)
 
     update = {
         parent:         ()=> this.attach(),
@@ -126,7 +133,7 @@ export class LabelForceLayer implements ILayer
         const k = this.size(n)
         const { w, h } = labelSize(n, this.name + 'len', this.view.model.geometry.captionHeight, k)
         const fp = n.forcepoints
-        return { x: fp.x, y: fp.y, w: w + paddingLeftRight * k / 2, h }
+        return { x: fp.x, y: fp.y, w: w + paddingsFor(this.view.model.geometry.captionHeight).lr * k / 2, h }
     }
     private gap(n:N) { return .012 * this.size(n) }
     private data() : N[] { return layerData(this.view, this.args.data, this) }
@@ -218,10 +225,10 @@ export class LabelForceLayer implements ILayer
             elementType:       'text',
             create:            s=> s.classed("P",            d=> d.name == 'P')
                                     .classed("caption-icon", d=> d.precalc.icon && navigator.platform.includes('inux'))
-                                    .style("fill",         d=> d.pathes && d.pathes.labelcolor)
+                                    .style("fill",         d=> (d.pathes && d.pathes.labelcolor) || this.args.color(d))
                                     .call(s=> setLabelText(s, this.args.text))
                                     .attr("transform",       calctransform),
-            updateColor:       s=> s.style("fill",         d=> d.pathes && d.pathes.labelcolor)
+            updateColor:       s=> s.style("fill",         d=> (d.pathes && d.pathes.labelcolor) || this.args.color(d))
                                     .call(markHoveredLabel),
             updateTransform:   s=> s.attr("transform",       calctransform)
                                     .call(s=> setLabelText(s, this.args.text))

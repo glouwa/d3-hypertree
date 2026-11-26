@@ -14,7 +14,7 @@ import { Trace }               from '../state/trace'
 import { LoaderFunction }      from '../data/loaders'
 import { LayoutFunction }      from '../layout/layouts'
 import { layoutBergé }         from '../layout/layouts'
-import { C }                   from '../geometry/hyperbolic-math'
+import { C, sigmoid01 }        from '../geometry/hyperbolic-math'
 import { Transformation }      from '../geometry/transformation'
 import { HyperbolicTransformation } from '../geometry/transformation'
 import { IUnitDisk }           from '../view/unitdisk'
@@ -134,6 +134,9 @@ export interface HypertreeArgs
         // (share of the disk radius, e.g. .5): the upper λ bound, replacing λbounds[1]
         maxLinkLength:      number | null
         animationDuration:  number                            // ms of goto, gotoNode, gotoHome, gotoλ, gotoOverview
+        // the curve of those animations: the share of the way at a share of the time,
+        // both 0..1 (default: a symmetric sigmoid, tanh, which starts and stops softly)
+        animationEasing:    (t:number)=> number
         wheelFactor:        number
     }
 }
@@ -242,6 +245,7 @@ export const coreDefaults = () : HypertreeArgs => ({
         minFill:            null,
         maxLinkLength:      null,
         animationDuration:  750,
+        animationEasing:    sigmoid01,
         wheelFactor:        1.175,
     },
 })

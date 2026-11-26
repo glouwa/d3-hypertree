@@ -18,6 +18,7 @@ const IDLE_DT = 16         // ms: ... counts as one frame
 interface LabelState {
     g:    number,               // growth 0..1
     show: boolean,              // shown (grows) or not (shrinks)
+    instant?: boolean,          // shown as instant (see instant below): it also goes at once
     tx:   number, ty: number,   // offset from the node: computed by the layer
     dx:   number, dy: number,   // offset from the node: drawn
 }
@@ -36,8 +37,11 @@ export class LabelTransitions
      * duration: ms of growing and shrinking (0: none)
      * redraw:   draws the layer (called on animation frames while anything moves)
      * active:   false while the layer is invisible: no frames
+     * instant:  labels without animation (e.g. the hovered node's, layer option
+     *           hoverTransition false): full size and in place at once, gone at once
      */
-    constructor(private duration:()=> number, private redraw:()=> void, private active:()=> boolean) {}
+    constructor(private duration:()=> number, private redraw:()=> void, private active:()=> boolean,
+                private instant:(n:N)=> boolean = ()=> false) {}
 
     private get animated() { return this.duration() > 0 }
 
@@ -56,13 +60,14 @@ export class LabelTransitions
         const step = this.animated ? this.dt / this.duration() : 1
         const isShown = new Set(shown)
         for (const n of shown) {
+            const instant = this.instant(n)
             const s = this.states.get(n)
-            if (s) s.show = true
-            else this.states.set(n, { g: this.animated ? 0 : 1, show: true, tx: NaN, ty: NaN, dx: NaN, dy: NaN })
+            if (s) { s.show = true; s.instant = instant; if (instant) s.g = 1 }
+            else this.states.set(n, { g: this.animated && !instant ? 0 : 1, show: true, instant, tx: NaN, ty: NaN, dx: NaN, dy: NaN })
         }
         const leaving:N[] = []
         for (const [n, s] of this.states) {
-            if (!isShown.has(n)) s.show = false
+            if (!isShown.has(n)) { s.show = false; if (s.instant) s.g = 0 }
             s.g = Math.max(0, Math.min(1, s.g + (s.show ? step : -step)))
             if (s.show ? s.g < 1 : s.g > 0) this.moving = true
             if (!s.show) {
@@ -94,7 +99,7 @@ export class LabelTransitions
         const s = this.states.get(n)
         if (!s) return { dx: tx || 0, dy: ty || 0 }
         if (tx !== undefined) { s.tx = tx; s.ty = ty }
-        if (isNaN(s.dx) || !this.animated) { s.dx = s.tx; s.dy = s.ty }
+        if (isNaN(s.dx) || !this.animated || s.instant) { s.dx = s.tx; s.dy = s.ty }
         else {
             // exponentially toward the target, but not faster than MAX_SPEED (a far jump,
             // e.g. to another place, would otherwise start with a big step)
