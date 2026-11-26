@@ -110,8 +110,56 @@ are listed first.
   node nearest to the center, for touch screens without a mouse. `'center'` follows
   the center node in every frame, also while dragging, pinching and animating (the
   hysteresis of the center node keeps it from flickering); the mouse does not change
-  it. Both go through one place (`Hypertree.highlight`). With `'mousehover'`,
-  mouse moves inside one cell no longer redraw the paths (they did on every move).
+  it. Both go through one place (state/highlight.ts, `ht.highlighting`). With
+  `'mousehover'`, mouse moves inside one cell no longer redraw the paths (they did on
+  every move).
+- **`interaction.highlightUpdate: 'live' | 'settled'` and `highlightDelay`** (ms).
+  `'live'` (default) sets the highlight at once; `'settled'` when the view stands still
+  (no drag, pinch, wheel or animation) and the mouse or the center node rested
+  `highlightDelay` ms: no flickering when sweeping over the tree, less work on slow
+  devices.
+- **`interaction.highlightLabelFallback: 'ancestor'`**: a highlighted node without a
+  label shows the label of its nearest ancestor with one, only as the hover label (it
+  gets its own back when the highlight moves on).
+- **Layer `highlight-marker`** (off by default): a disk on the highlighted node. When
+  the highlight moves on, it moves there along the tree (up to the common ancestor and
+  down, straight lines between the nodes, option `duration`, 250 ms) and goes on from
+  where it is when the target changes on the way. Its animation draws only itself.
+  Options `r` (times the rim factor of `geometry.shrinkAtRim`), `duration`.
+- **Presets `highlightCell` and `highlightDisk({ size, duration })`**: how the
+  highlighted node is shown, its voronoi cell (the theme's `.hovered.cell`) or the disk
+  of the layer `highlight-marker`, `size` label fonts high in the center (default 3);
+  with the disk the cells keep their own colors. The marker's `fill` and `stroke` are
+  lambdas of the highlighted node (e.g. another color over a link).
+- **Labels, emojis and the highlight marker grow with the tree while it zooms up**
+  (`animateUp`, the start animation: `ht.growth`); they were full size on a tree that
+  was still a dot. With a `startView` the first frame already shows the tree as a
+  point.
+- **`geometry.startView: 'overview' | { P, λ }` and `api.gotoStart()`.** The tree zooms
+  up to the start view and moves there at the start (`ht.startPromise`); `gotoStart`
+  goes back (a home button). `'overview'` is `api.overview()`, computed once per tree.
+  Without a start view `gotoStart` goes to the view of the initialization.
+- **`layout.childOrder: 'alternating'`**: the children as given on odd heights,
+  reversed on even ones (applications did it in `dataInitBFS`). Every child order now
+  starts from the data's order, so changing the option with `configure` (also back to
+  `'data'`) works.
+- **`geometry.captionPx` and `captionRatio`: labels in screen pixels.** In the units of
+  the disk a label is as large as the disk (4 px on a phone). With `captionPx` the font
+  of the labels is scaled so a caption has that size on the screen, `captionHeight` is
+  set to `captionRatio` (1.25) times the font; kept when the tree's element changes its
+  size (ResizeObserver) and changed with `configure` (e.g. a script that needs larger
+  text). Measured with a large font, so a browser's minimum font size does not falsify
+  it.
+- **A detail frame after every animation** (goto, gotoλ, gotoNode, gotoHome,
+  gotoOverview, gotoStart, animateUp): the frames of an animation have the low detail;
+  the library now draws the detail frame when it reaches its target (not when the next
+  animation follows at once or a pointer took over). Applications drew it themselves
+  (`.then(()=> ht.drawDetailFrame())`); that still works, it is only redundant.
+- **The box of the hovered label is computed, not measured**: from the widths measured
+  at the initialization (`precalc.<layer>len`) and the line box, instead of `getBBox`
+  for every newly highlighted label (a forced layout; with `highlightNode: 'center'` on
+  every change of the center node while dragging). The same for every
+  `geometry.shrinkAtRim`: the scale is in the label's transform.
 - **`labels-force` options `color` and `hoverTransition`.** `color(n)`: the text color
   (undefined: the theme's), as on `labels`. `hoverTransition: false`: the label of the
   node under the mouse appears and goes at once, the other labels keep their growing

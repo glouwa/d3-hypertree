@@ -51,7 +51,7 @@ export interface HypertreeArgs
         // order of the children in their wedge: 'data' (as given) or 'balanced' (the
         // heaviest child in the middle, the others on the lighter side: the heaviest
         // path runs straight, like a spruce; children-order.ts)
-        childOrder:         'data' | 'balanced'
+        childOrder:         'data' | 'balanced' | 'alternating'
         // the leaf children of a node with many of them in several rows (a staircase),
         // the node the angle of its columns (true); false: one row, every leaf its own
         // angle (fan-weight.ts)
@@ -105,8 +105,16 @@ export interface HypertreeArgs
         captionBackground:  'all' | 'center' | 'none'
         captionFont:        string                            // only without an SVG to measure in (hypertree.ts captionMetrics)
         captionHeight:      number
+        // the labels in screen pixels (null: in the units of the disk): the font is scaled
+        // to it, captionHeight set to captionRatio times the font; kept on resize
+        captionPx:          number | null
+        captionRatio:       number
         transformation:     Transformation<N>
         startPosition:      C | null                          // initial translation (v1: filter.transformation.P)
+        // the start view: 'overview' (api.overview) or { P, λ }; the tree zooms up to it
+        // and moves there at the start, api.gotoStart() goes back (null: no start
+        // animation, gotoStart goes to the view of the initialization)
+        startView:          'overview' | { P:C, λ:number } | null
     }
     interaction: {
         mouseRadius:        number
@@ -115,6 +123,13 @@ export interface HypertreeArgs
         // 'mousehover' the node under the mouse, 'center' the node nearest to the
         // center (also while dragging; touch screens), 'none'
         highlightNode:      'mousehover' | 'center' | 'none'
+        // when: 'live' at once (every mouse move, every frame while dragging), 'settled'
+        // when the view stands still and the mouse / center rested highlightDelay ms
+        highlightUpdate:    'live' | 'settled'
+        highlightDelay:     number
+        // a highlighted node without a label: 'ancestor' shows its nearest ancestor's
+        // label (only as the hover label), 'none' no label
+        highlightLabelFallback: 'none' | 'ancestor'
         selection:          'none' | 'single' | 'multi'      // 'single': a new selection replaces the old one
         maxSelections:      number                           // 'multi': the oldest selection is dropped beyond this
         clickAction:        'select' | 'goto' | 'none'       // what a click does besides onNodeClick
@@ -224,16 +239,22 @@ export const coreDefaults = () : HypertreeArgs => ({
         captionBackground:  'all',
         captionFont:        '6.5px Roboto',
         captionHeight:      .04,
+        captionPx:          null,
+        captionRatio:       1.25,
         transformation:     new HyperbolicTransformation({
             P:              { re: 0, im:0 },
             θ:              { re: 1, im:0 },
             λ:              .1
         }),
         startPosition:      null,
+        startView:          null,
     },
     interaction: {
         mouseRadius:        .9,
         highlightNode:      'mousehover',
+        highlightUpdate:    'live',
+        highlightDelay:     0,
+        highlightLabelFallback: 'none',
         selection:          'multi',
         maxSelections:      10,
         clickAction:        'none',
@@ -284,6 +305,9 @@ export const affects : { [pathPrefix:string]: Effect } = {
     'geometry.layerOptions':      'layers',
     'geometry.captionFont':       'labels',
     'geometry.captionHeight':     'labels',
+    'geometry.captionPx':         'none',       // configure measures and sets captionHeight (layers/caption-px.ts)
+    'geometry.captionRatio':      'none',
+    'geometry.startView':         'none',       // read at the start and by api.gotoStart
     'geometry.diskSize':          'layers',
     'geometry.clipRadius':        'layers',
     'geometry.linkCurvature':     'layers',     // the arc layers take it as their default when they are created

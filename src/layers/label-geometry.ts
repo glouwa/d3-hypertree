@@ -27,10 +27,12 @@ export function paddingsFor(captionHeight:number) : { lr:number, tb:number } {
 // Size of labels and emojis: the layer option scale (a number or a function of the
 // node, bound to the data; default 1) times the rim factor of geometry.shrinkAtRim:
 // 'none' constant, 'damped' (default) from 1 in the center to 0.5 at the rim,
-// 'full' like the links (to 0 at the rim).
+// 'full' like the links (to 0 at the rim). Times the growth of the tree while it zooms
+// up from a point (Hypertree.animateUp: from 0 to 1; else 1).
 export function rimScale(ctx:LayerContext, d:N) : number {
     const mode = ctx.model.geometry.shrinkAtRim
-    return mode === 'none' ? 1 : mode === 'full' ? d.distScale : d.dampedDistScale
+    const growth = ctx.hypertree ? ctx.hypertree.growth : 1
+    return (mode === 'none' ? 1 : mode === 'full' ? d.distScale : d.dampedDistScale) * growth
 }
 export function sizeAt(ctx:LayerContext, scale:number | ((n:N)=> number) | undefined, d:N) : number {
     const s = scale === undefined || scale === null ? 1 : typeof scale === 'function' ? scale(d) : scale

@@ -364,6 +364,26 @@ test('interaction: hover path and hover cell switch independently', async ({ pag
     expect(await hoverMiddle()).toEqual({ path: false, cell: true })
 })
 
+test('interaction: the highlight marker switches on (layer highlight-marker)', async ({ page }) => {
+    await page.goto('../playground/?gen=nTree&depth=6&childs=2&filter=off')
+    await ready(page)
+    await openSection(page, 'Interaction')
+    const box = page.locator('label.check', { hasText: /^Highlight marker$/ }).locator('input')
+    const shown = () => page.evaluate(() => { const c = document.querySelector('#tree circle.highlight-marker'); return !!c && c.style.display !== 'none' })
+    const hover = async () => {
+        const b = await page.locator('#tree svg').first().boundingBox()
+        await page.mouse.move(b.x + b.width * 0.55, b.y + b.height * 0.4, { steps: 3 })
+        await page.waitForTimeout(400)
+    }
+    expect(await box.isChecked()).toBe(false)
+    await hover()
+    expect(await shown()).toBe(false)
+    await box.check()
+    await page.waitForFunction(() => decodeURIComponent(location.search).includes('"highlight-marker":{"invisible":false}'))
+    await hover()
+    expect(await shown()).toBe(true)
+})
+
 test('initialization: multi-line labels', async ({ page }) => {
     await page.goto('../playground/?gen=nTree&depth=3&childs=2&labels=1&filter=off')
     await ready(page)

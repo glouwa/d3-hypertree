@@ -147,3 +147,24 @@ test('default: the children keep the data order', async ({ page }) => {
     })
     expect(same).toBe(true)
 })
+
+test('childOrder "alternating": as given on odd heights, reversed on even ones; configure goes back to the data order', async ({ page }) => {
+    await open(page, 'alternating')
+    const r = await page.evaluate(() => {
+        const ht = harness.ht
+        const check = mode => { let ok = true, flipped = 0; ht.data.each(n => {
+            if (!n.children || n.children.length < 2) return
+            const given = n.data.children, rev = mode === 'alternating' && n.height % 2 === 0
+            const want = rev ? given.slice().reverse() : given
+            ok = ok && n.children.every((c, i) => c.data === want[i]); if (rev) flipped++ }); return { ok, flipped } }
+        const alt = check('alternating')
+        ht.configure({ layout: { childOrder: 'data' } })
+        const data = check('data')
+        ht.configure({ layout: { childOrder: 'alternating' } })
+        return { alt, data, again: check('alternating') }
+    })
+    expect(r.alt.ok).toBe(true)
+    expect(r.alt.flipped).toBeGreaterThan(0)
+    expect(r.data.ok).toBe(true)
+    expect(r.again.ok).toBe(true)
+})

@@ -31,7 +31,7 @@
 
         'layout.type':              { kind: 'function', doc: 'the layout: Bergé (default, the only one that supports the weight filter), spiral, Buchheim, unit lines, unit vectors' },
         'layout.weight':            { kind: 'function', returns: 'number', doc: 'the layout weight of a node, summed over the subtree: the share of the wedge. Default leaves 1, inner nodes 0' },
-        'layout.childOrder':        { kind: 'enum', values: ['data', 'balanced'], doc: 'the order of the children in their wedge: as given, or the heaviest in the middle so the heaviest path runs straight (like a spruce)' },
+        'layout.childOrder':        { kind: 'enum', values: ['data', 'balanced', 'alternating'], doc: 'the order of the children in their wedge: as given, the heaviest in the middle so the heaviest path runs straight (like a spruce), or as given and reversed on every second level (even heights)' },
         'layout.multirowHighDegreeNodes': { kind: 'boolean', doc: 'the leaf children of a node with many of them in several rows (a staircase); the node needs only the angle of its columns, a big fan no longer squeezes its siblings. Off: one row, every leaf its own angle. Try the star generator' },
         'layout.rootLinkLength':    { kind: 'number', min: .01, max: 1, step: .01, nullable: true, doc: 'shorter links near the root: the root children get this part of a link, the leaves the whole one, linear in between. Off: the root children half, all others whole. The Tree of Life\'s rectangular view uses .1' },
         'layout.initSize':          { kind: 'number', min: .3, max: 1, step: .01, doc: 'the start zoom: the outermost visible node within this part of the disk radius' },
@@ -66,8 +66,15 @@
         'geometry.transformation':  { kind: 'state',  doc: 'the hyperbolic transformation (P, θ, λ): the view' },
         'geometry.startPosition':   { kind: 'point', min: -.9, max: .9, step: .01, nullable: true, doc: 'the translation at the start: where the root sits in the disk, e.g. { re: 0, im: .5 }. Off: the root in the center' },
 
+        'geometry.captionPx':       { kind: 'number', min: 6, max: 30, step: .5, unit: 'px', nullable: true, doc: 'the labels in screen pixels: the font of the labels is scaled so a caption has this size on the screen, kept when the tree\'s element changes its size; captionHeight is set to captionRatio × the font. Off: in the units of the disk (as large as the disk)' },
+        'geometry.captionRatio':    { kind: 'number', min: 1, max: 2, step: .05, doc: 'with captionPx: captionHeight (the label boxes) this many times the font size' },
+        'geometry.startView':       { kind: 'object', doc: 'the start view: \'overview\' (api.overview: the root at the bottom, the main branchings in the middle) or { P, λ }. The tree zooms up to it and moves there at the start; api.gotoStart() goes back (a home button). Off: no start animation' },
+
         'interaction.mouseRadius':  { kind: 'number', min: .3, max: 1, step: .01, doc: 'the radius within which the mouse picks nodes' },
         'interaction.highlightNode': { kind: 'enum', values: ['mousehover', 'center', 'none'], doc: 'which node is highlighted (hovered: the hover path, cell and label): the node under the mouse, the node nearest to the center (also while dragging; for touch screens), or none. Strategies set the node state (hovered, selected); the layers only decide how they show it' },
+        'interaction.highlightUpdate': { kind: 'enum', values: ['live', 'settled'], doc: 'when the highlight is set: live at once (every mouse move, every frame while dragging), settled when the view stands still and the mouse or the center rested highlightDelay ms' },
+        'interaction.highlightDelay': { kind: 'number', min: 0, max: 1000, step: 10, unit: 'ms', doc: 'settled: the rest before the highlight is set' },
+        'interaction.highlightLabelFallback': { kind: 'enum', values: ['none', 'ancestor'], doc: 'a highlighted node without a label: ancestor shows the label of its nearest ancestor with one (only as the hover label), none shows no label' },
         'interaction.selection':    { kind: 'enum', values: ['none', 'single', 'multi'], doc: 'the selection strategy: single replaces the old selection, multi keeps up to maxSelections' },
         'interaction.maxSelections': { kind: 'number', min: 1, max: 100, step: 1, doc: 'multi: the oldest selection is dropped beyond this' },
         'interaction.clickAction':  { kind: 'enum', values: ['select', 'goto', 'none'], doc: 'what a click does besides onNodeClick: toggle the selection, animate the node to the center, nothing' },
@@ -187,6 +194,12 @@
             mouseRadius: { kind: 'number', min: .3, max: 1, step: .01, doc: 'the radius within which the mouse picks nodes; default interaction.mouseRadius' },
         },
         'traces': {},
+        'highlight-marker': {
+            r:          { kind: 'function', returns: 'number', min: .002, max: .1, step: .001, doc: 'the radius of the disk in the center of the disk (a number or a function of the layer context, e.g. of geometry.captionHeight), times the rim factor (geometry.shrinkAtRim) where it is' },
+            duration:   { kind: 'number', min: 0, max: 1000, step: 10, unit: 'ms', doc: 'the way from the old to the new highlighted node, along the tree (0: it jumps)' },
+            fill:       { kind: 'function', returns: 'color', doc: 'the fill of the disk, a function of the highlighted node (default: the theme)' },
+            stroke:     { kind: 'function', returns: 'color', doc: 'the border of the disk, a function of the highlighted node (default: the theme)' },
+        },
     }
     layerOptions.paths = layerOptions.arcs
     // the emojis: a label layer of kind 'emoji' without the label limit (every icon is drawn)
@@ -211,6 +224,7 @@
         'labels-placed': 'labels placed on candidate positions like on a map: never overlapping, a label without a free place is left out',
         'interaction':   'mouse, touch and wheel: hover, drag, pinch, zoom, click and hold',
         'traces':        'touch traces while touching',
+        'highlight-marker': 'a disk on the highlighted node; when the highlight moves on it moves there along the tree, up to the common ancestor and down (off by default)',
     }
 
     /** The descriptor of a core option path: the longest described prefix (undefined if none). */

@@ -378,6 +378,9 @@ new hyt.Hypertree(
             // default 'mousehover': the node under the mouse; 'center': the node nearest
             // to the center, also while dragging (touch screens); 'none'
             highlightNode:      'mousehover' | 'center' | 'none'
+            highlightUpdate:    'live' | 'settled'           // default 'live'; 'settled': when the view stands still
+            highlightDelay:     number                       // 'settled': ms of rest before it is set (default 0)
+            highlightLabelFallback: 'none' | 'ancestor'      // a node without a label: its nearest ancestor's (hover label only)
             selection:          'none' | 'single' | 'multi'  // default 'multi'; 'single' replaces the old selection
             maxSelections:      number                       // 'multi': the oldest is dropped beyond this (default 10)
             clickAction:        'select' | 'goto' | 'none'   // besides onNodeClick (default 'none')

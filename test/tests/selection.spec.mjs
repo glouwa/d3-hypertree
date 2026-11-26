@@ -165,6 +165,130 @@ test.describe('highlightNode "center"', () => {
     })
 })
 
+test.describe('highlightUpdate "settled"', () => {
+    const hovered = page => page.evaluate(() => harness.ht.data.descendants().filter(n => n.hovered).map(n => n.mergeId))
+
+    test('"center": not while dragging, when the view stands still', async ({ page }) => {
+        const errors = collectErrors(page)
+        await open(page, { highlightNode: 'center', highlightUpdate: 'settled' })
+        await page.waitForTimeout(300)
+        const start = await hovered(page)
+        expect(start).toEqual([await page.evaluate(() => harness.ht.lastCenterNode.mergeId)])
+        const box = await diskBox(page)
+        const cx = box.x + box.width / 2, cy = box.y + box.height / 2
+        await page.mouse.move(cx, cy)
+        await page.mouse.down()
+        for (let i = 1; i <= 12; i++) { await page.mouse.move(cx + i * box.width * .03, cy - i * box.height * .02); await page.waitForTimeout(30) }
+        // the center node changed, the highlight did not
+        expect(await page.evaluate(() => harness.ht.lastCenterNode.mergeId)).not.toBe(start[0])
+        expect(await hovered(page)).toEqual(start)
+        await page.mouse.up()
+        await page.waitForTimeout(400)
+        expect(await hovered(page)).toEqual([await page.evaluate(() => harness.ht.lastCenterNode.mergeId)])
+        expectNoErrors(errors)
+    })
+
+    test('"mousehover" with highlightDelay: only after the mouse rested', async ({ page }) => {
+        await open(page, { highlightUpdate: 'settled', highlightDelay: 300 })
+        const box = await diskBox(page)
+        await page.mouse.move(box.x + box.width * 0.55, box.y + box.height * 0.4, { steps: 3 })
+        await page.waitForTimeout(100)
+        expect(await hovered(page)).toEqual([])
+        await page.waitForTimeout(500)
+        expect((await hovered(page)).length).toBe(1)
+    })
+})
+
+test('highlightLabelFallback "ancestor": a node without a label shows its ancestor\'s, and gets its own back', async ({ page }) => {
+    await openTree(page, `gen=nTree&depth=6&childs=2&filter=off&labels=1&interaction=${encodeURIComponent(JSON.stringify({ highlightLabelFallback: 'ancestor' }))}`)
+    const r = await page.evaluate(() => {
+        const ht = harness.ht
+        const leaf = ht.data.leaves()[3], other = ht.data.leaves()[20]
+        const parent = leaf.parent
+        leaf.precalc.label = ''
+        const lenKeys = Object.keys(parent.precalc).filter(k => k.endsWith('len') && k !== 'emojislen')
+        ht.highlighting.set(leaf)
+        const lent = { label: leaf.precalc.label, onHover: leaf.precalc.labelOnHover, widths: lenKeys.every(k => leaf.precalc[k] === parent.precalc[k]) }
+        ht.highlighting.set(other)
+        return { parent: parent.precalc.label, lent, back: leaf.precalc.label, otherOwn: other.precalc.label !== parent.precalc.label }
+    })
+    expect(r.lent).toEqual({ label: r.parent, onHover: true, widths: true })
+    expect(r.back).toBe('')
+    expect(r.otherOwn).toBe(true)
+})
+
+test.describe('layer highlight-marker', () => {
+    const openMarker = (page, interaction = {}) => openTree(page, `gen=nTree&depth=6&childs=2&filter=off`
+        + `&interaction=${encodeURIComponent(JSON.stringify(interaction))}`
+        + `&layers=${encodeURIComponent(JSON.stringify({ 'highlight-marker': { invisible: false, duration: 400 } }))}`)
+    const marker = page => page.evaluate(() => {
+        const c = document.querySelector('circle.highlight-marker'), n = harness.ht.highlighted
+        return { shown: !!c && c.style.display !== 'none', x: c && +c.getAttribute('cx'), y: c && +c.getAttribute('cy'),
+                 target: n && { x: n.cache.re, y: n.cache.im } }
+    })
+    const near = (m, eps = 1e-6) => Math.hypot(m.x - m.target.x, m.y - m.target.y) < eps
+
+    test('off by default; on: a disk on the highlighted node, moving along the tree to a new one', async ({ page }) => {
+        const errors = collectErrors(page)
+        await open(page)
+        expect(await page.evaluate(() => { const c = document.querySelector('circle.highlight-marker'); return !c || c.style.display === 'none' })).toBe(true)
+
+        await openMarker(page)
+        const nodes = await page.evaluate(() => {
+            const ht = harness.ht, [a, b] = [ht.data.leaves()[0], ht.data.leaves()[40]]
+            ht.highlighting.set(a)
+            return [a.mergeId, b.mergeId]
+        })
+        await page.waitForTimeout(500)
+        expect(near(await marker(page))).toBe(true)
+        // to another leaf: on the way it is on neither node, then on the new one
+        await page.evaluate(id => harness.ht.highlighting.set(harness.ht.data.leaves().find(n => n.mergeId === id)), nodes[1])
+        await page.waitForTimeout(120)
+        const mid = await marker(page)
+        expect(mid.shown).toBe(true)
+        expect(near(mid, 1e-3)).toBe(false)
+        await page.waitForTimeout(500)
+        expect(near(await marker(page))).toBe(true)
+        expectNoErrors(errors)
+    })
+
+    test('presets highlightCell and highlightDisk: the cell or the disk shows the highlighted node', async ({ page }) => {
+        const show = async preset => {
+            await openTree(page, `gen=nTree&depth=6&childs=2&filter=off&preset=${preset}`)
+            const box = await diskBox(page)
+            await page.mouse.move(box.x + box.width * 0.55, box.y + box.height * 0.4, { steps: 3 })
+            await page.waitForTimeout(400)
+            return page.evaluate(() => {
+                const c = document.querySelector('circle.highlight-marker')
+                return { cell: document.querySelectorAll('.cell.hovered').length > 0, disk: !!c && c.style.display !== 'none',
+                         r: c ? +c.getAttribute('r') : 0, font: harness.ht.args.geometry.captionHeight / harness.ht.args.geometry.captionRatio }
+            })
+        }
+        const cell = await show('highlightCell')
+        expect({ cell: cell.cell, disk: cell.disk }).toEqual({ cell: true, disk: false })
+        const disk = await show('highlightDisk')
+        expect({ cell: disk.cell, disk: disk.disk }).toEqual({ cell: false, disk: true })
+        expect(disk.r).toBeLessThanOrEqual(1.5 * disk.font + 1e-9)        // 3 fonts high in the center, smaller toward the rim
+        expect(disk.r).toBeGreaterThan(.3 * disk.font)
+    })
+
+    test('stays on the center node while dragging (highlightNode "center")', async ({ page }) => {
+        await openMarker(page, { highlightNode: 'center' })
+        await page.waitForTimeout(600)
+        const box = await diskBox(page)
+        const cx = box.x + box.width / 2, cy = box.y + box.height / 2
+        await page.mouse.move(cx, cy)
+        await page.mouse.down()
+        for (let i = 1; i <= 10; i++) { await page.mouse.move(cx + i * box.width * .03, cy - i * box.height * .02); await page.waitForTimeout(30) }
+        await page.mouse.up()
+        await page.waitForTimeout(700)
+        const m = await marker(page)
+        expect(m.shown).toBe(true)
+        expect(await page.evaluate(() => harness.ht.highlighted === harness.ht.lastCenterNode)).toBe(true)
+        expect(near(m)).toBe(true)
+    })
+})
+
 test.describe('clickAction', () => {
     const clickNode = async page => {
         const t = await page.evaluate(() => {

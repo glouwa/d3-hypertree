@@ -63,6 +63,8 @@ export interface AnimationArgs {
     resolve:   ()=> void
     reject:    (e?)=> void
     frame:     (progress01:number)=> void
+    // called when the animation reached its target (not when it was cancelled)
+    done?:     ()=> void
 }
 
 export class Animation extends Transition
@@ -102,6 +104,7 @@ export class Animation extends Transition
             if (now > this.endTime) {
                 args.frame(1)
                 this.end()
+                if (args.done) args.done()
                 args.resolve()
             }
             else {

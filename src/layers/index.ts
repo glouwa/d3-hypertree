@@ -21,6 +21,7 @@ import { LabelPlacementLayer }  from './label-placement-layer'
 import { EmojiBackgroundLayer } from './emoji-background-layer'
 import { InteractionLayer2 }    from '../interaction/interaction-layer'
 import { TraceLayer }           from './trace-layer'
+import { HighlightMarkerLayer } from './highlight-marker-layer'
 
 export const layerTypes : { [type:string]: LayerType } = {
     'background':     BackgroundLayer.type,
@@ -39,6 +40,7 @@ export const layerTypes : { [type:string]: LayerType } = {
     'labels-placed':  LabelPlacementLayer.type,
     'interaction':    InteractionLayer2.type,
     'traces':         TraceLayer.type,
+    'highlight-marker': HighlightMarkerLayer.type,
 }
 
 /** The default layer stack, in drawing order (a fresh list on every call). */
@@ -62,6 +64,8 @@ export const defaultLayers = () : LayerSpec[] => [
     { type: 'stem',       name: 'stem-arc' },
     { type: 'nodes',      name: 'nodes' },
     { type: 'symbols',    name: 'symbols' },
+    // a disk on the highlighted node that moves along the tree (off by default)
+    { type: 'highlight-marker', name: 'highlight-marker' },
     { type: 'images',     name: 'images' },
     // a disk under every emoji (off by default)
     { type: 'emoji-backgrounds', name: 'emoji-backgrounds' },

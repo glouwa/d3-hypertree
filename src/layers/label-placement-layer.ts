@@ -215,10 +215,10 @@ export class LabelPlacementLayer implements ILayer
                                     .attr("transform", transform),
             // (written only when changed, dom-write.ts)
             updateColor:       s=> s.each(function(d) { setStyle(this, 'fill', d.pathes && d.pathes.labelcolor) })
-                                    .call(markHoveredLabel),
+                                    .call(markHoveredLabel, this),
             updateTransform:   s=> s.attr("transform", transform)
                                     .call(s=> setLabelText(s, this.args.text))
-                                    .call(markHoveredLabel)
+                                    .call(markHoveredLabel, this)
         })
         const lineEnd = (d:N)=> {
             const b = this.drawnBox(d)

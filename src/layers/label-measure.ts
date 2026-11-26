@@ -26,14 +26,15 @@ const waiting = new WeakSet<object>()
 // The vertical middle of a caption's text relative to its baseline and the distance of
 // its lines (label units at scale 1), per tree: measured with the widths
 // (captionMetrics); the label backgrounds are centered on it (captionBox).
-const centers = new WeakMap<object, { center:number, line:number }>()
+const centers = new WeakMap<object, { center:number, line:number, height:number }>()
 
 /**
  * Where a caption's text sits: center (the middle of its first line's box above the
- * baseline, negative) and line (the distance of its lines), in label units. undefined
- * until the labels were measured in an SVG.
+ * baseline, negative), line (the distance of its lines) and height (the box of one
+ * line, as getBBox gives it), in label units. undefined until the labels were measured
+ * in an SVG.
  */
-export function captionBox(ht:object) : { center:number, line:number } | undefined { return centers.get(ht) }
+export function captionBox(ht:object) : { center:number, line:number, height:number } | undefined { return centers.get(ht) }
 
 function captionMetrics(ht:MeasureHost, context:CanvasRenderingContext2D) : { font:string, factor:number, probe:string } | null {
     const html = ht.view_ && ht.view_.html
@@ -58,7 +59,7 @@ function captionMetrics(ht:MeasureHost, context:CanvasRenderingContext2D) : { fo
     parent.removeChild(text)
     if (!width || !cs || !cs.fontFamily) return null
     // label-layer setLabelText: the lines of a label 1.2em apart
-    centers.set(ht, { center: bb.y + bb.height / 2, line: 1.2 * parseFloat(cs.fontSize) })
+    centers.set(ht, { center: bb.y + bb.height / 2, line: 1.2 * parseFloat(cs.fontSize), height: bb.height })
     const font = `${cs.fontStyle} ${cs.fontWeight} 100px ${cs.fontFamily}`
     context.font = font
     const canvasWidth = context.measureText(sample).width

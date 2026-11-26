@@ -231,10 +231,10 @@ export class LabelForceLayer implements ILayer
                                     .attr("transform",       calctransform),
             // (on every frame while dragging: written only when changed, dom-write.ts)
             updateColor:       s=> s.each(function(d) { setStyle(this, 'fill', (d.pathes && d.pathes.labelcolor) || T.args.color(d)) })
-                                    .call(markHoveredLabel),
+                                    .call(markHoveredLabel, T),
             updateTransform:   s=> s.attr("transform",       calctransform)
                                     .call(s=> setLabelText(s, this.args.text))
-                                    .call(markHoveredLabel)
+                                    .call(markHoveredLabel, T)
         })
 
         // leader lines from the label (nearest point of its box) to its node; they fade

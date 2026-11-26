@@ -64,7 +64,7 @@ export class InteractionLayer2 implements ILayer
             .on('mousedown',    e=> this.fireMouseDown(e))
             .on('mousemove',    e=> this.fireMouseMove(e))
             .on('mouseup',      e=> this.fireMouseUp(e))
-            .on('mouseout',     e=> { if (this.mousehover) this.view.hypertree.highlight(undefined) })
+            .on('mouseout',     e=> { if (this.mousehover) this.view.hypertree.highlighting.clear() })
 
             .on('touchstart',   e=> this.fireTouchEvent(e, 'onPointerStart'))
             .on('touchmove',    e=> this.fireTouchEvent(e, 'onPointerMove'))
@@ -103,13 +103,13 @@ export class InteractionLayer2 implements ILayer
                 // A label under the mouse hovers its node (also outside the disk, where
                 // labels at the rim may reach)
                 const p = this.mousePosAsC(e), m = this.toDisk(p)
-                this.view.hypertree.highlight(this.nodeAt(p, (m.re * m.re + m.im * m.im) <= 1))
+                this.view.hypertree.highlighting.offer(this.nodeAt(p, (m.re * m.re + m.im * m.im) <= 1))
             }
         }
     }
 
     // highlightNode 'mousehover' (default): the mouse sets the highlighted node
-    // (Hypertree.highlight; 'center': the center node, 'none': nothing)
+    // (state/highlight.ts; 'center': the center node, 'none': nothing)
     private get mousehover() { return this.interaction.highlightNode === 'mousehover' }
 
     // onNodeHold: pointer pressed for holdDuration ms without moving

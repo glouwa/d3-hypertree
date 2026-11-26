@@ -6,6 +6,7 @@ import { setClass, setStyle } from '../view/dom-write'
 import { labelsWithHover } from '../filter/labels'
 import { DEFAULT_MAX_LABELS } from '../filter/labels'
 import { sizeAt, offsetFactor, labelOffset, paddingLeftRight, paddingTopBottom } from './label-geometry'
+import { captionBox }      from './label-measure'
 
 export interface LabelLayerArgs extends ILayerArgs
 {
@@ -155,9 +156,9 @@ export class LabelLayer implements ILayer
                                         setStyle(this, 'stroke', d.pathes && d.pathes.labelcolor)
                                         setStyle(this, 'fill', $this.args.color(d))
                                     })
-                                    .call(markHoveredLabel),
+                                    .call(markHoveredLabel, this),
             updateTransform:   s=> s.attr("transform",       offset)
-                                    .call(markHoveredLabel)
+                                    .call(markHoveredLabel, this)
         })
     }
 }
@@ -256,8 +257,11 @@ export function setLabelText(s, text:(d)=> string) {
  * transform). Called with the layer's text elements on every style and transform
  * update; a label can be hovered by pointing at the label itself
  * (interaction-layer-2.ts: labelNodeAt).
+ *
+ * layer: the label layer (its name: the measured width precalc.<name>len), for the box
+ * without measuring in the DOM (hoveredBox).
  */
-export function markHoveredLabel(s) {
+export function markHoveredLabel(s, layer?:{ name:string, view:LayerContext }) {
     s.each(function(d) { setClass(this, 'caption-hovered', d && d.hovered) })   // only when changed
     const first = s.node()
     const group = first && first.parentNode
@@ -280,10 +284,9 @@ export function markHoveredLabel(s) {
             rect.setAttribute(a, background.getAttribute(a) || '0')
     }
     else {
-        // the text's box in its own coordinates: measured once per text, class and font
-        // size (hoveredBox), not on every frame (getBBox forces a layout right after the
-        // new transforms: a quarter of the time while dragging on a phone)
-        const b = hoveredBox(hovered)
+        // the text's box in its own coordinates, from the widths measured at the
+        // initialization (hoveredBox)
+        const b = hoveredBox(hovered, layer)
         if (!b) { rect.setAttribute('width', '0'); return }
         if (rect.dataset.box !== b.key) {
             const pad = b.height * .25
@@ -300,10 +303,26 @@ export function markHoveredLabel(s) {
     if (t) rect.setAttribute('transform', t); else rect.removeAttribute('transform')
 }
 
-// the box of a label's text in its own coordinates, by its text, class and the font
-// size of the svg (the page may size the labels there): getBBox only when one changed
+// The box of a label's text in its own coordinates (the text starts at x 0 on the
+// baseline; its transform places and scales it, so geometry.shrinkAtRim and the layer
+// option scale are in the transform, the box is the same for 'none', 'damped' and
+// 'full'). Computed from what the initialization measured (label-measure.ts): the
+// width precalc.<layer>len and the line box (captionBox: its middle and height, the
+// distance of the lines), with no measuring in the DOM: getBBox forced a layout for
+// every newly highlighted label (with highlightNode 'center' on every change of the
+// center node while dragging). Not measured (another text, no SVG yet): getBBox, once
+// per text, class and font size.
 const boxes = new WeakMap<SVGTextElement, { key:string, x:number, y:number, width:number, height:number }>()
-function hoveredBox(text:SVGTextElement) {
+function hoveredBox(text:SVGTextElement, layer?:{ name:string, view:LayerContext }) {
+    const d = (text as any).__data__ as N
+    const w = layer && d && d.precalc && d.precalc[layer.name + 'len']
+    const m = layer && captionBox(layer.view.hypertree)
+    if (w && m && (text as any).__labelText === d.precalc.label) {
+        const lines = text.childElementCount || 1
+        const height = m.height + (lines - 1) * m.line
+        const x = text.getAttribute('text-anchor') === 'middle' ? -w / 2 : 0
+        return { key: `${w}\0${lines}\0${m.center}\0${m.height}`, x, y: m.center - m.height / 2, width: w, height }
+    }
     const svg = text.ownerSVGElement
     const key = `${text.textContent}\0${text.getAttribute('class')}\0${svg ? svg.style.fontSize : ''}`
     const known = boxes.get(text)

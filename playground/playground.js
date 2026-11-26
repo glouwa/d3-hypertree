@@ -573,6 +573,9 @@
         layerCheck(g, 'Hover cell', 'the voronoi cell under the mouse (layer cells: visible, option hover)',
             () => !layerArgs('cells').invisible && layerArgs('cells').hover !== false,
             on => { change('geometry.layerOptions.cells.invisible', on ? false : undefined); change('geometry.layerOptions.cells.hover', on ? undefined : false) }, pointer)
+        layerCheck(g, 'Highlight marker', 'a disk on the highlighted node that moves along the tree to the next one (layer highlight-marker: visible)',
+            () => !layerArgs('highlight-marker').invisible,
+            on => change('geometry.layerOptions.highlight-marker.invisible', on ? false : undefined), pointer)
         function layerCheck(group, label, title, isOn, apply, when) {
             const c = el('input', { type: 'checkbox', onchange: e => apply(e.target.checked) })
             const wrap = el('div', { title }, el('label', { class: 'check' }, c, label))

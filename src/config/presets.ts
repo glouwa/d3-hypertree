@@ -24,4 +24,36 @@ export const presets : { [key:string]: (options?:any)=> ModelOverlay } =
     infovisEmoji:   (o?:InfovisOptions)=> infovisEmojiModel(o),
     // a file system tree: size as cell color, number of files as link color
     infovisFiles:   (o?:InfovisOptions)=> infovisFilesModel(o),
+
+    // how the highlighted node (interaction.highlightNode) is shown: its voronoi cell,
+    // or a disk on it that moves along the tree to the next one (layer highlight-marker)
+    highlightCell:  ()=> highlightCell(),
+    highlightDisk:  (o?:HighlightDiskOptions)=> highlightDisk(o),
+}
+
+/** The highlighted node shown by its voronoi cell (the theme's .hovered.cell), no disk. */
+export function highlightCell() : ModelOverlay {
+    return { geometry: { layerOptions: {
+        'cells':            { invisible: false, hover: true },
+        'highlight-marker': { invisible: true },
+    } } }
+}
+
+export interface HighlightDiskOptions {
+    size?:     number      // the disk's height in label lines (geometry.captionHeight / captionRatio: the font) in the center; default 3
+    duration?: number      // ms of its way to the next node; default 250
+}
+
+/**
+ * The highlighted node shown by a disk on it (layer highlight-marker), size times the
+ * label font high in the center of the disk; it moves along the tree to the next
+ * highlighted node. The cells do not show it (they keep their own colors).
+ */
+export function highlightDisk(o:HighlightDiskOptions = {}) : ModelOverlay {
+    const size = o.size || 3
+    return { geometry: { layerOptions: {
+        'cells':            { hover: false },
+        'highlight-marker': { invisible: false, duration: o.duration === undefined ? 250 : o.duration,
+                              r: (ctx)=> size / 2 * ctx.model.geometry.captionHeight / ctx.model.geometry.captionRatio },
+    } } }
 }

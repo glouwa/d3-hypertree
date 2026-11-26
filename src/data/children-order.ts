@@ -25,6 +25,28 @@ import { N } from './n'
 //     left on even depths, right on odd depths (the branches alternate from level to
 //     level).
 
+// The order the data gave (after dataInitBFS), per node: every childOrder starts from
+// it, so changing the option (configure) never stacks one order on another.
+const dataOrder = new WeakMap<N, N[]>()
+
+/**
+ * Orders the children of every node by layout.childOrder: 'data' as given, 'balanced'
+ * (balanceChildren), 'alternating' as given on odd heights, reversed on even heights
+ * (n.height: the distance to the deepest leaf; the old rule of the Tree of Life, whose
+ * branches then alternate from level to level). Called after dataInitBFS and when the
+ * option changes.
+ */
+export function orderChildren(root:N, mode:'data' | 'balanced' | 'alternating') {
+    root.each((n:N)=> {
+        if (!n.children || n.children.length < 2) return
+        let order = dataOrder.get(n)
+        if (!order) dataOrder.set(n, order = n.children.slice())
+        const next = mode === 'alternating' && n.height % 2 === 0 ? order.slice().reverse() : order
+        n.children.splice(0, n.children.length, ...next)
+    })
+    if (mode === 'balanced') balanceChildren(root)
+}
+
 const weight = (c:N)=> (c.precalc.angleWeight !== undefined ? c.precalc.angleWeight : c.precalc.layoutWeight) || 0
 
 /** Orders the children of every node of the tree (weights: precalc.angleWeight, the

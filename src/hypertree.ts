@@ -10,7 +10,7 @@ import { createProjection }    from './projection'
 import { N }                   from './data/n'
 import { Path }                from './state/path'
 import { computeWeights }      from './data/weights'
-import { balanceChildren }     from './data/children-order'
+import { orderChildren }       from './data/children-order'
 import { setZ }                from './layout/layouts'
 import { applyλBounds, findInitλ } from './layout/fit'
 import { overview, OverviewOptions, OverviewView } from './layout/overview'
@@ -20,8 +20,10 @@ import { CassignC }            from './geometry/hyperbolic-math'
 import { CaddC, CsubC, CmulR } from './geometry/hyperbolic-math'
 import { IUnitDisk, UnitDisk } from './view/unitdisk'
 import { measureLabels }       from './layers/label-measure'
+import { sizeCaptions, watchCaptionSize } from './layers/caption-px'
 import { Animation, Transition } from './interaction/animation'
 import * as selection          from './state/selection'
+import { Highlight }           from './state/highlight'
 
 export { Transition, Frame } from './interaction/animation'
 
@@ -92,40 +94,63 @@ export class Hypertree
 
     lastCenterNode = undefined
 
-    // the highlighted node (interaction.highlightNode): the node under the mouse
-    // (interaction-layer.ts) or the center node (update.centernode)
-    private highlighted : N | undefined = undefined
-    // a style frame is waiting (update.centernode); every frame clears it (view/unitdisk.ts)
-    public highlightFramePending = false
-
-    /**
-     * Highlights n (undefined: none): the callbacks onNodeHover / onHoverNodeChange
-     * when it changes, then the hover path (n.hovered). redraw: a style frame; false
-     * from inside a frame (its layers draw the new state).
-     */
-    public highlight(n:N | undefined, redraw = true) {
-        const i = this.args.interaction
-        const changed = n !== this.highlighted
-        if (changed) {
-            this.highlighted = n
-            if (i.onNodeHover)       i.onNodeHover(n)
-            if (i.onHoverNodeChange) i.onHoverNodeChange(n)
-        }
-        // unchanged: only if the hover path went away (selectQuery clears the paths)
-        else if (!n || this.args.objects.pathes.some(p=> p.type === 'HoverPath' && p.head === n))
-            return
-        selection.setPathHead(this, undefined, n)
-        if (redraw) this.update.pathes()
-    }
+    // the highlighted node (state/highlight.ts, interaction.highlightNode): offered by
+    // the mouse (interaction-layer.ts) or the center node (update.centernode)
+    public highlighting = new Highlight(this)
+    /** the highlighted node (undefined: none) */
+    public get highlighted() : N | undefined { return this.highlighting.node }
 
     /**
      * @param args  the application's overlay over the defaults, or a stack of named
      *              overlays [{ name, overlay }] applied in order (the name goes into
      *              the provenance; e.g. presets and the application's own options)
      */
+    /**
+     * Resolved when the start animation (geometry.startView: zoomed up, then moved to
+     * the start view) is done; right after initPromise without a startView.
+     */
+    startPromise : Promise<void>
+
     constructor(view:{ parent:HTMLElement }, args:ModelOverlay | NamedOverlay[]) {
         this.view_ = view
         this.initPromise = this.api.setModel(args)
+        // the start animation first (it sets the zoom to a point at once), then the label
+        // size (its frame would show the full tree before it shrinks to a point)
+        this.startPromise = this.initPromise.then(()=> this.playStart())
+        // geometry.captionPx: the labels in screen pixels (layers/caption-px.ts)
+        this.initPromise.then(()=> sizeCaptions(this), ()=> {})
+        watchCaptionSize(this)
+        this.startPromise.catch(()=> {})                  // a failed load: reported by initPromise
+    }
+
+    // the start view of the tree (geometry.startView), computed once per tree
+    // (api.overview lays the tree out several times)
+    private startView_ : { P:C, λ:number } | null = null
+    // the zoom findInitλ found for the tree (the start view without geometry.startView)
+    private initλ : number
+
+    /**
+     * The start view { P, λ }: geometry.startView ('overview': api.overview(), or a
+     * given { P, λ }), without one the view the tree started with (startPosition, the
+     * zoom of the initialization). Computed once per tree.
+     */
+    public startView() : { P:C, λ:number } {
+        if (this.startView_) return this.startView_
+        const s = this.args.geometry.startView
+        const v = s === 'overview' ? this.api.overview()
+                : s ? { P: s.P, λ: s.λ }
+                : { P: this.args.geometry.startPosition || { re: 0, im: 0 }, λ: this.initλ }
+        return this.startView_ = { P: { re: v.P.re, im: v.P.im }, λ: this.clampλ(v.λ) }
+    }
+
+    // geometry.startView: the start animation, zoomed up to its λ, then moved to its P
+    private playStart() : Promise<void> {
+        if (!this.args.geometry.startView || !this.data) return Promise.resolve()
+        const v = this.startView()
+        this.args.geometry.transformation.state.λ = v.λ
+        return new Promise<void>((ok, err)=> this.animateUp(ok, err))
+            .then(()=> this.api.goto(v.P, null))
+            .then(()=> {})
     }
 
     public api = {
@@ -194,6 +219,8 @@ export class Hypertree
         },
         selectQuery: (query:string, prop?:string)=> selection.selectQuery(this, query),
         gotoHome: ()=>     new Promise((ok, err)=> this.animateTo(ok, err, { re:0, im:0 }, null)),
+        /** Animates to the start view (startView(): geometry.startView), e.g. for a home button. */
+        gotoStart: ()=>    { const v = this.startView(); return new Promise((ok, err)=> this.animateTo(ok, err, v.P, v.λ)) },
         gotoNode: (n:N)=>  new Promise((ok, err)=> this.animateTo(ok, err, CmulR({ re:n.layout.z.re, im:n.layout.z.im }, -1), null)),
 
         goto:     (p, l)=> new Promise((ok, err)=> this.animateTo(ok, err, p, l)),
@@ -230,6 +257,9 @@ export class Hypertree
         const effects = pathsOf(migrated).map(effectOf)
         const effect = effectOrder.find(e=> effects.includes(e)) || 'none'
         this.applyEffect(effect)
+        // the labels in screen pixels: measured in the SVG (layers/caption-px.ts)
+        const g = migrated && migrated.geometry
+        if (g && this.data && ('captionPx' in g || 'captionRatio' in g)) sizeCaptions(this)
         return effect
     }
 
@@ -243,7 +273,7 @@ export class Hypertree
                 break
             case 'layout':
                 computeWeights(this.data, this.args)
-                if (this.args.layout.childOrder === 'balanced') balanceChildren(this.data)
+                orderChildren(this.data, this.args.layout.childOrder)
                 this.args.layout.type(this.data, state.λ)
                 this.update.data()
                 break
@@ -283,21 +313,10 @@ export class Hypertree
 
             this.lastCenterNode = centerNode
 
-            // highlightNode 'center': called from inside the frame (filter/culling.ts),
-            // after the filter: this frame's layers draw the new state; when the view
-            // stands still a style frame follows if no other frame comes first (the
-            // filter keeps the new path); while it moves the next frame comes anyway
-            if (this.args.interaction.highlightNode === 'center') {
-                this.highlight(centerNode, false)
-                if (!this.highlightFramePending && !this.isAnimationRunning()) {
-                    this.highlightFramePending = true
-                    requestAnimationFrame(()=> {
-                        if (!this.highlightFramePending) return
-                        this.highlightFramePending = false
-                        this.update.pathes()
-                    })
-                }
-            }
+            // highlightNode 'center': offered from inside the frame (filter/culling.ts),
+            // after the filter: this frame's layers draw the new state
+            if (this.args.interaction.highlightNode === 'center')
+                this.highlighting.offer(centerNode, true)
 
             const pathStr = centerNode
                 .ancestors()
@@ -385,6 +404,7 @@ export class Hypertree
         this.data = undefined
         this.langMap = undefined
 
+        this.startView_ = null
         this.args.geometry.transformation.state.λ = .001
         this.args.geometry.transformation.state.P.re = 0
         this.args.geometry.transformation.state.P.im = 0
@@ -433,9 +453,8 @@ export class Hypertree
         this.data.each(n=> n.precalc.clickable = true)
         // dataInitBFS: emoji, imageHref, ...
         this.data.each(n=> this.args.dataInitBFS(this, n))
-        // layout.childOrder 'balanced': after dataInitBFS (which may reorder children)
-        if (this.args.layout.childOrder === 'balanced')
-            balanceChildren(this.data)
+        // layout.childOrder: after dataInitBFS (which may reorder children)
+        orderChildren(this.data, this.args.layout.childOrder)
         // iconmap: an emoji per node name (or id), applied once
         const iconmap = this.args.iconmap
         if (iconmap) this.data.each(n=> {
@@ -452,6 +471,14 @@ export class Hypertree
 
         applyλBounds(this)
         findInitλ(this)
+        this.initλ = this.args.geometry.transformation.state.λ
+        this.startView_ = null
+        // with a start view the tree starts as a point (playStart zooms it up): already
+        // the first frame, else it showed the tree at the initial zoom for a moment
+        if (this.args.geometry.startView) {
+            this.growTo = this.initλ
+            this.args.geometry.transformation.state.λ = .001
+        }
         this.data.each((n:N)=> n.layoutReference = clone(n.layout))
 
         this.view_.html.querySelector('.preloader').innerHTML = ''
@@ -497,10 +524,37 @@ export class Hypertree
         this.update.data()
     }
 
+    // An animation (goto, gotoλ, animateUp, gotoStart, ...) ended at its target: its
+    // frames had the low detail; a detail frame, unless the next animation started
+    // right away (a chain like animateUp, then goto: only after the last one) or the
+    // user took over. Until v2 every application drew it itself (.then(drawDetailFrame)).
+    private detailFrameAfterAnimation() {
+        requestAnimationFrame(()=> {
+            if (!this.transition && !this.isAnimationRunning()) this.drawDetailFrame()
+        })
+    }
+
     public animateUp(ok, err) : void {
         const newλ = this.args.geometry.transformation.state.λ
         this.args.geometry.transformation.state.λ = .001
-        this.animateToλ(ok, err, newλ)
+        // the tree grows from a point: what has a size of its own (labels, emojis, the
+        // highlight marker) grows with it (growth); they were full size on a tree that
+        // was a dot
+        this.growTo = this.clampλ(newλ)
+        const grown = (f)=> (...a)=> { this.growTo = null; f(...a) }
+        this.animateToλ(grown(ok), grown(err), newλ)
+    }
+
+    // the target zoom of a running animateUp
+    private growTo : number | null = null
+
+    /**
+     * 1, or while the tree zooms up from a point (animateUp) the share of the zoom
+     * reached: the size factor of labels, emojis and the highlight marker
+     * (layers/label-geometry.ts rimScale).
+     */
+    public get growth() : number {
+        return this.growTo ? Math.min(1, this.args.geometry.transformation.state.λ / this.growTo) : 1
     }
 
     /** λ limited to interaction.λbounds [min, max] (inclusive). */
@@ -519,6 +573,7 @@ export class Hypertree
             duration: this.args.interaction.animationDuration,
             resolve: ok,
             reject: err,
+            done: ()=> this.detailFrameAfterAnimation(),
             frame: (progress01)=> {
                 const waydone01 = 1-this.args.interaction.animationEasing(progress01)
                 console.assert(waydone01 >= 0 && waydone01 <= 1)
@@ -543,6 +598,7 @@ export class Hypertree
             name: 'animateTo',
             resolve: resolve,
             reject: reject,
+            done: ()=> this.detailFrameAfterAnimation(),
             hypertree: this,
             duration: this.args.interaction.animationDuration,
             frame: (progress01)=> {
