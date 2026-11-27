@@ -5,7 +5,7 @@ export const GROUPS = [
     { key: 'load', title: 'Load (data, layout, first frame)', rowLabel: 'tree, mode', metrics: [
         { key: 'readyMs',  label: 'ready ms', digits: 0 },
         { key: 'nodes',    label: 'nodes', digits: 0 },
-        { key: 'visible',  label: 'visible', digits: 0 },
+        { key: 'visible',  label: 'visible nodes', digits: 0 },
     ] },
     { key: 'idle', title: 'Idle (3 s standing still)', rowLabel: 'tree, mode', metrics: [
         { key: 'frames',   label: 'frames', digits: 1 },
@@ -16,7 +16,7 @@ export const GROUPS = [
         { key: 'fps',         label: 'frames/sec (JS of the median frame)', digits: 0 },
         { key: 'filterMs',    label: 'filter ms/frame', digits: 1 },
         { key: 'frames',      label: 'frames during', digits: 0 },
-        { key: 'visible',     label: 'visible', digits: 0 },
+        { key: 'visible',     label: 'visible nodes', digits: 0 },
     ] },
     { key: 'afterDrag', title: 'After the drag (4 s)', rowLabel: 'tree, mode', metrics: [
         { key: 'frames',   label: 'frames', digits: 1 },
@@ -46,13 +46,13 @@ export const GROUPS = [
         { key: 'mainPerStep', label: 'main thread ms/step', digits: 1 },
         { key: 'fps',         label: 'frames/sec (JS of the median frame)', digits: 0 },
         { key: 'frames',      label: 'frames during', digits: 0 },
-        { key: 'visible',     label: 'visible', digits: 0 },
+        { key: 'visible',     label: 'visible nodes', digits: 0 },
     ] },
     { key: 'presets', title: 'Presets: a drag with a library preset applied', rowLabel: 'tree, mode, preset', metrics: [
         { key: 'readyMs',     label: 'ready ms', digits: 0 },
         { key: 'mainPerStep', label: 'main thread ms/step', digits: 1 },
         { key: 'fps',         label: 'frames/sec (JS of the median frame)', digits: 0 },
-        { key: 'visible',     label: 'visible', digits: 0 },
+        { key: 'visible',     label: 'visible nodes', digits: 0 },
     ] },
 ]
 

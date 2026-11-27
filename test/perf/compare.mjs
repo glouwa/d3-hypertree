@@ -15,12 +15,48 @@ export const load = name => { const f = resolveResult(name); return existsSync(f
 
 const f = (v, d) => v === undefined || v === null || isNaN(v) ? '-' : v.toFixed(d)
 const pctOf = (a, b) => b ? (a - b) / b * 100 : NaN
+
+/**
+ * Which way is better for a metric: 'higher' (frames/sec, frames during a gesture),
+ * null for counts that only describe the tree (nodes, visible nodes, style frames), else 'lower'.
+ */
+export function better(m) {
+    if (m.key === 'fps' || m.key === 'framesDuring' || /frames during/.test(m.label)) return 'higher'
+    if (m.key === 'nodes' || m.key === 'visible' || m.key === 'styleFrames') return null
+    return 'lower'
+}
+
+/**
+ * Whether a change is beyond the noise: both results from at least MIN_N iterations (a
+ * standard deviation from one or two samples says nothing: two equal samples gave sd 0
+ * and a +23 % of plain noise turned red), more than twice the larger sd and more than
+ * NOISE_PCT (the drag of the same build varies by about 1 ms of 6 between iterations).
+ */
+export const MIN_N = 3, NOISE_PCT = 10
+export const significant = (x, y) => (x.n || 0) >= MIN_N && (y.n || 0) >= MIN_N
+    && Math.abs(x.mean - y.mean) > 2 * Math.max(x.sd || 0, y.sd || 0) && Math.abs(pctOf(x.mean, y.mean)) > NOISE_PCT
+
+const COLORS = { green: '#2e7d32', red: '#c62828', gray: '#888888' }
+
+/**
+ * The change of a cell against the previous result, for the markdown tables: the signed
+ * percentage, green when it got better beyond the noise, red when worse, gray otherwise
+ * (and for metrics without a direction). An HTML span in the text's own font (the VS Code
+ * preview shows the color; GitHub drops it and shows the number plainly).
+ */
+export function deltaCell(x, y, m) {
+    if (!x || !y || isNaN(x.mean) || isNaN(y.mean) || !y.mean) return ''
+    const p = pctOf(x.mean, y.mean), dir = better(m)
+    const text = (p >= 0 ? '+' : '−') + Math.abs(p).toFixed(Math.abs(p) < 10 ? 1 : 0) + ' %'
+    const color = !dir || !significant(x, y) ? 'gray' : (p < 0) === (dir === 'lower') ? 'green' : 'red'
+    return ` <span style="color:${COLORS[color]}">${text}</span>`
+}
 const describe = r => `${r.kind} ${r.date.slice(0, 16)} (${r.commit}${r.dirty ? '+' : ''}, ${r.iterations} iterations)`
 
 /** The comparison as markdown lines. a: the newer result, b: the reference. */
 export function compare(a, b, { onlyChanged = false } = {}) {
     const out = [`a: ${describe(a)}`, `b: ${describe(b)}`,
-        'Δ = (a − b) / b; * = |a − b| > 2 · max(sd) and > 3 %. Lower is better except "visible", "nodes", "frames during" and "frames/sec" (higher is better).']
+        `Δ = (a − b) / b; * = both ≥ ${MIN_N} iterations, |a − b| > 2 · max(sd) and > ${NOISE_PCT} %. Lower is better except "visible nodes", "nodes", "frames during" and "frames/sec" (higher is better).`]
     for (const g of GROUPS) {
         const rows = Object.keys(a.rows).filter(k => k.startsWith(g.key + '|') && b.rows[k])
         if (!rows.length) continue
@@ -31,7 +67,7 @@ export function compare(a, b, { onlyChanged = false } = {}) {
                 const x = ra[m.key], y = rb[m.key]
                 if (!x || !y || isNaN(x.mean) || isNaN(y.mean)) return '-'
                 const p = pctOf(x.mean, y.mean)
-                const sig = Math.abs(x.mean - y.mean) > 2 * Math.max(x.sd || 0, y.sd || 0) && Math.abs(p) > 3
+                const sig = significant(x, y)
                 return `${f(x.mean, m.digits)} / ${f(y.mean, m.digits)} (${p >= 0 ? '+' : ''}${f(p, 0)} %${sig ? ' *' : ''})`
             })
             if (onlyChanged && !cells.some(c => c.endsWith('*)'))) continue
