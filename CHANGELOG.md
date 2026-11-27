@@ -9,6 +9,11 @@ are listed first.
 
 ### Changed behavior
 
+- **Labels take part in clicks, not in hovering** (interaction/interaction-layer.ts
+  `nodeAt`). Moving the mouse over a label no longer hovers the label's node; the
+  hovered node is the one drawn under the mouse or of the voronoi cell there, so the
+  highlight no longer jumps between nodes while the mouse passes labels. Clicking (and
+  holding) a label still acts on its node.
 - **Hover labels count in `maxLabels`** (filter/labels.ts `labelsWithHover`, all label
   layers). The label of the node under the mouse (`hoverLabel`) is always shown and
   counts; then the path to the root (`hoverPathLabels`), nearest first, as far as the
@@ -362,6 +367,12 @@ are listed first.
 
 ### Fixed
 
+- **`geometry.linkCurvature: '-'` is the geodesic in every projection**
+  (projection/schwarz-christoffel.ts, glatzhofer.ts, band.ts, half-band.ts, mapped.ts).
+  The projections that draw a link as a quadratic curve through the image of the disk
+  arc's midpoint mirrored the curve for `'-'`, the default: they drew the mirror image of
+  the geodesic, and `'+'` looked like the disk. Now `'-'` is the image of the geodesic
+  there too, `'+'` its mirror image, as in the disk (test: curvature.spec).
 - **The mouse's back and forward buttons work over the tree** (interaction/interaction-layer.ts).
   The tree cancelled every mouse button's mousedown and mouseup (`preventDefault`),
   so the browser did not go back when the back button was released over the tree.
@@ -548,6 +559,9 @@ are listed first.
 - `layout.linklen` from the documentation (never implemented; the zoom λ is the
   link length in this layout).
 - The dependency on `ducd` (fixes "Can't resolve 'ducd'", #28).
+- The pulsing loading disk (`hypertree.ts`, `styles/hypertree.scss`: the
+  `.preloader` element and the `.spinner` / `.double-bounce*` styles): nothing is
+  drawn over the tree while data loads; an application shows its own indicator.
 
 ### Performance
 

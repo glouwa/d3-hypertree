@@ -32,12 +32,6 @@ export interface NamedOverlay { name:string, overlay:ModelOverlay }
 
 let globelhtid = 0
 
-const htmlpreloader = `
-    <div class="spinner">
-        <div class="double-bounce1"></div>
-        <div class="double-bounce2"></div>
-    </div>`
-
 const grad = [255,96,36,0]
 const bubbleSvgDef =
     `<defs>
@@ -54,7 +48,6 @@ const hypertreehtml =
         <svg width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-0 0 1000 1000">
             ${bubbleSvgDef}
         </svg>
-        <div class="preloader"></div>
     </div>`
 
 // the order of the effects of configure(): the strongest wins
@@ -402,7 +395,6 @@ export class Hypertree
     //########################################################################################################
 
     protected resetData() {
-        this.view_.html.querySelector('.preloader').innerHTML = htmlpreloader
         this.unitdisk.args.data = undefined
         this.data = undefined
         this.langMap = undefined
@@ -483,8 +475,6 @@ export class Hypertree
             this.args.geometry.transformation.state.λ = .001
         }
         this.data.each((n:N)=> n.layoutReference = clone(n.layout))
-
-        this.view_.html.querySelector('.preloader').innerHTML = ''
     }
 
     protected updateLang_(dl=0) : void {

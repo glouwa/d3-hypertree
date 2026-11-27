@@ -119,7 +119,7 @@ export class HalfBandProjection implements Projection
         if (curvature === '0' || curvature === 'l') return `M ${a.re} ${a.im} L ${b.re} ${b.im}`
         const mid = this.toView(this.arcMiddle(this.diskOf(a), this.diskOf(b)))
         let cx = 2 * mid.re - (a.re + b.re) / 2, cy = 2 * mid.im - (a.im + b.im) / 2
-        if (curvature === '-') { cx = a.re + b.re - cx; cy = a.im + b.im - cy }
+        if (curvature === '+') { cx = a.re + b.re - cx; cy = a.im + b.im - cy }
         return `M ${a.re} ${a.im} Q ${cx} ${cy}, ${b.re} ${b.im}`
     }
 

@@ -104,11 +104,10 @@ export class InteractionLayer2 implements ILayer
              && !this.view.hypertree.isInitializing
              && !this.view.hypertree.isAnimationRunning()) {
                 // The capture circle (r = 5) reaches far beyond the disk, and the voronoi
-                // cells are unbounded: outside the disk no node is hovered.
-                // A label under the mouse hovers its node (also outside the disk, where
-                // labels at the rim may reach)
+                // cells are unbounded: outside the disk no node is hovered. Labels do not
+                // take part in hovering, only in clicks (nodeAt)
                 const p = this.mousePosAsC(e), m = this.toDisk(p)
-                this.view.hypertree.highlighting.offer(this.nodeAt(p, (m.re * m.re + m.im * m.im) <= 1))
+                this.view.hypertree.highlighting.offer(this.nodeAt(p, (m.re * m.re + m.im * m.im) <= 1, false))
             }
         }
     }
@@ -412,15 +411,17 @@ export class InteractionLayer2 implements ILayer
 
     // The node at a view position (hover, click, hold):
     //   1. a node drawn right there (within NODE_HIT_PX of its position on the screen)
-    //   2. else the node of a label there (a label sits beside its node, often in
-    //      another node's cell: pointing at it acts on its own node; labels may lie
-    //      over other nodes, which is why 1. comes first)
+    //   2. else, for a click or hold only (labelsToo), the node of a label there (a label
+    //      sits beside its node, often in another node's cell: clicking it acts on its
+    //      own node; labels may lie over other nodes, which is why 1. comes first).
+    //      Moving the mouse over a label does not change the hovered node: the labels
+    //      jumped the highlight between nodes while the mouse moved over the tree
     //   3. else the node of the voronoi cell (only inside the disk for hover)
-    private nodeAt = (v:C, cellToo = true) : N | undefined=> {
+    private nodeAt = (v:C, cellToo = true, labelsToo = true) : N | undefined=> {
         const q = this.view.cache.voronoiDiagram && this.view.cache.voronoiDiagram.find(v.re, v.im)
         const cell:N = q ? q.data : undefined
         if (cell && cell.cache && this.screenDistance(v, cell.cache) <= NODE_HIT_PX) return cell
-        return this.labelNodeAt(v) || (cellToo ? cell : undefined)
+        return (labelsToo && this.labelNodeAt(v)) || (cellToo ? cell : undefined)
     }
     // distance of two view positions in screen pixels
     private screenDistance(a:C, b:C) : number {

@@ -245,11 +245,12 @@ for (const layer of ['labels-force', 'labels-placed']) {
     })
 }
 
-// Pointing at a label acts on its node, like pointing at the node's voronoi cell: hover
-// (and the label is highlighted: rect.caption-hover, class caption-hovered) and click.
-// Tested with a label whose center lies in the voronoi cell of another node.
+// Clicking a label acts on its node, like clicking the node's voronoi cell. Moving the
+// mouse over a label does not: the hovered node stays the one of the cell under the
+// mouse (labels jumped the highlight between nodes while the mouse moved). Tested with a
+// label whose center lies in the voronoi cell of another node.
 for (const layer of ['labels', 'labels-force', 'labels-placed']) {
-    test(`${layer}: hovering and clicking a label act on its node`, async ({ page }) => {
+    test(`${layer}: clicking a label acts on its node, hovering it not`, async ({ page }) => {
         const errors = collectErrors(page)
         await open(page, layer)
         await waitForStable(page)
@@ -273,19 +274,12 @@ for (const layer of ['labels', 'labels-force', 'labels-placed']) {
         expect(t, 'a label over another node\'s cell').toBeTruthy()
         await page.mouse.move(t.x + 40, t.y + 40)
         await page.mouse.move(t.x, t.y, { steps: 3 })
-        await expect.poll(() => page.evaluate(() => { const h = harness.ht.data.descendants().find(n => n.hovered); return h && h.mergeId })).toBe(t.id)
-        // highlighted: the box behind the label and the class on its text
-        await expect.poll(() => page.evaluate(layer => {
-            const g = document.querySelector(`[id="${layer}"]`)
-            const text = g.querySelector('text.caption-hovered')
-            return { box: !!g.querySelector('rect.caption-hover'), text: text ? text.__data__.mergeId : null }
-        }, layer)).toEqual({ box: true, text: t.id })
+        // hovered: the node of the cell under the mouse, not the label's node
+        await expect.poll(() => page.evaluate(() => { const h = harness.ht.data.descendants().find(n => n.hovered); return h && h.mergeId })).toBe(t.cell)
         await page.evaluate(() => harness.clearEvents())
         await page.mouse.click(t.x, t.y)
+        // clicked: the label's node
         await expect.poll(() => page.evaluate(() => harness.events.filter(e => e.type === 'click').map(e => e.id))).toEqual([t.id])
-        // away from the label: no box
-        await page.mouse.move(5, 5)
-        await expect.poll(() => page.evaluate(layer => !!document.querySelector(`[id="${layer}"] rect.caption-hover`), layer)).toBe(false)
         expectNoErrors(errors)
     })
 }
