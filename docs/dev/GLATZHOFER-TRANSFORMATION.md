@@ -6,7 +6,12 @@ Status: analysis (2026-11-27); candidate A implemented the same day as
 `?view=glatzhofer`). View coordinates there: twice `(X, Y − ½)`, so the rectangle is
 `x ∈ ±A, y ∈ ±1` with the disk's scale at the center. `keepTreeInView` is on: its
 disk rules (the tree's tip and the root behind the center) mean the same here, since
-the view's center is the disk's. A′ and C are open. Question: starting from the
+the view's center is the disk's. Candidate B is `'band'` (`src/projection/band.ts`,
+the log of the half-plane: a horizontal strip, the rim on both long edges, the gap at
+the left end) and `'half-band'` (`src/projection/half-band.ts`, the arccosh of the
+half-plane: the strip closed at the right end, the rim on three edges; the
+Schwarz–Christoffel rectangle with one pair of corners at infinity). A′ and C are
+open. Question: starting from the
 Schwarz–Christoffel rectangle (`geometry.projection: 'schwarz-christoffel'`), can the ideal boundary
 of the hyperbolic plane (the rim of the disk) be mapped onto the top edge only,
 giving a dendrogram-like picture with the root static at the bottom middle and the
@@ -157,7 +162,7 @@ X = (A/2) · tanh( 2x / (A (1 + y)²) )
   (as in the disk, not better); no depth levels; the whole rim on one edge means
   the leaf density per edge length is higher than in the disk.
 
-### [ ] B. The band (strip) model
+### [x] B. The band (strip) model
 
 `ξ = log w` maps the half-plane onto the strip `0 < Im ξ < π`: two ideal edges
 (the two halves of the real axis), the left end the rim point `w = 0`, the right end

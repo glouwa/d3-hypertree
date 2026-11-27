@@ -40,6 +40,7 @@
 import { N }                      from '../data/n'
 import { C, compose, shift, maxR } from '../geometry/hyperbolic-math'
 import { diskPos }                from '../geometry/cayley'
+import { KEEP_IN_VIEW_KINDS }     from '../projection/index'
 
 /** What the view bounds need of the unit disk. */
 export interface ViewBoundsHost {
@@ -161,7 +162,7 @@ function currentTipMargin(ud:ViewBoundsHost) : number {
  * view is invalid. Returns true if P changed (the filter has to run again).
  */
 export function keepTreeInView(ud:ViewBoundsHost) : boolean {
-    if (!ud.args.model.interaction.keepTreeInView || (ud.args.projection.kind !== 'poincare' && ud.args.projection.kind !== 'schwarz-christoffel' && ud.args.projection.kind !== 'glatzhofer')) return false
+    if (!ud.args.model.interaction.keepTreeInView || !KEEP_IN_VIEW_KINDS.has(ud.args.projection.kind)) return false
     if (!ud.isDraging && !ud.isWheeling) return false
     const root = ud.args.data
     if (!root || !root.cache) return false

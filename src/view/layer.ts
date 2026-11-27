@@ -2,7 +2,7 @@ import { LayerStack }          from './layerstack'
 import { IUnitDisk }           from './unitdisk'
 import { Hypertree }           from '../hypertree'
 import { HypertreeArgs }       from '../config/schema'
-import { TransformationCache } from '../geometry/transformation'
+import { TransformationCache } from '../filter/frame-cache'
 import { Projection }          from '../projection/projection'
 
 /**

@@ -1,7 +1,7 @@
 import { Hypertree }               from '../hypertree'
 import { N }                       from '../data/n'
 import { C }                       from '../geometry/hyperbolic-math'
-import { Transformation }          from '../geometry/transformation'
+import { Transformation }          from '../navigation/transformation'
 import { HypertreeArgs }           from '../config/schema'
 import { Projection }              from '../projection/projection'
 

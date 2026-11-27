@@ -1,11 +1,16 @@
+// The navigation state: the Möbius transformation {P, θ, λ} of the disk onto itself
+// that dragging, pinching, the wheel and goto change (an isometry, the same for every
+// projection), and its drag operations. The layout, the filter and the projection
+// read it; the projection (projection/) then maps the transformed disk onto the screen.
 import { N }                                     from '../data/n'
-import { T }                                     from './hyperbolic-math'
-import {C, CassignC, CktoCp, CptoCk }            from './hyperbolic-math'
-import {Ck }                                     from './hyperbolic-math'
-import {CaddC, CsubC, CmulR, CdivR }             from './hyperbolic-math'
-import {h2e, compose, shift, lengthDilledation } from './hyperbolic-math'
-import {dfs, clone, πify, setR, maxR }           from './hyperbolic-math'
-import { VoronoiDiagram, VoronoiPolygon }       from '../filter/voronoi'
+import { T }                                     from '../geometry/hyperbolic-math'
+import {C, CassignC, CktoCp, CptoCk }            from '../geometry/hyperbolic-math'
+import {Ck }                                     from '../geometry/hyperbolic-math'
+import {CaddC, CsubC, CmulR, CdivR }             from '../geometry/hyperbolic-math'
+import {h2e, compose, shift, lengthDilledation } from '../geometry/hyperbolic-math'
+import {dfs, clone, πify, setR, maxR }           from '../geometry/hyperbolic-math'
+import { TransformationCache }                   from '../filter/frame-cache'
+export { TransformationCache }                   from '../filter/frame-cache'
 
 export interface Transformation<OT>
 {    
@@ -101,30 +106,4 @@ export class NegTransformation implements Transformation<N>
     onDragλ =        (l:number)=> this.decorated.onDragλ(l)
 }
 
-export class TransformationCache
-{
-    N:              number    
-    focusR:         number
-    centerNode:     N
-    unculledNodes:  N[]
-    // the weight filter's last selection (magic-filter.ts adjustMagic): the magic at
-    // which the next visible node is hidden, the next hidden one shows (null: none)
-    nextHideAt?:    number | null
-    nextShowAt?:    number | null
-    // of the visible nodes those drawn whatever their weight (in the focus circle or a
-    // child of a node in it); adjustMagic counts only the others against rangeNodes
-    focusCount?:    number
-    links:          N[]
-    leafOrLazy:     N[]
-    spezialNodes:   N[]
-    paths:          N[]
-    weights:        N[]
-    labels:         N[]
-    labelsByMax?:   { [max:number]: N[] }   // labels of layers with their own maxLabels
-    emojis:         N[]
-    images:         N[]
-        
-    voronoiDiagram: VoronoiDiagram<N>    
-    cells:          VoronoiPolygon<N>[] = []
-}
 

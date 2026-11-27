@@ -1,7 +1,7 @@
 import { N }                        from '../data/n'
 import { IUnitDisk }                from '../view/unitdisk'
 import { dfs2, dfsFlat2, dfsFlat }  from '../geometry/hyperbolic-math'
-import { TransformationCache }      from '../geometry/transformation'
+import { TransformationCache }      from './frame-cache'
 import { C, CptoCk, CktoCp, πify }  from '../geometry/hyperbolic-math'
 import { CassignC }                 from '../geometry/hyperbolic-math'
 

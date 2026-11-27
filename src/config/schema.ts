@@ -15,11 +15,12 @@ import { LoaderFunction }      from '../data/loaders'
 import { LayoutFunction }      from '../layout/layouts'
 import { layoutBergé }         from '../layout/layouts'
 import { C, sigmoid01 }        from '../geometry/hyperbolic-math'
-import { Transformation }      from '../geometry/transformation'
-import { HyperbolicTransformation } from '../geometry/transformation'
+import { Transformation }      from '../navigation/transformation'
+import { HyperbolicTransformation } from '../navigation/transformation'
 import { IUnitDisk }           from '../view/unitdisk'
 import { ILayer }              from '../view/layer'
 import { Projection }          from '../projection/projection'
+import type { ProjectionName }  from '../projection/index'
 
 export type ArcCurvature = '+' | '0' | '-' | 'l'
 
@@ -90,7 +91,7 @@ export interface HypertreeArgs
         // the projection of the hyperbolic plane onto the screen (projection/): the
         // disk, the rectangular half-plane view, the rectangle (the conformal image
         // of the whole disk, Schwarz–Christoffel), or an own Projection
-        projection:         'poincare' | 'cayley' | 'schwarz-christoffel' | 'glatzhofer' | Projection
+        projection:         ProjectionName | Projection
         diskSize:           number                            // the diameter of the disk in the square view (.96); > 1: beyond the view
         // the layer stack in drawing order: specs, or the name of a default layer
         // (layers/index.ts defaultLayers) for its spec

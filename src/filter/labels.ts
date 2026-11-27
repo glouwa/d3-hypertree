@@ -1,6 +1,6 @@
 import { N }                        from '../data/n'
 import { IUnitDisk }                from "../view/unitdisk"
-import { TransformationCache }      from "../geometry/transformation"
+import { TransformationCache }      from './frame-cache'
 
 // The parts of the frame after the culling: the voronoi cells, the label selection
 // and the images.

@@ -69,7 +69,7 @@ process.on('exit', ()=> { try { if (readFileSync(LOCK, 'utf8') === String(proces
 const tStart = Date.now()
 if (!has('no-build') && !has('server')) {
     console.log('building ...')
-    if (spawnSync('npm', ['run', 'build'], { cwd: root, shell: true, stdio: 'ignore' }).status) { console.error('build failed'); process.exit(1) }
+    if (spawnSync('npm run build', { cwd: root, shell: true, stdio: 'ignore' }).status) { console.error('build failed'); process.exit(1) }
 }
 let server = null, base = arg('server', '')
 if (!base) {

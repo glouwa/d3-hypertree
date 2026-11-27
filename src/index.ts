@@ -7,11 +7,11 @@ export { migrate } from './config/migrate'
 export { presets, defaults } from './config/presets'
 
 export * from './geometry/hyperbolic-math'
-export * from './geometry/transformation'
+export * from './navigation/transformation'
 export { toHalfPlane, toView, viewToDisk, viewScale, infinityOf, circleToView } from './geometry/cayley'
 export { RectangleMap, ellipticK, carlsonRF } from './geometry/schwarz-christoffel'
 export type { Projection, ViewBox } from './projection/projection'
-export { PoincareProjection, CayleyProjection, SchwarzChristoffelProjection, GlatzhoferProjection, createProjection } from './projection'
+export { PoincareProjection, CayleyProjection, SchwarzChristoffelProjection, GlatzhoferProjection, BandProjection, HalfBandProjection, RadialProjection, StretchProjection, SquircleProjection, SectorProjection, createProjection } from './projection'
 export { colorBy, sizeBy, nodeValues } from './config/infovis'
 export { voronoiLayout } from './filter/voronoi'
  

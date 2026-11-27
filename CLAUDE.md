@@ -20,8 +20,11 @@ backward compatibility not required; prereleases as `2.0.0-alpha.x` on dist-tag 
 ## Code and configuration
 
 - Source by pipeline stage: `src/config` (schema, resolve, migrate, presets), `data`,
-  `layout`, `geometry`, `filter`, `projection`, `view`, `layers`, `interaction`, `state`,
-  `styles`; `src/hypertree.ts` is the facade, `src/index.ts` the public API.
+  `layout`, `navigation` (the Möbius transformation {P, θ, λ}), `filter` (also the
+  frame's result, `frame-cache.ts`), `projection` (disk → screen), `view`, `layers`,
+  `interaction`, `state`, `styles`; `geometry` is pure math without state (hyperbolic
+  math, the Cayley and Schwarz–Christoffel maps). `src/hypertree.ts` is the facade,
+  `src/index.ts` the public API.
   Applications import only from `d3-hypertree`, never from internal paths.
 - Configuration (`docs/dev/REFACTORING.md` §2): a default lives exactly once, next to
   the option (core options in `src/config/schema.ts`, layer options as the layer's

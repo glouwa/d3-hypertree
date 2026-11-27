@@ -296,11 +296,13 @@
         c.addEventListener('change', () => change(path, c.checked, prov))
         controls.push({ refresh: () => { c.checked = !!value(path) } })
     }
+    // info.valueDocs: a tooltip per value (on the option and, for the chosen one, on the select)
     function enumControl(group, label, path, info) {
-        const s = el('select', {}, ...info.values.map(v => el('option', { value: v }, v)))
+        const docOf = v => (info.valueDocs && info.valueDocs[v]) || ''
+        const s = el('select', {}, ...info.values.map(v => el('option', Object.assign({ value: v }, docOf(v) ? { title: docOf(v) } : {}), v)))
         const { prov } = row(group, label, path, info, s)
         s.addEventListener('change', () => change(path, s.value, prov))
-        controls.push({ refresh: () => { const v = value(path); s.value = typeof v === 'string' ? v : ''; s.title = typeof v === 'object' && v ? 'an object (a Projection)' : '' } })
+        controls.push({ refresh: () => { const v = value(path); s.value = typeof v === 'string' ? v : ''; s.title = typeof v === 'object' && v ? 'an object (a Projection)' : docOf(v) } })
     }
     function stringControl(group, label, path, info) {
         const t = el('input', { type: 'text' })

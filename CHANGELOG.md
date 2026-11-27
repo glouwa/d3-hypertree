@@ -103,6 +103,30 @@ are listed first.
 
 ### Added
 
+- **Seven closed-form projections** (projection/euclidean.ts, on the common base
+  projection/mapped.ts): `'klein'` (Beltrami–Klein, straight links), `'equal-area'`
+  (the drawn area around the center πH/(H+π) for the hyperbolic area H: equal for small areas, bounded),
+  `'equidistant'` (the hyperbolic distance halved, then bounded by tanh), `'gans'` (the
+  orthographic image of the hyperboloid, unbounded, the box shows the inner part),
+  `'stretch'` (the disk stretched to an ellipse filling a wide box), `'squircle'` (the
+  elliptic grid map of the disk onto the box, the rim on all four edges, no conformal
+  pinch at the corners) and `'sector'` (conformal: a 120° wedge, the gap at its apex at
+  the bottom middle). The non-conformal ones draw nodes as circles sized by the local
+  scale. Layout, filter and navigation stay in the disk; `interaction.keepTreeInView`
+  works in all of them.
+- **`geometry.projection: 'half-band'`**: the half band (projection/half-band.ts). The
+  Cayley half-plane under `arccosh`: the strip closed at one end, the rim on its top,
+  bottom and right edges, the gap of the root wedge at the open left end, the stem
+  along the axis. The Schwarz–Christoffel rectangle with one pair of corners at
+  infinity, between the rectangle and the band; conformal. The drawn box ends at the
+  closed end, the disk's center sits .56 left of it.
+- **`geometry.projection: 'band'`**: the band (strip) model (projection/band.ts,
+  docs/dev/GLATZHOFER-TRANSFORMATION.md candidate B). The Cayley half-plane under the
+  complex logarithm, `ξ = log w`: a horizontal strip y ∈ ±1 whose top and bottom edges
+  are the two halves of the rim, the gap of the root wedge at the left end (the stem
+  runs along the axis), the rim point opposite the gap at the right end. Conformal,
+  the Schwarz–Christoffel rectangle with two corners at infinity; the box shows as much
+  of the strip's length as its aspect ratio allows, nodes beyond get `outOfView`.
 - **`geometry.projection: 'glatzhofer'`**: the compressed half-plane
   (projection/glatzhofer.ts, docs/dev/GLATZHOFER-TRANSFORMATION.md). The Cayley
   half-plane squeezed into a rectangle: the height `Y = y / (1 + y)`, the width
