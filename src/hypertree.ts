@@ -358,6 +358,9 @@ export class Hypertree
                 const p = this.viewPosition()
                 const g = this.view_.html.querySelector('.unitdisk-nav > svg > .unitDisc')
                 if (g) g.setAttribute('transform', p)
+                // a projection whose map depends on the box (the rectangle's aspect
+                // ratio): the positions follow in a frame
+                if (this.data && !this.isInitializing) this.update.transformation()
             }
             window.addEventListener('resize', this.onResize)
             // the element changes size without the window too (a splitter: the tree

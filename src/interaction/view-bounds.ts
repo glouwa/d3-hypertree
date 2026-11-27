@@ -161,7 +161,7 @@ function currentTipMargin(ud:ViewBoundsHost) : number {
  * view is invalid. Returns true if P changed (the filter has to run again).
  */
 export function keepTreeInView(ud:ViewBoundsHost) : boolean {
-    if (!ud.args.model.interaction.keepTreeInView || ud.args.projection.kind !== 'disk') return false
+    if (!ud.args.model.interaction.keepTreeInView || (ud.args.projection.kind !== 'disk' && ud.args.projection.kind !== 'rectangle')) return false
     if (!ud.isDraging && !ud.isWheeling) return false
     const root = ud.args.data
     if (!root || !root.cache) return false

@@ -103,6 +103,16 @@ are listed first.
 
 ### Added
 
+- **`geometry.view: 'rectangle'`**: the rectangular view as the conformal image of the
+  whole disk (the Schwarz–Christoffel map, geometry/schwarz-christoffel.ts,
+  projection/rectangle.ts). The rim of the disk becomes the edge of the rectangle,
+  so every node, the root and the path to it are always in the picture, as in the
+  disk; fans keep their angles; the gap of the root wedge goes to the middle of the
+  bottom edge; the aspect ratio follows the drawn element (the map's modulus is set
+  from it, a resize draws a frame). Links are quadratic curves through the image of
+  the midpoint of their disk arc. Unlike `'halfplane'` (kept), which sends one rim
+  point to infinity, nothing leaves the view. `interaction.keepTreeInView` works
+  here too.
 - **`interaction.highlightNode: 'mousehover' | 'center' | 'none'`** (replaces the
   v2 preview's `interaction.hover: 'pointer' | 'none'`, migrated with a warning).
   Which node is highlighted (`n.hovered`, the hover path, the hover label,

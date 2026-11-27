@@ -88,8 +88,9 @@ export interface HypertreeArgs
     }
     geometry: {
         // the projection of the hyperbolic plane onto the screen (projection/): the
-        // disk, the rectangular half-plane view, or an own Projection
-        view:               'disk' | 'halfplane' | Projection
+        // disk, the rectangular half-plane view, the rectangle (the conformal image
+        // of the whole disk, Schwarz–Christoffel), or an own Projection
+        view:               'disk' | 'halfplane' | 'rectangle' | Projection
         diskSize:           number                            // the diameter of the disk in the square view (.96); > 1: beyond the view
         // the layer stack in drawing order: specs, or the name of a default layer
         // (layers/index.ts defaultLayers) for its spec

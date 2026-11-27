@@ -229,3 +229,53 @@ test('infovis scales: colors and sizes follow the value, log scales accept 0', a
     expect(r.redRange).toEqual([0, 255])
     expect(r.cached).toBe(true)
 })
+
+// The Schwarz–Christoffel map of the disk onto a rectangle (the rectangular view):
+// map and unmap are inverse, the whole disk lands in the rectangle x ∈ ±1,
+// y ∈ ±height/2 with the aspect ratio asked for, the rim on its edges with the four
+// corners, the center in the middle, and scale is the local scale of the map.
+test('Schwarz–Christoffel map: inverse, the disk fills the rectangle, the rim on its edges, conformal scale', async ({ page }) => {
+    const r = await page.evaluate(() => {
+        const out = {}
+        for (const aspect of [.5, 1, 1.6, 2.5]) {
+            const m = new hyt.RectangleMap(aspect), h = m.height
+            let inverse = 0, outside = 0, scaleErr = 0, maxX = 0, maxY = 0
+            for (let i = 0; i < 400; i++) {
+                const z = inDisk(.999), w = m.map(z)
+                maxX = Math.max(maxX, Math.abs(w.re)); maxY = Math.max(maxY, Math.abs(w.im))
+                if (Math.abs(w.re) > 1 + 1e-9 || Math.abs(w.im) > h / 2 + 1e-9) outside++
+                inverse = Math.max(inverse, dist(m.unmap(w), z))
+                if (abs2(z) < .9) {
+                    const e = 1e-6, a = 2 * Math.PI * rnd(), dz = { re: e * Math.cos(a), im: e * Math.sin(a) }
+                    const numeric = dist(m.map({ re: z.re + dz.re, im: z.im + dz.im }), w) / e
+                    scaleErr = Math.max(scaleErr, Math.abs(numeric - m.scale(z)) / m.scale(z))
+                }
+            }
+            const rim = []
+            for (let a = 0; a < 2 * Math.PI; a += .02) rim.push(m.map({ re: .999999 * Math.cos(a), im: .999999 * Math.sin(a) }))
+            const onEdge = rim.every(w => Math.abs(Math.abs(w.re) - 1) < 2e-3 || Math.abs(Math.abs(w.im) - h / 2) < 2e-3)
+            // the corners: the images of the prevertices ζ = ±1, ±1/k (z = (ζ − i·a) / (ζ + i·a),
+            // a = 1/√k), just inside the rim (the map compresses like a square root there)
+            const a = 1 / Math.sqrt(m.k)
+            const corners = [1, -1, 1 / m.k, -1 / m.k].every(ζ => {
+                const d = ζ * ζ + a * a, z = { re: (ζ * ζ - a * a) / d * .9999999, im: -2 * ζ * a / d * .9999999 }
+                const w = m.map(z)
+                return Math.abs(Math.abs(w.re) - 1) < 1e-3 && Math.abs(Math.abs(w.im) - h / 2) < 1e-3
+            })
+            const c = m.map({ re: 0, im: 0 })
+            out[aspect] = { inverse, outside, scaleErr, aspectErr: Math.abs(2 / h - aspect), onEdge, corners, center: Math.abs(c.re) + Math.abs(c.im), maxX, maxY: maxY / (h / 2) }
+        }
+        return out
+    })
+    for (const a in r) {
+        expect(r[a].inverse, a).toBeLessThan(1e-7)
+        expect(r[a].outside, a).toBe(0)
+        expect(r[a].scaleErr, a).toBeLessThan(1e-4)
+        expect(r[a].aspectErr, a).toBeLessThan(1e-9)
+        expect(r[a].onEdge, a).toBe(true)
+        expect(r[a].corners, a).toBe(true)
+        expect(r[a].center, a).toBeLessThan(1e-9)
+        expect(r[a].maxX, a).toBeGreaterThan(.9)                       // the disk fills the rectangle
+        expect(r[a].maxY, a).toBeGreaterThan(.9)
+    }
+})
