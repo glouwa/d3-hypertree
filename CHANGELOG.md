@@ -362,6 +362,14 @@ are listed first.
 
 ### Fixed
 
+- **Links and nodes in the Schwarz–Christoffel rectangle as thin as in the disk**
+  (projection/schwarz-christoffel.ts). The sizes were normalized to 1 at the center in
+  view units, but a view unit of the rectangle is about twice the disk's radius in
+  pixels, and the map's local stretch toward the middle of the long edges kept the
+  links there as thick as in the center. Now the sizes are the disk's (its shrink
+  toward the rim) times the map's scale at the center: Mammalia's median link 2.5 px
+  (disk 2.1 px; the rectangle shows the center 1.3 times larger), thin toward the
+  edges as in the disk.
 - **Zooming in deep in the tree no longer empties the view** (filter/culling.ts
   `pathToLastVisible`, hypertree.ts `updateLayoutPath_`). A wheel or pinch step changes
   λ and relays only the ancestors of the node under the pointer. The next frame's path

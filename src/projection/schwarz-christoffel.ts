@@ -58,9 +58,13 @@ export class SchwarzChristoffelProjection implements Projection
             n.outOfView = false
             n.cache = <ViewPos>{ re: v.re, im: v.im, disk: z }
             n.cachep = CktoCp(n.cache)
-            // sizes follow the map's scale relative to the center, never bigger than
-            // there (the map stretches the rim near the middle of the long edges)
-            n.distScale = Math.min(n.distScale * this.map.scale(zr) / this.scale0, 1)
+            // sizes as in the disk (its shrink toward the rim), times the map's scale at
+            // the center: a view unit is the half width of the rectangle, about twice the
+            // disk's radius in pixels. The local scale of the map is left out: it stretches
+            // the rim toward the middle of the long edges, and links and nodes there were
+            // as thick as in the center (relative to the center they were also 1.5 times
+            // too thick there)
+            n.distScale = n.distScale * this.scale0
             n.dampedDistScale = n.distScale * (.5 / n.distScale + .5)
             n.strCache = `${n.cache.re} ${n.cache.im}`
             n.transformStrCache = ` translate(${n.strCache})`
