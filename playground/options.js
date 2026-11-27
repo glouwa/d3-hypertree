@@ -85,6 +85,7 @@
         'interaction.onNodeHover':  { kind: 'callback', doc: 'the node under the pointer changed (undefined when leaving the tree)' },
         'interaction.onHoverNodeChange': { kind: 'callback', doc: 'the hovered node changed (after the paths are updated)' },
         'interaction.onCenterNodeChange': { kind: 'callback', doc: 'the node in the center changed (node, path string)' },
+        'interaction.keepTreeInView': { kind: 'boolean', doc: 'the center of the view never lies beyond the tip of the tree: dragging, pinching and the wheel keep the translation on the boundary (the tree slides along it); the zoom and animations are not limited' },
         'interaction.λbounds':      { kind: 'pair', min: .001, max: 1, step: .005, doc: 'the zoom λ stays within [min, max]' },
         'interaction.minFill':      { kind: 'number', min: .3, max: 1, step: .01, nullable: true, doc: 'the tree never fills less than this share of the disk radius: the lower λ bound is computed per tree after loading, replacing λbounds[0]' },
         'interaction.maxLinkLength': { kind: 'number', min: .1, max: 1, step: .01, nullable: true, doc: 'a normal link with its parent in the middle of the disk is at most this long (share of the radius): the upper λ bound, replacing λbounds[1]' },

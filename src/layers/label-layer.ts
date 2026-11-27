@@ -171,6 +171,37 @@ export class LabelLayer implements ILayer
  * font, and then reused as an <image> with a data URL.
  */
 const textImages = new Map<string, { href:string, x:number, y:number, w:number, h:number }>()
+
+// The font of a caption class, measured once per class and svg font size
+// (geometry.captionPx sets the svg's font size, caption-px.ts): the family, and the
+// size of one canvas pixel in the units of the SVG (unit: the probe's box height by
+// the font's box height on the canvas at px). Until v2.0 every new emoji was measured
+// as SVG text with getBBox, a forced layout per emoji (9 ms each on a phone, with
+// dozens of new emojis in a frame while dragging).
+const PX = ()=> 96 * (window.devicePixelRatio || 1)        // canvas font: crisp up to ~100 px on screen
+const classFonts = new Map<string, { family:string, unit:number, ascent:number, descent:number, y:number }>()
+function classFont(group:Element, className:string) {
+    const svg = (<SVGElement>group).ownerSVGElement
+    const key = className + '\u0000' + ((svg && svg.style.fontSize) || '')
+    let f = classFonts.get(key)
+    if (f) return f
+    const probe = document.createElementNS('http://www.w3.org/2000/svg', 'text')
+    probe.setAttribute('class', className)
+    probe.textContent = 'M'
+    group.appendChild(probe)
+    const bb = probe.getBBox()
+    const family = getComputedStyle(probe).fontFamily
+    group.removeChild(probe)
+    if (!bb.width || !bb.height || !family) return undefined          // not rendered (yet)
+    const px = PX()
+    const ctx = document.createElement('canvas').getContext('2d')
+    ctx.font = `${px}px ${family}`
+    const m = ctx.measureText('M')
+    const ascent = m.fontBoundingBoxAscent || px * .9, descent = m.fontBoundingBoxDescent || px * .25
+    classFonts.set(key, f = { family, unit: bb.height / (ascent + descent), ascent, descent, y: bb.y })
+    return f
+}
+
 /**
  * centered: the bitmap holds only the ink of the text and is centered on the origin
  * (the emojis: their middle exactly on the node). Otherwise it covers the text's box
@@ -180,22 +211,15 @@ export function textImage(group:Element, className:string, text:string, centered
     const key = className + '\u0000' + text + (centered ? '\u0000c' : '')
     let image = textImages.get(key)
     if (image) return image
+    const font = classFont(group, className)
+    if (!font) return undefined
 
-    const svgText = document.createElementNS('http://www.w3.org/2000/svg', 'text')
-    svgText.setAttribute('class', className)
-    svgText.textContent = text
-    group.appendChild(svgText)
-    const bb = svgText.getBBox()
-    const family = getComputedStyle(svgText).fontFamily
-    group.removeChild(svgText)
-    if (!bb.width || !bb.height) return undefined          // not rendered (yet)
-
-    const px = 96 * (window.devicePixelRatio || 1)         // crisp up to ~100 px on screen
+    const px = PX()
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')
-    ctx.font = `${px}px ${family}`
+    ctx.font = `${px}px ${font.family}`
     const m = ctx.measureText(text)
-    const ascent = m.fontBoundingBoxAscent || px * .9, descent = m.fontBoundingBoxDescent || px * .25
+    const { ascent, descent, unit } = font
     if (centered) {
         // the ink box (actualBoundingBox: left and ascent are positive toward the
         // left and up), one pixel of margin; its size in SVG units by the ratio of the
@@ -205,10 +229,9 @@ export function textImage(group:Element, className:string, text:string, centered
         const pad = 1, inkW = left + right, inkH = up + down
         canvas.width = Math.max(1, Math.ceil(inkW + 2*pad))
         canvas.height = Math.max(1, Math.ceil(inkH + 2*pad))
-        ctx.font = `${px}px ${family}`
+        ctx.font = `${px}px ${font.family}`
         ctx.textBaseline = 'alphabetic'
         ctx.fillText(text, pad + left, pad + up)
-        const unit = bb.height / (ascent + descent)
         const w = canvas.width * unit, h = canvas.height * unit
         image = { href: canvas.toDataURL(), x: -w/2, y: -h/2, w, h }
         textImages.set(key, image)
@@ -216,13 +239,14 @@ export function textImage(group:Element, className:string, text:string, centered
     }
     canvas.width = Math.max(1, Math.ceil(m.width))
     canvas.height = Math.max(1, Math.ceil(ascent + descent))
-    ctx.font = `${px}px ${family}`
+    ctx.font = `${px}px ${font.family}`
     ctx.textBaseline = 'alphabetic'
     // center the ink horizontally (the canvas may pick another fallback font with
     // other side bearings than the SVG text; emoji glyphs are centered in their box)
     const inkLeft = m.actualBoundingBoxLeft || 0, inkWidth = (m.actualBoundingBoxRight || m.width) + inkLeft
     ctx.fillText(text, (canvas.width - inkWidth) / 2 + inkLeft, ascent)
-    image = { href: canvas.toDataURL(), x: bb.x, y: bb.y, w: bb.width, h: bb.height }
+    // the text's box at its own position: from x 0 (text-anchor start), its width from the canvas
+    image = { href: canvas.toDataURL(), x: 0, y: font.y, w: canvas.width * unit, h: canvas.height * unit }
     textImages.set(key, image)
     return image
 }

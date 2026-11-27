@@ -392,6 +392,7 @@ new hyt.Hypertree(
             onNodeSelect:       (n:N, selected:boolean)=> void // every selection change, also replaced or dropped ones
             onCenterNodeChange: (n:N)=> void 
             λbounds:            [ number, number ]           // [min, max] zoom; start zoom, wheel, pinch and gotoλ stay inside
+            keepTreeInView:     boolean                      // default true: dragging, pinching and the wheel never leave the tree behind
             wheelFactor:        number                       // zoom step per wheel notch (was wheelSensitivity)
             mouseRadius:        number
         }

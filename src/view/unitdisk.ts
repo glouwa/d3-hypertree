@@ -7,7 +7,8 @@ import { LayerStack }              from './layerstack'
 import { FrameReason }             from './layer'
 import { UnitDiskArgs }            from './unitdisk-model'
 import { UnitDiskView }            from './unitdisk-model'
-import { cacheUpdate }             from '../filter/culling'
+import { cacheUpdate, cacheUpdateStyle } from '../filter/culling'
+import { keepTreeInView }          from '../interaction/view-bounds'
 
 //----------------------------------------------------------------------------------------
 
@@ -77,7 +78,12 @@ export class UnitDisk implements IUnitDisk
      */
     public frame(reason:FrameReason) {
         this.view.hypertree.highlighting.framePending = false
-        cacheUpdate(this, this.cache)
+        // a style frame with the view unchanged keeps the visible set (culling.ts)
+        if (reason !== 'style' || !cacheUpdateStyle(this, this.cache)) {
+            cacheUpdate(this, this.cache)
+            // an interaction left the tree behind: P corrected, the filter again (view-bounds.ts)
+            if (reason === 'transform' && keepTreeInView(this)) cacheUpdate(this, this.cache)
+        }
         this.layerStack.frame(reason)
     }
 

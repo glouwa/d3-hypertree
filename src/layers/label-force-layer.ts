@@ -83,6 +83,7 @@ export class LabelForceLayer implements ILayer
         ()=> this.args.transition,
         ()=> this.update.data(),
         ()=> !!this.d3updatePattern && !this.args.invisible,
+        ()=> this.view.hypertree.isAnimationRunning(),
         (n:N)=> this.args.hoverTransition === false && !!n.hovered)
 
     update = {

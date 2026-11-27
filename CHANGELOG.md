@@ -126,6 +126,18 @@ are listed first.
   down, straight lines between the nodes, option `duration`, 250 ms) and goes on from
   where it is when the target changes on the way. Its animation draws only itself.
   Options `r` (times the rim factor of `geometry.shrinkAtRim`), `duration`.
+- **`interaction.keepTreeInView` (default true)**: the center of the view never lies
+  beyond the tip of the tree. root*: where the line from the center through the root
+  meets the unit circle. The node nearest to the center decides: a tip (a leaf whose
+  branch lies behind it, seen from the center) must lie outside the circle with the
+  diameter center–root*; a node the tree passes through (a trunk beside the center)
+  is always fine. And the center never lies in the root's stem gap (the part of the
+  circle `layout.rootWedge` leaves free): the root can't pass the center in the tree's
+  direction. Dragging, pinching and
+  the wheel correct the translation by the smallest shift that makes the view valid
+  (the tree slides along the boundary); the zoom and animations (goto, the start
+  view) are not limited; the disk view only. Before, a view could end up as empty
+  disk with the tree bunched at the rim.
 - **Presets `highlightCell` and `highlightDisk({ size, duration })`**: how the
   highlighted node is shown, its voronoi cell (the theme's `.hovered.cell`) or the disk
   of the layer `highlight-marker`, `size` label fonts high in the center (default 3);
@@ -304,6 +316,38 @@ are listed first.
 
 ### Fixed
 
+- **The cells are joined by their node** (view/d3-join.ts). The join keyed every
+  element by `mergeId`, but a voronoi polygon carries its node in `data`: every cell
+  got the key `undefined`, so d3 removed and recreated every cell on every frame (ten
+  thousand DOM writes per frame on the Tree of Life, the cells layer a third to a half
+  of the frame's script time). Measured while dragging: main thread per step −35 to
+  −58 % (Mammalia desktop 67 → 28 ms, main page 25 → 17 ms, Mammalia phone ×6
+  237 → 176 ms, with the two items below).
+- **The weight filter settles in one frame** (filter/culling.ts `settle`). After a
+  wheel burst or a drag its remaining steps toward `rangeNodes` ran one per frame,
+  each a full frame with every layer: 10–18 frames, 0.5–0.8 s of main thread on a
+  desktop, 1.8 s on a phone. When the view stands still they now run at once without
+  drawing (as before the first frame), then one frame (Mammalia desktop: 12 → 4 frames
+  after a wheel burst).
+- **No frames of their own for the label transitions while the view moves**
+  (layers/label-transition.ts). `labels-force` and `labels-placed` requested an
+  animation frame for their growing, shrinking and gliding labels also while dragging,
+  where the hypertree draws every frame anyway: the relaxation and the join ran twice
+  per frame. A drawn offset within .0005 of its target snaps (was 1e-4: seven more
+  redraws for nothing visible). The invisible `labels-placed` layer no longer computes
+  its placement (2–3 ms per frame on a phone).
+- **A style frame keeps the visible set** (filter/culling.ts `cacheUpdateStyle`,
+  view/unitdisk.ts). A hover or selection change drew a frame that ran the full
+  filter: the DFS over the tree with all its transformations and the voronoi diagram,
+  although the view had not moved. When the transformation, the data, the filter and
+  the selection paths are those of the last full update, the frame keeps its visible
+  set, cells and positions and only selects the labels and the links on paths again.
+  Hover change on the Tree of Life: 55 → 21 ms of script at CPU ×6 (filter 39 → 4 ms),
+  2.4 ms on a desktop, no long tasks while sweeping the mouse.
+- **One probe per caption class for the emoji bitmaps** (layers/label-layer.ts
+  `textImage`). Every new emoji was measured as SVG text with `getBBox`, a forced
+  layout per emoji (9 ms each on a phone, dozens in a frame while dragging); the
+  font and its scale are now measured once per class and svg font size.
 - **Colors and state classes are written only when they change** (view/dom-write.ts;
   the cell, node, link and label layers, `markHoveredLabel`). The data join runs
   `updateColor` on every element on every frame while dragging (the visible nodes

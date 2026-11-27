@@ -74,12 +74,16 @@ export class LabelPlacementLayer implements ILayer
     private transitions = new LabelTransitions(
         ()=> this.args.transition,
         ()=> this.update.data(),
-        ()=> !!this.d3updatePattern && !this.args.invisible)
+        ()=> !!this.d3updatePattern && !this.args.invisible,
+        ()=> this.view.hypertree.isAnimationRunning())
 
+    // invisible: nothing is drawn (d3-join.ts), so nothing is placed either (the
+    // placement ran on every frame for the hidden layer: 2-3 ms per frame on a phone);
+    // the layer comes back with a data frame (configure: effect 'layers')
     update = {
         parent:         ()=> this.attach(),
-        data:           ()=> { this.place(); this.redraw(true) },
-        transformation: ()=> { if (this.place()) this.redraw(true); else this.redraw(false) },
+        data:           ()=> { if (!this.args.invisible) this.place(); this.redraw(true) },
+        transformation: ()=> { if (this.args.invisible) return; if (this.place()) this.redraw(true); else this.redraw(false) },
         style:          ()=> {
             if (this.args.hoverLabel || this.args.hoverPathLabels) { this.update.data(); return }
             this.d3updatePattern.update.style(); this.d3updatePattern2.update.style()

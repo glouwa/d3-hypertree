@@ -118,9 +118,16 @@ function adjustMagic(ud:IUnitDisk, cache:TransformationCache) {
 // step one more update is requested for the next frame; when another update came in
 // between, it waits a frame more (that update could not request one: one was pending).
 // It ends when the count is in the range or a limit stops the steps.
+//
+// When the view stands still (no drag, pinch, wheel or animation: nothing else draws),
+// the remaining steps run at once without drawing, as settleMagic before the first
+// frame, and one frame shows the result. One full frame per step (every layer drawn,
+// the labels relaxed) made 10-18 frames after a wheel burst: 0.5-0.8 s of main thread
+// on a desktop, 1.8 s on a phone. While the view moves, the frames come anyway.
 const updates = new WeakMap<object, number>()     // adjustMagic calls per unit disk
 const stepping = new WeakMap<object, boolean>()   // the last call took a step
 const settling = new WeakSet<object>()            // a frame is requested
+const SETTLE_STEPS = 50                           // steps at once; more go on frame by frame
 function settle(ud:IUnitDisk) {
     if (settling.has(ud) || typeof requestAnimationFrame === 'undefined') return
     settling.add(ud)
@@ -128,8 +135,9 @@ function settle(ud:IUnitDisk) {
     requestAnimationFrame(()=> {
         settling.delete(ud)
         if (!stepping.get(ud)) return
-        if (updates.get(ud) === seen) ud.view.hypertree.update.transformation()
-        else settle(ud)
+        if (updates.get(ud) !== seen) { settle(ud); return }
+        if (!ud.view.hypertree.isAnimationRunning()) settleMagic(ud, ud.cache, SETTLE_STEPS)
+        ud.view.hypertree.update.transformation()
     })
 }
 
@@ -324,13 +332,41 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
         Δ: [t1-t0, t2-t1, t3-t2, performance.now()-t3]
     }
 
-    if (ud.view.hypertree.transition  
-     && ud.view.hypertree.transition.currentframe) {
-        //ud.view.hypertree.transition.currentframe.cache = ud.cache
-        //ud.view.hypertree.transition.currentframe.cacheMeta = ud.cacheMeta
-    }
-    //else
-    //    console.log("why is there a cache update without a assigne transition?")
+    // what this update was computed for (cacheUpdateStyle)
+    const sig = updateSignature(ud)
+    if (sig === null) fullUpdates.delete(cache)
+    else fullUpdates.set(cache, { sig, data: ud.args.data })
+}
+
+// A 'style' frame (the hover or selection state changed, view/unitdisk.ts) whose
+// transformation, data, filter and selection paths are those of the last full update
+// keeps its visible set, its voronoi cells and its positions: only the labels are
+// selected again (the label fallback may have lent one) and the links on paths
+// collected (cache.paths). The hover path's nodes are visible already: a visible node
+// and its ancestors up to the culling radius. Until v2.0 every hover change ran the
+// full update, the DFS over the tree with all its transformations and the voronoi
+// diagram: 5 of 8 ms per change on a desktop, 13-15 long tasks per mouse sweep on a
+// phone. Not while the view moves (labels and cells may have been left out).
+const fullUpdates = new WeakMap<object, { sig:string, data:N | undefined }>()
+function updateSignature(ud:IUnitDisk) : string | null {
+    if (ud.view.hypertree.isAnimationRunning()) return null
+    const s = ud.args.transformation.state
+    const wf = ud.args.model.filter.weightFilter
+    const paths = ud.args.model.objects.pathes
+        .filter(p=> p.type !== 'HoverPath')
+        .map(p=> p.type + ':' + (p.head ? p.head.mergeId : ''))
+        .join(',')
+    return `${s.P.re}|${s.P.im}|${s.θ}|${s.λ}|${wf ? wf.magic : ''}|${paths}`
+}
+/** The light update of a 'style' frame; false: the full cacheUpdate is needed. */
+export function cacheUpdateStyle(ud:IUnitDisk, cache:TransformationCache) : boolean {
+    const last = fullUpdates.get(cache), sig = updateSignature(ud)
+    if (!last || sig === null || last.sig !== sig || last.data !== ud.args.data || !cache.unculledNodes) return false
+    const t0 = performance.now()
+    doLabelStuff(ud, cache)
+    cache.paths = cache.links.filter((n:N)=> n.pathes.partof && n.pathes.partof.length)
+    ud.cacheMeta = { minWeight: ud.cacheMeta ? ud.cacheMeta.minWeight : [], Δ: [0, 0, 0, performance.now() - t0] }
+    return true
 }
 
 function pathToLastVisible(ud:IUnitDisk, cache:TransformationCache) {

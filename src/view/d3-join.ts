@@ -22,6 +22,12 @@ export interface D3UpdatePatternArgs
 
 // The d3 join of a layer's elements: one group per pattern, the elements keyed by
 // the node's mergeId; data() joins, transformation() and style() update in place.
+//
+// the key: the node itself, or a datum wrapping a node (the cells layer's voronoi
+// polygons, voronoi.ts: p.data is the node). Without the key, every cell was
+// recreated on every frame (removeChild + appendChild per cell)
+const mergeKey = (d:any)=> d && (d.mergeId !== undefined ? d.mergeId : d.data && d.data.mergeId)
+
 export class D3UpdatePattern
 {
     args                 : D3UpdatePatternArgs
@@ -65,7 +71,7 @@ export class D3UpdatePattern
             this.data = this.mayEval(this.args.data)
         }
 
-        this.elements = this.elements.data(this.data, d=> d && d.mergeId)
+        this.elements = this.elements.data(this.data, mergeKey)
         this.elements
             .exit()
                 .remove()

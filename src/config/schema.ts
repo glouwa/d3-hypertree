@@ -145,6 +145,11 @@ export interface HypertreeArgs
         onHoverNodeChange:  (n:N)=> void
         onCenterNodeChange: (n:N, s:string)=> void
         λbounds:            [ number, number ]
+        // the center of the view never lies beyond the tip of the tree (the node nearest to
+        // the center, if the tree ends there: outside the circle with the diameter
+        // center–root*) nor in the root's stem gap: dragging, pinching and the wheel keep
+        // the translation on the boundary (interaction/view-bounds.ts; the disk view only)
+        keepTreeInView:     boolean
         // the tree never fills less than this share of the disk radius (e.g. .9): the
         // lower λ bound is computed per tree after loading, replacing λbounds[0]
         minFill:            number | null
@@ -266,6 +271,7 @@ export const coreDefaults = () : HypertreeArgs => ({
         onHoverNodeChange:  (n:N)=> {},
         onCenterNodeChange: (n:N)=> {},
         λbounds:            [ 1/40, .45 ],
+        keepTreeInView:     true,
         minFill:            null,
         maxLinkLength:      null,
         animationDuration:  750,

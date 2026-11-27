@@ -14,6 +14,10 @@ const FOLLOW = 70          // ms: time constant of the drawn offset following th
 const MAX_SPEED = .001     // view units per ms: a label that changes its place glides there
 const MAX_DT = 50          // ms: a longer pause (no updates) ...
 const IDLE_DT = 16         // ms: ... counts as one frame
+// view units: a drawn offset this near its target snaps to it (the exponential
+// approach never ends by itself; .0005 is a fifth of a pixel on a 400 px disk, 1e-4
+// took 7 more frames for nothing visible)
+const SNAP = 5e-4
 
 interface LabelState {
     g:    number,               // growth 0..1
@@ -37,11 +41,15 @@ export class LabelTransitions
      * duration: ms of growing and shrinking (0: none)
      * redraw:   draws the layer (called on animation frames while anything moves)
      * active:   false while the layer is invisible: no frames
+     * busy:     true while the view moves (dragging, pinching, the wheel, an animation):
+     *           the hypertree draws every frame anyway, no frames of our own (they ran
+     *           the relaxation and the join a second time per frame, and after the
+     *           interaction's end the hypertree draws a frame that continues here)
      * instant:  labels without animation (e.g. the hovered node's, layer option
      *           hoverTransition false): full size and in place at once, gone at once
      */
     constructor(private duration:()=> number, private redraw:()=> void, private active:()=> boolean,
-                private instant:(n:N)=> boolean = ()=> false) {}
+                private busy:()=> boolean = ()=> false, private instant:(n:N)=> boolean = ()=> false) {}
 
     private get animated() { return this.duration() > 0 }
 
@@ -109,7 +117,7 @@ export class LabelTransitions
             if (len > max) { mx *= max / len; my *= max / len }
             s.dx += mx
             s.dy += my
-            if (Math.abs(s.tx - s.dx) + Math.abs(s.ty - s.dy) > 1e-4) this.moving = true
+            if (Math.abs(s.tx - s.dx) + Math.abs(s.ty - s.dy) > SNAP) this.moving = true
             else { s.dx = s.tx; s.dy = s.ty }
         }
         return { dx: s.dx, dy: s.dy }
@@ -118,6 +126,7 @@ export class LabelTransitions
     /** Ends a frame: while anything moves, the layer is drawn again on the next frame. */
     finish() {
         if (!this.moving || this.frame || typeof requestAnimationFrame === 'undefined') return
+        if (this.busy()) return         // the next frame comes anyway (see busy)
         this.frame = requestAnimationFrame(()=> {
             this.frame = 0
             if (!this.active()) return
