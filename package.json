@@ -23,7 +23,12 @@
     "dev": "node build/watch.mjs --playground",
     "run": "node build/watch.mjs",
     "playground": "browser-sync start --server --port 3100 --ui-port 3101 --startPath /playground/ --files \"dist/*.js\" \"dist/*.css\" \"playground/*\" \"test/config.js\" --no-open --no-notify",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "perf": "node test/perf/run.mjs",
+    "perf:quick": "node test/perf/run.mjs --quick",
+    "perf:commit": "node test/perf/run.mjs --write commit",
+    "perf:longterm": "node test/perf/run.mjs --write longterm",
+    "perf:compare": "node test/perf/compare.mjs"
   },
   "dependencies": {
     "d3": "^7.9.2",

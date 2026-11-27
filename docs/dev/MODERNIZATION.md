@@ -388,7 +388,7 @@ Rendering (DOM, browser), in order of expected gain:
         depend on the data.
   - [ ] Open: in the playground, the emoji layer is off by default (it is slow)
         and this overrides presets that turn it on (infovisEmoji)
-  - [ ] Step 4: the app's index.html and otol.html use the new presets
+  - [x] Step 4: the app's index.html and otol.html use the new presets (done 2026-11-25: the Tree-of-Life presets moved to the app, `hypertree-of-life/src/presets.ts`)
 
 ### Future features
 
@@ -453,7 +453,7 @@ Done 2026-11-23 as a prototype, `geometry.halfPlane` (`src/models/transformation
 
 ### Phase 4: v2 release
 
-- [ ] **Folder structure by pipeline stage** (first step of phase 4, before the API
+- [x] **Folder structure by pipeline stage** (done 2026-11-25, REFACTORING.md §3: folders by stage, without numbers) (first step of phase 4, before the API
       review). Today `components/` vs `models/` is blurry (`models/hypertree/` holds
       the filter, label selection, voronoi and the default layer stack), the data
       flow isn't visible, labels are spread over four files, `hypertree.ts` has
@@ -684,3 +684,7 @@ The harness ([`test/harness.html`](../../test/harness.html)) takes the data sour
 every option as URL parameters (documented at the top of the file), e.g.
 `harness.html?gen=nTree&depth=5&childs=8&labels=1&icons=1` or
 `harness.html?file=fixtures/flare.csv&filterOpt={"maxlabels":3}`.
+
+---
+
+Created 2026-11-22 · Last edit 2026-11-27

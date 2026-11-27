@@ -249,3 +249,7 @@ Implemented 2026-11-25 (see the commit): sections 2 to 8 as described, with
 the old playground replaced. Not implemented: the application presets' registration
 in hypertree-of-life (5.1, the page side), the readme cheat sheet generated from the
 descriptors (an open decision of the first draft).
+
+---
+
+Created 2026-11-25 · Last edit 2026-11-25

@@ -9,6 +9,12 @@ the bug; this document is about the design limit behind it and about what a
 layout relative to the focus node would give and cost, in particular for trees
 loaded in parts.
 
+Status:
+
+- [x] The acute bug: path laid out top-down, never empty, start at the preserved node (2026-11-27)
+- [ ] Focus-rooted layout (section 3)
+- [ ] One of the cheap alternatives (section 6)
+
 ## 1. The current design: absolute coordinates, root at the origin
 
 `layout.type` (`layoutBergé`, `src/layout/layouts.ts`) places every node in the
@@ -209,13 +215,13 @@ ancestor stands in for it.
 
 ## 6. Alternatives considered
 
-- **Higher precision storage** (hyperbolic polar coordinates: distance as a
+- [ ] **Higher precision storage** (hyperbolic polar coordinates: distance as a
   plain double, angle): removes the storage problem but not the cancellation
   in the view transform with `|P| → 1`, and not the clamp. Not sufficient alone.
-- **Clamp λ by depth** so the deepest visible node stays inside the clamp:
+- [ ] **Clamp λ by depth** so the deepest visible node stays inside the clamp:
   cheap, keeps the current design, but forbids exactly the spread the user
   wants near the leaves. Could be a stop-gap (`λ_max(depth)` from the table).
-- **Keep absolute coordinates, raise the clamp** to `1 − 1e-13`: moves the
+- [ ] **Keep absolute coordinates, raise the clamp** to `1 − 1e-13`: moves the
   wall a few levels (λ 0.25: depth 37 → 60), no structural change. Possible
   quick win but the precision wall is then the hard limit.
 
@@ -226,3 +232,7 @@ basis if one of these comes: on-demand loading of parts of a tree (especially
 upward or without the root), trees deeper than the table allows at the wanted
 λ, or a request for large λ near the leaves of the clade trees. Until then,
 `λ_max(depth)` or the raised clamp are the cheap options.
+
+---
+
+Created 2026-11-27 · Last edit 2026-11-27

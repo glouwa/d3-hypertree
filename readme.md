@@ -402,3 +402,7 @@ new hyt.Hypertree(
 
 Selection API (all go through `interaction.selection`): `api.toggleSelection(n)`,
 `api.select(n)`, `api.deselect(n)`, `api.clearSelection()`.
+
+---
+
+Created 2017-11-01 · Last edit 2026-11-27

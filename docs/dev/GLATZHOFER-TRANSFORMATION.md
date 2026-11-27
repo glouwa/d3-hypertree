@@ -92,7 +92,7 @@ height 1 (`Y ∈ [0, 1]`, 0 at the top) and width `A` (the aspect ratio),
 `X ∈ [−A/2, A/2]`. Along the disk diameter through the gap, `z = t` (t toward the
 gap), the Cayley map gives `y = (1 + t) / (1 − t)`.
 
-### A. Compressed half-plane (projection only)
+### [ ] A. Compressed half-plane (projection only)
 
 ```
 Y = y / (1 + y)                              = (1 + t) / 2 on the axis: the disk's radial scale
@@ -151,7 +151,7 @@ X = (A/2) · tanh( 2x / (A (1 + y)²) )
   (as in the disk, not better); no depth levels; the whole rim on one edge means
   the leaf density per edge length is higher than in the disk.
 
-### B. The band (strip) model
+### [ ] B. The band (strip) model
 
 `ξ = log w` maps the half-plane onto the strip `0 < Im ξ < π`: two ideal edges
 (the two halves of the real axis), the left end the rim point `w = 0`, the right end
@@ -162,7 +162,7 @@ rim edge you would cut the strip in half along the axis, which is not a map of t
 disk any more. Not a candidate for the wanted view; worth remembering as the
 natural picture when one path (focus → root) is the subject.
 
-### C. Horocycle layout in the half-plane (Inxight, US 6,901,555)
+### [ ] C. Horocycle layout in the half-plane (Inxight, US 6,901,555)
 
 A layout directly in half-plane coordinates: the children of a node at `(x_p, y_p)`
 lie on the horocycle `y = y_p·e^(−d)` (a line parallel to the horizon), spread in x
@@ -265,12 +265,12 @@ loading.
 
 ## 6. Recommendation
 
-1. Build A as a projection and look at the Tree of Life in it (desktop and phone).
+1. [ ] Build A as a projection and look at the Tree of Life in it (desktop and phone).
    It answers the question "rim on the top edge only" exactly, costs little, and
    supersedes the uncompressed `'halfplane'` prototype (same model, bounded).
-2. If the picture is good but the root wanders, add A′ (navigation fixing the
+2. [ ] If the picture is good but the root wanders, add A′ (navigation fixing the
    gap). Expect the root at the bottom and the stem never crossing the tree.
-3. Do C only if depth levels are the goal. Then do it as the half-plane variant of
+3. [ ] Do C only if depth levels are the goal. Then do it as the half-plane variant of
    the focus-rooted layout, not as a third absolute layout.
 
 ## 7. Open questions
@@ -284,3 +284,7 @@ loading.
   dense along the edge; does the label filter need an edge-aware rule?
 - Portrait phones: a minimum aspect ratio for the compression, or let the view
   fall back to the disk below it?
+
+---
+
+Created 2026-11-27 · Last edit 2026-11-27

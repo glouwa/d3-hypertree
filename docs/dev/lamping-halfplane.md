@@ -103,15 +103,15 @@ and the navigation along the axes.
 
 ## Options
 
-1. **Inxight-style half-plane as a second prototype**, next to the current one:
+1. [ ] **Inxight-style half-plane as a second prototype**, next to the current one:
    a layout in the half-plane on horocycles, the compression and orientation
    (horizon right or bottom), navigation along the axes (`w → w + t`, `w → k·w`
    as moves, a click centers). Zoom can stay a layout parameter. This is its own
    pipeline next to the disk, not a display option.
-2. **Improve the current prototype** without a new layout: horizon on the right,
+2. [ ] **Improve the current prototype** without a new layout: horizon on the right,
    compression of the ancestor side, navigation constrained to the axes.
-3. **Leave the rectangular view as it is** for now.
-4. **A conformal map of the whole disk onto the rectangle** (Schwarz–Christoffel,
+3. [ ] **Leave the rectangular view as it is** for now.
+4. [x] **A conformal map of the whole disk onto the rectangle** (Schwarz–Christoffel,
    the "any conformal map" of Lamping's outlook): keeps everything the disk has (the
    root and the path to it always in the picture, nodes bounded, fans with their
    angles), only the four corners are compressed. No new layout or navigation.
@@ -122,3 +122,7 @@ Life's `?view=rect` uses it. The half-plane stays as `'halfplane'`. Reason: no
 isometry keeps the root in view while a leaf is magnified; the disk has that
 property through its compactness, and the Cayley map gives it up by sending a rim
 point to infinity.
+
+---
+
+Created 2026-11-23 · Last edit 2026-11-27

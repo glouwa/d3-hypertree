@@ -517,6 +517,13 @@ and after on the same machine (see [docs/dev/PERFORMANCE.md](docs/dev/PERFORMANC
 
 ### Packaging and development
 
+- **Performance suite** (`test/perf/run.mjs`, `npm run perf`): generated trees in the
+  test harness in headless Edge; load, idle, drag, settling, wheel, pinch, hover, the
+  render time per layer, the cost of single options and of the presets, as mean ± sd
+  over iterations. Three generated result files with one schema in
+  `docs/dev/performance/` (`longterm`, `last-commit`, `last-run`) and `npm run
+  perf:compare` for before/after comparisons without stashing old code
+  (`docs/dev/PERFORMANCE-SUITE.md`).
 - Built with Vite, TypeScript 6 and dart-sass; Node ≥ 20.19.
 - `dist/d3-hypertree.js` (UMD, global `hyt`, self-contained),
   `dist/d3-hypertree.mjs` (ESM), `dist/d/` type declarations (`types` pointed to
@@ -546,3 +553,7 @@ and after on the same machine (see [docs/dev/PERFORMANCE.md](docs/dev/PERFORMANC
 ## 1.1.3 and earlier
 
 See the git history.
+
+---
+
+Created 2026-11-22 · Last edit 2026-11-27

@@ -270,3 +270,7 @@ default tree with labels: 15 (11 drawing) per layer, 8 (4 drawing) with planes,
 3. Re-run once more if a change looks small; given the noise, only differences
    well beyond ~30% are reliable from a single run.
 4. Commit the new JSON together with the change and update the tables above.
+
+---
+
+Created 2026-11-22 · Last edit 2026-11-22

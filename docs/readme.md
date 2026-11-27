@@ -285,3 +285,7 @@ Youtube:
 - What Is The Shape of Space? (ft. PhD Comics)
   minutephysics
 -->
+
+---
+
+Created 2017-11-01 · Last edit 2026-11-22

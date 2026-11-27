@@ -281,18 +281,18 @@ benchmarks of PERFORMANCE.md before and after.
 Each step ends green (295 library tests, 21 app tests; the scene snapshots catch
 geometry changes to the pixel):
 
-1. **Delete** the legacy code of 1.2 (`HypertreeEx`, `UnitDiskNav`, the old interaction
+1. [x] **Delete** the legacy code of 1.2 (`HypertreeEx`, `UnitDiskNav`, the old interaction
    layer, `meta/`), after hypertree-of-life drops `navigation.ts`'s import. Changelog
    entry. −19 %.
-2. **Config** (section 2): schema with defaults and `affects`, `resolveModel` with
+2. [x] **Config** (section 2): schema with defaults and `affects`, `resolveModel` with
    provenance, typed layer options, `configure()`. Move the Tree-of-Life presets into
    hypertree-of-life and make both pages use them. The scene tests must not change.
-3. **Projection** (section 4): extract `DiskProjection` first with every scene
+3. [x] **Projection** (section 4): extract `DiskProjection` first with every scene
    byte-identical, then move the half-plane code into `HalfPlaneProjection`, delete
    `geometry.halfPlane`.
-4. **Folder move** (section 3): one commit, `git mv` and imports only.
-5. **Frame** (section 5): with before/after benchmarks.
-6. Split `hypertree.ts` as described in section 3 (can be folded into 4).
+4. [x] **Folder move** (section 3): one commit, `git mv` and imports only.
+5. [x] **Frame** (section 5): with before/after benchmarks.
+6. [x] Split `hypertree.ts` as described in section 3 (can be folded into 4).
 
 Decisions taken before step 1: `HypertreeEx` and the three-disk navigation are
 dropped from the public API of v2; the Tree-of-Life presets live in
@@ -334,3 +334,7 @@ What differs from the text above:
   host interface each.
 - **`filter.maxlabels`** became the layer option `maxLabels` (default 25 on each
   label layer, `DEFAULT_MAX_LABELS`), as section 2.1 (5) asked.
+
+---
+
+Created 2026-11-25 · Last edit 2026-11-27
