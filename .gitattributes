@@ -1,0 +1,2 @@
+# the hooks are sh scripts: always LF (CRLF breaks sh)
+.githooks/* text eol=lf

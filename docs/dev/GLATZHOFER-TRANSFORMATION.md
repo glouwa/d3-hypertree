@@ -1,6 +1,12 @@
 # One-edge rectangular view ("dendrogram-like"): analysis
 
-Status: analysis, nothing implemented (2026-11-27). Question: starting from the
+Status: analysis (2026-11-27); candidate A implemented the same day as
+`geometry.projection: 'glatzhofer'` (`src/projection/glatzhofer.ts`, tests
+`test/tests/glatzhofer.spec.mjs`; the Tree of Life's branch pages open it with
+`?view=glatzhofer`). View coordinates there: twice `(X, Y − ½)`, so the rectangle is
+`x ∈ ±A, y ∈ ±1` with the disk's scale at the center. `keepTreeInView` is on: its
+disk rules (the tree's tip and the root behind the center) mean the same here, since
+the view's center is the disk's. A′ and C are open. Question: starting from the
 Schwarz–Christoffel rectangle (`geometry.projection: 'schwarz-christoffel'`), can the ideal boundary
 of the hyperbolic plane (the rim of the disk) be mapped onto the top edge only,
 giving a dendrogram-like picture with the root static at the bottom middle and the
@@ -92,7 +98,7 @@ height 1 (`Y ∈ [0, 1]`, 0 at the top) and width `A` (the aspect ratio),
 `X ∈ [−A/2, A/2]`. Along the disk diameter through the gap, `z = t` (t toward the
 gap), the Cayley map gives `y = (1 + t) / (1 − t)`.
 
-### [ ] A. Compressed half-plane (projection only)
+### [x] A. Compressed half-plane (projection only)
 
 ```
 Y = y / (1 + y)                              = (1 + t) / 2 on the axis: the disk's radial scale
@@ -265,7 +271,7 @@ loading.
 
 ## 6. Recommendation
 
-1. [ ] Build A as a projection and look at the Tree of Life in it (desktop and phone).
+1. [x] Build A as a projection and look at the Tree of Life in it (desktop and phone).
    It answers the question "rim on the top edge only" exactly, costs little, and
    supersedes the uncompressed `'cayley'` prototype (same model, bounded).
 2. [ ] If the picture is good but the root wanders, add A′ (navigation fixing the

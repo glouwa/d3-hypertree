@@ -1,0 +1,10 @@
+#!/bin/sh
+# After every commit: measure the committed state with the performance suite and write
+# docs/dev/performance/last-commit (docs/dev/PERFORMANCE-SUITE.md). Runs in the
+# background so the commit returns at once; the suite waits for another measurement
+# to finish and refuses a dirty working tree (then the log says so).
+# Installed by `npm run hooks` (git config core.hooksPath .githooks).
+cd "$(git rev-parse --show-toplevel)" || exit 0
+mkdir -p docs/dev/performance
+nohup node test/perf/run.mjs --write commit > docs/dev/performance/last-commit.log 2>&1 &
+exit 0

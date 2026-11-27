@@ -91,8 +91,10 @@ cd test && npm run test:update                 # accept new scene/screenshot ref
   perf` in `../hypertree-of-life`; the real pages) and read the printed comparison with
   `last-commit` and `longterm` (`docs/dev/PERFORMANCE-SUITE.md`). Never stash or
   rebuild old code to measure it; the reference is the measured last commit.
-  `last-commit` is written right after a commit (`npm run perf:commit`, clean tree);
-  `longterm` only when the user asks (`npm run perf:longterm`).
+  `last-commit` and `last-push` are written by the git hooks in `.githooks` (installed
+  with `npm run hooks`) after every commit and on every push, in the background with
+  a shared lock; `longterm` only when the user asks (`npm run perf:longterm`). A
+  hook's result files are uncommitted until the next commit; commit them with it.
 - The older trace-based benchmarks for the cost per layer and per pipeline phase:
   `test/bench-layers.mjs`, `test/bench-interaction.mjs` (`docs/dev/PERFORMANCE.md`).
 - The user's main goal is pleasant zooming, pinching and dragging; render and

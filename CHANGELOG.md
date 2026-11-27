@@ -103,6 +103,16 @@ are listed first.
 
 ### Added
 
+- **`geometry.projection: 'glatzhofer'`**: the compressed half-plane
+  (projection/glatzhofer.ts, docs/dev/GLATZHOFER-TRANSFORMATION.md). The Cayley
+  half-plane squeezed into a rectangle: the height `Y = y / (1 + y)`, the width
+  `X = (A/2)·tanh(2x / (A (1 + y)²))` for the aspect ratio A of the drawn element. The
+  rim of the disk (all leaves) is the top edge only; the other three edges are the one
+  ideal point of the root wedge's gap, which no node reaches. Every node and every path
+  to the root is in the picture; the root's stem bends to the middle of the bottom edge;
+  along the center line the map is isotropic with the disk's scale. Layout, λ zoom,
+  filter and navigation stay in the disk; links are quadratic curves through the image
+  of their disk arc's midpoint. Closed form, cheaper than the Schwarz–Christoffel map.
 - **`geometry.projection: 'schwarz-christoffel'`** (named `geometry.view` until 2026-11-27; the old name is migrated with a warning): the rectangular view as the conformal image of the
   whole disk (the Schwarz–Christoffel map, geometry/schwarz-christoffel.ts,
   projection/rectangle.ts). The rim of the disk becomes the edge of the rectangle,
@@ -527,9 +537,10 @@ and after on the same machine (see [docs/dev/PERFORMANCE.md](docs/dev/PERFORMANC
   test harness in headless Edge; load, idle, drag, settling, wheel, pinch, hover, the
   render time per layer, the cost of single options and of the presets, as mean ± sd
   over iterations. Three generated result files with one schema in
-  `docs/dev/performance/` (`longterm`, `last-commit`, `last-run`) and `npm run
-  perf:compare` for before/after comparisons without stashing old code
-  (`docs/dev/PERFORMANCE-SUITE.md`).
+  `docs/dev/performance/` (`longterm`, `last-push`, `last-commit`, `last-run`) and
+  `npm run perf:compare` for before/after comparisons without stashing old code
+  (`docs/dev/PERFORMANCE-SUITE.md`). The git hooks in `.githooks` (`npm run hooks`)
+  measure every commit and every push in the background.
 - Built with Vite, TypeScript 6 and dart-sass; Node ≥ 20.19.
 - `dist/d3-hypertree.js` (UMD, global `hyt`, self-contained),
   `dist/d3-hypertree.mjs` (ESM), `dist/d/` type declarations (`types` pointed to

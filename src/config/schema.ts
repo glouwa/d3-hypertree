@@ -90,7 +90,7 @@ export interface HypertreeArgs
         // the projection of the hyperbolic plane onto the screen (projection/): the
         // disk, the rectangular half-plane view, the rectangle (the conformal image
         // of the whole disk, Schwarz–Christoffel), or an own Projection
-        projection:         'poincare' | 'cayley' | 'schwarz-christoffel' | Projection
+        projection:         'poincare' | 'cayley' | 'schwarz-christoffel' | 'glatzhofer' | Projection
         diskSize:           number                            // the diameter of the disk in the square view (.96); > 1: beyond the view
         // the layer stack in drawing order: specs, or the name of a default layer
         // (layers/index.ts defaultLayers) for its spec

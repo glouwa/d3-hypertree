@@ -27,7 +27,9 @@
     "perf": "node test/perf/run.mjs",
     "perf:quick": "node test/perf/run.mjs --quick",
     "perf:commit": "node test/perf/run.mjs --write commit",
+    "perf:push": "node test/perf/run.mjs --write push",
     "perf:longterm": "node test/perf/run.mjs --write longterm",
+    "hooks": "git config core.hooksPath .githooks",
     "perf:compare": "node test/perf/compare.mjs"
   },
   "dependencies": {
