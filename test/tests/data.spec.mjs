@@ -17,6 +17,8 @@ const sources = [
     ['skos',        'file=fixtures/animals.skos.xml',         7],
     ['treeml',      'file=fixtures/primates.treeml.xml',      192],
     ['d3json 10k',  'file=fixtures/filesystem.d3.json',       10000],
+    ['d3json otol', 'file=fixtures/primates.d3.json',         1128],
+    ['d3json deep', 'file=fixtures/embryophyta.d3.json',      45740],
 ]
 
 for (const [name, query, count] of sources) {

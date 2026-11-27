@@ -5,9 +5,9 @@ import { Projection, ArcCurvature, ViewBox } from './projection'
 // The Poincaré disk as it is: view positions are the disk positions, geodesics are
 // circular arcs orthogonal to the rim (hyperbolic-math.ts arcCenter), the root's stem
 // goes straight down to the rim.
-export class DiskProjection implements Projection
+export class PoincareProjection implements Projection
 {
-    readonly kind = 'disk'
+    readonly kind = 'poincare'
     readonly followsSize = false
 
     project(nodes:N[]) : N[] { return nodes }      // n.cache is the view position already

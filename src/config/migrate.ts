@@ -19,7 +19,7 @@ const labelLayers = ['labels', 'labels-force', 'labels-placed']
  *   layerOptions[*].nodeColor -> fill, linkColor -> stroke,
  *   interaction.wheelSensitivity -> wheelFactor,
  *   geometry.animateUpRadius -> layout.initSize,
- *   geometry.halfPlane -> geometry.view 'halfplane',
+ *   geometry.halfPlane -> geometry.projection 'cayley', geometry.view -> geometry.projection,
  *   filter.cullingWeight -> filter.weightFilter.rangeNodes,
  *   filter.maxlabels -> layerOptions[label layers].maxLabels,
  *   filter.transformation.P -> geometry.startPosition
@@ -57,13 +57,28 @@ export function migrate(input:any) : any {
             delete branch('geometry').animateUpRadius
         }
         if (g.halfPlane !== undefined) {
-            deprecated('geometry.halfPlane', "geometry.view: 'halfplane'")
+            deprecated('geometry.halfPlane', "geometry.projection: 'cayley'")
             const geometry = branch('geometry')
-            if (geometry.view === undefined) geometry.view = g.halfPlane ? 'halfplane' : 'disk'
+            if (geometry.projection === undefined) geometry.projection = g.halfPlane ? 'cayley' : 'poincare'
             delete geometry.halfPlane
         }
+        // the v2 prereleases' name of the projection (until 2026-11-27)
+        if (g.view !== undefined) {
+            deprecated('geometry.view', 'geometry.projection')
+            const geometry = branch('geometry')
+            if (geometry.projection === undefined) geometry.projection = g.view
+            delete geometry.view
+        }
+        // the v2 prereleases' values of the projection (until 2026-11-27): named after
+        // their shape; now after the map
+        const oldNames = { disk: 'poincare', halfplane: 'cayley', rectangle: 'schwarz-christoffel' }
+        const p = branch('geometry').projection
+        if (typeof p === 'string' && oldNames[p]) {
+            deprecated(`geometry.projection: '${p}'`, `geometry.projection: '${oldNames[p]}'`)
+            branch('geometry').projection = oldNames[p]
+        }
         if (g.decorator !== undefined) {
-            deprecated('geometry.decorator', 'geometry.view (a Projection)')
+            deprecated('geometry.decorator', 'geometry.projection (a Projection)')
             delete branch('geometry').decorator
         }
         if (g.cacheUpdate !== undefined) {

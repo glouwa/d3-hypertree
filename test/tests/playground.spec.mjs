@@ -201,6 +201,10 @@ test('the initialization section lists every step with its current value', async
     const text = await steps.allInnerTexts()
     expect(text[0]).toContain('dataloader')
     expect(text[0]).toContain('hyt.nTree(depth 6, 3 children)')
+    // the explanations are tooltips, not visible text
+    expect(text[0]).not.toContain('Loads the data')
+    expect(await steps.nth(0).locator('.step-title').getAttribute('title')).toContain('Loads the data')
+    expect(await page.locator('summary', { hasText: 'Initialization' }).getAttribute('title')).toContain('in this order')
     expect(text[5]).toContain('langInitBFS')
     expect(text[5]).toContain('Node 0')
     await steps.nth(5).locator('.check', { hasText: /^Labels$/ }).locator('input').uncheck()
@@ -449,9 +453,9 @@ test('geometry: the rectangular view (half-plane) in a wide tree element', async
     await page.goto('../playground/?gen=nTree&depth=5&childs=3')
     await ready(page)
     await openSection(page, 'Geometry')
-    await opt(page, 'geometry.view').locator('select').selectOption('halfplane')
-    await page.waitForFunction(() => decodeURIComponent(location.search).includes('"view":"halfplane"'))
-    await page.waitForFunction(() => window.ht && window.ht.args.geometry.view === 'halfplane' && window.ht.unitdisk.cache && window.ht.unitdisk.cache.unculledNodes.length > 10)
+    await opt(page, 'geometry.projection').locator('select').selectOption('cayley')
+    await page.waitForFunction(() => decodeURIComponent(location.search).includes('"projection":"cayley"'))
+    await page.waitForFunction(() => window.ht && window.ht.args.geometry.projection === 'cayley' && window.ht.unitdisk.cache && window.ht.unitdisk.cache.unculledNodes.length > 10)
     await page.waitForTimeout(300)
     const r = await page.evaluate(() => {
         const box = document.querySelector('#tree').getBoundingClientRect()

@@ -90,7 +90,7 @@ export interface HypertreeArgs
         // the projection of the hyperbolic plane onto the screen (projection/): the
         // disk, the rectangular half-plane view, the rectangle (the conformal image
         // of the whole disk, Schwarz–Christoffel), or an own Projection
-        view:               'disk' | 'halfplane' | 'rectangle' | Projection
+        projection:         'poincare' | 'cayley' | 'schwarz-christoffel' | Projection
         diskSize:           number                            // the diameter of the disk in the square view (.96); > 1: beyond the view
         // the layer stack in drawing order: specs, or the name of a default layer
         // (layers/index.ts defaultLayers) for its spec
@@ -223,7 +223,7 @@ export const coreDefaults = () : HypertreeArgs => ({
         labelScore:         null,
     },
     geometry: {
-        view:               'disk',
+        projection:         'poincare',
         diskSize:           .96,
         layers:             [],                   // filled by resolve.ts from the layer types
         layerOptions:       {},
@@ -307,7 +307,7 @@ export const affects : { [pathPrefix:string]: Effect } = {
     'filter.weightFilter.weight': 'layout',     // the culling weights are summed with the layout weights
     'filter.labelScore':          'frame',
     'geometry':                   'frame',
-    'geometry.view':              'layers',
+    'geometry.projection':        'layers',
     'geometry.layers':            'layers',
     'geometry.layerOptions':      'layers',
     'geometry.captionFont':       'labels',

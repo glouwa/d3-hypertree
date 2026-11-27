@@ -161,6 +161,14 @@ icon) is not part of the model; it stays in `config.js` (`gen=`, `file=`, `label
 component when changed. The "Initialization" section (the steps the data goes
 through: dataInitBFS, langInitBFS, weights, start zoom, with their current values)
 stays; it is the one place that reads the hypertree's internals rather than the model.
+The explanation of each step is a tooltip of its title (and the section's, of its
+summary), so the list shows only the steps and their current values.
+
+Both panels use the same row: height, label column and fonts come from the variables
+`--row-h` and `--label-w` in `playground.css`; every second setting is shaded
+(`--row-alt`), the setting under the mouse darker (`--row-hover`). Collapsible click
+areas (section titles, layer and group rows, the expanders of the stack) are pale
+green (`--collapse`, every second layer row `--collapse-alt`, hover `--collapse-hover`).
 
 ## 5. The preset stack
 
@@ -252,4 +260,4 @@ descriptors (an open decision of the first draft).
 
 ---
 
-Created 2026-11-25 · Last edit 2026-11-25
+Created 2026-11-25 · Last edit 2026-11-27

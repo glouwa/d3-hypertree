@@ -8,7 +8,14 @@
     --accent-weak: #e7f0fc;
     --preset: #8e5bd9;
     --preset-weak: #f1eafc;
+    --row-alt: #f1f3f7;          /* every second setting */
+    --row-hover: #e3e7ee;        /* the setting under the mouse */
+    --collapse: #e8f5e9;         /* a collapsible click area (section titles, layer rows, groups) */
+    --collapse-alt: #dcefdd;     /* every second layer row */
+    --collapse-hover: #c2e2c6;   /* under the mouse */
     --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --row-h: 30px;               /* the height of one setting, both panels */
+    --label-w: 104px;            /* the label column of a setting, both panels */
 }
 body.dark {
     --bg: #15181e;
@@ -20,6 +27,11 @@ body.dark {
     --accent-weak: #22324a;
     --preset: #b78cff;
     --preset-weak: #2d2540;
+    --row-alt: #232833;
+    --row-hover: #2c3342;
+    --collapse: #1e2d22;
+    --collapse-alt: #243527;
+    --collapse-hover: #34503b;
 }
 * { box-sizing: border-box; }
 html, body { height: 100%; }
@@ -52,11 +64,14 @@ body {
 }
 #panel footer button { flex: 1; }
 
-details { border-bottom: 1px solid var(--line); padding: 2px 8px; }
+details { border-bottom: 1px solid var(--line); padding: 0 8px 2px; }
+/* the collapsible click area: pale green, like the layer rows on the right */
 summary {
-    cursor: pointer; padding: 8px 0; font-weight: 600; list-style: none;
+    cursor: pointer; margin: 2px -8px 0; padding: 0 8px; min-height: var(--row-h); font-weight: 600; list-style: none;
     display: flex; justify-content: space-between; align-items: center;
+    background: var(--collapse); border-radius: 4px;
 }
+summary:hover { background: var(--collapse-hover); }
 summary::-webkit-details-marker { display: none; }
 summary::after { content: "▸"; color: var(--muted); transition: transform .15s; }
 details[open] summary::after { transform: rotate(90deg); }
@@ -64,12 +79,15 @@ summary .badge {
     margin-left: auto; margin-right: 8px; font-weight: 400; font-size: 11px;
     color: var(--accent); background: var(--accent-weak); border-radius: 8px; padding: 0 6px;
 }
-.group { padding: 0 0 10px; display: grid; gap: 6px; }
-.hint { color: var(--muted); font-size: 12px; margin: 0; }
+.group { padding: 4px 0 8px; display: grid; gap: 0; }
+.hint { color: var(--muted); font-size: 12px; margin: 4px 0; }
 .hint code { font-family: var(--mono); font-size: 11px; }
 
-.row { display: grid; grid-template-columns: 120px 1fr 52px; align-items: center; gap: 8px; }
-.row.two { grid-template-columns: 120px 1fr; }
+/* a setting: one row of the same height in both panels; every second one shaded */
+.row { display: grid; grid-template-columns: var(--label-w) 1fr 52px; align-items: center; gap: 8px; min-height: var(--row-h); padding: 2px 8px; margin: 0 -8px; }
+.row.two { grid-template-columns: var(--label-w) 1fr; }
+.group > .row:nth-child(even of .row) { background: var(--row-alt); }
+.group > .row:hover, ol.init-steps > li:hover { background: var(--row-hover); }
 .row label { color: var(--muted); }
 .row output { font-family: var(--mono); font-size: 12px; text-align: right; }
 .check { display: flex; align-items: center; gap: 6px; }
@@ -83,7 +101,7 @@ input[type=checkbox] { accent-color: var(--accent); }
 input[type=color] { width: 32px; height: 24px; padding: 0; border: 1px solid var(--line); border-radius: 4px; background: none; flex: none; }
 
 /* an option: label | control | value, provenance, reset */
-.row.opt { grid-template-columns: 110px 1fr auto; }
+.row.opt { grid-template-columns: var(--label-w) 1fr auto; }
 .row.opt > label { cursor: help; text-decoration: underline dotted var(--line); font-family: var(--mono); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .row.opt.changed > label { color: var(--accent); }
 .row.opt .tail { display: flex; align-items: center; gap: 4px; justify-content: flex-end; min-width: 52px; }
@@ -103,9 +121,12 @@ button.reset { font-size: 13px; line-height: 1; }
 .fn .sub input[type=range] { flex: 1 1 60px; }
 
 table.layers { width: 100%; border-collapse: collapse; }
-table.layers th { text-align: left; font-weight: 400; color: var(--muted); font-size: 11px; padding: 2px 4px; }
-table.layers td { padding: 2px 4px; border-top: 1px solid var(--line); }
+table.layers th { text-align: left; font-weight: 400; color: var(--muted); font-size: 11px; padding: 2px 8px; }
+table.layers td { padding: 2px 8px; height: var(--row-h); }
 table.layers td:first-child { font-family: var(--mono); font-size: 12px; }
+/* a layer or group row is a collapsible click area: pale green, every second one a little darker */
+table.layers tr.expandable td { background: var(--collapse); }
+table.layers tr:nth-child(even of .expandable:not([hidden])) td { background: var(--collapse-alt); }
 table.layers td.c { text-align: center; width: 54px; }
 table.layers td.tools { width: 60px; white-space: nowrap; text-align: right; }
 table.layers td.tools button { font-size: 12px; padding: 0 2px; visibility: hidden; }
@@ -124,7 +145,9 @@ button.link.active { color: #fff; background: var(--accent); border-radius: 3px;
 
 /* ---- the stack --------------------------------------------------------- */
 .stack { display: grid; gap: 2px; }
-.entry { display: flex; align-items: center; gap: 5px; padding: 3px 4px; border-radius: 4px; }
+.entry { display: flex; align-items: center; gap: 5px; padding: 0 4px; min-height: var(--row-h); border-radius: 4px; }
+.entry button.expander { background: var(--collapse); border-radius: 3px; padding: 0 4px; min-width: 18px; min-height: 22px; }
+.entry button.expander:hover { background: var(--collapse-hover); }
 .entry.editing { background: var(--accent-weak); }
 .entry.off .name, .entry.off .count { opacity: .5; text-decoration: line-through; }
 .entry .name { font-family: var(--mono); font-size: 12px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -189,23 +212,28 @@ body.halfplane #tree { width: 100%; aspect-ratio: auto; height: calc(100vh - 230
     #info { grid-template-columns: 1fr; height: auto; }
 }
 
-/* per-layer options */
+/* per-layer options: the same rows as on the left, indented under their layer */
 table.layers button.expander { width: 14px; text-align: left; color: var(--muted); }
-table.layers tr.layer-options td { border-top: none; padding: 2px 4px 8px 22px; background: var(--panel); }
-table.layers tr.layer-options .row.opt { grid-template-columns: 90px 1fr auto; margin: 2px 0; }
-table.layers tr.layer-options .hint { margin: 2px 0 4px; }
+table.layers tr.layer-options td { height: auto; padding: 0 0 6px 22px; background: var(--panel); border-bottom: 1px solid var(--line); }
+table.layers tr.layer-options .group { padding: 0; }
+table.layers tr.layer-options .row { margin: 0; }
+table.layers tr.layer-options .hint { margin: 4px 8px; }
 .check output { min-width: 52px; text-align: right; font-family: var(--mono); font-size: 12px; }
 table.layers tr.expandable { cursor: pointer; }
-table.layers tr.expandable:hover td { background: var(--accent-weak); }
+table.layers tr.expandable:hover td { background: var(--collapse-hover); }
 table.layers .alias { color: var(--muted); font-family: system-ui, sans-serif; font-size: 11px; }
-table.layers tr.layer-group td:first-child { font-family: system-ui, sans-serif; font-weight: 600; font-size: 12px; }
-table.layers tr.in-group td:first-child { padding-left: 22px; }
+table.layers tr.layer-group td:first-child { font-family: system-ui, sans-serif; font-weight: 600; font-size: 13px; }
+table.layers tr.in-group td:first-child { padding-left: 26px; }
 table.layers tr.layer-options.in-group td { padding-left: 40px; }
 
-/* initialization steps */
-ol.init-steps { margin: 0; padding-left: 20px; display: grid; gap: 8px; }
+/* initialization steps: one shaded row per step, like the settings */
+ol.init-steps { margin: 0; padding-left: 20px; display: grid; gap: 0; }
+ol.init-steps > li { margin: 0 -8px 0 -20px; padding: 4px 8px 4px 20px; min-height: var(--row-h); }
+ol.init-steps > li:nth-child(even) { background: var(--row-alt); }
 ol.init-steps li::marker { color: var(--muted); }
-ol.init-steps .step-title { font-weight: 500; display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; }
+ol.init-steps .row { margin: 0; padding-left: 0; }
+ol.init-steps .step-title { font-weight: 500; display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; cursor: help; }
+ol.init-steps label[title] { cursor: help; }
 ol.init-steps code { font-family: var(--mono); font-size: 11px; color: var(--accent); }
 ol.init-steps .hint { margin: 1px 0; }
 ol.init-steps .now { margin: 1px 0; font-family: var(--mono); font-size: 11px; }

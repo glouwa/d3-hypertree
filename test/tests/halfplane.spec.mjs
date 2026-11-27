@@ -8,7 +8,7 @@ import { collectErrors, expectNoErrors, openTree, waitForStable } from './helper
 
 test.use({ viewport: { width: 1300, height: 700 } })
 
-const geometry = encodeURIComponent(JSON.stringify({ view: 'halfplane' }))
+const geometry = encodeURIComponent(JSON.stringify({ projection: 'cayley' }))
 const open = (page, query = 'gen=nTree&depth=6&childs=3&labels=1') =>
     openTree(page, `${query}&size=1200x600&geometry=${geometry}`)
 

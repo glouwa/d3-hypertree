@@ -1,15 +1,15 @@
 import { test, expect } from '@playwright/test'
 import { collectErrors, expectNoErrors, openTree, waitForStable } from './helpers.mjs'
 
-// The rectangular view as the conformal image of the whole disk (geometry.view
-// 'rectangle', the Schwarz–Christoffel map, projection/rectangle.ts): the rim of the
+// The rectangular view as the conformal image of the whole disk (geometry.projection
+// 'schwarz-christoffel', projection/schwarz-christoffel.ts): the rim of the
 // disk is the edge of the rectangle, so every node is in the picture; the gap of the
 // root wedge goes to the middle of the bottom edge. Layout, filter and transformation
 // stay in the disk; the drawn positions are mapped at the end, pointer input back.
 
 test.use({ viewport: { width: 1300, height: 700 } })
 
-const geometry = encodeURIComponent(JSON.stringify({ view: 'rectangle' }))
+const geometry = encodeURIComponent(JSON.stringify({ projection: 'schwarz-christoffel' }))
 const open = (page, query = 'gen=nTree&depth=6&childs=3&labels=1') =>
     openTree(page, `${query}&size=1200x600&geometry=${geometry}`)
 

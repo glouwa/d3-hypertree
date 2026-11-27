@@ -324,7 +324,7 @@ new hyt.Hypertree(
             labelScore?:        (n:N)=> number               // which nodes get a label (default: the subtree weight)
         }       
         geometry: {
-            view:               'disk' | 'halfplane' | 'rectangle' | Projection   // how the plane is drawn (default 'disk')
+            projection:         'poincare' | 'cayley' | 'schwarz-christoffel' | Projection   // how the plane is drawn (default 'poincare')
             diskSize:           number                     // the disk's diameter in the square view (default .96)
             layers:             LayerSpec[]                // { type, name, data, options }, see hyt.defaultLayers()
             layerOptions: {

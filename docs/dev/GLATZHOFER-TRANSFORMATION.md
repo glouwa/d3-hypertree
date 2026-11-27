@@ -1,7 +1,7 @@
 # One-edge rectangular view ("dendrogram-like"): analysis
 
 Status: analysis, nothing implemented (2026-11-27). Question: starting from the
-Schwarz–Christoffel rectangle (`geometry.view: 'rectangle'`), can the ideal boundary
+Schwarz–Christoffel rectangle (`geometry.projection: 'schwarz-christoffel'`), can the ideal boundary
 of the hyperbolic plane (the rim of the disk) be mapped onto the top edge only,
 giving a dendrogram-like picture with the root static at the bottom middle and the
 path from every visible node to the root always completely visible?
@@ -11,7 +11,7 @@ path from every visible node to the root always completely visible?
 - **Not with a conformal map.** A conformal map of the disk onto a rectangle puts
   the rim on the whole perimeter (today: all four edges, the root's gap in the middle
   of the bottom edge, not three). The only conformal picture with the rim on one
-  straight line is the half-plane (the Cayley map we already have as `'halfplane'`),
+  straight line is the half-plane (the Cayley map we already have as `'cayley'`),
   whose "one edge" is infinitely long and whose root side is at infinity. The wanted
   view is therefore the half-plane *compressed* into a rectangle, which is
   necessarily non-conformal (as Inxight did), or a different layout.
@@ -37,8 +37,8 @@ path from every visible node to the root always completely visible?
 - **Dendrogram-like:** A gives "leaves at the top, root side at the bottom", not
   levels: the Bergé layout's link lengths and directions vary, so equal depth does
   not mean equal height. Levels need C (all nodes of depth k on one horocycle).
-- **Recommendation:** build A as a projection (`geometry.view: 'horizon'` or as the
-  new behaviour of `'halfplane'`), test it on the Tree of Life, add the restricted
+- **Recommendation:** build A as a projection (`geometry.projection: 'horizon'` or as the
+  new behaviour of `'cayley'`), test it on the Tree of Life, add the restricted
   navigation as an option if the picture asks for it. C is a second pipeline
   (layout + transformation + navigation), 2–3 weeks, only if dendrogram levels are
   really wanted; it combines well with the focus-rooted layout
@@ -64,7 +64,7 @@ The map is conformal (fans keep their angles), its scale is zero at the corners
 and larger than the disk's near the middles of the long edges (sizes are capped at
 the center's).
 
-In the `'halfplane'` prototype (`cayley.ts`, `projection/halfplane.ts`) the rim is
+In the `'cayley'` prototype (`cayley.ts`, `projection/halfplane.ts`) the rim is
 the single line `Im w = 0` (drawn as the top edge at view y = −1), and the gap is
 the point at infinity below. That is the only conformal picture with the rim on one
 line; its price is an unbounded view (the root and far ancestors leave it,
@@ -238,7 +238,7 @@ scale, as today), `outward` (toward the top edge: `(0, −1)`), `rim` (the disk
 radius of the position, as `rectangle.ts`), `viewBox`/`clip`/`voronoiExtent`/
 `background` (a rectangle, like `rectangle.ts`), `overviewClamp` (the whole disk is
 in the picture: identity). Register in `projection/index.ts` and
-`config/schema.ts` (`geometry.view`), allow the kind in `view-bounds.ts` (the
+`config/schema.ts` (`geometry.projection`), allow the kind in `view-bounds.ts` (the
 disk-based check is valid: the view is a bijective image of the disk), document in
 `playground/options.js`, `readme.md`, `CHANGELOG.md`; the app's `?view=` switch gets
 a value. Tests like `test/tests/rectangle.spec.mjs`: positions inside the
@@ -267,7 +267,7 @@ loading.
 
 1. [ ] Build A as a projection and look at the Tree of Life in it (desktop and phone).
    It answers the question "rim on the top edge only" exactly, costs little, and
-   supersedes the uncompressed `'halfplane'` prototype (same model, bounded).
+   supersedes the uncompressed `'cayley'` prototype (same model, bounded).
 2. [ ] If the picture is good but the root wanders, add A′ (navigation fixing the
    gap). Expect the root at the bottom and the stem never crossing the tree.
 3. [ ] Do C only if depth levels are the goal. Then do it as the half-plane variant of
@@ -277,7 +277,7 @@ loading.
 
 - Anchor the x compression at the focus (the view center, as A does) or at the
   root's column (the root at the bottom middle, the focus wherever its column is)?
-- Should A replace `'halfplane'` or be a fourth value (`'horizon'`)?
+- Should A replace `'cayley'` or be a fourth value (`'horizon'`)?
 - Keep the λ zoom as the layout's link length in A (yes, nothing speaks against
   it) and in C (where it would be the level distance `d`)?
 - Labels: with the horizon at the top the labels are horizontal and the leaves

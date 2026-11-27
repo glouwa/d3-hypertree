@@ -57,7 +57,7 @@ test('migrate: v1 option names are translated with a warning', async ({ page }) 
         filter: { maxlabels: 7, cullingWeight: { min: 1, max: 2 } },
         interaction: { wheelSensitivity: 2 },
     }))
-    expect(r.geometry.view).toBe('halfplane')
+    expect(r.geometry.projection).toBe('cayley')
     expect(r.geometry.decorator).toBeUndefined()
     expect(r.geometry.layerOptions.cells.invisible).toBe(false)
     expect(r.geometry.layerOptions['labels-force'].maxLabels).toBe(7)

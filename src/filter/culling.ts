@@ -282,7 +282,7 @@ export function cacheUpdate(ud:IUnitDisk, cache:TransformationCache) {
     // add pathes to unculled nodes    
     ud.args.model.objects.pathes.forEach(p=> addPathToUnculled(ud, cache, p))   
 
-    // the projection (geometry.view): from here on the drawn positions are view
+    // the projection (geometry.projection): from here on the drawn positions are view
     // positions (the half-plane view maps them; the disk keeps them); the filter above
     // worked in the disk. Nodes outside the view get no emoji or symbol.
     cache.unculledNodes = ud.args.projection.project(cache.unculledNodes)

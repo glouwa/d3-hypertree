@@ -3,14 +3,14 @@ import { collectErrors, expectNoErrors, openTree, waitForStable } from './helper
 
 // The projection (src/projection/): how the hyperbolic plane appears on the screen.
 // The layers ask the projection for geodesics, circles, the outward direction; the
-// filter maps the positions; the pointer is mapped back. geometry.view selects it:
-// 'disk', 'halfplane' or an own Projection.
+// filter maps the positions; the pointer is mapped back. geometry.projection selects it:
+// 'poincare', 'cayley', 'schwarz-christoffel' or an own Projection.
 
 test('the disk and the half-plane are the two projections; the layers hold no view branches', async ({ page }) => {
     await page.goto('harness.html?gen=data')
     const r = await page.evaluate(() => {
-        const disk = hyt.createProjection('disk', { orientation: 0, angle: 1 })
-        const half = hyt.createProjection('halfplane', { orientation: 3 * Math.PI / 2, angle: 1 })
+        const disk = hyt.createProjection('poincare', { orientation: 0, angle: 1 })
+        const half = hyt.createProjection('cayley', { orientation: 3 * Math.PI / 2, angle: 1 })
         const own = { kind: 'own' }
         return {
             kinds: [disk.kind, half.kind, hyt.createProjection(own, {}).kind],
@@ -22,7 +22,7 @@ test('the disk and the half-plane are the two projections; the layers hold no vi
             diskCircle: disk.circle({ re: 0, im: 0 }, .3), halfCircleAtInfinity: half.circle({ re: 0, im: 0 }, 1.5),
         }
     })
-    expect(r.kinds).toEqual(['disk', 'halfplane', 'own'])
+    expect(r.kinds).toEqual(['poincare', 'cayley', 'own'])
     expect(r.diskIdentity).toEqual({ re: .3, im: -.2 })
     expect(Math.abs(r.halfBorder.re) + Math.abs(r.halfBorder.im)).toBeLessThan(1e-12)   // the disk center maps to the view's (0,0)
     expect(r.diskArc).toMatch(/^M 0.2 0.1 A /)
@@ -34,20 +34,20 @@ test('the disk and the half-plane are the two projections; the layers hold no vi
     expect(r.halfCircleAtInfinity).toBeNull()
 })
 
-test('an own projection in geometry.view: the layers draw what it says', async ({ page }) => {
+test('an own projection in geometry.projection: the layers draw what it says', async ({ page }) => {
     const errors = collectErrors(page)
     await page.goto('harness.html?gen=nTree&depth=4&childs=3')
     await page.waitForFunction(() => window.harness)
     await page.evaluate(() => harness.ready)
     // a projection that draws every link as a straight line and marks every circle
     await page.evaluate(() => {
-        const disk = hyt.createProjection('disk', harness.ht.args.layout.rootWedge)
+        const disk = hyt.createProjection('poincare', harness.ht.args.layout.rootWedge)
         const own = Object.assign(Object.create(Object.getPrototypeOf(disk)), disk, {
             kind: 'straight',
             geodesic: (a, b) => `M ${a.re} ${a.im} L ${b.re} ${b.im}`,
             circle: (c, r) => ({ cx: c.re, cy: c.im, r: r * 2 }),
         })
-        harness.ht.configure({ geometry: { view: own } })
+        harness.ht.configure({ geometry: { projection: own } })
     })
     await waitForStable(page)
     const r = await page.evaluate(() => ({

@@ -79,6 +79,8 @@
         ['file:fixtures/animals.skos.xml', 'File: animals.skos.xml (SKOS)'],
         ['file:fixtures/primates.treeml.xml', 'File: primates.treeml.xml (TreeML)'],
         ['file:fixtures/filesystem.d3.json', 'File: filesystem.d3.json (10k nodes, sizes; preset infovisFiles)'],
+        ['file:fixtures/primates.d3.json', 'File: primates.d3.json (Tree of Life, 1.1k nodes, depth 19)'],
+        ['file:fixtures/embryophyta.d3.json', 'File: embryophyta.d3.json (Tree of Life, land plants: 46k nodes, depth 88)'],
     ]
 
     const inlineData = {

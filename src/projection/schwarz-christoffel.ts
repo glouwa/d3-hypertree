@@ -20,9 +20,9 @@ type ViewPos = C & { disk?:C }
 const rotate   = (z:C, g:C) : C => ({ re: z.re * g.re - z.im * g.im, im: z.re * g.im + z.im * g.re })
 const unrotate = (z:C, g:C) : C => ({ re: z.re * g.re + z.im * g.im, im: z.im * g.re - z.re * g.im })
 
-export class RectangleProjection implements Projection
+export class SchwarzChristoffelProjection implements Projection
 {
-    readonly kind = 'rectangle'
+    readonly kind = 'schwarz-christoffel'
     readonly followsSize = true
     private g:C                    // the direction of the disk that goes to the bottom edge
     private map:RectangleMap

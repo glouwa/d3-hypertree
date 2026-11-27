@@ -153,25 +153,36 @@ test.describe('interaction', () => {
 
 
 test.describe('deep trees', () => {
-    // Known bug: node positions are global Poincaré-disk coordinates composed from
-    // parent to child, so deep nodes end up extremely close to the boundary.
-    // Navigating down a long arm then makes the view collapse (no NaN, but the
-    // values are no longer usable for the transformation). Remove .fail once fixed.
-    test.fail('navigating down a deep arm keeps the neighbourhood visible', async ({ page }) => {
+    // Node positions are global Poincaré-disk coordinates composed from parent to
+    // child, so deep nodes end up extremely close to the rim (1 − |z| ≈ 1e-8 at the
+    // end of an arm of depth 80, the clamp of the layout; docs/dev/FOCUS-ROOTED-LAYOUT.md).
+    // Navigating down a long arm used to empty the view (the path search started from
+    // a stale center, culling-path.spec.mjs); now the neighbourhood stays: the nodes
+    // around the center and the links to them. Circles are no measure here: the node
+    // layer draws leaves and nodes with hidden children only, and an arm has neither.
+    test('navigating down a deep arm keeps the neighbourhood visible', async ({ page }) => {
         await openTree(page, 'gen=deepStar&arms=8&depth=80')
-        let visible = 0
+        const steps = []
         for (let step = 0; step < 4; step++) {
-            visible = await page.evaluate(async () => {
-                const rendered = [...document.querySelectorAll('#nodes circle')].map(c => c.__data__).filter(Boolean)
-                const deepest = rendered.reduce((a, b) => (b.depth > a.depth ? b : a))
+            await page.evaluate(async () => {
+                const u = harness.ht.unitdisk.cache.unculledNodes
+                const deepest = u.reduce((a, b) => (b.depth > a.depth ? b : a))
                 await harness.ht.api.gotoNode(deepest)
-                return document.querySelectorAll('#nodes circle').length
             })
             await waitForStable(page)
+            steps.push(await page.evaluate(() => {
+                const u = harness.ht.unitdisk.cache.unculledNodes, c = harness.ht.unitdisk.cache.centerNode
+                return { center: c && c.depth, visible: u.length, near: u.filter(n => Math.hypot(n.cache.re, n.cache.im) < .5).length,
+                         links: document.querySelectorAll('#link-arcs path').length }
+            }))
         }
-        visible = await page.evaluate(() => document.querySelectorAll('#nodes circle').length)
-        // a focused node on a path should show several neighbours around it
-        expect(visible).toBeGreaterThanOrEqual(5)
+        // the last step reaches the end of the arm; a focused node on a path shows
+        // several neighbours around it, drawn with their links
+        expect(steps[3].center, JSON.stringify(steps)).toBeGreaterThan(60)
+        for (const s of steps) {
+            expect(s.near, JSON.stringify(steps)).toBeGreaterThanOrEqual(5)
+            expect(s.links, JSON.stringify(steps)).toBeGreaterThanOrEqual(5)
+        }
     })
 })
 

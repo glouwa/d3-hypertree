@@ -63,8 +63,8 @@ export const LAYERS = ['cells', 'link-arcs', 'nodes', 'labels-force', 'labels-pl
 // otherwise the object is a model overlay for ht.configure after the load
 export const FEATURES = {
     base:             null,
-    rectangle:        { query: 'geometry=' + encodeURIComponent('{"view":"rectangle"}') },
-    halfplane:        { query: 'geometry=' + encodeURIComponent('{"view":"halfplane"}') },
+    rectangle:        { query: 'geometry=' + encodeURIComponent('{"projection":"schwarz-christoffel"}') },
+    halfplane:        { query: 'geometry=' + encodeURIComponent('{"projection":"cayley"}') },
     icons:            { query: 'icons=1' },
     multiline:        { query: 'multiline=1' },
     filterOff:        { query: 'filter=off' },

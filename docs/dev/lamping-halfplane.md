@@ -116,9 +116,9 @@ and the navigation along the axes.
    root and the path to it always in the picture, nodes bounded, fans with their
    angles), only the four corners are compressed. No new layout or navigation.
 
-Decided 2026-11-27: option 4, `geometry.view: 'rectangle'`
+Decided 2026-11-27: option 4, `geometry.projection: 'schwarz-christoffel'`
 (`src/geometry/schwarz-christoffel.ts`, `src/projection/rectangle.ts`); the Tree of
-Life's `?view=rect` uses it. The half-plane stays as `'halfplane'`. Reason: no
+Life's `?view=rect` uses it. The half-plane stays as `'cayley'`. Reason: no
 isometry keeps the root in view while a leaf is magnified; the disk has that
 property through its compactness, and the Cayley map gives it up by sending a rim
 point to infinity.

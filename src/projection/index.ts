@@ -1,16 +1,16 @@
 import { Projection }          from './projection'
-import { DiskProjection }      from './disk'
-import { HalfPlaneProjection } from './halfplane'
-import { RectangleProjection } from './rectangle'
+import { PoincareProjection }      from './poincare'
+import { CayleyProjection } from './cayley'
+import { SchwarzChristoffelProjection } from './schwarz-christoffel'
 
 export type { Projection, ArcCurvature, ViewBox } from './projection'
-export { DiskProjection, HalfPlaneProjection, RectangleProjection }
+export { PoincareProjection, CayleyProjection, SchwarzChristoffelProjection }
 
-/** The projection of geometry.view: 'disk', 'halfplane', 'rectangle' or an own Projection. */
-export function createProjection(view:'disk' | 'halfplane' | 'rectangle' | Projection | undefined,
+/** The projection of geometry.projection: 'poincare', 'cayley', 'schwarz-christoffel' or an own Projection. */
+export function createProjection(view:'poincare' | 'cayley' | 'schwarz-christoffel' | Projection | undefined,
                                  rootWedge:{ orientation:number, angle:number }) : Projection {
     if (view && typeof view === 'object') return view
-    if (view === 'halfplane') return new HalfPlaneProjection(rootWedge)
-    if (view === 'rectangle') return new RectangleProjection(rootWedge)
-    return new DiskProjection()
+    if (view === 'cayley') return new CayleyProjection(rootWedge)
+    if (view === 'schwarz-christoffel') return new SchwarzChristoffelProjection(rootWedge)
+    return new PoincareProjection()
 }

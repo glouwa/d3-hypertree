@@ -72,7 +72,7 @@ export class Hypertree
 {
     args           : HypertreeArgs             // the resolved model
     provenance     : Provenance                // option path -> 'defaults' | 'app' (or the stack's names) | 'configure'
-    projection     : Projection                // geometry.view
+    projection     : Projection                // geometry.projection
     data           : N
     langMap        : {}
 
@@ -167,7 +167,7 @@ export class Hypertree
             const resolved = resolveModel(defaults(), stack.map(o=> ({ name: o.name, overlay: migrate(o.overlay) })))
             this.args = resolved.model
             this.provenance = resolved.provenance
-            this.projection = createProjection(this.args.geometry.view, this.args.layout.rootWedge)
+            this.projection = createProjection(this.args.geometry.projection, this.args.layout.rootWedge)
 
             this.update.view.parent()
             this.api.setDataloader(ok, err, this.args.dataloader)
@@ -282,7 +282,7 @@ export class Hypertree
                 this.update.data()
                 break
             case 'layers':
-                this.projection = createProjection(this.args.geometry.view, this.args.layout.rootWedge)
+                this.projection = createProjection(this.args.geometry.projection, this.args.layout.rootWedge)
                 this.update.view.unitdisk()
                 this.unitdisk.args.data = this.data
                 this.update.data()

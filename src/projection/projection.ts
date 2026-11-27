@@ -4,10 +4,10 @@
 // disk positions of a frame into view coordinates at the end of the pipeline, maps
 // pointer input back, and draws the geometric primitives (geodesics, circles, the
 // background) in view coordinates. The layers ask the projection; they hold no
-// knowledge of the view: DiskProjection (projection/disk.ts) is the disk itself,
-// HalfPlaneProjection (projection/halfplane.ts) the rectangular half-plane view.
+// knowledge of the view: PoincareProjection (projection/poincare.ts) is the disk itself,
+// CayleyProjection (projection/cayley.ts) the half-plane view, SchwarzChristoffelProjection the rectangle.
 //
-// Selected by geometry.view: 'disk' | 'halfplane' | an own Projection.
+// Selected by geometry.projection: 'poincare' | 'cayley' | 'schwarz-christoffel' | an own Projection.
 
 import { N } from '../data/n'
 import { C } from '../geometry/hyperbolic-math'

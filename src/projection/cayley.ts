@@ -8,9 +8,9 @@ import { toView, viewToDisk, mapToView, circleToView, infinityOf, BORDER_Y } fro
 // infinity below, so it looks like the disk: the root at the bottom with its stem,
 // the tree growing up to the border. Geodesics are semicircles centered on the
 // border, or vertical lines.
-export class HalfPlaneProjection implements Projection
+export class CayleyProjection implements Projection
 {
-    readonly kind = 'halfplane'
+    readonly kind = 'cayley'
     readonly followsSize = true
     // the direction of the disk that goes to infinity: the middle of the root wedge's gap
     private g:C

@@ -103,7 +103,7 @@ are listed first.
 
 ### Added
 
-- **`geometry.view: 'rectangle'`**: the rectangular view as the conformal image of the
+- **`geometry.projection: 'schwarz-christoffel'`** (named `geometry.view` until 2026-11-27; the old name is migrated with a warning): the rectangular view as the conformal image of the
   whole disk (the Schwarz–Christoffel map, geometry/schwarz-christoffel.ts,
   projection/rectangle.ts). The rim of the disk becomes the edge of the rectangle,
   so every node, the root and the path to it are always in the picture, as in the
@@ -193,13 +193,15 @@ are listed first.
   what a change affects (`hyt.affects`, `hyt.effectOf(path)`): the data is loaded
   again, the layout, the label measures, the layer stack, a frame, or the styles;
   configure applies the strongest effect of the changed options and returns it.
-- **`geometry.view`** selects the projection of the hyperbolic plane onto the
-  screen: `'disk'` (default), `'halfplane'` (the rectangular view) or an own
-  `Projection` (`hyt.DiskProjection`, `hyt.HalfPlaneProjection`,
-  `hyt.createProjection`). The layers ask the projection for geodesics, circles,
-  the outward direction and the view box; the filter maps the positions, the
-  pointer is mapped back. A third view is a new projection, not a change of the
-  layers.
+- **`geometry.projection`** selects the projection of the hyperbolic plane onto the
+  screen: `'poincare'` (default), `'cayley'` (the half-plane view), `'schwarz-christoffel'` (the rectangle) or an own
+  `Projection` (`hyt.PoincareProjection`, `hyt.CayleyProjection`,
+  `hyt.SchwarzChristoffelProjection`, `hyt.createProjection`). The layers ask the
+  projection for geodesics, circles, the outward direction and the view box; the
+  filter maps the positions, the pointer is mapped back. A further view is a new
+  projection, not a change of the layers. The projections are named after their
+  maps, not their shapes: until 2026-11-27 the option was `geometry.view` with the
+  values `'disk'`, `'halfplane'`, `'rectangle'`; both are migrated with a warning.
 - **Configuration helpers** in the API: `hyt.defaults()`, `hyt.coreDefaults()`,
   `hyt.resolveModel`, `hyt.composeOverlays`, `hyt.mergeInto`, `hyt.migrate` (v1
   option names), `hyt.whence`, `hyt.pathsOf`.
@@ -467,9 +469,9 @@ are listed first.
 | `filter.cullingWeight` | `filter.weightFilter.rangeNodes` |
 | `filter.transformation.P` | `geometry.startPosition` |
 | `geometry.addLayer: ['link-lines' / 'path-lines']` | `link-arcs` / `path-arcs` with `geometry.linkCurvature: 'l'` |
-| `geometry.halfPlane: true` | `geometry.view: 'halfplane'` |
+| `geometry.halfPlane: true` | `geometry.projection: 'cayley'` |
 | `filter.maxlabels` | the layer option `maxLabels` of `labels`, `labels-force`, `labels-placed` |
-| `geometry.decorator` (the unit disk class) | `geometry.view` (a `Projection`); dropped |
+| `geometry.decorator` (the unit disk class) | `geometry.projection` (a `Projection`); dropped |
 | `geometry.cacheUpdate` (the frame function) | nothing: the frame is not an option; dropped |
 
 ### Removed
@@ -517,6 +519,10 @@ and after on the same machine (see [docs/dev/PERFORMANCE.md](docs/dev/PERFORMANC
 
 ### Packaging and development
 
+- **Two real trees as playground examples** (`test/fixtures/primates.d3.json`, 1.1k
+  nodes, and `embryophyta.d3.json`, 46k nodes, depth 88): the primates and the land
+  plants of the Open Tree of Life synthesis 16.1 as the hypertree-of-life pipeline
+  writes them. In the playground's data sources and the loader tests.
 - **Performance suite** (`test/perf/run.mjs`, `npm run perf`): generated trees in the
   test harness in headless Edge; load, idle, drag, settling, wheel, pinch, hover, the
   render time per layer, the cost of single options and of the presets, as mean ± sd

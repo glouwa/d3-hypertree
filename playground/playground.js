@@ -172,7 +172,7 @@
         const stack = currentStack()
         if (!stack) return
         resolveBase(stack)
-        document.body.classList.toggle('halfplane', base.model.geometry.view === 'halfplane')   // a wide tree element (before the tree measures it)
+        document.body.classList.toggle('halfplane', base.model.geometry.projection === 'cayley')   // a wide tree element (before the tree measures it)
         const tree = $('#tree')
         tree.innerHTML = ''
         updateTimes = []
@@ -222,7 +222,7 @@
                 clearTimeout(effectShown[path])
                 effectShown[path] = setTimeout(() => { badge.classList.remove('effect'); refreshControls() }, 1500)
             }
-            document.body.classList.toggle('halfplane', base.model.geometry.view === 'halfplane')
+            document.body.classList.toggle('halfplane', base.model.geometry.projection === 'cayley')
         }
         refreshControls()
     }
@@ -235,9 +235,9 @@
     let refreshLayerPanel = () => {}
     const refreshControls = () => { if (!base) return; for (const c of controls) c.refresh(); refreshLayerPanel() }
 
-    function section(title, container = '#controls', open = false, changed = () => 0) {
+    function section(title, container = '#controls', open = false, changed = () => 0, doc = '') {
         const badge = el('span', { class: 'badge' })
-        const d = el('details', open ? { open: true } : {}, el('summary', {}, title, badge))
+        const d = el('details', open ? { open: true } : {}, el('summary', doc ? { title: doc } : {}, title, badge))
         const g = el('div', { class: 'group' })
         d.append(g)
         $(container).append(d)
@@ -469,7 +469,7 @@
         }
         const dataCheck = (group, label, key, when, note) => {
             const c = el('input', { type: 'checkbox', onchange: e => { state.data[key] = e.target.checked; scheduleRebuild() } })
-            const wrap = el('div', {}, el('label', { class: 'check' }, c, label), note ? el('p', { class: 'hint' }, note) : null)
+            const wrap = el('div', {}, el('label', Object.assign({ class: 'check' }, note ? { title: note } : {}), c, label))
             group.append(wrap)
             controls.push({ refresh: () => { c.checked = !!state.data[key]; if (when) wrap.style.display = when() ? '' : 'none' } })
         }
@@ -493,14 +493,15 @@
         buildStackSection()
 
         // --- Initialization: what the library does when a model is set, in this order
-        // (hypertree.ts: setModel, initData, findInitλ), with the option of each step and its current value
-        g = section('Initialization', '#controls', false, () => ['lang', 'labels', 'multiline', 'iconPercent', 'values'].filter(k => state.data[k] !== DATA_DEFAULTS[k]).length)
-        hint(g, 'What happens when the tree is set up, in this order. Steps with an option can be configured by the application; here the data entry of the stack sets them.')
+        // (hypertree.ts: setModel, initData, findInitλ), with the option of each step and its current
+        // value. The explanations are tooltips (of the section title and of each step title).
+        g = section('Initialization', '#controls', false, () => ['lang', 'labels', 'multiline', 'iconPercent', 'values'].filter(k => state.data[k] !== DATA_DEFAULTS[k]).length,
+            'What happens when the tree is set up, in this order. Steps with an option can be configured by the application; here the data entry of the stack sets them. A preset may replace these callbacks with its own (e.g. infovisFiles: labels with the folder size). Hover a step for its description.')
         const steps = el('ol', { class: 'init-steps' })
         g.append(steps)
         const step = (title, option, text, current) => {
             const now = el('p', { class: 'now' })
-            const li = el('li', {}, el('div', { class: 'step-title' }, title, option ? el('code', {}, option) : null), el('p', { class: 'hint' }, text), now)
+            const li = el('li', {}, el('div', { class: 'step-title', title: text }, title, option ? el('code', {}, option) : null), now)
             steps.append(li)
             if (current) controls.push({ refresh: () => { now.textContent = 'here: ' + current() } })
             else now.remove()
@@ -545,7 +546,6 @@
         step('Find the start zoom', 'layout.initSize, interaction.λbounds',
             'Internal: grows λ until the outermost visible node reaches layout.initSize of the radius, then limits it to λbounds.',
             () => `initSize ${value('layout.initSize')}, λbounds [${value('interaction.λbounds').map(v => +v.toFixed(3)).join(', ')}]`)
-        hint(g, 'A preset may replace these callbacks with its own (e.g. infovisFiles: labels with the folder size).')
 
         // --- the model's options, by section
         g = section('Layout', '#controls', false, changedIn(['layout.*']))
