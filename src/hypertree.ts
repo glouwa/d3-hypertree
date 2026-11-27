@@ -512,6 +512,9 @@ export class Hypertree
 
         preservingnode.ancestors().reverse().forEach(n=> this.args.layout.type(n, t.state.λ, true))
         t.state.P = CmulR(preservingnode.layout.z, -1) // set preserving node back to .... zero? no, orig pos?
+        // the next frame's path search starts here: the one node whose chain was just
+        // laid out for the new λ and that the caller keeps in place (wheel, pinch)
+        t.cache.centerNode = preservingnode
 
         this.layoutMeta = { Δ: performance.now()-t0 }
     }

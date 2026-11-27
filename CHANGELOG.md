@@ -326,6 +326,20 @@ are listed first.
 
 ### Fixed
 
+- **Zooming in deep in the tree no longer empties the view** (filter/culling.ts
+  `pathToLastVisible`, hypertree.ts `updateLayoutPath_`). A wheel or pinch step changes
+  λ and relays only the ancestors of the node under the pointer. The next frame's path
+  search started at the last center node, often in another branch, and laid it out from
+  its parent that still had the old λ. In hyperbolic space that mix displaces a deep
+  node by far more than the λ change (Tree of Life, Mammalia at depth 41: from the
+  center to r .9975), so the center lay beyond the culling radius, the path was empty,
+  nothing was selected, the root became the center and kept the path empty: the tree
+  was gone until a reload, in the disk and the rectangle view alike, from depth ~30 on.
+  Now the whole chain root → center is laid out top-down before it is transformed, the
+  path is never empty (the nearest node of the chain, else of the last visible set,
+  else the root starts the selection, so the view refills as nodes come in), and after
+  a wheel or pinch step the search starts at the preserved node. See
+  docs/dev/FOCUS-ROOTED-LAYOUT.md for the depth limits of the layout behind it.
 - **The cells are joined by their node** (view/d3-join.ts). The join keyed every
   element by `mergeId`, but a voronoi polygon carries its node in `data`: every cell
   got the key `undefined`, so d3 removed and recreated every cell on every frame (ten

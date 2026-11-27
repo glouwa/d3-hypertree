@@ -369,27 +369,48 @@ export function cacheUpdateStyle(ud:IUnitDisk, cache:TransformationCache) : bool
     return true
 }
 
-function pathToLastVisible(ud:IUnitDisk, cache:TransformationCache) {
-    let startNode : N = null
-    let path = []
-    if (ud.args.data) {
-        startNode = cache.centerNode || ud.args.data        
-        path.push(startNode)
+/**
+ * The path the selection starts from: the ancestors of the center node (the nearest
+ * node of the last frame; the root before the first) that lie within the culling
+ * radius, from the highest one down to the center. path[0] is the start node of the
+ * DFS and the branch point whose weight the others are compared with.
+ *
+ * The whole chain root → center is laid out and transformed top-down first, so every
+ * node is placed from a parent that has the current λ. Before, the chain was walked
+ * upward from the center and each node laid out from its stale parent: after a wheel
+ * step at depth 40 (old λ on the parent, new λ on the link) the center landed beyond
+ * the culling radius, the path was empty, nothing was selected, the root became the
+ * center and kept the path empty. The tree was gone until a reload.
+ *
+ * The path is never empty: when the center is outside the radius (also after a large
+ * jump of P), the nearest node of the chain starts, else the nearest of the last
+ * visible nodes (their chains laid out the same way), else the root. The start node is
+ * always drawn (abortfilter), so the selection refills as nodes come into the radius.
+ */
+function pathToLastVisible(ud:IUnitDisk, cache:TransformationCache) : N[] {
+    if (!ud.args.data) return []
+    const R = ud.args.model.filter.cullingRadius
+    const placed = new Set<N>()
+    const place = (n:N)=> n.ancestors().reverse().forEach(a=> {
+        if (placed.has(a)) return
+        placed.add(a)
+        peocessNodeTransformation(ud, cache, a)
+    })
+    const nearest = (ns:N[])=> ns.reduce((a, n)=> !a || n.cachep.r < a.cachep.r ? n : a, <N>null)
 
-        while (true) {
-            peocessNodeTransformation(ud, cache, startNode) 
-
-            if (startNode.cachep.r >= ud.args.model.filter.cullingRadius) {
-                path = path.slice(0, -1)
-                break
-            }
-            if(!startNode.parent) 
-                break
-           
-            startNode = startNode.parent
-            path.push(startNode)
-        }
+    const center = cache.centerNode || ud.args.data
+    place(center)
+    let start = center
+    if (start.cachep.r >= R) start = nearest(center.ancestors())
+    if (start.cachep.r >= R && cache.unculledNodes && cache.unculledNodes.length) {
+        cache.unculledNodes.forEach(place)
+        start = nearest(cache.unculledNodes)
     }
+    if (start.cachep.r >= R) start = ud.args.data
+
+    const path = []
+    for (let n = start; n && n.cachep.r < R; n = n.parent) path.push(n)
+    if (!path.length) path.push(start)
     return path.reverse()
 }
 
