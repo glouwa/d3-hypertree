@@ -1,7 +1,7 @@
 {
   "name": "d3-hypertree",
-  "main": "dist/js/d3-hypertree.js",
-  "types": "dist/d/d3-hypertree.d.js",
+  "main": "dist/d3-hypertree.js",
+  "types": "dist/d/index.d.ts",
   "version": "1.1.3",
   "description": "Hyperbolictree",
   "author": "Michael Glatzhofer",
@@ -16,33 +16,49 @@
     "hyper tree"
   ],
   "scripts": {
-    "run": "gulp watch",
-    "globalinstall": "npm i -g gulp"
+    "build": "vite build && node build/css.mjs && npm run build:types",
+    "build:types": "node build/types.mjs",
+    "typecheck": "tsc -p . --noEmit --emitDeclarationOnly false",
+    "watch": "node build/watch.mjs",
+    "dev": "node build/watch.mjs --playground",
+    "run": "node build/watch.mjs",
+    "playground": "browser-sync start --server --port 3100 --ui-port 3101 --startPath /playground/ --files \"dist/*.js\" \"dist/*.css\" \"playground/*\" \"test/config.js\" --no-open --no-notify",
+    "lint": "eslint src",
+    "perf": "node test/perf/run.mjs",
+    "perf:quick": "node test/perf/run.mjs --quick",
+    "perf:commit": "node test/perf/run.mjs --write commit",
+    "perf:push": "node test/perf/run.mjs --write push",
+    "perf:longterm": "node test/perf/run.mjs --write longterm",
+    "hooks": "git config core.hooksPath .githooks",
+    "perf:compare": "node test/perf/compare.mjs"
   },
   "dependencies": {
-    "d3": "^4.13.0",
-    "d3-force-gravity": "^1.0.2",
-    "xml2js": "^0.4.17"
+    "d3": "^7.9.2",
+    "xml2js": "^0.6.2"
   },
   "devDependencies": {
-    "@types/d3": "^4.13.2",
-    "@types/node": "^7.10.5",
-    "browser-sync": "^2.26.3",
-    "del": "^3.0.0",
-    "gulp": "^3.9.1",
-    "gulp-concat": "^2.6.1",
-    "gulp-debug": "^3.2.0",
-    "gulp-plumber": "^1.2.1",
-    "gulp-rename": "^1.4.0",
-    "gulp-sass": "^3.2.1",
-    "gulp-typescript": "^3.2.4",
-    "gulp-uglifycss": "^1.1.0",
-    "gulp-uglifyes": "^0.1.3",
-    "gulp-util": "^3.0.8",
-    "merge2": "^1.2.3",
-    "typescript": "^2.9.2",
-    "webpack": "^3.12.0",
-    "webpack-stream": "^4.0.3",
-    "yargs": "^8.0.2"
+    "@eslint/js": "^10.0.1",
+    "@types/d3": "^7.4.3",
+    "@types/node": "^26.6.6",
+    "browser-sync": "^3.0.4",
+    "eslint": "^10.15.0",
+    "events": "^3.3.0",
+    "sass": "^1.108.2",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.73.0",
+    "vite": "^8.3.8"
+  },
+  "module": "dist/d3-hypertree.mjs",
+  "exports": {
+    ".": {
+      "types": "./dist/d/index.d.ts",
+      "import": "./dist/d3-hypertree.mjs",
+      "require": "./dist/d3-hypertree.js"
+    },
+    "./dist/*": "./dist/*",
+    "./package.json": "./package.json"
+  },
+  "engines": {
+    "node": ">=20.19"
   }
 }

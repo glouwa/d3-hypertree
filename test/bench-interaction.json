@@ -1,0 +1,330 @@
+{
+  "date": "2026-11-21T23:25:57.334Z",
+  "note": "Per tree update, headless Edge 900x900, no labels/emojis. msPerUpdate = renderer main-thread time (trace); browserNativeMs = style/layout/paint/commit part of it; js = JavaScript split by call stack (CPU profile, separate run). At 60 fps the budget is 16.7 ms per frame.",
+  "results": [
+    {
+      "tree": "binary",
+      "scenario": "drag",
+      "cpu": 1,
+      "updates": 182,
+      "visibleNodes": 129,
+      "msPerUpdate": 4.86,
+      "browserNativeMs": 1.35,
+      "js": {
+        "layout": 0.72,
+        "filter": 0.33,
+        "labels": 0,
+        "voronoi": 0.01,
+        "layers": 1.7,
+        "other JS": 0.22,
+        "gc": 0.16
+      }
+    },
+    {
+      "tree": "binary",
+      "scenario": "wheel",
+      "cpu": 1,
+      "updates": 32,
+      "visibleNodes": 129,
+      "msPerUpdate": 8.8,
+      "browserNativeMs": 1.87,
+      "js": {
+        "layout": 1.06,
+        "filter": 0.63,
+        "labels": 0.02,
+        "voronoi": 0.87,
+        "layers": 2.31,
+        "other JS": 1.01,
+        "gc": 0.66
+      }
+    },
+    {
+      "tree": "binary",
+      "scenario": "pinch",
+      "cpu": 1,
+      "updates": 182,
+      "visibleNodes": 129,
+      "msPerUpdate": 4.99,
+      "browserNativeMs": 1.46,
+      "js": {
+        "layout": 0.74,
+        "filter": 0.41,
+        "labels": 0.01,
+        "voronoi": 0.01,
+        "layers": 1.81,
+        "other JS": 0.07,
+        "gc": 0.21
+      }
+    },
+    {
+      "tree": "wide 8^5",
+      "scenario": "drag",
+      "cpu": 1,
+      "updates": 182,
+      "visibleNodes": 513,
+      "msPerUpdate": 18.08,
+      "browserNativeMs": 5.08,
+      "js": {
+        "layout": 4.07,
+        "filter": 1.88,
+        "labels": 0.03,
+        "voronoi": 0.01,
+        "layers": 6.41,
+        "other JS": 0.26,
+        "gc": 0.8
+      }
+    },
+    {
+      "tree": "wide 8^5",
+      "scenario": "wheel",
+      "cpu": 1,
+      "updates": 32,
+      "visibleNodes": 513,
+      "msPerUpdate": 29.38,
+      "browserNativeMs": 6.47,
+      "js": {
+        "layout": 5.39,
+        "filter": 2.48,
+        "labels": 0.02,
+        "voronoi": 3.4,
+        "layers": 8.24,
+        "other JS": 3.49,
+        "gc": 1.38
+      }
+    },
+    {
+      "tree": "wide 8^5",
+      "scenario": "pinch",
+      "cpu": 1,
+      "updates": 182,
+      "visibleNodes": 513,
+      "msPerUpdate": 14.21,
+      "browserNativeMs": 2.66,
+      "js": {
+        "layout": 5.89,
+        "filter": 1.88,
+        "labels": 0.01,
+        "voronoi": 0.02,
+        "layers": 3.32,
+        "other JS": 0.12,
+        "gc": 0.59
+      }
+    },
+    {
+      "tree": "large 6^6",
+      "scenario": "drag",
+      "cpu": 1,
+      "updates": 182,
+      "visibleNodes": 217,
+      "msPerUpdate": 9.41,
+      "browserNativeMs": 2.43,
+      "js": {
+        "layout": 2.45,
+        "filter": 1.08,
+        "labels": 0.01,
+        "voronoi": 0.01,
+        "layers": 2.88,
+        "other JS": 0.26,
+        "gc": 0.37
+      }
+    },
+    {
+      "tree": "large 6^6",
+      "scenario": "wheel",
+      "cpu": 1,
+      "updates": 32,
+      "visibleNodes": 217,
+      "msPerUpdate": 23.28,
+      "browserNativeMs": 5.05,
+      "js": {
+        "layout": 2.94,
+        "filter": 2.04,
+        "labels": 0.02,
+        "voronoi": 2.32,
+        "layers": 6.9,
+        "other JS": 2.67,
+        "gc": 1.59
+      }
+    },
+    {
+      "tree": "large 6^6",
+      "scenario": "pinch",
+      "cpu": 1,
+      "updates": 182,
+      "visibleNodes": 217,
+      "msPerUpdate": 6.02,
+      "browserNativeMs": 1.35,
+      "js": {
+        "layout": 1.85,
+        "filter": 0.81,
+        "labels": 0.01,
+        "voronoi": 0.01,
+        "layers": 1.44,
+        "other JS": 0.12,
+        "gc": 0.22
+      }
+    },
+    {
+      "tree": "binary",
+      "scenario": "drag",
+      "cpu": 4,
+      "updates": 182,
+      "visibleNodes": 129,
+      "msPerUpdate": 23.24,
+      "browserNativeMs": 6.63,
+      "js": {
+        "layout": 3.22,
+        "filter": 1.82,
+        "labels": 0.02,
+        "voronoi": 0.04,
+        "layers": 8.58,
+        "other JS": 1.04,
+        "gc": 0.67
+      }
+    },
+    {
+      "tree": "binary",
+      "scenario": "wheel",
+      "cpu": 4,
+      "updates": 32,
+      "visibleNodes": 129,
+      "msPerUpdate": 42.56,
+      "browserNativeMs": 10.02,
+      "js": {
+        "layout": 5,
+        "filter": 2.95,
+        "labels": 0.03,
+        "voronoi": 4.1,
+        "layers": 12.51,
+        "other JS": 4.95,
+        "gc": 1.97
+      }
+    },
+    {
+      "tree": "binary",
+      "scenario": "pinch",
+      "cpu": 4,
+      "updates": 182,
+      "visibleNodes": 129,
+      "msPerUpdate": 24.79,
+      "browserNativeMs": 7.55,
+      "js": {
+        "layout": 3.48,
+        "filter": 1.84,
+        "labels": 0.03,
+        "voronoi": 0.04,
+        "layers": 9.3,
+        "other JS": 0.62,
+        "gc": 0.64
+      }
+    },
+    {
+      "tree": "wide 8^5",
+      "scenario": "drag",
+      "cpu": 4,
+      "updates": 182,
+      "visibleNodes": 513,
+      "msPerUpdate": 93.51,
+      "browserNativeMs": 26.5,
+      "js": {
+        "layout": 18.74,
+        "filter": 9.64,
+        "labels": 0.16,
+        "voronoi": 0.07,
+        "layers": 32.85,
+        "other JS": 1.17,
+        "gc": 2.3
+      }
+    },
+    {
+      "tree": "wide 8^5",
+      "scenario": "wheel",
+      "cpu": 4,
+      "updates": 32,
+      "visibleNodes": 513,
+      "msPerUpdate": 146.87,
+      "browserNativeMs": 34.03,
+      "js": {
+        "layout": 22.55,
+        "filter": 12.58,
+        "labels": 0.19,
+        "voronoi": 18.12,
+        "layers": 38.98,
+        "other JS": 17.6,
+        "gc": 3.85
+      }
+    },
+    {
+      "tree": "wide 8^5",
+      "scenario": "pinch",
+      "cpu": 4,
+      "updates": 182,
+      "visibleNodes": 513,
+      "msPerUpdate": 66.35,
+      "browserNativeMs": 12.7,
+      "js": {
+        "layout": 25.46,
+        "filter": 8.96,
+        "labels": 0.05,
+        "voronoi": 0.1,
+        "layers": 15.25,
+        "other JS": 0.67,
+        "gc": 1.66
+      }
+    },
+    {
+      "tree": "large 6^6",
+      "scenario": "drag",
+      "cpu": 4,
+      "updates": 182,
+      "visibleNodes": 217,
+      "msPerUpdate": 46.56,
+      "browserNativeMs": 12.02,
+      "js": {
+        "layout": 13.6,
+        "filter": 6.89,
+        "labels": 0.09,
+        "voronoi": 0.06,
+        "layers": 17.73,
+        "other JS": 1.28,
+        "gc": 1.06
+      }
+    },
+    {
+      "tree": "large 6^6",
+      "scenario": "wheel",
+      "cpu": 4,
+      "updates": 32,
+      "visibleNodes": 217,
+      "msPerUpdate": 152.52,
+      "browserNativeMs": 36.33,
+      "js": {
+        "layout": 18,
+        "filter": 10.18,
+        "labels": 0.21,
+        "voronoi": 18.7,
+        "layers": 42.73,
+        "other JS": 17.76,
+        "gc": 6
+      }
+    },
+    {
+      "tree": "large 6^6",
+      "scenario": "pinch",
+      "cpu": 4,
+      "updates": 182,
+      "visibleNodes": 217,
+      "msPerUpdate": 31.96,
+      "browserNativeMs": 7.53,
+      "js": {
+        "layout": 9.9,
+        "filter": 4.36,
+        "labels": 0.01,
+        "voronoi": 0.07,
+        "layers": 8.68,
+        "other JS": 0.65,
+        "gc": 0.73
+      }
+    }
+  ]
+}

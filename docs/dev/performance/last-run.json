@@ -1,0 +1,374 @@
+{
+ "kind": "run",
+ "date": "2026-11-27T20:48:45.025Z",
+ "label": "",
+ "iterations": 1,
+ "commit": "de014e3",
+ "dirty": true,
+ "machine": {
+  "cpu": "AMD Ryzen 9 7900X3D 12-Core Processor",
+  "cores": 24,
+  "os": "win32 10.0.26300",
+  "node": "v26.13.1",
+  "edge": "155.0.4283.45"
+ },
+ "settings": {
+  "trees": [
+   "ternary"
+  ],
+  "modes": [
+   "desktop"
+  ],
+  "features": [
+   "base",
+   "noCells",
+   "noLabels",
+   "rectangle"
+  ],
+  "presets": [],
+  "featureTree": "ternary",
+  "base": "http://localhost:4183",
+  "quick": true
+ },
+ "runtimeMin": 0.5,
+ "rows": {
+  "load|ternary desktop": {
+   "readyMs": {
+    "n": 1,
+    "mean": 298,
+    "sd": null,
+    "values": [
+     298
+    ]
+   },
+   "nodes": {
+    "n": 1,
+    "mean": 9841,
+    "sd": null,
+    "values": [
+     9841
+    ]
+   },
+   "visible": {
+    "n": 1,
+    "mean": 364,
+    "sd": null,
+    "values": [
+     364
+    ]
+   }
+  },
+  "idle|ternary desktop": {
+   "frames": {
+    "n": 1,
+    "mean": 0,
+    "sd": null,
+    "values": [
+     0
+    ]
+   },
+   "mainMs": {
+    "n": 1,
+    "mean": 1.1079999999999979,
+    "sd": null,
+    "values": [
+     1.1079999999999979
+    ]
+   }
+  },
+  "drag|ternary desktop": {
+   "mainPerStep": {
+    "n": 1,
+    "mean": 6.0169344262295095,
+    "sd": null,
+    "values": [
+     6.0169344262295095
+    ]
+   },
+   "fps": {
+    "n": 1,
+    "mean": 370.3703703703703,
+    "sd": null,
+    "values": [
+     370.3703703703703
+    ]
+   },
+   "filterMs": {
+    "n": 1,
+    "mean": 0.9,
+    "sd": null,
+    "values": [
+     0.9
+    ]
+   },
+   "frames": {
+    "n": 1,
+    "mean": 61,
+    "sd": null,
+    "values": [
+     61
+    ]
+   },
+   "visible": {
+    "n": 1,
+    "mean": 364,
+    "sd": null,
+    "values": [
+     364
+    ]
+   }
+  },
+  "layers|ternary desktop link-arcs": {
+   "fps": {
+    "n": 1,
+    "mean": 1111.111111111111,
+    "sd": null,
+    "values": [
+     1111.111111111111
+    ]
+   }
+  },
+  "layers|ternary desktop nodes": {
+   "fps": {
+    "n": 1,
+    "mean": 2500,
+    "sd": null,
+    "values": [
+     2500
+    ]
+   }
+  },
+  "layers|ternary desktop labels": {
+   "fps": {
+    "n": 1,
+    "mean": 10000,
+    "sd": null,
+    "values": [
+     10000
+    ]
+   }
+  },
+  "afterDrag|ternary desktop": {
+   "frames": {
+    "n": 1,
+    "mean": 0,
+    "sd": null,
+    "values": [
+     0
+    ]
+   },
+   "mainMs": {
+    "n": 1,
+    "mean": 3.0999999999999917,
+    "sd": null,
+    "values": [
+     3.0999999999999917
+    ]
+   },
+   "lastAt": {
+    "n": 1,
+    "mean": 0,
+    "sd": null,
+    "values": [
+     0
+    ]
+   }
+  },
+  "wheel|ternary desktop": {
+   "mainPerStep": {
+    "n": 1,
+    "mean": 4.607899999999998,
+    "sd": null,
+    "values": [
+     4.607899999999998
+    ]
+   },
+   "framesDuring": {
+    "n": 1,
+    "mean": 11,
+    "sd": null,
+    "values": [
+     11
+    ]
+   },
+   "framesAfter": {
+    "n": 1,
+    "mean": 1,
+    "sd": null,
+    "values": [
+     1
+    ]
+   },
+   "mainAfterMs": {
+    "n": 1,
+    "mean": 8.952000000000071,
+    "sd": null,
+    "values": [
+     8.952000000000071
+    ]
+   }
+  },
+  "hover|ternary desktop": {
+   "mainPerStep": {
+    "n": 1,
+    "mean": 0.7086249999999988,
+    "sd": null,
+    "values": [
+     0.7086249999999988
+    ]
+   },
+   "fps": {
+    "n": 1,
+    "mean": 1666.6666666666667,
+    "sd": null,
+    "values": [
+     1666.6666666666667
+    ]
+   },
+   "styleFrames": {
+    "n": 1,
+    "mean": 6,
+    "sd": null,
+    "values": [
+     6
+    ]
+   }
+  },
+  "features|ternary desktop base": {
+   "mainPerStep": {
+    "n": 1,
+    "mean": 5.887262295081968,
+    "sd": null,
+    "values": [
+     5.887262295081968
+    ]
+   },
+   "fps": {
+    "n": 1,
+    "mean": 357.14285714285717,
+    "sd": null,
+    "values": [
+     357.14285714285717
+    ]
+   },
+   "frames": {
+    "n": 1,
+    "mean": 61,
+    "sd": null,
+    "values": [
+     61
+    ]
+   },
+   "visible": {
+    "n": 1,
+    "mean": 364,
+    "sd": null,
+    "values": [
+     364
+    ]
+   }
+  },
+  "features|ternary desktop noCells": {
+   "mainPerStep": {
+    "n": 1,
+    "mean": 6.643573770491803,
+    "sd": null,
+    "values": [
+     6.643573770491803
+    ]
+   },
+   "fps": {
+    "n": 1,
+    "mean": 344.82758620689657,
+    "sd": null,
+    "values": [
+     344.82758620689657
+    ]
+   },
+   "frames": {
+    "n": 1,
+    "mean": 61,
+    "sd": null,
+    "values": [
+     61
+    ]
+   },
+   "visible": {
+    "n": 1,
+    "mean": 364,
+    "sd": null,
+    "values": [
+     364
+    ]
+   }
+  },
+  "features|ternary desktop noLabels": {
+   "mainPerStep": {
+    "n": 1,
+    "mean": 4.539688524590164,
+    "sd": null,
+    "values": [
+     4.539688524590164
+    ]
+   },
+   "fps": {
+    "n": 1,
+    "mean": 434.7826086956522,
+    "sd": null,
+    "values": [
+     434.7826086956522
+    ]
+   },
+   "frames": {
+    "n": 1,
+    "mean": 61,
+    "sd": null,
+    "values": [
+     61
+    ]
+   },
+   "visible": {
+    "n": 1,
+    "mean": 364,
+    "sd": null,
+    "values": [
+     364
+    ]
+   }
+  },
+  "features|ternary desktop rectangle": {
+   "mainPerStep": {
+    "n": 1,
+    "mean": 6.751901639344263,
+    "sd": null,
+    "values": [
+     6.751901639344263
+    ]
+   },
+   "fps": {
+    "n": 1,
+    "mean": 285.7142857142857,
+    "sd": null,
+    "values": [
+     285.7142857142857
+    ]
+   },
+   "frames": {
+    "n": 1,
+    "mean": 61,
+    "sd": null,
+    "values": [
+     61
+    ]
+   },
+   "visible": {
+    "n": 1,
+    "mean": 364,
+    "sd": null,
+    "values": [
+     364
+    ]
+   }
+  }
+ }
+}

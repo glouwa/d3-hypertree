@@ -1,0 +1,174 @@
+.unitdisk-nav {    
+    svg {
+        cursor: crosshair;
+
+        .cell {
+            pointer-events:none;
+        }
+        .arc {            
+            pointer-events: none;
+        }
+        .node {
+            pointer-events:none;
+            //animation: nodefadein 1250ms ease-in-out;// infinite;            
+        }
+        @keyframes nodefadein {
+            0%   { opacity: 0; }            
+            100% { opacity: 1; }
+        }
+        
+        .caption {
+            //font-family: 'NotoColorEmoji';
+            //text-transform: uppercase;
+            //font-size: .025pt;
+            font-size: .002em;
+            font-weight: 300;
+            //dominant-baseline: middle;
+            //text-anchor: middle;
+            user-select: none;            
+            //letter-spacing: 0.05em;
+            pointer-events: none;
+
+            text-rendering: optimizeSpeed;
+            //animation: fade-in 750ms ease-in-out;
+        }
+        .caption:lang(zh) {
+            font-size: .0025em;            
+        }
+
+        @keyframes fade-in {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+        .caption-label {
+            /*
+            //transition-property: transform;
+            //transition-duration: 250ms;
+            transition-duration: 0ms;
+            transition-timing-function: ease-in-out;
+            transition-delay: 150ms;   
+            */
+            //animation: fade-in 750ms ease-in-out;
+        }        
+
+        .caption-icon {
+            font-family: 'NotoColorEmoji', Roboto;
+            font-size: .8;
+            
+            transition-property: none;                       
+            transition-duration: 0ms;            
+        }
+
+        .caption-background {
+            pointer-events: none;
+            //animation: fade-in 750ms ease-in-out;
+        }
+
+        // the label of the hovered node (markHoveredLabel): an opaque box with a border
+        // of always one screen pixel (whatever the zoom and the label's scale)
+        .caption-hover {
+            pointer-events: none;
+            stroke-width: 1px;
+            vector-effect: non-scaling-stroke;
+        }
+        // the disk under an emoji: a border of one screen pixel
+        .emoji-background {
+            pointer-events: none;
+            stroke-width: 1px;
+            vector-effect: non-scaling-stroke;
+        }
+
+        .label-link {
+            stroke-width:.02;
+            stroke-dasharray: .001;
+            stroke-linecap: round;
+            //animation: fade-in 750ms ease-in-out;
+        }
+
+        .background-circle {
+            pointer-events: none;
+        }
+        .mouse-circle {
+            pointer-events: visibleFill;
+            fill: none;
+            //cursor: crosshair;
+        }
+        .mouse-circle-cursor {
+            pointer-events: visibleFill;
+            fill: none;
+            cursor: crosshair;
+        }
+
+        .ripple-world {
+            pointer-events: none;
+            cursor: crosshair;
+        }
+        .ripple-circle {
+            pointer-events: none;
+            cursor: crosshair;
+            opacity: 0;
+            animation: ripple 500ms ease-out;
+        }
+        @keyframes ripple {
+            0% {
+                transform: scale(0);
+                opacity: .8;
+            }
+            12% {
+                transform: scale(.45);
+                opacity: .8;
+            }
+            100% {
+                opacity: 0;
+                transform: scale(3);
+            }
+        }
+
+        #path-arcs {
+            opacity: .3;
+        }
+        #stem-path {
+            opacity: .3;
+        }
+
+        .focus-circle {        
+            pointer-events:none;
+        }
+        .ping-circle {              
+            opacity: 1;
+            pointer-events:none;            
+        }
+        .trace-polyline {              
+            opacity: .8;
+            stroke: orange; //#8d6e63;            
+            stroke-width: .03;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill:none;
+            pointer-events:none;
+        }
+
+        .center-node {
+            animation: centernodemove 500ms ease-out;// infinite;
+            stroke: none;            
+            stroke-width: .006;
+        }
+    
+        @keyframes centernodemove {
+            0% { 
+                transform: scale(0);                 
+                transform: rotate(1);
+            }
+            10% { 
+                transform: scale(0); 
+            }
+            75% { 
+                transform: scale(.1); 
+            }
+            80%, 100% {               
+                //transform: scale(.6);   
+                //transform: rotate(0);
+            }
+        }
+    }
+}

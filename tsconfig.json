@@ -1,11 +1,22 @@
 {
-  "compilerOptions": {
+    // Used for the type declarations (npm run build:types -> dist/d) and the type check
+    // (npm run typecheck). The JavaScript is built by Vite. The ~20 known type errors
+    // are fixed in Phase 2, until then the declarations are emitted despite them.
+    "compilerOptions": {
         "target": "ES2017",
-        "module": "commonjs",
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "lib": ["ES2017", "DOM", "DOM.Iterable"],
+        "types": ["d3", "node"],
+        "strict": false,
+        "noImplicitAny": false,
+        "isolatedModules": true,
+        "skipLibCheck": true,
         "declaration": true,
-        "sourceMap": true,
-        "types": [ "d3", "node" ],
-        "typeRoots": ["node_modules/@types"],
+        "emitDeclarationOnly": true,
+        "outDir": "dist/d",
+        "rootDir": "src",
         "pretty": true
-  }
+    },
+    "include": ["src/**/*.ts"]
 }

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>d3-hypertree playground</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" id="theme" href="../dist/d3-hypertree-light.css">
+    <link rel="stylesheet" href="playground.css">
+</head>
+<body>
+    <aside id="panel">
+        <header>
+            <h1>d3-hypertree <span>playground</span></h1>
+            <p>Every option of the library, live. The data, the preset stack and your changes are the URL.</p>
+        </header>
+        <div id="controls"></div>
+        <footer>
+            <button id="btn-reset" class="secondary">Reset all</button>
+            <button id="btn-link" class="secondary">Copy link</button>
+            <button id="btn-harness">Open as test</button>
+        </footer>
+    </aside>
+    <main>
+        <div id="stage"><div id="tree"></div></div>
+        <section id="info">
+            <dl id="stats"></dl>
+            <div id="log-wrap">
+                <h2>Log <button id="btn-clear-log" class="link">clear</button></h2>
+                <ol id="log"></ol>
+            </div>
+        </section>
+    </main>
+    <aside id="layers-panel">
+        <div id="layer-controls"></div>
+    </aside>
+    <script src="../dist/d3-hypertree.js"></script>
+    <script src="../node_modules/d3/dist/d3.min.js"></script>
+    <script src="options.js"></script>
+    <script src="../test/config.js"></script>
+    <script src="playground.js"></script>
+</body>
+</html>

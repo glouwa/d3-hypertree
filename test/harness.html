@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>d3-hypertree test harness</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" id="theme" href="../dist/d3-hypertree-light.css">
+    <style>
+        html, body { margin: 0; height: 100%; background: #fff; }
+        #tree { width: 900px; height: 900px; }
+    </style>
+</head>
+<body>
+    <div id="tree"></div>
+    <script src="../dist/d3-hypertree.js"></script>
+    <script src="../node_modules/d3/dist/d3.min.js"></script>
+    <script src="../playground/options.js"></script>
+    <script src="config.js"></script>
+    <script>
+        // Test harness for d3-hypertree. Everything is configured by URL parameters
+        // (documented in config.js, shared with the playground), so every test and
+        // benchmark describes its input in one string.
+        // window.harness exposes the component, recorded callbacks and helpers.
+        const q = new URLSearchParams(location.search)
+        if (q.get('theme') === 'dark') document.getElementById('theme').href = '../dist/d3-hypertree-dark.css'
+        // size=WxH: the size of the tree's element (default 900x900), e.g. a rectangle
+        // for the half-plane view
+        if (/^\d+x\d+$/.test(q.get('size') || '')) {
+            const [w, h] = q.get('size').split('x')
+            Object.assign(document.getElementById('tree').style, { width: w + 'px', height: h + 'px' })
+        }
+
+        // every interaction callback is recorded in harness.events
+        const events = []
+        const record = type => (n, ...rest) => events.push({
+            type, id: n ? n.mergeId : undefined, arg: typeof rest[0] === 'boolean' ? rest[0] : undefined,
+        })
+        // the stack of named overlays (the provenance names them: data, the presets, url, harness)
+        const stack = hypertreeConfig.buildStack(q, { interaction: {
+            onNodeClick:        record('click'),
+            onNodeHold:         record('hold'),
+            onNodeHover:        record('hover'),
+            onHoverNodeChange:  record('hoverchange'),
+            onNodeSelect:       record('select'),
+            onCenterNodeChange: record('center'),
+        } })
+
+        const ht = new hyt.Hypertree({ parent: document.querySelector('#tree') }, stack)
+
+        const layerStack = () => ht.unitdisk.layerStack || ht.unitdisk.mainView.layerStack
+        const r1 = v => Math.round(v * 10) / 10
+        const r4 = v => Math.round(v * 1e4) / 1e4
+
+        window.harness = {
+            ht,
+            ready: ht.initPromise,
+            events,
+            clearEvents: () => { events.length = 0 },
+            layerNames: () => Object.keys(layerStack().layers),
+            layer: name => layerStack().layers[name],
+            /** Per-layer JS time (ms) of the most recent update, as measured by the layer stack. */
+            lastLayerTimings: () => {
+                const m = layerStack().d3meta
+                return m ? Object.fromEntries(m.names.map((n, i) => [n, m.Δ[i]])) : {}
+            },
+            /** Show only the given layers (also while dragging), hide all others; 'all' restores. */
+            showOnly: names => {
+                const layers = layerStack().layers
+                for (const [n, l] of Object.entries(layers)) {
+                    if (l.args.__origInvisible === undefined) {
+                        l.args.__origInvisible = !!l.args.invisible
+                        l.args.__origHideOnDrag = !!l.args.hideOnDrag
+                    }
+                    const visible = names !== 'all' && names.includes(n)
+                    l.args.invisible  = names === 'all' ? l.args.__origInvisible  : !visible
+                    l.args.hideOnDrag = names === 'all' ? l.args.__origHideOnDrag : !visible
+                }
+                ht.update.data()
+            },
+            /** Screen position of a node's circle (page coordinates), or null if not rendered. */
+            nodePos: id => {
+                const c = [...document.querySelectorAll('#nodes circle')].find(c => c.__data__ && c.__data__.mergeId === id)
+                if (!c) return null
+                const r = c.getBoundingClientRect()
+                return { x: r.x + r.width / 2, y: r.y + r.height / 2, r: r.width / 2 }
+            },
+            /**
+             * Compact description of what's drawn, for scene snapshots: visible nodes
+             * (id, position relative to the component, radius, fill), element count per
+             * layer, label texts, zoom and translation.
+             */
+            scene: () => {
+                const box = document.querySelector('#tree').getBoundingClientRect()
+                const nodes = [...document.querySelectorAll('#nodes circle')]
+                    .filter(c => c.__data__)
+                    .map(c => {
+                        const r = c.getBoundingClientRect()
+                        return {
+                            id: c.__data__.mergeId,
+                            x: r1(r.x + r.width / 2 - box.x), y: r1(r.y + r.height / 2 - box.y), r: r1(r.width / 2),
+                            fill: c.style.fill || c.getAttribute('fill') || null,
+                        }
+                    })
+                    .sort((a, b) => a.id - b.id)
+                const layers = {}
+                for (const name of Object.keys(layerStack().layers)) {
+                    const g = document.getElementById(name)
+                    layers[name] = g ? g.querySelectorAll('*').length : 0
+                }
+                const labels = [...document.querySelectorAll('#labels text, #labels2 text, #labels-force text')]
+                    .map(t => t.textContent).filter(Boolean).sort()
+                const linkColors = {}
+                document.querySelectorAll('#link-arcs path').forEach(p => {
+                    const c = p.style.stroke || p.getAttribute('stroke') || 'css'
+                    linkColors[c] = (linkColors[c] || 0) + 1
+                })
+                const s = ht.unitdisk.args.transformation.state
+                return {
+                    λ: r4(s.λ), P: { re: r4(s.P.re), im: r4(s.P.im) },
+                    nodes, layers, labels, linkColors,
+                    selections: ht.args.objects.selections.map(n => n.mergeId).sort((a, b) => a - b),
+                }
+            },
+        }
+    </script>
+</body>
+</html>

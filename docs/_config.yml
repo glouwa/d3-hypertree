@@ -1,4 +1,6 @@
 theme: jekyll-theme-minimal
+# development notes (plan, performance): in the repository, not on the site
+exclude: [dev]
 show_downloads: false
 github:
   zip_url: dist/bundle.min.js.zip

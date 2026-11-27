@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+         xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <skos:ConceptScheme rdf:about="#animals">
+    <dc:title>Animals</dc:title>
+    <dc:identifier>animals</dc:identifier>
+    <skos:hasTopConcept rdf:resource="#mammals"/>
+    <skos:hasTopConcept rdf:resource="#birds"/>
+  </skos:ConceptScheme>
+  <skos:Concept rdf:about="#mammals">
+    <skos:prefLabel>Mammals</skos:prefLabel>
+    <skos:inScheme rdf:resource="#animals"/>
+    <skos:narrower rdf:resource="#cats"/>
+    <skos:narrower rdf:resource="#dogs"/>
+  </skos:Concept>
+  <skos:Concept rdf:about="#birds">
+    <skos:prefLabel>Birds</skos:prefLabel>
+    <skos:inScheme rdf:resource="#animals"/>
+    <skos:narrower rdf:resource="#owls"/>
+    <skos:narrower rdf:resource="#eagles"/>
+  </skos:Concept>
+  <skos:Concept rdf:about="#cats"><skos:prefLabel>Cats</skos:prefLabel><skos:inScheme rdf:resource="#animals"/></skos:Concept>
+  <skos:Concept rdf:about="#dogs"><skos:prefLabel>Dogs</skos:prefLabel><skos:inScheme rdf:resource="#animals"/></skos:Concept>
+  <skos:Concept rdf:about="#owls"><skos:prefLabel>Owls</skos:prefLabel><skos:inScheme rdf:resource="#animals"/></skos:Concept>
+  <skos:Concept rdf:about="#eagles"><skos:prefLabel>Eagles</skos:prefLabel><skos:inScheme rdf:resource="#animals"/></skos:Concept>
+</rdf:RDF>

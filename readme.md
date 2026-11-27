@@ -121,7 +121,7 @@ named `n` in the following examples.
 
 A typical data driven property configuration looks like this:
 ```typescript
-    nodeColor: function(n, i, v) {
+    fill: function(n, i, v) {          // e.g. layerOptions.nodes.fill
         if (n.data.valueX>30) return 'red'
         else return 'blue'
     }
@@ -130,7 +130,7 @@ The given function is called by the renderer, for each frame, for each visible n
 JavaScript supports a shorter syntax for functions, called lambda expressions.
 Most code snippets will use this syntax equivalent to the function above.
 ```typescript
-    nodeColor: n=> (n.data.valueX>30 ? 'red' : 'blue')
+    fill: n=> (n.data.valueX>30 ? 'red' : 'blue')
 ```
 
 #### The Node objects `n`
@@ -197,13 +197,13 @@ const mytree = new hyt.Hypertree(
                 'cells':       { invisible: true, hideOnDrag: true },                
                 'images':      { width: .1, height: .1 },
                 'link-arcs':   { 
-                    linkColor: n=> {
+                    stroke: n=> {
                         if (n.mergeId == 12) return 'orange'
                         return undefined
                     }
                 }, 
                 'nodes': {                     
-                    nodeColor: n=> {
+                    fill: n=> {
                         if (n.mergeId == 12) return 'yellow'
                         if (!n.children) return 'red'
                         return '#a5d6a7'
@@ -301,10 +301,12 @@ new hyt.Hypertree(
         dataloader?:            (ok:(root:N, t0:number, dl:number)=>void, err:(err)=>void)=> void   
         dataInitBFS:            (ht:Hypertree, n:N)=> void
         langInitBFS:            (ht:Hypertree, n:N)=> void         
+        langmap:                { [name:string]: string }  // labels by node name, applied once at initialization
+        iconmap:                { [name:string]: string }  // emojis by node name (or id), applied once
         layout: {
             type:               (root:N, t?:number, noRecursion?:boolean) => void
             weight:             (n:N)=> number
-            linklen:            (n:N)=> number            
+            initSize:           number                     // the start zoom fits the tree into this radius (default .97)
             rootWedge: {
                 orientation:    number
                 angle:          number
@@ -312,18 +314,19 @@ new hyt.Hypertree(
         }
         filter: {
             cullingRadius:      number
-            weightFilter:       null | number | {            
+            weightFilter:       null | {                   // null: no culling by weight
                 weight:         (n)=> number
-                rangeWeight:    { min:number, max:number }
-                rangeNodes:     { min:number, max:number }
-                alpha:          number
+                rangeNodes:     { min:number, max:number }       // number of visible nodes (target)
+                alpha:          number                           // adaptation step per update
             }
             focusExtension:     number
             maxFocusRadius:     number            
-            maxlabels:          number       
+            labelScore?:        (n:N)=> number               // which nodes get a label (default: the subtree weight)
         }       
         geometry: {
-            layers:             ((v, ls:IUnitDisk)=> ILayer)[]
+            projection:         'poincare' | 'cayley' | 'schwarz-christoffel' | 'glatzhofer' | 'band' | 'half-band' | 'klein' | 'equal-area' | 'equidistant' | 'gans' | 'stretch' | 'squircle' | 'sector' | Projection   // how the plane is drawn (default 'poincare')
+            diskSize:           number                     // the disk's diameter in the square view (default .96)
+            layers:             LayerSpec[]                // { type, name, data, options }, see hyt.defaultLayers()
             layerOptions: {
                 layerbase: {
                     invisible:  false
@@ -339,7 +342,7 @@ new hyt.Hypertree(
                 links: {
                     stroke:            (n:N)=> color
                     strokeWidth:       (n:N)=> number
-                    linkCurvature:     '+' | '-' | 'l'
+                    linkCurvature:     '-' | '+' | '0' | 'l'   // '-' default (hyperbolic geodesic), '+' other side, '0' and 'l' straight
                 },
                 nodes: {
                     fill:              (n:N)=> color
@@ -357,21 +360,49 @@ new hyt.Hypertree(
                 'cells',
                 'culling-r', 'mouse-r', 'focus-r', 'labels-r-𝐖', 'λ', 'zerozero-circle',
                 'center-node', 'path-arcs', 'stem-arc', 'nodes', 'symbols', 'images', 'emojis',  
-                'labels', 'labels2', 'labels-force', 
+                'labels', 'labels-force', 
                 'traces',
                 */
             }
             nodeRadius:        (ud:IUnitDisk, n:N)=> number
             nodeScale:         (n:N)=> number
             nodeFilter:        (n:N)=> boolean
+            addLayer:          string[]                    // layer names to show, e.g. ['traces', 'labels']
+            removeLayer:       string[]                    // layer names to remove, e.g. ['stem-arc']
+            startPosition:     C                           // initial translation, e.g. { re:.3, im:0 }
         }
         interaction: {            
+            // strategies: they set the node state n.hovered / n.selected; layers only show it
+            // (layer options hover / selection: 'path' default, 'node' or 'none'; cells: true / false)
+            // the highlighted node (n.hovered, hover path and label, onNodeHover):
+            // default 'mousehover': the node under the mouse; 'center': the node nearest
+            // to the center, also while dragging (touch screens); 'none'
+            highlightNode:      'mousehover' | 'center' | 'none'
+            highlightUpdate:    'live' | 'settled'           // default 'live'; 'settled': when the view stands still
+            highlightDelay:     number                       // 'settled': ms of rest before it is set (default 0)
+            highlightLabelFallback: 'none' | 'ancestor'      // a node without a label: its nearest ancestor's (hover label only)
+            selection:          'none' | 'single' | 'multi'  // default 'multi'; 'single' replaces the old selection
+            maxSelections:      number                       // 'multi': the oldest is dropped beyond this (default 10)
+            clickAction:        'select' | 'goto' | 'none'   // besides onNodeClick (default 'none')
             onNodeClick:        (n:N, m:C, l:ILayer)=> void
+            onNodeHold:         (n:N, m:C, l:ILayer)=> void  // pressed for holdDuration ms without moving; no click follows
+            holdDuration:       number                       // default 500
+            onNodeHover:        (n:N)=> void                 // highlighted node changed (mouse or center); undefined when leaving
+            onHoverNodeChange:  (n:N)=> void                 // same as onNodeHover
+            onNodeSelect:       (n:N, selected:boolean)=> void // every selection change, also replaced or dropped ones
             onCenterNodeChange: (n:N)=> void 
-            λbounds:            [ number, number ]
-            wheelSensitivity:   number
+            λbounds:            [ number, number ]           // [min, max] zoom; start zoom, wheel, pinch and gotoλ stay inside
+            keepTreeInView:     boolean                      // default true: dragging, pinching and the wheel never leave the tree behind
+            wheelFactor:        number                       // zoom step per wheel notch (was wheelSensitivity)
             mouseRadius:        number
         }
     }
 )
 ```
+
+Selection API (all go through `interaction.selection`): `api.toggleSelection(n)`,
+`api.select(n)`, `api.deselect(n)`, `api.clearSelection()`.
+
+---
+
+Created 2017-11-01 · Last edit 2026-11-27

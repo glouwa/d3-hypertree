@@ -1,0 +1,48 @@
+# Build, lint and all browser tests on every push and pull request.
+# Windows runner: the tests drive the installed Microsoft Edge through Playwright
+# (channel msedge, no browser download), which the Windows images include.
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            test/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build (fails on type errors)
+        run: npm run build
+
+      - name: Install test dependencies
+        working-directory: test
+        run: npm ci
+
+      - name: Browser tests
+        working-directory: test
+        run: npx playwright test
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: test/test-results/
+          retention-days: 7

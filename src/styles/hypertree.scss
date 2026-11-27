@@ -1,0 +1,48 @@
+.unitdisk-nav {
+    top:0;
+    bottom:0;
+    left:0em;
+    right:0;
+    position: absolute;       
+    padding: .3em;
+
+    .tool-bar {
+        width: 3em;
+
+        button {
+            margin-top: .27em;
+            padding:0;
+        }
+        .tool-seperator {
+            margin-top: .6em;
+        }
+        .tool-seperator:first-child {
+            margin-top: 1em;
+        }
+        .tool-active {
+            background-color: #333;
+        }
+    }
+
+    .path-bar {
+        top: .4em;
+        right: 1.65em;
+        position: absolute;       
+    }
+
+    svg {
+        top:0;
+        bottom:0;
+        left:0;
+        right:0;
+        position: absolute;   
+    }
+
+}
+
+.absolute-center {
+    margin: auto;
+    position: absolute;
+    top: .75em; left: 2em; bottom: .2em; right: 0;
+    text-align: center;
+}

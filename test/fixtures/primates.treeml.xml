@@ -1,0 +1,582 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<tree>
+  <declarations>
+    <attributeDecl name="name" type="String"/>
+  </declarations>
+  <branch>
+    <attribute name="name" value="Primaten"/>
+    <branch>
+      <attribute name="name" value=""/>
+      <branch>
+        <attribute name="name" value=""/>
+        <branch>
+          <attribute name="name" value="Neuweltaffen"/>
+          <branch>
+            <attribute name="name" value=""/>
+            <branch>
+              <attribute name="name" value=""/>
+              <branch>
+                <attribute name="name" value=""/>
+                <branch>
+                  <attribute name="name" value=""/>
+                  <branch>
+                    <attribute name="name" value=""/>
+                    <branch>
+                      <attribute name="name" value=""/>
+                      <branch>
+                        <attribute name="name" value="Büschelaffen"/>
+                      </branch>
+                      <branch>
+                        <attribute name="name" value="Zwergseidenäffchen"/>
+                      </branch>
+                    </branch>
+                    <branch>
+                      <attribute name="name" value="Löwenäffchen"/>
+                    </branch>
+                  </branch>
+                  <branch>
+                    <attribute name="name" value="Saguinus"/>
+                  </branch>
+                </branch>
+                <branch>
+                  <attribute name="name" value="Springtamarin"/>
+                </branch>
+              </branch>
+              <branch>
+                <attribute name="name" value=""/>
+                <branch>
+                  <attribute name="name" value="Ungehaubte Kapuziner"/>
+                </branch>
+                <branch>
+                  <attribute name="name" value="Totenkopfaffen"/>
+                </branch>
+              </branch>
+            </branch>
+            <branch>
+              <attribute name="name" value=""/>
+              <branch>
+                <attribute name="name" value="Aotus"/>
+              </branch>
+              <branch>
+                <attribute name="name" value="Callicebus"/>
+              </branch>
+            </branch>
+          </branch>
+          <branch>
+            <attribute name="name" value=""/>
+            <branch>
+              <attribute name="name" value=""/>
+              <branch>
+                <attribute name="name" value="Sakis"/>
+              </branch>
+              <branch>
+                <attribute name="name" value=""/>
+                <branch>
+                  <attribute name="name" value="Uakaris"/>
+                </branch>
+                <branch>
+                  <attribute name="name" value="Bartsakis"/>
+                </branch>
+              </branch>
+            </branch>
+            <branch>
+              <attribute name="name" value=""/>
+              <branch>
+                <attribute name="name" value="Brüllaffen"/>
+              </branch>
+              <branch>
+                <attribute name="name" value=""/>
+                <branch>
+                  <attribute name="name" value=""/>
+                  <branch>
+                    <attribute name="name" value="Klammeraffen"/>
+                  </branch>
+                  <branch>
+                    <attribute name="name" value="Wollaffen"/>
+                  </branch>
+                </branch>
+                <branch>
+                  <attribute name="name" value="Spinnenaffen"/>
+                </branch>
+              </branch>
+            </branch>
+          </branch>
+        </branch>
+        <branch>
+          <attribute name="name" value="Altweltaffen"/>
+          <branch>
+            <attribute name="name" value="Meerkatzenverwandte"/>
+            <branch>
+              <attribute name="name" value=""/>
+              <branch>
+                <attribute name="name" value=""/>
+                <branch>
+                  <attribute name="name" value="Makaken"/>
+                </branch>
+                <branch>
+                  <attribute name="name" value=""/>
+                  <branch>
+                    <attribute name="name" value=""/>
+                    <branch>
+                      <attribute name="name" value="Weißlid-Mangaben"/>
+                    </branch>
+                    <branch>
+                      <attribute name="name" value="Mandrillartige"/>
+                    </branch>
+                  </branch>
+                  <branch>
+                    <attribute name="name" value=""/>
+                    <branch>
+                      <attribute name="name" value="Paviane"/>
+                    </branch>
+                    <branch>
+                      <attribute name="name" value="Dschelada"/>
+                    </branch>
+                  </branch>
+                </branch>
+              </branch>
+              <branch>
+                <attribute name="name" value=""/>
+                <branch>
+                  <attribute name="name" value=""/>
+                  <branch>
+                    <attribute name="name" value=""/>
+                    <branch>
+                      <attribute name="name" value="Meerkatzen"/>
+                    </branch>
+                    <branch>
+                      <attribute name="name" value="Husarenaffe"/>
+                    </branch>
+                  </branch>
+                  <branch>
+                    <attribute name="name" value="Zwergmeerkatzen"/>
+                  </branch>
+                </branch>
+                <branch>
+                  <attribute name="name" value="Sumpfmeerkatze"/>
+                </branch>
+              </branch>
+            </branch>
+            <branch>
+              <attribute name="name" value=""/>
+              <branch>
+                <attribute name="name" value=""/>
+                <branch>
+                  <attribute name="name" value="Grüner Stummelaffe"/>
+                </branch>
+              </branch>
+              <branch>
+                <attribute name="name" value=""/>
+                <branch>
+                  <attribute name="name" value="Kleideraffen"/>
+                </branch>
+                <branch>
+                  <attribute name="name" value=""/>
+                  <branch>
+                    <attribute name="name" value=""/>
+                    <branch>
+                      <attribute name="name" value="Pageh-Stumpfnase"/>
+                    </branch>
+                    <branch>
+                      <attribute name="name" value="Nasalis"/>
+                    </branch>
+                  </branch>
+                  <branch>
+                    <attribute name="name" value="Mützenlanguren"/>
+                  </branch>
+                </branch>
+              </branch>
+            </branch>
+          </branch>
+          <branch>
+            <attribute name="name" value=""/>
+            <branch>
+              <attribute name="name" value="Menschenaffen"/>
+              <branch>
+                <attribute name="name" value="Pongo"/>
+                <branch>
+                  <attribute name="name" value="Sumatra-Orang-Utan"/>
+                </branch>
+                <branch>
+                  <attribute name="name" value="Borneo-Orang-Utan"/>
+                </branch>
+              </branch>
+              <branch>
+                <attribute name="name" value=""/>
+                <branch>
+                  <attribute name="name" value=""/>
+                  <branch>
+                    <attribute name="name" value="Pan"/>
+                    <branch>
+                      <attribute name="name" value="Bonobo"/>
+                    </branch>
+                    <branch>
+                      <attribute name="name" value="Gemeiner Schimpanse"/>
+                    </branch>
+                  </branch>
+                  <branch>
+                    <attribute name="name" value=""/>
+                    <branch>
+                      <attribute name="name" value="Ardipithecus"/>
+                    </branch>
+                    <branch>
+                      <attribute name="name" value=""/>
+                      <branch>
+                        <attribute name="name" value="Australopithecus"/>
+                      </branch>
+                      <branch>
+                        <attribute name="name" value="Homo"/>
+                        <branch>
+                          <attribute name="name" value="Mensch"/>
+                        </branch>
+                        <branch>
+                          <attribute name="name" value="Homo erectus"/>
+                        </branch>
+                        <branch>
+                          <attribute name="name" value="Homo ergaster"/>
+                        </branch>
+                        <branch>
+                          <attribute name="name" value="Homo rudolfensis"/>
+                        </branch>
+                        <branch>
+                          <attribute name="name" value="Homo habilis"/>
+                        </branch>
+                      </branch>
+                    </branch>
+                  </branch>
+                </branch>
+                <branch>
+                  <attribute name="name" value="Gorillas"/>
+                  <branch>
+                    <attribute name="name" value="Östlicher Gorilla"/>
+                  </branch>
+                  <branch>
+                    <attribute name="name" value="Westlicher Gorilla"/>
+                  </branch>
+                </branch>
+              </branch>
+            </branch>
+            <branch>
+              <attribute name="name" value="Gibbons"/>
+              <branch>
+                <attribute name="name" value=""/>
+                <branch>
+                  <attribute name="name" value="Kleine Gibbons"/>
+                  <branch>
+                    <attribute name="name" value=""/>
+                    <branch>
+                      <attribute name="name" value=""/>
+                      <branch>
+                        <attribute name="name" value=""/>
+                        <branch>
+                          <attribute name="name" value="Schwarzhandgibbon"/>
+                        </branch>
+                        <branch>
+                          <attribute name="name" value="Weißhandgibbon"/>
+                        </branch>
+                        <branch>
+                          <attribute name="name" value="Müller-Gibbon"/>
+                        </branch>
+                      </branch>
+                      <branch>
+                        <attribute name="name" value="Silbergibbon"/>
+                      </branch>
+                    </branch>
+                    <branch>
+                      <attribute name="name" value="Kappengibbon"/>
+                    </branch>
+                  </branch>
+                  <branch>
+                    <attribute name="name" value="Kloss-Gibbon"/>
+                  </branch>
+                </branch>
+                <branch>
+                  <attribute name="name" value="Weißbrauengibbons"/>
+                </branch>
+              </branch>
+              <branch>
+                <attribute name="name" value="Siamang"/>
+              </branch>
+              <branch>
+                <attribute name="name" value="Schopfgibbons"/>
+                <branch>
+                  <attribute name="name" value="Südlicher Gelbwangen-Schopfgibbon"/>
+                </branch>
+                <branch>
+                  <attribute name="name" value="Hainan-Schopfgibbon"/>
+                </branch>
+                <branch>
+                  <attribute name="name" value="Nördlicher Weißwangen-Schopfgibbon"/>
+                </branch>
+                <branch>
+                  <attribute name="name" value="Südlicher Weißwangen-Schopfgibbon"/>
+                </branch>
+                <branch>
+                  <attribute name="name" value="Westlicher Schwarzer Schopfgibbon"/>
+                </branch>
+              </branch>
+            </branch>
+          </branch>
+        </branch>
+      </branch>
+      <branch>
+        <attribute name="name" value="Sulawesi-Koboldmakis"/>
+        <branch>
+          <attribute name="name" value=""/>
+          <branch>
+            <attribute name="name" value=""/>
+            <branch>
+              <attribute name="name" value="Sunda-Koboldmaki"/>
+            </branch>
+            <branch>
+              <attribute name="name" value="Philippinen-Koboldmaki"/>
+            </branch>
+          </branch>
+          <branch>
+            <attribute name="name" value="Sulawesi tarsiers"/>
+            <branch>
+              <attribute name="name" value="Zwergkoboldmaki"/>
+            </branch>
+            <branch>
+              <attribute name="name" value="Selayar-Koboldmaki"/>
+            </branch>
+            <branch>
+              <attribute name="name" value="Diana-Koboldmaki"/>
+            </branch>
+            <branch>
+              <attribute name="name" value="Sangihe-Koboldmaki"/>
+            </branch>
+            <branch>
+              <attribute name="name" value="Peleng-Koboldmaki"/>
+            </branch>
+            <branch>
+              <attribute name="name" value="Lariang-Koboldmaki"/>
+            </branch>
+          </branch>
+        </branch>
+      </branch>
+    </branch>
+    <branch>
+      <attribute name="name" value="Feuchtnasenprimaten"/>
+      <branch>
+        <attribute name="name" value="Lemuren"/>
+        <branch>
+          <attribute name="name" value=""/>
+          <branch>
+            <attribute name="name" value=""/>
+            <branch>
+              <attribute name="name" value="Gewöhnliche Makis"/>
+              <branch>
+                <attribute name="name" value=""/>
+                <branch>
+                  <attribute name="name" value="Katta"/>
+                </branch>
+                <branch>
+                  <attribute name="name" value="Gentle lemurs"/>
+                  <branch>
+                    <attribute name="name" value="Goldener Bambuslemur"/>
+                  </branch>
+                  <branch>
+                    <attribute name="name" value="Östlicher Bambuslemur"/>
+                  </branch>
+                </branch>
+              </branch>
+              <branch>
+                <attribute name="name" value=""/>
+                <branch>
+                  <attribute name="name" value="Kronenmaki"/>
+                </branch>
+                <branch>
+                  <attribute name="name" value="Mohrenmaki"/>
+                </branch>
+                <branch>
+                  <attribute name="name" value="Mongozmaki"/>
+                </branch>
+                <branch>
+                  <attribute name="name" value="Rotbauchmaki"/>
+                </branch>
+                <branch>
+                  <attribute name="name" value="Brauner Maki"/>
+                </branch>
+              </branch>
+              <branch>
+                <attribute name="name" value="Schwarzweißer Vari"/>
+              </branch>
+            </branch>
+            <branch>
+              <attribute name="name" value=""/>
+              <branch>
+                <attribute name="name" value=""/>
+                <branch>
+                  <attribute name="name" value="Indriartige"/>
+                  <branch>
+                    <attribute name="name" value="Östlicher Wollmaki"/>
+                  </branch>
+                  <branch>
+                    <attribute name="name" value="Sifakas"/>
+                    <branch>
+                      <attribute name="name" value="Diademsifaka"/>
+                    </branch>
+                    <branch>
+                      <attribute name="name" value="Goldkronensifaka"/>
+                    </branch>
+                    <branch>
+                      <attribute name="name" value="Larvensifaka"/>
+                    </branch>
+                  </branch>
+                  <branch>
+                    <attribute name="name" value="Indri"/>
+                  </branch>
+                </branch>
+                <branch>
+                  <attribute name="name" value="Palaeopropithecinae"/>
+                  <branch>
+                    <attribute name="name" value="Archaeoindris"/>
+                  </branch>
+                  <branch>
+                    <attribute name="name" value="Babakotia"/>
+                  </branch>
+                </branch>
+              </branch>
+              <branch>
+                <attribute name="name" value="Archaeolemurinae"/>
+                <branch>
+                  <attribute name="name" value="Hadropithecus"/>
+                </branch>
+              </branch>
+            </branch>
+          </branch>
+          <branch>
+            <attribute name="name" value="Katzenmakis"/>
+            <branch>
+              <attribute name="name" value=""/>
+              <branch>
+                <attribute name="name" value=""/>
+                <branch>
+                  <attribute name="name" value="Mouse lemurs"/>
+                  <branch>
+                    <attribute name="name" value="Grauer Mausmaki"/>
+                  </branch>
+                  <branch>
+                    <attribute name="name" value="Brauner Mausmaki"/>
+                  </branch>
+                </branch>
+                <branch>
+                  <attribute name="name" value="Südlicher Riesenmausmaki"/>
+                </branch>
+              </branch>
+              <branch>
+                <attribute name="name" value="Dwarf lemurs"/>
+                <branch>
+                  <attribute name="name" value="Brauner Fettschwanzmaki"/>
+                </branch>
+                <branch>
+                  <attribute name="name" value="Westlicher Fettschwanzmaki"/>
+                </branch>
+              </branch>
+            </branch>
+            <branch>
+              <attribute name="name" value=""/>
+              <branch>
+                <attribute name="name" value="Büschelohrmaki"/>
+              </branch>
+              <branch>
+                <attribute name="name" value="Masoala-Gabelstreifenmaki"/>
+              </branch>
+            </branch>
+          </branch>
+          <branch>
+            <attribute name="name" value="Wieselmakis"/>
+            <branch>
+              <attribute name="name" value="Graurücken-Wieselmaki"/>
+            </branch>
+            <branch>
+              <attribute name="name" value="Rotschwanz-Wieselmaki"/>
+            </branch>
+            <branch>
+              <attribute name="name" value="Edwards-Wieselmaki"/>
+            </branch>
+            <branch>
+              <attribute name="name" value="Weißfuß-Wieselmaki"/>
+            </branch>
+            <branch>
+              <attribute name="name" value="Gewöhnlicher Wieselmaki"/>
+            </branch>
+            <branch>
+              <attribute name="name" value="Kleinzahn-Wieselmaki"/>
+            </branch>
+            <branch>
+              <attribute name="name" value="Nördlicher Wieselmaki"/>
+            </branch>
+          </branch>
+        </branch>
+        <branch>
+          <attribute name="name" value=""/>
+          <branch>
+            <attribute name="name" value="Fingertier"/>
+          </branch>
+          <branch>
+            <attribute name="name" value="Riesenfingertier"/>
+          </branch>
+        </branch>
+      </branch>
+      <branch>
+        <attribute name="name" value="Loriartige"/>
+        <branch>
+          <attribute name="name" value="Galagos"/>
+          <branch>
+            <attribute name="name" value="Demidoff-Galago"/>
+          </branch>
+          <branch>
+            <attribute name="name" value="Sansibar-Galago"/>
+          </branch>
+          <branch>
+            <attribute name="name" value="Moholi-Galago"/>
+          </branch>
+          <branch>
+            <attribute name="name" value="Allen-Galago"/>
+          </branch>
+          <branch>
+            <attribute name="name" value="Senegal-Galago"/>
+          </branch>
+          <branch>
+            <attribute name="name" value="Greater bush babies"/>
+            <branch>
+              <attribute name="name" value="Großohr-Riesengalago"/>
+            </branch>
+            <branch>
+              <attribute name="name" value="Kleinohr-Riesengalago"/>
+            </branch>
+          </branch>
+          <branch>
+            <attribute name="name" value="Needle-clawed bush babies"/>
+            <branch>
+              <attribute name="name" value="Südlicher Kielnagelgalago"/>
+            </branch>
+          </branch>
+        </branch>
+        <branch>
+          <attribute name="name" value="Loris"/>
+          <branch>
+            <attribute name="name" value="Roter Schlanklori"/>
+          </branch>
+          <branch>
+            <attribute name="name" value="Gewöhnlicher Bärenmaki"/>
+          </branch>
+          <branch>
+            <attribute name="name" value="Slow lorises"/>
+            <branch>
+              <attribute name="name" value="Sunda-Plumplori"/>
+            </branch>
+            <branch>
+              <attribute name="name" value="Zwerglori"/>
+            </branch>
+          </branch>
+          <branch>
+            <attribute name="name" value="Potto"/>
+          </branch>
+        </branch>
+      </branch>
+    </branch>
+  </branch>
+</tree>

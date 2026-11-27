@@ -1,0 +1,5 @@
+{ "name": "root", "children": [
+  { "name": "a", "children": [ { "name": "a1" }, { "name": "a2" }, { "name": "a3" } ] },
+  { "name": "b", "children": [ { "name": "b1" }, { "name": "b2", "children": [ { "name": "b21" }, { "name": "b22" } ] } ] },
+  { "name": "c" }
+] }

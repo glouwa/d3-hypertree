@@ -1,0 +1,378 @@
+import { test, expect } from '@playwright/test'
+import { collectErrors, expectNoErrors, openTree, waitForStable, diskBox, expectScene, expectPlausibleScene } from './helpers.mjs'
+
+// Configuration options and switchable features. Every option is changed on its
+// own against the defaults and checked by state and scene snapshot.
+
+const base = 'gen=nTree&depth=4&childs=3&labels=1&icons=1'
+const ALWAYS = ['interaction-2']
+
+test.describe('each layer on its own', () => {
+    // layer names as configured by the default layer set
+    const layers = ['background', 'cells', 'culling-r', 'mouse-r', 'focus-r', 'labels-r-𝐖', 'λ', '(0,0)',
+        'center-node', 'path-arcs', 'link-arcs', 'stem-arc', 'nodes', 'symbols', 'highlight-marker', 'images', 'emoji-backgrounds', 'emojis',
+        'labels', 'labels-force', 'labels-placed', 'traces']
+    const safe = name => name.replace(/[^a-z0-9-]/gi, c => ({ '(': '', ')': '', ',': '-', 'λ': 'lambda', '𝐖': 'W' })[c] ?? '_')
+
+    test('the default layer set is unchanged', async ({ page }) => {
+        await openTree(page, base)
+        expect(await page.evaluate(() => harness.layerNames())).toEqual([...layers.slice(0, -1), ...ALWAYS, 'traces'])
+    })
+
+    for (const layer of layers) {
+        test(`only "${layer}"`, async ({ page }, testInfo) => {
+            const errors = collectErrors(page)
+            await openTree(page, base)
+            await page.evaluate(l => harness.showOnly([l, 'interaction', 'interaction-2']), layer)
+            await waitForStable(page)
+            const counts = await page.evaluate(() => harness.scene().layers)
+            for (const [name, n] of Object.entries(counts)) {
+                if (name === layer || ALWAYS.includes(name)) continue
+                // every other data-driven layer is empty
+                if (!['background', 'λ', '(0,0)', 'stem-arc', 'center-node', 'culling-r', 'mouse-r', 'focus-r', 'labels-r-𝐖'].includes(name))
+                    expect(n, `${name} must be empty`).toBe(0)
+            }
+            await expectPlausibleScene(page)
+            await expectScene(page, testInfo, `only-${safe(layer)}`)
+            expectNoErrors(errors)
+        })
+    }
+
+    test('traces: touch points are drawn while touching', async ({ page, browser }) => {
+        const context = await browser.newContext({ viewport: { width: 900, height: 900 }, hasTouch: true, baseURL: test.info().project.use.baseURL })
+        const p = await context.newPage()
+        const errors = collectErrors(p)
+        await openTree(p, `${base}&layers={"traces":{"invisible":false,"hideOnDrag":false}}`)
+        const box = await diskBox(p)
+        const cdp = await context.newCDPSession(p)
+        const x = box.x + box.width * 0.6, y = box.y + box.height * 0.45
+        await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y, id: 0 }] })
+        for (let i = 1; i <= 5; i++) {
+            await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: x - i * 10, y, id: 0 }] })
+            await p.waitForTimeout(16)
+        }
+        await p.waitForTimeout(100)
+        const during = await p.evaluate(() => document.getElementById('traces').querySelectorAll('*').length)
+        await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] })
+        await waitForStable(p)
+        const after = await p.evaluate(() => document.getElementById('traces').querySelectorAll('*').length)
+        expect(during).toBeGreaterThan(0)
+        expect(after).toBe(0)
+        expectNoErrors(errors)
+        await context.close()
+    })
+})
+
+test.describe('layer options', () => {
+    test('color callbacks: node fill and link stroke', async ({ page }, testInfo) => {
+        const errors = collectErrors(page)
+        await openTree(page, 'gen=nTree&depth=6&childs=2&colors=1')
+        const s = await page.evaluate(() => harness.scene())
+        // node circles are only drawn for leaves (all at depth 6 here), so the
+        // colors by depth show on the links, which cover every depth
+        expect(s.nodes.every(n => n.fill && n.fill.startsWith('rgb'))).toBe(true)
+        expect(Object.keys(s.linkColors).length).toBeGreaterThan(1)
+        expect(Object.keys(s.linkColors).every(c => c.startsWith('rgb'))).toBe(true)
+        await expectScene(page, testInfo, 'colors')
+        expectNoErrors(errors)
+    })
+
+    // documented values: '+', '-', 'l' (a code comment also mentions '0', see below)
+    for (const curvature of ['+', '-', 'l']) {
+        test(`link curvature "${curvature}"`, async ({ page }, testInfo) => {
+            const errors = collectErrors(page)
+            await openTree(page, `gen=nTree&depth=6&childs=2&layers=${encodeURIComponent(JSON.stringify({ 'link-arcs': { curvature } }))}`)
+            const tag = await page.evaluate(() => { const e = document.getElementById('link-arcs').firstElementChild; return e && e.tagName })
+            expect(tag).toBe(curvature === 'l' ? 'line' : 'path')
+            await expectPlausibleScene(page)
+            await expectScene(page, testInfo, `curvature-${{ '+': 'plus', '-': 'minus', 'l': 'line' }[curvature]}`)
+            expectNoErrors(errors)
+        })
+    }
+
+    // Known bug: curvature '0' (mentioned in a comment in preset-layers.ts, not in the
+    // docs) crashes with "Cannot read properties of undefined (reading 'nodePosStr')".
+    // Regression: curvature '0' crashed (the path function was called without `this`).
+    // '0' draws straight lines as SVG paths ('l' draws them as SVG lines).
+    test('link curvature "0" draws straight lines', async ({ page }) => {
+        const errors = collectErrors(page)
+        const layers = encodeURIComponent(JSON.stringify({ 'link-arcs': { curvature: '0' } }))
+        await page.goto(`harness.html?gen=nTree&depth=6&childs=2&layers=${layers}`)
+        await page.waitForFunction(() => window.harness && harness.ht.data && document.querySelectorAll('#link-arcs path').length > 10)
+        const ds = await page.evaluate(() => [...document.querySelectorAll('#link-arcs path')].map(p => p.getAttribute('d')))
+        expect(ds.every(d => /^M \S+ \S+ L \S+ \S+$/.test(d))).toBe(true)
+        expectNoErrors(errors)
+    })
+
+    test('geometry.linkCurvature "0" straightens both arc layers', async ({ page }) => {
+        const errors = collectErrors(page)
+        await page.goto(`harness.html?gen=nTree&depth=6&childs=2&geometry=${encodeURIComponent('{"linkCurvature":"0"}')}`)
+        await page.waitForFunction(() => window.harness && harness.ht.data && document.querySelectorAll('#link-arcs path').length > 10)
+        expect(await page.evaluate(() => [...document.querySelectorAll('#link-arcs path')].some(p => p.getAttribute('d').includes(' A ')))).toBe(false)
+        expectNoErrors(errors)
+    })
+
+    test('dark theme renders like the light one (coarse image check)', async ({ page }, testInfo) => {
+        const errors = collectErrors(page)
+        await openTree(page, 'gen=nTree&depth=6&childs=2&theme=dark')
+        await expectScene(page, testInfo, 'theme-dark')
+        // level 3: coarse image comparison, catches broken CSS or empty renders
+        await expect(page).toHaveScreenshot('theme-dark.png', { maxDiffPixelRatio: 0.02, threshold: 0.3 })
+        expectNoErrors(errors)
+    })
+})
+
+test.describe('layout', () => {
+    const wedges = [
+        ['wedge-right-half', { rootWedge: { orientation: 0, angle: Math.PI } }],
+        ['wedge-full', { rootWedge: { orientation: 3 * Math.PI / 2, angle: 2 * Math.PI } }],
+        ['wedge-narrow-up', { rootWedge: { orientation: 3 * Math.PI / 2, angle: Math.PI / 2 } }],
+    ]
+    for (const [name, layout] of wedges) {
+        test(`rootWedge ${name}`, async ({ page }, testInfo) => {
+            const errors = collectErrors(page)
+            await openTree(page, `gen=nTree&depth=6&childs=2&filter=off&layout=${encodeURIComponent(JSON.stringify(layout))}`)
+            // all children of the root lie within the wedge
+            const ok = await page.evaluate(w => harness.ht.data.children.every(c => {
+                const a = Math.atan2(c.layout.z.im, c.layout.z.re)
+                const d = Math.atan2(Math.sin(a - w.orientation), Math.cos(a - w.orientation))
+                return Math.abs(d) <= w.angle / 2 + 1e-6
+            }), layout.rootWedge)
+            expect(ok).toBe(true)
+            await expectPlausibleScene(page)
+            await expectScene(page, testInfo, `layout-${name}`)
+            expectNoErrors(errors)
+        })
+    }
+
+    for (const type of ['berge', 'spiral', 'buchheim', 'unitLines', 'unitVectors']) {
+        test(`layout type ${type} (filter off)`, async ({ page }, testInfo) => {
+            const errors = collectErrors(page)
+            await openTree(page, `gen=nTree&depth=5&childs=2&filter=off&layoutType=${type}`)
+            expect((await page.evaluate(() => harness.scene())).layers['link-arcs']).toBeGreaterThan(10)
+            await expectPlausibleScene(page)
+            await expectScene(page, testInfo, `layout-type-${type}`)
+            expectNoErrors(errors)
+        })
+    }
+})
+
+test.describe('presets', () => {
+    // the library's presets (generic; the Tree of Life presets live with the application)
+    for (const preset of ['modelBase', 'infovis', 'infovisEmoji']) {
+        test(`preset ${preset}`, async ({ page }, testInfo) => {
+            const errors = collectErrors(page)
+            const content = preset === 'modelBase' ? '' : '&labels=1&icons=1'
+            await openTree(page, `gen=nTree&depth=4&childs=3${content}&preset=${preset}`)
+            expect((await page.evaluate(() => harness.scene())).nodes.length).toBeGreaterThan(5)
+            await expectPlausibleScene(page)
+            await expectScene(page, testInfo, `preset-${preset}`)
+            expectNoErrors(errors)
+        })
+    }
+
+    test('the presets until v1 are gone; the model overlay of an application replaces them', async ({ page }) => {
+        await openTree(page, 'gen=nTree&depth=3&childs=2')
+        expect(await page.evaluate(() => Object.keys(hyt.presets).sort())).toEqual(['highlightCell', 'highlightDisk', 'infovis', 'infovisEmoji', 'infovisFiles', 'modelBase'])
+    })
+
+    // infovisFiles on the generated file system (fixtures/gen-filesystem.mjs): the size
+    // as cell color, the number of files as link color, folder labels with their size
+    test('infovisFiles: size as cell color, number of files as link color', async ({ page }) => {
+        const errors = collectErrors(page)
+        await openTree(page, 'file=fixtures/filesystem.d3.json&preset=infovisFiles')
+        await waitForStable(page)
+        const r = await page.evaluate(() => {
+            const same = (els, key, style) => {   // equal data value -> equal color; how many colors
+                const byValue = new Map()
+                for (const e of els) {
+                    const v = key(e.__data__); if (v === undefined) continue
+                    if (!byValue.has(v)) byValue.set(v, new Set())
+                    byValue.get(v).add(style(e))
+                }
+                return { consistent: [...byValue.values()].every(s => s.size === 1), colors: new Set([...byValue.values()].map(s => [...s][0])).size }
+            }
+            return {
+                nodes: harness.ht.data.descendants().length,
+                cells: same([...document.querySelectorAll('[id="cells"] polygon')], p => p.data.data.size, e => e.style.fill),
+                links: same([...document.querySelectorAll('[id="link-arcs"] > *')], n => n.data.files, e => e.style.stroke),
+                folderLabel: harness.ht.data.precalc.label,
+            }
+        })
+        expect(r.nodes).toBe(10000)
+        expect(r.cells.consistent).toBe(true)
+        expect(r.cells.colors).toBeGreaterThan(20)
+        expect(r.links.consistent).toBe(true)
+        expect(r.links.colors).toBeGreaterThan(10)
+        expect(r.folderLabel).toMatch(/^\/\n\d+(\.\d)? GB$/)
+        expectNoErrors(errors)
+    })
+
+    // infovis: values mapped with d3-scales to sizes and colors
+    test('infovis: own values as size and color of nodes, links, cells and label backgrounds', async ({ page }) => {
+        const opt = encodeURIComponent(JSON.stringify({ value: 'value', colorValue: 'depth' }))
+        await openTree(page, `gen=nTree&depth=4&childs=3&labels=1&filter=off&values=1&preset=infovis&presetOpt=${opt}`)
+        await waitForStable(page)
+        const r = await page.evaluate(() => {
+            const nodes = [...document.querySelectorAll('#nodes circle')]
+            const byDepth = {}
+            for (const c of nodes) (byDepth[c.__data__.depth] = byDepth[c.__data__.depth] || new Set()).add(c.style.fill)
+            return {
+                inner: nodes.some(c => c.__data__.children),                              // show: 'all'
+                radii: new Set(nodes.map(c => c.getAttribute('r'))).size,                 // radius from the value
+                colorsPerDepth: Object.values(byDepth).map(s => s.size),                  // color from the depth
+                depthColors: new Set(Object.values(byDepth).map(s => [...s][0])).size,
+                links: new Set([...document.querySelectorAll('[id="link-arcs"] > *')].map(l => l.style.stroke)).size,
+                cells: [...document.querySelectorAll('[id="cells"] polygon')].filter(p => p.style.fill).length,
+                backgrounds: [...document.querySelectorAll('[id="labels"] rect')].filter(r => r.style.fill).length,
+            }
+        })
+        expect(r.inner).toBe(true)
+        expect(r.radii).toBeGreaterThan(10)
+        expect(r.colorsPerDepth.every(n => n === 1)).toBe(true)
+        expect(r.depthColors).toBeGreaterThan(3)
+        expect(r.links).toBeGreaterThan(3)
+        expect(r.cells).toBeGreaterThan(10)
+        expect(r.backgrounds).toBeGreaterThan(3)
+    })
+})
+
+test.describe('node layer option show', () => {
+    const circles = page => page.evaluate(() => [...document.querySelectorAll('#nodes circle')].map(c => c.__data__))
+    test('default "leaves": leaves, root and nodes with hidden children only', async ({ page }) => {
+        await openTree(page, 'gen=nTree&depth=6&childs=2&filter=off')
+        const ds = await page.evaluate(() => [...document.querySelectorAll('#nodes circle')].map(c => !!(c.__data__.children && c.__data__.parent)))
+        expect(ds.length).toBeGreaterThan(10)
+        expect(ds.some(inner => inner)).toBe(false)
+    })
+    test('"all": a disk for every visible node, inner nodes included', async ({ page }) => {
+        const errors = collectErrors(page)
+        await openTree(page, `gen=nTree&depth=6&childs=2&filter=off&layers=${encodeURIComponent('{"nodes":{"show":"all"}}')}`)
+        const r = await page.evaluate(() => ({
+            circles: document.querySelectorAll('#nodes circle').length,
+            visible: harness.ht.unitdisk.cache.unculledNodes.length,
+            inner: [...document.querySelectorAll('#nodes circle')].filter(c => c.__data__.children && c.__data__.parent).length }))
+        expect(r.circles).toBe(r.visible)
+        expect(r.inner).toBeGreaterThan(10)
+        expectNoErrors(errors)
+    })
+    test('a function chooses the nodes', async ({ page }) => {
+        await openTree(page, 'gen=nTree&depth=6&childs=2&filter=off')
+        await page.evaluate(() => { harness.layer('nodes').args.show = n => n.depth === 3; harness.ht.update.data() })
+        await page.waitForTimeout(200)
+        expect(await page.evaluate(() => [...new Set([...document.querySelectorAll('#nodes circle')].map(c => c.__data__.depth))])).toEqual([3])
+    })
+})
+
+// geometry.shrinkAtRim (labels, labels-force, emojis): 'none' constant, 'damped' (default)
+// 1 to 0.5, 'full' like the links; times the layer option scale (bound to the data)
+test.describe('shrinkAtRim and layer scale', () => {
+    const scales = (page, layer) => page.evaluate(layer => [...document.querySelectorAll(`[id="${layer}"] > text, [id="${layer}"] > image`)]
+        .filter(t => t.__data__.forcepoints !== undefined || layer !== 'labels-force').map(t => {
+            const m = /scale\(([^)]+)\)/.exec(t.getAttribute('transform') || '')
+            return { s: m ? +m[1] : 1, k: t.__data__.distScale, damped: t.__data__.dampedDistScale }
+        }), layer)
+    const open = (page, query, geometry, layers) => openTree(page, `gen=nTree&depth=6&childs=2&filter=off&${query}`
+        + (geometry ? `&geometry=${encodeURIComponent(JSON.stringify(geometry))}` : '')
+        + `&layers=${encodeURIComponent(JSON.stringify(layers))}`)
+    for (const [layer, query, factor] of [['labels', 'labels=1', 1], ['emojis', 'icons=1', 2], ['labels-force', 'labels=1', 1]]) {
+        const base = layer === 'labels-force' ? { 'labels-force': { invisible: false } } : {}
+        for (const [mode, expected] of [[undefined, t => t.damped], ['none', () => 1], ['damped', t => t.damped], ['full', t => t.k]]) {
+            test(`${layer}: shrinkAtRim ${mode || 'default (damped)'}`, async ({ page }) => {
+                const errors = collectErrors(page)
+                await open(page, query, mode && { shrinkAtRim: mode }, base)
+                const list = await scales(page, layer)
+                expect(list.length).toBeGreaterThan(5)
+                for (const t of list) expect(t.s).toBeCloseTo(expected(t) * factor, 6)
+                expectNoErrors(errors)
+            })
+        }
+        test(`${layer}: layer option scale multiplies the size`, async ({ page }) => {
+            await open(page, query, { shrinkAtRim: 'full' }, { [layer]: { ...(base[layer] || {}), scale: 1.5 } })
+            const list = await scales(page, layer)
+            expect(list.length).toBeGreaterThan(5)
+            for (const t of list) expect(t.s).toBeCloseTo(t.k * 1.5 * factor, 6)
+        })
+    }
+})
+
+// layer option maxLabels: a limit per label layer (default filter.maxlabels)
+test('label layers: maxLabels per layer', async ({ page }) => {
+    const layers = { labels: { maxLabels: 3 }, 'labels-force': { invisible: false, hideOnDrag: false, maxLabels: 8 } }
+    await openTree(page, `gen=nTree&depth=6&childs=3&labels=1&filter=off&layers=${encodeURIComponent(JSON.stringify(layers))}`)
+    await waitForStable(page)
+    const count = id => page.evaluate(id => document.querySelectorAll(`[id="${id}"] text`).length, id)
+    const labels = await count('labels'), force = await count('labels-force')
+    expect(labels).toBeGreaterThan(0)
+    expect(labels).toBeLessThanOrEqual(3)
+    expect(force).toBeGreaterThan(labels)
+    expect(force).toBeLessThanOrEqual(8)
+})
+
+// default node radius, relative to the node's link: inner nodes half the link width
+// (the disk never sticks out of the link), leaves 1.5 times (disk three times as wide)
+test('nodes: default disks, inner nodes as wide as their link, leaves three times', async ({ page }) => {
+    const layers = { nodes: { show: 'all' } }
+    await openTree(page, `gen=nTree&depth=4&childs=3&filter=off&layers=${encodeURIComponent(JSON.stringify(layers))}`)
+    await waitForStable(page)
+    const r = await page.evaluate(() => {
+        const width = new Map([...document.querySelectorAll('[id="link-arcs"] > *')].map(l => [l.__data__, +l.getAttribute('stroke-width')]))
+        return [...document.querySelectorAll('#nodes circle')].filter(c => c.__data__.parent && width.has(c.__data__)).map(c => {
+            const s = /scale\(([^)]+)\)/.exec(c.getAttribute('transform'))
+            const d = c.__data__
+            return { leaf: !d.children || !d.children.length, ratio: +c.getAttribute('r') * (s ? +s[1] : 1) / width.get(d) }
+        })
+    })
+    const leaves = r.filter(x => x.leaf), inner = r.filter(x => !x.leaf)
+    expect(leaves.length).toBeGreaterThan(20)
+    expect(inner.length).toBeGreaterThan(5)
+    for (const { ratio } of leaves) expect(ratio).toBeCloseTo(1.5, 3)
+    // inner: at most half the link width (lazy nodes are drawn at 80 %)
+    for (const { ratio } of inner) { expect(ratio).toBeLessThanOrEqual(0.5001); expect(ratio).toBeGreaterThan(0.39) }
+})
+
+// layer options hoverLabel / hoverPathLabels: the node under the mouse always gets a
+// label, then the path from it to the root, nearest first; all of them count in
+// maxLabels, the other labels get what is left
+test.describe('label layers: labels for the hovered node and its path', () => {
+    for (const layer of ['labels', 'labels-force']) {
+        for (const option of ['hoverLabel', 'hoverPathLabels']) {
+            test(`${layer}: ${option}`, async ({ page }) => {
+                const errors = collectErrors(page)
+                const opts = { [layer]: { invisible: false, hideOnDrag: false, maxLabels: 3, [option]: true } }
+                if (layer === 'labels-force') opts.labels = { invisible: true }
+                await openTree(page, `gen=nTree&depth=5&childs=3&labels=1&filter=off&layers=${encodeURIComponent(JSON.stringify(opts))}`)
+                await waitForStable(page)
+                const shown = () => page.evaluate(layer => [...document.querySelectorAll(`[id="${layer}"] text`)].map(t => t.__data__.mergeId), layer)
+                const before = await shown()
+                expect(before.length).toBe(3)                   // the limit
+                // hover a node of depth 3
+                const target = await page.evaluate(() => {
+                    const n = harness.ht.unitdisk.cache.unculledNodes.find(n => n.depth === 3)
+                    const m = document.querySelector('.unitDisc').getScreenCTM()
+                    return { id: n.mergeId, path: n.ancestors().map(a => a.mergeId), x: m.a * n.cache.re + m.c * n.cache.im + m.e, y: m.b * n.cache.re + m.d * n.cache.im + m.f }
+                })
+                await page.mouse.move(target.x + 8, target.y + 8)
+                await page.mouse.move(target.x, target.y, { steps: 3 })
+                await page.waitForFunction(id => harness.ht.data.descendants().find(n => n.mergeId === id).hovered, target.id)
+                await expect.poll(async () => (await shown()).includes(target.id)).toBe(true)
+                // still the limit
+                await expect.poll(async () => (await shown()).length).toBe(3)
+                const ids = await shown()
+                if (option === 'hoverPathLabels') {
+                    // the hovered node and its two nearest ancestors (depth 2 and 1), not
+                    // the root: the path takes the limit, nothing is left for the others
+                    expect([...ids].sort()).toEqual(target.path.slice(0, 3).sort())
+                }
+                else {
+                    // the hovered node and two others; the path is not asked for
+                    expect(ids.filter(id => target.path.slice(1, 3).includes(id) && !before.includes(id))).toEqual([])
+                }
+                // the mouse leaves: back to the others
+                await page.mouse.move(2, 2)
+                await expect.poll(async () => [...(await shown())].sort()).toEqual([...before].sort())
+                expectNoErrors(errors)
+            })
+        }
+    }
+})

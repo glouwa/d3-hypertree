@@ -1,0 +1,14 @@
+{
+  "name": "d3-hypertree-test",
+  "private": true,
+  "description": "Browser tests and render benchmarks for d3-hypertree, using generated trees. Serves the repo root statically and loads dist/d3-hypertree.js.",
+  "scripts": {
+    "test": "playwright test",
+    "test:update": "playwright test --update-snapshots",
+    "bench": "node bench-layers.mjs",
+    "bench:interaction": "node bench-interaction.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.1"
+  }
+}

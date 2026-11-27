@@ -81,3 +81,10 @@ typings/
 # dotenv environment variables file
 .env
 
+
+# browser tests
+test/test-results/
+test/playwright-report/
+
+# logs of the performance hooks
+docs/dev/performance/*.log

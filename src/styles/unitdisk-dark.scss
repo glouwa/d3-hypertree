@@ -1,0 +1,138 @@
+@import "unitdisk";
+
+$leafcolor:     #a5d6a7; //"#e3f2fd" "#ffe082
+$hovercolor:    #fff;  //#42a5f5;
+$selectedcolor: orange;
+$rootcolor:     #ffeb3b; //#e53935; //#e53935; //"#e3f2fd" "#ffe082
+$exitcolor:     #ce93d8; //"#e3f2fd" "#ffe082
+$lazycolor:     #e53935; //"#e3f2fd" "#ffe082
+$w:             #fff;
+$nodeStroke:    #90caf9;
+
+.hypertree-background {
+    background-color: #1f1f1f;
+}
+
+
+.unitdisk-nav {
+   
+    svg {
+        //filter:drop-shadow(0px 1px 1.5px rgba(0,0,0,0.22));
+
+        .cell {            
+            fill: rgba(lighten($leafcolor, 0%), .00);
+            stroke: rgba(#000, .15);
+            stroke-width: 0.001;
+        }
+        .arc {
+            stroke: #bbb; //#8d6e63;
+            fill: none;
+        }
+        .arc-focus {
+            stroke: #fff; 
+            fill: none;
+        }
+        .node {
+            fill: #f4f8f4;
+            //fill: rgba(75,75,75,.7); // für fs
+            
+            stroke: #555;
+            //stroke-width: .001;
+            stroke-width: 0;
+        }        
+        .caption {     
+            font-weight:400;
+            fill: #b5b5b5;
+            paint-order:stroke;
+            stroke: rgba(#000, 1);
+            stroke-width: .005;
+            font-weight: 400;
+            //stroke-linecap: butt;
+            //stroke-linejoin: miter;
+        }
+
+        .caption-background {
+            fill: rgba(#111111, .4);
+            //stroke: rgba(#fff, 1);
+            //stroke-width: .0002;
+        }
+
+        // hovered label: no transparency, a border
+        .caption-hover {
+            fill: #111111;
+            stroke: #b5b5b5;
+        }
+        // the disk under an emoji (layer emoji-backgrounds): transparent like the label
+        // backgrounds, with the border of the hovered label's box
+        .emoji-background {
+            fill: rgba(#111111, .4);
+            stroke: #b5b5b5;
+        }
+        .caption.caption-hovered {
+            fill: #fff;
+        }
+
+        .label-link {
+            stroke: #000;            
+            stroke-width: .001;
+            //stroke-dasharray: .02, .015;
+            stroke-dasharray: .018, .012;
+        }
+
+        //.cell.leaf      { stroke: rgba($leafcolor, .05);               fill: rgba(lighten($leafcolor, 0%), .00);    }
+        
+        .root           { stroke: darken($rootcolor, 15%);             fill: lighten($rootcolor, 5%);               }
+        .root.cell      { stroke: rgba(darken($rootcolor, 0%), .9);    fill: rgba(lighten($rootcolor, 0%), .05);    }
+        .root.node      { stroke: orange;                                                                         }
+
+        .lazy           { stroke: darken($lazycolor, 15%);             fill: lighten($lazycolor, 5%);               }
+        .lazy.cell      {
+            stroke: rgba(0, 0, 0, 0.15);
+            stroke-width:.0013;  
+            //fill: rgba(255, 204, 188, 0.03);    
+            fill: none;
+        }
+        .lazy.node      { stroke: #c5c5c5;                    stroke-width:0     /*cooler effekt, cringel*/       }
+
+        .exit           { stroke: darken($exitcolor, 15%);             fill: lighten($exitcolor, 5%);               }
+        .exit.cell      { stroke: rgba(darken($exitcolor, 95%), .9);   fill: rgba(lighten($exitcolor, 0%), .05);    }
+        .exit.node      { stroke: rgba(darken($exitcolor, 50%), .5);                                                }
+
+        //.hovered        { stroke: $hovercolor;                         fill: lighten($hovercolor, 25%);             }
+        .hovered.arc      { stroke: rgba($hovercolor, 1);                                                          }
+        .hovered-path.arc { stroke: rgba($hovercolor, .8);                                                          }
+        .hovered.cell     { stroke: rgba($hovercolor, .35);              fill: rgba($hovercolor, .15);                }
+        .hovered.node     { stroke: darken($hovercolor, 10%);                                                         }
+        // the disk on the highlighted node (layer highlight-marker, off by default)
+        .highlight-marker { fill: rgba($hovercolor, .55); stroke: rgba($hovercolor, .9); stroke-width: 1px; vector-effect: non-scaling-stroke; pointer-events: none; }
+
+        //.selected       { stroke: $selectedcolor;                      fill: lighten($selectedcolor, 25%);          }
+        .selected.arc      { stroke: rgba($selectedcolor, 1);                                                          }
+        .selected-path.arc { stroke: rgba($selectedcolor, .2);           }
+        //.selected-path-nav.arc { stroke: rgba($selectedcolor, 1);                                                       }
+        .selected.cell     { stroke: rgba($selectedcolor, .2);           fill: rgba(lighten($selectedcolor, 0%), .1); }
+        .selected.node     { stroke: darken($selectedcolor, 5%);                                                       }
+        
+        .center-node {
+            //fill: rgba(#fff, .15);
+
+            fill: #bbb;
+            stroke: #fff;
+            stroke-width: .005;
+            opacity: .125;            
+        }        
+        .focus-circle {        
+            fill:none;
+            stroke: darken($nodeStroke, 25%);
+            stroke-width: .0008;            
+        }
+        .zerozero-circle {        
+            fill:none;
+            stroke: #000;
+            stroke-width: .1;
+        }
+        .ripple-circle {
+            fill: #fff;
+        }
+    }
+}
