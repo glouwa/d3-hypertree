@@ -171,6 +171,40 @@ test('hover: highlights the path from the root to the hovered node', async ({ pa
     expectNoErrors(errors)
 })
 
+// The mouse's back and forward buttons (3, 4) belong to the browser: the tree neither
+// cancels them (that kept the browser from going back) nor drags with them
+test('the back and forward mouse buttons are left to the browser', async ({ page }) => {
+    const errors = collectErrors(page)
+    await openTree(page, 'gen=nTree&depth=6&childs=2')
+    const r = await page.evaluate(async () => {
+        const target = document.querySelector('circle.mouse-circle')         // the interaction layer's capture circle
+        const box = document.querySelector('.unitDisc').getBoundingClientRect()
+        const at = { clientX: box.x + box.width / 2, clientY: box.y + box.height / 2, bubbles: true, cancelable: true }
+        const P0 = { ...harness.ht.args.geometry.transformation.state.P }
+        const out = {}
+        for (const button of [3, 4]) {
+            const down = new MouseEvent('mousedown', { ...at, button, buttons: button === 3 ? 8 : 16 })
+            target.dispatchEvent(down)
+            const move = new MouseEvent('mousemove', { ...at, clientX: at.clientX + 80, button, buttons: button === 3 ? 8 : 16 })
+            target.dispatchEvent(move)
+            const up = new MouseEvent('mouseup', { ...at, clientX: at.clientX + 80, button, buttons: 0 })
+            target.dispatchEvent(up)
+            out[button] = { down: down.defaultPrevented, up: up.defaultPrevented }
+        }
+        await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))
+        const P1 = harness.ht.args.geometry.transformation.state.P
+        // the left button still drags (and is cancelled)
+        const left = new MouseEvent('mousedown', { ...at, button: 0, buttons: 1 })
+        target.dispatchEvent(left)
+        target.dispatchEvent(new MouseEvent('mouseup', { ...at, button: 0, buttons: 0 }))
+        return { out, moved: Math.hypot(P1.re - P0.re, P1.im - P0.im), leftPrevented: left.defaultPrevented }
+    })
+    expect(r.out).toEqual({ 3: { down: false, up: false }, 4: { down: false, up: false } })
+    expect(r.moved).toBeLessThan(1e-12)
+    expect(r.leftPrevented).toBe(true)
+    expectNoErrors(errors)
+})
+
 test('layers with hideOnDrag are hidden while dragging and come back afterwards', async ({ page }) => {
     const errors = collectErrors(page)
     await openTree(page, 'gen=nTree&depth=5&childs=4&labels=1&icons=1')

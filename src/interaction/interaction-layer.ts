@@ -86,7 +86,12 @@ export class InteractionLayer2 implements ILayer
 
     // just to keep the list above clear
 
+    // the mouse's back and forward buttons (3, 4) belong to the browser: untouched (their
+    // preventDefault on mouseup kept the browser from going back)
+    private static browserButton = (e:MouseEvent)=> e.button === 3 || e.button === 4
+
     private fireMouseDown(e:MouseEvent) {
+        if (InteractionLayer2.browserButton(e)) return
         this.mousedown = true
         this.fireMouseEvent(e, 'onPointerStart')
     }
@@ -134,6 +139,7 @@ export class InteractionLayer2 implements ILayer
     }
 
     private fireMouseUp(e:MouseEvent) {
+        if (InteractionLayer2.browserButton(e)) return
         this.mousedown = false
         this.fireMouseEvent(e, 'onPointerEnd')
     }

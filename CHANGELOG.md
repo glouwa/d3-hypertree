@@ -362,6 +362,10 @@ are listed first.
 
 ### Fixed
 
+- **The mouse's back and forward buttons work over the tree** (interaction/interaction-layer.ts).
+  The tree cancelled every mouse button's mousedown and mouseup (`preventDefault`),
+  so the browser did not go back when the back button was released over the tree.
+  Buttons 3 and 4 are now left to the browser; the others drag as before.
 - **Links and nodes in the Schwarz–Christoffel rectangle as thin as in the disk**
   (projection/schwarz-christoffel.ts). The sizes were normalized to 1 at the center in
   view units, but a view unit of the rectangle is about twice the disk's radius in
